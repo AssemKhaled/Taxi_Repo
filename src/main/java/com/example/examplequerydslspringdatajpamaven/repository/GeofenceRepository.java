@@ -13,26 +13,24 @@ import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 
 public interface GeofenceRepository extends JpaRepository<Geofence, Long>, QueryDslPredicateExecutor<Geofence>{
 
-	@Query(value = "select * from tc_geofences where tc_geofences.id=:geofenceId and tc_geofences.delete_date IS NULL", nativeQuery = true)
-	public Geofence getGeofenceById(@Param("geofenceId") int geofenceId);
 	
 	@Transactional
     @Modifying
 	@Query(value = "Update tc_geofences geofence Set geofence.delete_date=:date where geofence.id=:geofenceId", nativeQuery = true)
-	public void deleteGeofence(@Param("geofenceId") int geofenceId,@Param("date") String currentDate);
+	public void deleteGeofence(@Param("geofenceId") Long geofenceId,@Param("date") String currentDate);
 	
 	@Transactional
     @Modifying
 	@Query(value = "Delete from tc_user_geofence where tc_user_geofence.geofenceid=:geofenceId", nativeQuery = true)
-	public void deleteGeofenceId(@Param("geofenceId") int geofenceId);
+	public void deleteGeofenceId(@Param("geofenceId") Long geofenceId);
 	
 	@Query(value = "select * from tc_geofences INNER JOIN tc_user_geofence ON tc_user_geofence.geofenceid = tc_geofences.id"
 			+ " where tc_geofences.name=:name and tc_user_geofence.userid=:userId and tc_geofences.delete_date IS NULL", nativeQuery = true)
-	public List<Geofence> checkDublicateGeofenceInAdd(@Param("userId") int id,@Param("name") String name);
+	public List<Geofence> checkDublicateGeofenceInAdd(@Param("userId") Long id,@Param("name") String name);
 	
 	@Query(value = "select * from tc_geofences INNER JOIN tc_user_geofence ON tc_user_geofence.geofenceid = tc_geofences.id"
 			+ " where tc_geofences.name=:name and tc_geofences.id !=:geofenceId and tc_user_geofence.userid=:userId and tc_geofences.delete_date IS NULL", nativeQuery = true)
-	public List<Geofence> checkDublicateGeofenceInEdit(@Param("geofenceId") int geofenceId,@Param("userId") int userId,@Param("name") String name);
+	public List<Geofence> checkDublicateGeofenceInEdit(@Param("geofenceId") Long geofenceId,@Param("userId") Long userId,@Param("name") String name);
 	
 	
 }

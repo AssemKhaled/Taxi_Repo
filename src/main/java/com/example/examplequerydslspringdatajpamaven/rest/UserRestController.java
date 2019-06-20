@@ -29,11 +29,11 @@ public class UserRestController {
 		
 	}
 	@RequestMapping(value = "/get_all_users/{userId}", method = RequestMethod.GET,consumes = MediaType.APPLICATION_JSON_VALUE,produces=MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody ResponseEntity<?> getDrivers(@PathVariable (value = "userId") String id) {
+	public @ResponseBody ResponseEntity<?> getDrivers(@PathVariable (value = "userId") Long id) {
 		
-		if(Integer.parseInt(id) != 0) {
+		if(id != 0) {
 			
-			return ResponseEntity.ok(userServiceImpl.getAllUsers(Integer.parseInt(id)));
+			return ResponseEntity.ok(userServiceImpl.getAllUsers(id));
 
 		}
 		else {
