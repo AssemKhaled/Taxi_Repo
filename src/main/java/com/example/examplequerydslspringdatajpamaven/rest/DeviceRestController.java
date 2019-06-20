@@ -15,8 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
+import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.service.DeviceServiceImpl;
+import com.example.service.DriverServiceImpl;
 import com.example.service.UserServiceImpl;
 
 @RestController
@@ -28,6 +30,9 @@ public class DeviceRestController {
 	
 	@Autowired
 	private UserServiceImpl userService;
+	
+	@Autowired
+	private DriverServiceImpl driverService;
 	//selection of all devices from user controller not device controller
 	@GetMapping(path = "/getAllUserDevices")
 	public List<Device> getAllUserDevices() {
@@ -132,7 +137,11 @@ public class DeviceRestController {
 	
 	@PostMapping(path = "/assignDeviceToDriver/{driverId}")
 	public ResponseEntity<Long> assignDeviceToDriver(@PathVariable (value = "driverId") Long driverId,@RequestBody(required = false) Device device) {
-//	      Device device = deviceService.findById(deviceId);
+		Set<Driver> driver=new HashSet<>() ;
+		driver.add(driverService.getDriverById(driverId));
+//		Set<User> user= userService.findById(userId);
+        device.setDriver(driver);
+//		Device device = deviceService.findById(deviceId);
 	            
 		/*	if(device == null) {
 				//throw bad request
