@@ -32,7 +32,7 @@ public class User {
 	@Id
 	@GeneratedValue
 	@Column(name = "id")
-	private Long id;
+	private int id;
 
 	@Column(name = "name")
 	private String name;
@@ -115,11 +115,11 @@ public class User {
 		this.name = name;
 	}
 
-	public Long getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
@@ -251,4 +251,35 @@ public class User {
 	public void setType(UsersTypes type) {
 		this.type = type;
 	}*/
+
+	@ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            mappedBy = "userDriver")
+    private Set<Driver> drivers = new HashSet<>();
+
+
+	public Set<Driver> getDrivers() {
+		return drivers;
+	}
+	public void setDrivers(Set<Driver> drivers) {
+		this.drivers = drivers;
+	}
+
+	
+	@ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            mappedBy = "userGeofence")
+    private Set<Geofence> geofences = new HashSet<>();
+
+
+	public Set<Geofence> getGeofences() {
+		return geofences;
+	}
+	public void setGeofences(Set<Geofence> geofences) {
+		this.geofences = geofences;
+	}
+	
+	
+
+	
+
+	
 }

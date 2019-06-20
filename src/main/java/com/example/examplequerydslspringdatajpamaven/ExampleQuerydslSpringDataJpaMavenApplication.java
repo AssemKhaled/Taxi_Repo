@@ -5,9 +5,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-
 import com.example.service.DeviceServiceImpl;
+import com.example.service.DriverServiceImpl;
+import com.example.service.GeofenceServiceImpl;
 import com.example.service.UserServiceImpl;
 
 @SpringBootApplication
@@ -30,6 +30,15 @@ public class ExampleQuerydslSpringDataJpaMavenApplication  {
 		return new DeviceServiceImpl();
 	}
 	
+	@Bean
+	public DriverServiceImpl testDriver() {
+		return new DriverServiceImpl();
+	}
+	
+	@Bean
+	public GeofenceServiceImpl testGeofence() {
+		return new GeofenceServiceImpl();
+	}
 	
 //	@Bean(name = "mainDataSource")
 //	@Primary
