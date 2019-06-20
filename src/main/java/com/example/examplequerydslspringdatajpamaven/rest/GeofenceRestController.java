@@ -33,11 +33,11 @@ public class GeofenceRestController {
 	}
 	
 	@RequestMapping(value = "/get_all_geofences/{userId}", method = RequestMethod.GET,consumes = MediaType.APPLICATION_JSON_VALUE,produces=MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody ResponseEntity<?> getGeofences(@PathVariable (value = "userId") String id) {
+	public @ResponseBody ResponseEntity<?> getGeofences(@PathVariable (value = "userId") Long id) {
 		
-		if(Integer.parseInt(id) != 0) {
+		if(id != 0) {
 			
-			return ResponseEntity.ok(geofenceServiceImpl.getAllGeofences(Integer.parseInt(id)));
+			return ResponseEntity.ok(geofenceServiceImpl.getAllGeofences(id));
 
 		}
 		else{
@@ -50,11 +50,26 @@ public class GeofenceRestController {
 	}
 	
 	@RequestMapping(value = "/get_geofence_by_id/{geofenceId}", method = RequestMethod.GET,consumes = MediaType.APPLICATION_JSON_VALUE,produces=MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody ResponseEntity<?> getGeofenceById(@PathVariable (value = "geofenceId") String geofenceId) {
+	public @ResponseBody ResponseEntity<?> getGeofenceById(@PathVariable (value = "geofenceId") Long geofenceId) {
 		
-		if(Integer.parseInt(geofenceId) != 0) {
+		if(geofenceId != 0) {
 			
-			return ResponseEntity.ok(geofenceServiceImpl.getGeofenceById(Integer.parseInt(geofenceId)));
+			
+
+			Geofence geofence=geofenceServiceImpl.getGeofenceById(geofenceId);
+			if(geofence != null) {
+				if(geofence.getDelete_date() == null) {
+					return ResponseEntity.ok(geofence);
+				}
+				else {
+					return ResponseEntity.ok("no data for this driver may be deleted");
+
+				}
+			}
+			else {
+				return ResponseEntity.ok("no data for this driver");
+			}
+			
 						
 		}
 		else {
@@ -66,13 +81,13 @@ public class GeofenceRestController {
 	}
 	
 	@RequestMapping(value = "/delete_geofence/{geofenceId}", method = RequestMethod.GET,consumes = MediaType.APPLICATION_JSON_VALUE,produces=MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody ResponseEntity<?> deleteDriver(@PathVariable (value = "geofenceId") String geofenceId) {
+	public @ResponseBody ResponseEntity<?> deleteDriver(@PathVariable (value = "geofenceId") Long geofenceId) {
 		
-		if(Integer.parseInt(geofenceId) != 0) {
-			Geofence res= geofenceServiceImpl.getGeofenceById(Integer.parseInt(geofenceId));
+		if(geofenceId != 0) {
+			Geofence res= geofenceServiceImpl.getGeofenceById(geofenceId);
 			if(res != null) {
 				
-				geofenceServiceImpl.deleteGeofence(Integer.parseInt(geofenceId));
+				geofenceServiceImpl.deleteGeofence(geofenceId);
 				return ResponseEntity.ok("Deleted successfully.");
 				
 			}
@@ -92,8 +107,8 @@ public class GeofenceRestController {
 	}
 	
 	@RequestMapping(value = "/add_geofence/{userId}", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE,produces=MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody ResponseEntity<?> addDriver(@RequestBody Map<String, Object> geofence,@PathVariable (value = "userId") String id) {
-		if(Integer.parseInt(id) != 0) {
+	public @ResponseBody ResponseEntity<?> addDriver(@RequestBody Map<String, Object> geofence,@PathVariable (value = "userId") Long id) {
+		if(id != 0) {
 			
             Geofence queryData=new Geofence();
             
@@ -121,7 +136,7 @@ public class GeofenceRestController {
 				queryData.setType("");
 			}
 			
-			List<Geofence> res=geofenceServiceImpl.checkDublicateGeofenceInAdd(Integer.parseInt(id),queryData.getName());
+			List<Geofence> res=geofenceServiceImpl.checkDublicateGeofenceInAdd(id,queryData.getName());
 			if(!res.isEmpty()) {
 				String message="";
 				for(int i=0;i<res.size();i++) {
@@ -134,7 +149,7 @@ public class GeofenceRestController {
 
 			}
 			else {
-				String resut=geofenceServiceImpl.addGeofence(queryData,Integer.parseInt(id));
+				String resut=geofenceServiceImpl.addGeofence(queryData,id);
 				return ResponseEntity.ok(resut);
 
 			}
@@ -151,9 +166,9 @@ public class GeofenceRestController {
 	}
 	
 	@RequestMapping(value = "/edit_geofence/{userId}", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE,produces=MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody ResponseEntity<?> editGeofence(@RequestBody Map<String, Object> geofence,@PathVariable (value = "userId") String id) {
+	public @ResponseBody ResponseEntity<?> editGeofence(@RequestBody Map<String, Object> geofence,@PathVariable (value = "userId") Long id) {
 		
-		if(Integer.parseInt(id) != 0) {
+		if(id != 0) {
 			
 		    Geofence queryData=new Geofence();
         
@@ -180,14 +195,14 @@ public class GeofenceRestController {
 				queryData.setType("");
 			}
             if(geofence.get("geofenceId") != null) {
-    			Geofence checkAvaliable=geofenceServiceImpl.getGeofenceById(Integer.parseInt(geofence.get("geofenceId").toString()));
+    			Geofence checkAvaliable=geofenceServiceImpl.getGeofenceById(Long.parseLong(geofence.get("geofenceId").toString()));
     			if(checkAvaliable == null) {
     				
     				return ResponseEntity.ok("no data for this geofenceId");
 
     			}
     			else {
-    				List<Geofence> checkDublicateInEdit=geofenceServiceImpl.checkDublicateGeofenceInEdit(Integer.parseInt(geofence.get("geofenceId").toString()),Integer.parseInt(id),queryData.getName());
+    				List<Geofence> checkDublicateInEdit=geofenceServiceImpl.checkDublicateGeofenceInEdit(Long.parseLong(geofence.get("geofenceId").toString()),id,queryData.getName());
     				if(!checkDublicateInEdit.isEmpty()) {
     					String message="";
     					for(int i=0;i<checkDublicateInEdit.size();i++) {
@@ -202,7 +217,7 @@ public class GeofenceRestController {
     					
     				}
     				else {
-    					queryData.setId(Integer.parseInt(geofence.get("geofenceId").toString()));
+    					queryData.setId(Long.parseLong(geofence.get("geofenceId").toString()));
     					geofenceServiceImpl.editGeofence(queryData);
     					return ResponseEntity.ok("Updated successfully.");
 

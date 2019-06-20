@@ -10,7 +10,7 @@ public interface IUserService {
 	public Set<Device> UserDevice();
 	public  User findById(Long userId);
 	
-	public Set<User> getAllUsers(int id);
+	public Set<User> getAllUsers(Long id);
 
 
 }

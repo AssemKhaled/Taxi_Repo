@@ -20,7 +20,7 @@ public class GeofenceServiceImpl implements GeofenceService {
 	UserRepository userRepository;
 
 	@Override
-	public Set<Geofence> getAllGeofences(int id) {
+	public Set<Geofence> getAllGeofences(Long id) {
 
 		User user=userRepository.getUserData(id);
 		Set<Geofence> geofences = user.getGeofences();
@@ -29,31 +29,32 @@ public class GeofenceServiceImpl implements GeofenceService {
 	}
 
 	@Override
-	public Geofence getGeofenceById(int geofenceId) {
+	public Geofence getGeofenceById(Long geofenceId) {
 		
-		return geofenceRepository.getGeofenceById(geofenceId);
+		return geofenceRepository.findOne(geofenceId);
 
 	}
 
 	@Override
-	public void deleteGeofence(int geofenceId) {
+	public void deleteGeofence(Long geofenceId) {
 
 		Date date = new Date();
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd"); 
 		String currentDate=formatter.format(date);
 		geofenceRepository.deleteGeofence(geofenceId,currentDate);
 		geofenceRepository.deleteGeofenceId(geofenceId);
+		
 	}
 
 	@Override
-	public List<Geofence> checkDublicateGeofenceInAdd(int id, String name) {
+	public List<Geofence> checkDublicateGeofenceInAdd(Long id, String name) {
 		
 		return geofenceRepository.checkDublicateGeofenceInAdd(id, name);
 		
 	}
 	
 	@Override
-	public String addGeofence(Geofence geofence,int id) {
+	public String addGeofence(Geofence geofence,Long id) {
 		User userData = userRepository.getUserData(id);
 		if(userData != null) {
 			Set<User> usergeofence = new HashSet<>();
@@ -70,7 +71,7 @@ public class GeofenceServiceImpl implements GeofenceService {
 	}
 	
 	@Override
-	public List<Geofence> checkDublicateGeofenceInEdit(int geofenceId, int userId, String name) {
+	public List<Geofence> checkDublicateGeofenceInEdit(Long geofenceId, Long userId, String name) {
 		
 		return geofenceRepository.checkDublicateGeofenceInEdit(geofenceId,userId,name);
 		
