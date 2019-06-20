@@ -66,6 +66,13 @@ public class Driver {
 	@Column(name = "photo")
 	private String photo;
 	
+	@ManyToMany(
+            fetch = FetchType.LAZY,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            mappedBy = "driver"
+    )
+//    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Set<Device> device = new HashSet<>();
 	
 	
 	public Driver() {
@@ -196,6 +203,14 @@ public class Driver {
 
 	public void setUserDriver(Set<User> userDriver) {
 		this.userDriver = userDriver;
+	}
+
+	public Set<Device> getDevice() {
+		return device;
+	}
+
+	public void setDevice(Set<Device> device) {
+		this.device = device;
 	}
 	
 	

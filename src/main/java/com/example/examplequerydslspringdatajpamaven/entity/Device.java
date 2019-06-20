@@ -163,7 +163,20 @@ public class Device {
             inverseJoinColumns = { @JoinColumn(name = "userid") }
     )
 //    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Set<User> user = new HashSet<>();
+	private Set<User> user = new HashSet<>();
+	@JsonIgnore 
+	@ManyToMany(
+            fetch = FetchType.LAZY,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+    )
+    @JoinTable(
+            name = "tc_device_driver",
+            joinColumns = { @JoinColumn(name = "deviceid") },
+            inverseJoinColumns = { @JoinColumn(name = "driverid") }
+    )
+//    @OnDelete(action = OnDeleteAction.CASCADE)
+	private Set<Driver> driver = new HashSet<>();
+   
    
 
 	public Device() {
@@ -457,6 +470,14 @@ public class Device {
 
 	public void setUser(Set<User> user) {
 		this.user = user;
+	}
+
+	public Set<Driver> getDriver() {
+		return driver;
+	}
+
+	public void setDriver(Set<Driver> driver) {
+		this.driver = driver;
 	}
 	
 }
