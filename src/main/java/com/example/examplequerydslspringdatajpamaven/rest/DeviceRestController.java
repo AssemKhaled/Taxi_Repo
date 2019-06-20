@@ -51,12 +51,103 @@ public class DeviceRestController {
 		{*/
 			 Device newDevice= deviceService.createDevice(device);
 			 return new ResponseEntity<>(newDevice, HttpStatus.OK);
-		//}
-			
-		
-		
-		
-		
+		//}	 
+				
 	}
+	@PostMapping(path ="/editDevice/{userId}")
+	public ResponseEntity<Device> editDevice(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) Device device) {
+		Set<User> user=new HashSet<>() ;
+		user.add(userService.findById(userId));
+//		Set<User> user= userService.findById(userId);
+        device.setUser(user);
+            
+	/*	if(device == null) {
+			//throw bad request
+//			return "bad request";
+			return new ResponseEntity<>(device, HttpStatus.BAD_REQUEST);
+		}
+		else
+		{*/
+			 Device newDevice= deviceService.createDevice(device);
+			 return new ResponseEntity<>(newDevice, HttpStatus.OK);
+		//}	 
+				
+	}
+	@PostMapping(path ="/deleteDevice/{userId}")
+	public ResponseEntity<String> deleteDevice(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) Device device) {
+	//	Set<User> user=new HashSet<>() ;
+		//user.add(userService.findById(userId));
+//		Set<User> user= userService.findById(userId);
+      //  device.setUser(user);
+            
+	/*	if(device == null) {
+			//throw bad request
+//			return "bad request";
+			return new ResponseEntity<>(device, HttpStatus.BAD_REQUEST);
+		}
+		else
+		{*/
+			String deleted= deviceService.deleteDevice(device);
+			 return new ResponseEntity<>(deleted, HttpStatus.OK);
+		//}	 
+				
+	}
+	@PostMapping(path ="/checkDuplication/{userId}")
+	public ResponseEntity<List<Integer>> checkDulication(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) Device device) {
+		Set<User> user=new HashSet<>() ;
+		user.add(userService.findById(userId));
+//		Set<User> user= userService.findById(userId);
+        device.setUser(user);
+            
+	/*	if(device == null) {
+			//throw bad request
+//			return "bad request";
+			return new ResponseEntity<>(device, HttpStatus.BAD_REQUEST);
+		}
+		else
+		{*/
+			 //Device newDevice= deviceService.createDevice(device);
+        List<Integer> newDevice =deviceService.checkDeviceDuplication(device);
+			 return new ResponseEntity<>(newDevice, HttpStatus.OK);
+		//}	 
+				
+	}
+	@GetMapping(path ="/getDevicebyId/{deviceId}")
+	public ResponseEntity<Device> getDevicebyId(@PathVariable (value = "deviceId") Long deviceId) {
+      Device device = deviceService.findById(deviceId);
+            
+	/*	if(device == null) {
+			//throw bad request
+//			return "bad request";
+			return new ResponseEntity<>(device, HttpStatus.BAD_REQUEST);
+		}
+		else
+		{*/
+			 //Device newDevice= deviceService.createDevice(device);
+      
+			 return new ResponseEntity<>(device, HttpStatus.OK);
+		//}	 
+				
+	}
+	
+	@PostMapping(path = "/assignDriverToDevice")
+	public ResponseEntity<Long> assignDriverToDevice(@RequestBody(required = false) Long deviceId,@RequestBody(required = false) Long driverId) {
+//	      Device device = deviceService.findById(deviceId);
+	            
+		/*	if(device == null) {
+				//throw bad request
+//				return "bad request";
+				return new ResponseEntity<>(device, HttpStatus.BAD_REQUEST);
+			}
+			else
+			{*/
+				 //Device newDevice= deviceService.createDevice(device);
+	      
+				 return new ResponseEntity<>(deviceId, HttpStatus.OK);
+			//}	 
+					
+		}
+	
+	
 
 }
