@@ -29,7 +29,7 @@ public class Device {
 	@Id
 	@GeneratedValue
 	@Column(name = "id")
-	private int id;
+	private Long id;
 
 	@Column(name = "name") 
 	private String name;
@@ -59,7 +59,7 @@ public class Device {
 	private String model;
 	
 	@Column(name = "plate_num")
-	private String plateNum;
+	private String plate_num;
 	
 	@Column(name = "right_letter")
 	private String right_letter;
@@ -102,7 +102,7 @@ public class Device {
 	private String rejectReason;
 	
 	@Column(name = "sequence_number")
-	private String sequenceNumber;
+	private String sequence_number;
 	
 	@Column(name = "is_valid")
 	private Integer is_valid;
@@ -170,11 +170,11 @@ public class Device {
 		
 	}
    
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 	
@@ -243,11 +243,11 @@ public class Device {
 	}
 
 	public String getPlateNum() {
-		return plateNum;
+		return plate_num;
 	}
 
 	public void setPlateNum(String plateNum) {
-		this.plateNum = plateNum;
+		this.plate_num = plateNum;
 	}
 
 	public String getRightLetter() {
@@ -340,11 +340,11 @@ public class Device {
 	}
 
 	public String getSequenceNumber() {
-		return sequenceNumber;
+		return sequence_number;
 	}
 
 	public void setSequenceNumber(String sequenceNumber) {
-		this.sequenceNumber = sequenceNumber;
+		this.sequence_number = sequenceNumber;
 	}
 
 	public Integer getIsValid() {
