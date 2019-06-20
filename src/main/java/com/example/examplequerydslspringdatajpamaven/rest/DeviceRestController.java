@@ -130,8 +130,8 @@ public class DeviceRestController {
 				
 	}
 	
-	@PostMapping(path = "/assignDriverToDevice")
-	public ResponseEntity<Long> assignDriverToDevice(@RequestBody(required = false) Long deviceId,@RequestBody(required = false) Long driverId) {
+	@PostMapping(path = "/assignDeviceToDriver/{driverId}")
+	public ResponseEntity<Long> assignDeviceToDriver(@PathVariable (value = "driverId") Long driverId,@RequestBody(required = false) Device device) {
 //	      Device device = deviceService.findById(deviceId);
 	            
 		/*	if(device == null) {
@@ -143,7 +143,7 @@ public class DeviceRestController {
 			{*/
 				 //Device newDevice= deviceService.createDevice(device);
 	      
-				 return new ResponseEntity<>(deviceId, HttpStatus.OK);
+				 return new ResponseEntity<>(driverId, HttpStatus.OK);
 			//}	 
 					
 		}
