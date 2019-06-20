@@ -18,7 +18,7 @@ public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredi
 	public User getAll();
 	
 	@Query(value = "select * from tc_users u where u.id =:userId and u.delete_date Is null",nativeQuery = true)
-	public User getUserData(@Param("userId") int userId);
+	public User getUserData(@Param("userId") Long userId);
 	
 
 }

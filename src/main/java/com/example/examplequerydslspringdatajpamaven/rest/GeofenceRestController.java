@@ -1,5 +1,6 @@
 package com.example.examplequerydslspringdatajpamaven.rest;
 
+import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -10,10 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
-import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
 import com.example.service.GeofenceServiceImpl;
 
 @RestController
@@ -97,8 +95,51 @@ public class GeofenceRestController {
 	public @ResponseBody ResponseEntity<?> addDriver(@RequestBody Map<String, Object> geofence,@PathVariable (value = "userId") String id) {
 		if(Integer.parseInt(id) != 0) {
 			
+            Geofence queryData=new Geofence();
+            
+			if(geofence.get("name")!=null) {
+				queryData.setName(geofence.get("name").toString());
+				
+			}
+			else {
+				queryData.setName("");
+			}
 			
-			return null;
+			if(geofence.get("area")!=null) {
+				queryData.setArea(geofence.get("area").toString());
+				
+			}
+			else {
+				queryData.setArea("");
+			}
+			
+			if(geofence.get("type")!=null) {
+				queryData.setType(geofence.get("type").toString());
+				
+			}
+			else {
+				queryData.setType("");
+			}
+			
+			List<Geofence> res=geofenceServiceImpl.checkDublicateGeofenceInAdd(Integer.parseInt(id),queryData.getName());
+			if(!res.isEmpty()) {
+				String message="";
+				for(int i=0;i<res.size();i++) {
+					if(res.get(i).getName().equalsIgnoreCase(queryData.getName())) {
+						message="name was add before";
+													
+					}
+				}
+				return ResponseEntity.ok(message);
+
+			}
+			else {
+				String resut=geofenceServiceImpl.addGeofence(queryData,Integer.parseInt(id));
+				return ResponseEntity.ok(resut);
+
+			}
+			
+			
 		}
 		else {
 			
@@ -107,6 +148,82 @@ public class GeofenceRestController {
 			
 		}
 		
+	}
+	
+	@RequestMapping(value = "/edit_geofence/{userId}", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE,produces=MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody ResponseEntity<?> editGeofence(@RequestBody Map<String, Object> geofence,@PathVariable (value = "userId") String id) {
+		
+		if(Integer.parseInt(id) != 0) {
+			
+		    Geofence queryData=new Geofence();
+        
+			if(geofence.get("name")!=null) {
+				queryData.setName(geofence.get("name").toString());
+				
+			}
+			else {
+				queryData.setName("");
+			}
+			
+			if(geofence.get("area")!=null) {
+				queryData.setArea(geofence.get("area").toString());
+				
+			}
+			else {
+				queryData.setArea("");
+			}
+			
+			if(geofence.get("type")!=null) {
+				queryData.setType(geofence.get("type").toString());
+			}
+			else {
+				queryData.setType("");
+			}
+            if(geofence.get("geofenceId") != null) {
+    			Geofence checkAvaliable=geofenceServiceImpl.getGeofenceById(Integer.parseInt(geofence.get("geofenceId").toString()));
+    			if(checkAvaliable == null) {
+    				
+    				return ResponseEntity.ok("no data for this geofenceId");
+
+    			}
+    			else {
+    				List<Geofence> checkDublicateInEdit=geofenceServiceImpl.checkDublicateGeofenceInEdit(Integer.parseInt(geofence.get("geofenceId").toString()),Integer.parseInt(id),queryData.getName());
+    				if(!checkDublicateInEdit.isEmpty()) {
+    					String message="";
+    					for(int i=0;i<checkDublicateInEdit.size();i++) {
+    						if(checkDublicateInEdit.get(i).getName().equalsIgnoreCase(queryData.getName())) {
+    							message="name was add before";
+    														
+    						}
+    						
+    						
+    					}
+    					return ResponseEntity.ok(message);
+    					
+    				}
+    				else {
+    					queryData.setId(Integer.parseInt(geofence.get("geofenceId").toString()));
+    					geofenceServiceImpl.editGeofence(queryData);
+    					return ResponseEntity.ok("Updated successfully.");
+
+    				}
+
+    				
+    			}
+
+			}
+            else {
+				return ResponseEntity.ok("no geofence to edit.");
+
+            }
+			
+		}
+		else {
+			
+			return ResponseEntity.ok("no user selected to edit his own driver");
+
+			
+		}
 	}	
 
 }
