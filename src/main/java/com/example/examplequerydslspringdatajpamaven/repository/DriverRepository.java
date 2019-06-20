@@ -13,26 +13,23 @@ import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 
 public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslPredicateExecutor<Driver> {
 
-	@Query(value = "select * from tc_drivers where tc_drivers.id=:driverId and tc_drivers.delete_date IS NULL", nativeQuery = true)
-	public Driver getDriverById(@Param("driverId") int driverId);
-	
 	@Transactional
     @Modifying
 	@Query(value = "Update tc_drivers driver Set driver.delete_date=:date where driver.id=:driverId", nativeQuery = true)
-	public void deleteDriver(@Param("driverId") int driverId,@Param("date") String currentDate);
+	public void deleteDriver(@Param("driverId") Long driverId,@Param("date") String currentDate);
 	
 	@Transactional
     @Modifying
 	@Query(value = "Delete from tc_user_driver where tc_user_driver.driverid=:driverId", nativeQuery = true)
-	public void deleteDriverId(@Param("driverId") int driverId);
+	public void deleteDriverId(@Param("driverId") Long driverId);
 	
 	@Query(value = "select * from tc_drivers INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id"
 			+ " where ( tc_drivers.name=:name OR tc_drivers.mobile_num=:mobileNum OR tc_drivers.uniqueid=:uniqueId) and tc_user_driver.userid=:userId and tc_drivers.delete_date IS NULL", nativeQuery = true)
-	public List<Driver> checkDublicateDriverInAdd(@Param("userId") int id,@Param("name") String name,@Param("uniqueId") String uniqueId,@Param("mobileNum") String mobileNum);
+	public List<Driver> checkDublicateDriverInAdd(@Param("userId") Long id,@Param("name") String name,@Param("uniqueId") String uniqueId,@Param("mobileNum") String mobileNum);
 	
 	@Query(value = "select * from tc_drivers INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id"
 			+ " where ( tc_drivers.name=:name OR tc_drivers.mobile_num=:mobileNum OR tc_drivers.uniqueid=:uniqueId) and tc_drivers.id !=:driverId and tc_user_driver.userid=:userId and tc_drivers.delete_date IS NULL", nativeQuery = true)
-	public List<Driver> checkDublicateDriverInEdit(@Param("driverId") int driverId,@Param("userId") int userId,@Param("name") String name,@Param("uniqueId") String uniqueId,@Param("mobileNum") String mobileNum);
+	public List<Driver> checkDublicateDriverInEdit(@Param("driverId") Long driverId,@Param("userId") Long userId,@Param("name") String name,@Param("uniqueId") String uniqueId,@Param("mobileNum") String mobileNum);
 	
 	
 }

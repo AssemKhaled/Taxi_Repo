@@ -20,7 +20,7 @@ public class DriverServiceImpl implements DriverService{
 	UserRepository userRepository;
 	
 	@Override
-	public Set<Driver> getAllDrivers(int id) {
+	public Set<Driver> getAllDrivers(Long id) {
 		
 		User user=userRepository.getUserData(id);
 		Set<Driver> drivers = user.getDrivers();		
@@ -29,14 +29,14 @@ public class DriverServiceImpl implements DriverService{
 	}
 
 	@Override
-	public List<Driver> checkDublicateDriverInAdd(int id, String name, String uniqueId, String mobileNum) {
+	public List<Driver> checkDublicateDriverInAdd(Long id, String name, String uniqueId, String mobileNum) {
 		
 		return driverRepository.checkDublicateDriverInAdd(id,name,uniqueId,mobileNum);
 
 	}
 	
 	@Override
-	public String addDriver(Driver driver,int id) {
+	public String addDriver(Driver driver,Long id) {
 		User userData = userRepository.getUserData(id);
 		if(userData != null) {
 			Set<User> userDriver = new HashSet<>();
@@ -53,7 +53,7 @@ public class DriverServiceImpl implements DriverService{
 	}
 	
 	@Override
-	public List<Driver> checkDublicateDriverInEdit(int driverId, int userId, String name, String uniqueId,
+	public List<Driver> checkDublicateDriverInEdit(Long driverId, Long userId, String name, String uniqueId,
 			String mobileNum) {
 
 		return driverRepository.checkDublicateDriverInEdit(driverId, userId, name, uniqueId, mobileNum);
@@ -69,13 +69,13 @@ public class DriverServiceImpl implements DriverService{
 
 
 	@Override
-	public Driver getDriverById(int driverId) {
+	public Driver getDriverById(Long driverId) {
 		
-		return driverRepository.getDriverById(driverId);
+		return driverRepository.findOne(driverId);
 	}
 	
 	@Override
-	public void deleteDriver(int driverId) {
+	public void deleteDriver(Long driverId) {
 		
 		Date date = new Date();
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd"); 

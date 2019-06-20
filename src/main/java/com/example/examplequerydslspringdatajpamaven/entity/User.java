@@ -32,7 +32,7 @@ public class User {
 	@Id
 	@GeneratedValue
 	@Column(name = "id")
-	private int id;
+	private Long id;
 
 	@Column(name = "name")
 	private String name;
@@ -115,11 +115,11 @@ public class User {
 		this.name = name;
 	}
 
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -277,9 +277,35 @@ public class User {
 		this.geofences = geofences;
 	}
 	
+	@JsonIgnore 
+	@ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "tc_user_user",joinColumns = { @JoinColumn(name = "userid") },
+    inverseJoinColumns = { @JoinColumn(name = "manageduserid") })
+    private Set<User> userUser = new HashSet<>();
+
+
+	public Set<User> getUserUser() {
+		return userUser;
+	}
+	public void setUserUser(Set<User> userUser) {
+		this.userUser = userUser;
+	}
+	
+	@ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            mappedBy = "userUser")
+    private Set<User> users = new HashSet<>();
+
+
+	public Set<User> getUsers() {
+		return users;
+	}
+	public void setUsers(Set<User> users) {
+		this.users = users;
+	}
+	
 	
 
-	
 
-	
+
+
 }
