@@ -1,29 +1,19 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import javax.persistence.JoinColumn;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.opencsv.bean.CsvBindByName;
 
 @Entity
 @Table(name ="tc_users",schema="sareb_blue")
@@ -279,9 +269,13 @@ public class User {
 	
 	@JsonIgnore 
 	@ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(name = "tc_user_user",joinColumns = { @JoinColumn(name = "userid") },
-    inverseJoinColumns = { @JoinColumn(name = "manageduserid") })
+    @JoinTable(name = "tc_user_user",joinColumns = { @JoinColumn(name = "manageduserid") },
+    inverseJoinColumns = { @JoinColumn(name = "userid") })
     private Set<User> userUser = new HashSet<>();
+	
+	@ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            mappedBy = "userUser")
+    private Set<User> users = new HashSet<>();
 
 
 	public Set<User> getUserUser() {
@@ -290,12 +284,6 @@ public class User {
 	public void setUserUser(Set<User> userUser) {
 		this.userUser = userUser;
 	}
-	
-	@ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE},
-            mappedBy = "userUser")
-    private Set<User> users = new HashSet<>();
-
-
 	public Set<User> getUsers() {
 		return users;
 	}
@@ -304,7 +292,6 @@ public class User {
 	}
 	
 	
-
 
 
 

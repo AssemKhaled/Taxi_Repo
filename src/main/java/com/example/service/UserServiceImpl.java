@@ -38,7 +38,7 @@ public class UserServiceImpl implements IUserService {
 
 	@Override
 	public Set<User> getAllUsers(Long id) {
-		User user=userRepository.getUserData(id);
+		User user=userRepository.findOne(id);
 		Set<User> users = user.getUsers();
 		
 		return users;
