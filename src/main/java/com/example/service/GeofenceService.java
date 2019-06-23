@@ -13,6 +13,8 @@ public interface GeofenceService {
 	public String addGeofence(Geofence geofence,Long id);
 	public List<Geofence> checkDublicateGeofenceInEdit(Long geofenceId,Long userId,String name);
 	public void editGeofence(Geofence geofence);
+	
+	public List<Geofence> getMultipleGeofencesById(Long [] ids);
 
 
 

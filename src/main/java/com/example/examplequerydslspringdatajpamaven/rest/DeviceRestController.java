@@ -16,9 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
+import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.service.DeviceServiceImpl;
 import com.example.service.DriverServiceImpl;
+import com.example.service.GeofenceServiceImpl;
 import com.example.service.UserServiceImpl;
 
 @RestController
@@ -34,6 +36,8 @@ public class DeviceRestController {
 	@Autowired
 	private DriverServiceImpl driverService;
 	//selection of all devices from user controller not device controller
+	@Autowired 
+	GeofenceServiceImpl geofenceService;
 	@GetMapping(path = "/getAllUserDevices")
 	public List<Device> getAllUserDevices() {
 		
@@ -136,7 +140,8 @@ public class DeviceRestController {
 	}
 	
 	@PostMapping(path = "/assignDeviceToDriver/{driverId}")
-	public ResponseEntity<Long> assignDeviceToDriver(@PathVariable (value = "driverId") Long driverId,@RequestBody(required = false) Device device) {
+	public ResponseEntity<String> assignDeviceToDriver(@PathVariable (value = "driverId") Long driverId,@RequestBody(required = false) Device device) {
+		
 		Set<Driver> driver=new HashSet<>() ;
 		driver.add(driverService.getDriverById(driverId));
 //		Set<User> user= userService.findById(userId);
@@ -150,9 +155,35 @@ public class DeviceRestController {
 			}
 			else
 			{*/
-				 //Device newDevice= deviceService.createDevice(device);
+				String assignDevice = deviceService.assignDeviceToDriver(device);
 	      
-				 return new ResponseEntity<>(driverId, HttpStatus.OK);
+				 return new ResponseEntity<>(assignDevice, HttpStatus.OK);
+			//}	 
+					
+		}
+	@PostMapping(path = "/assignGeofencesToDevice/{geoIds}")
+	public ResponseEntity<List<Geofence>> assignGeofencesToDevice(@PathVariable (value = "geoIds")Long [] geoIds,@RequestBody(required = false) Device device) {
+		
+		Set<Geofence> geofence=new HashSet<>();
+		//selectMultiple geofences
+		List<Geofence> geofences = geofenceService.getMultipleGeofencesById(geoIds);
+		for ( Geofence geo : geofences) 
+		{ 
+			geofence.add(geo);
+		}
+        device.setGeofence(geofence);
+//		Device device = deviceService.findById(deviceId);
+	            
+		/*	if(device == null) {
+				//throw bad request
+//				return "bad request";
+				return new ResponseEntity<>(device, HttpStatus.BAD_REQUEST);
+			}
+			else
+			{*/
+				String assignDevice = deviceService.assignDeviceToGeofences(device);
+	      
+				 return new ResponseEntity<>(geofences, HttpStatus.OK);
 			//}	 
 					
 		}

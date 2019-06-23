@@ -16,4 +16,7 @@ public interface DeviceService {
 	
 	public Device findById(Long deviceId);
 	
+	public String assignDeviceToDriver(Device device);
+	
+	public String assignDeviceToGeofences(Device device);
 }

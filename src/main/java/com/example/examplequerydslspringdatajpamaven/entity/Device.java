@@ -176,7 +176,17 @@ public class Device {
     )
 //    @OnDelete(action = OnDeleteAction.CASCADE)
 	private Set<Driver> driver = new HashSet<>();
-   
+	@JsonIgnore
+	@ManyToMany(
+			fetch = FetchType.LAZY,
+			cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+			)
+	@JoinTable(
+			name = "tc_device_geofence",
+			joinColumns = {@JoinColumn (name = "deviceid")},
+			inverseJoinColumns = {@JoinColumn(name = "geofenceid")}
+			)
+	private Set<Geofence> geofence = new HashSet<>();
    
 
 	public Device() {
@@ -479,6 +489,15 @@ public class Device {
 	public void setDriver(Set<Driver> driver) {
 		this.driver = driver;
 	}
+
+	public Set<Geofence> getGeofence() {
+		return geofence;
+	}
+
+	public void setGeofence(Set<Geofence> geofence) {
+		this.geofence = geofence;
+	}
+
 	
 }
 
