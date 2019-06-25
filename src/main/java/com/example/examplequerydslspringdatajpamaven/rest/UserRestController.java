@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
+import com.example.examplequerydslspringdatajpamaven.exceptions.UserExceptionEnum;
+import com.example.examplequerydslspringdatajpamaven.exceptions.UserExceptions;
 import com.example.service.UserServiceImpl;
 
 @RestController
@@ -88,11 +90,9 @@ public class UserRestController {
 				
 	}
 	@PostMapping(path ="/deleteUser/{userId}")
-	public ResponseEntity<User> deleteDevice(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) User user) {
-		Set<User> userCreater=new HashSet<>() ;
-		userCreater.add(userService.findById(userId));
-//		Set<User> user= userService.findById(userId);
-        user.setUsersOfUser(userCreater);
+	public ResponseEntity<String> deleteDevice(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) User user) {
+	
+//		
             
 	/*	if(device == null) {
 			//throw bad request
@@ -101,10 +101,11 @@ public class UserRestController {
 		}
 		else
 		{*/
-			 User newUser= userService.createUser(user);
-			 return new ResponseEntity<>(newUser, HttpStatus.OK);
+			 String deleted= userService.deleteUser(user);
+			 return new ResponseEntity<>(deleted, HttpStatus.OK);
 		//}	 
 				
 	}
-	
+
+
 }
