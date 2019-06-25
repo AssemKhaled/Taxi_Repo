@@ -83,6 +83,13 @@ public class GeofenceServiceImpl implements GeofenceService {
 		geofenceRepository.save(geofence);
 
 	}
+
+	@Override
+	public List<Geofence> getMultipleGeofencesById(Long [] ids) {
+		// TODO Auto-generated method stub
+		
+		return geofenceRepository.getMultipleGeofencesById(ids);
+	}
 	
 
 }

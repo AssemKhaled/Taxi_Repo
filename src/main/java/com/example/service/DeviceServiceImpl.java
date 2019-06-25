@@ -146,4 +146,19 @@ public class DeviceServiceImpl implements DeviceService {
 		
 	}
 
+	@Override
+	public String assignDeviceToDriver(Device device) {
+		// TODO Auto-generated method stub
+		deviceRepository.save(device);
+		
+		return "ok";
+	}
+
+	@Override
+	public String assignDeviceToGeofences(Device device) {
+		// TODO Auto-generated method stub
+		deviceRepository.save(device);
+		return "ok";
+	}
+
 }

@@ -49,6 +49,14 @@ public class Geofence {
 	@Column(name = "delete_date")
 	private String delete_date;
 	
+	@ManyToMany(
+            fetch = FetchType.LAZY,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            mappedBy = "geofence"
+    )
+//    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Set<Device> device = new HashSet<>();
+	
 	public Geofence() {
 		
 	}
@@ -137,6 +145,14 @@ public class Geofence {
 
 	public void setUserGeofence(Set<User> userGeofence) {
 		this.userGeofence = userGeofence;
+	}
+
+	public Set<Device> getDevice() {
+		return device;
+	}
+
+	public void setDevice(Set<Device> device) {
+		this.device = device;
 	}
 	
 	

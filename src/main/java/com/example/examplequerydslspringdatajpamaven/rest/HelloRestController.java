@@ -18,7 +18,7 @@ public class HelloRestController {
 	UserRepository userRepository;
 
 	@Autowired
-	UserServiceImpl userService;
+//	UserServiceImpl userService;
 
 	/*@GetMapping
 	public String helloWorld() {
@@ -26,17 +26,13 @@ public class HelloRestController {
 	}*/
 
 	@GetMapping("/users")
-	public User helloCats() {
+	public String helloCats() {
 		
 		//S x = userService.getName();
-		return userService.getName();
+//		return userService.getName();
+		return "555fff";
 	}
-	@GetMapping("/deviceslist")
-	public Set<Device> devicesList() {
-		
-		//S x = userService.getName();
-		return userService.UserDevice();
-	}
+	
 	
 	
 }
