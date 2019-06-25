@@ -31,12 +31,7 @@ public class HelloRestController {
 		//S x = userService.getName();
 		return userService.getName();
 	}
-	@GetMapping("/deviceslist")
-	public Set<Device> devicesList() {
-		
-		//S x = userService.getName();
-		return userService.UserDevice();
-	}
+	
 	
 	
 }

@@ -30,56 +30,57 @@ public class User {
 	@Column(name = "email")
 	private String email;
 	
+//	@JsonIgnore
 	@Column (name = "hashedpassword")
 	private String password;
 	
-	@Column (name = "salt")
-	private String salt;
+//	@JsonProperty
+	@Column(name = "phone")
+	private String phone;
 	
-	@Column (name = "readonly")
-	private int readOnly;
+	@Column(name = "commercial_num")
+	private String commercial_num;
 	
-	@Column (name = "administrator")
-	private int administrator;
+	@Column(name = "identity_num")
+	private String identity_num;
 	
-	@Column (name = "map")
-	private String map;
+	@Column(name = "company_num")
+	private String company_num;
 	
-	@Column (name = "latitude")
-	private double latitude;
+	@Column(name = "manager_name")
+	private String manager_name;
 	
-	@Column (name = "longitude")
-	private double longitude;
+	@Column(name = "manager_phone")
+	private String manager_phone;
 	
-	@Column (name = "zoom")
-	private int zoom;
+	@Column(name = "manager_mobile")
+	private String manager_mobile;
 	
-	@Column (name = "twelvehourformat")
-	private int twelveHourFormat;
+	@Column(name = "commercial_reg")
+	private String commercial_reg;
 	
-	@JsonProperty
-	@Column (name = "attributes")
-	private String attributes;
+	@Column(name = "reference_key")
+	private String reference_key;
 	
-	@Column (name = "photo")
+	@Column(name = "is_deleted")
+	private Integer is_deleted;
+	
+	@Column(name = "company_phone")
+	private String company_phone;
+	
+	@Column(name = "delete_date")
+	private String delete_date;
+	
+	@Column(name = "photo")
 	private String photo;
 	
-	@Column (name = "Iscompany")
-	private int isCompany;
+	@Column(name = "reject_reason")
+	private String reject_reason;
 	
+	@Column(name = "Iscompany")
+	private Integer IsCompany;
 	
-	/*@JsonIgnore 
-	@ManyToMany(
-            fetch = FetchType.LAZY,
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
-    )
-    @JoinTable(
-            name = "tc_user_device",
-            joinColumns = { @JoinColumn(name = "userid") },
-            inverseJoinColumns = { @JoinColumn(name = "deviceid") }
-    )
-//    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Set<Device> devices = new HashSet<>();*/
+	 @JsonIgnore
 	 @ManyToMany(
 	            fetch = FetchType.LAZY,
 	            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
@@ -87,8 +88,29 @@ public class User {
 	    )
 //	    @OnDelete(action = OnDeleteAction.CASCADE)
 	    private Set<Device> devices = new HashSet<>();
-	
-	
+	    @JsonIgnore
+		@ManyToMany(
+	            fetch = FetchType.LAZY,
+	            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+	    )
+	    @JoinTable(
+	            name = "tc_user_user",
+	            joinColumns = { @JoinColumn(name = "userid") },
+	            inverseJoinColumns = { @JoinColumn(name = "manageduserid") }
+	    )
+//	    @OnDelete(action = OnDeleteAction.CASCADE)
+		private Set<User> usersOfUser = new HashSet<>();
+	    
+	    @JsonIgnore
+	    @ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+	            mappedBy = "userDriver")
+	    private Set<Driver> drivers = new HashSet<>();
+	    
+	    @JsonIgnore
+	    @ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+	            mappedBy = "userGeofence")
+	    private Set<Geofence> geofences = new HashSet<>();
+
 	/*@Column(name="active")
 	@CsvBindByName
 	private Boolean active;
@@ -121,6 +143,8 @@ public class User {
 		this.email = email;
 	}
 
+	@JsonIgnore
+	@JsonProperty(value = "password")
 	public String getPassword() {
 		return password;
 	}
@@ -129,77 +153,7 @@ public class User {
 		this.password = password;
 	}
 
-	public String getSalt() {
-		return salt;
-	}
-
-	public void setSalt(String salt) {
-		this.salt = salt;
-	}
-
-	public int getReadOnly() {
-		return readOnly;
-	}
-
-	public void setReadOnly(int readOnly) {
-		this.readOnly = readOnly;
-	}
-
-	public int getAdministrator() {
-		return administrator;
-	}
-
-	public void setAdministrator(int administrator) {
-		this.administrator = administrator;
-	}
-
-	public String getMap() {
-		return map;
-	}
-
-	public void setMap(String map) {
-		this.map = map;
-	}
-
-	public double getLatitude() {
-		return latitude;
-	}
-
-	public void setLatitude(double latitude) {
-		this.latitude = latitude;
-	}
-
-	public double getLongitude() {
-		return longitude;
-	}
-
-	public void setLongitude(double longitude) {
-		this.longitude = longitude;
-	}
-
-	public int getZoom() {
-		return zoom;
-	}
-
-	public void setZoom(int zoom) {
-		this.zoom = zoom;
-	}
-
-	public int getTwelveHourFormat() {
-		return twelveHourFormat;
-	}
-
-	public void setTwelveHourFormat(int twelveHourFormat) {
-		this.twelveHourFormat = twelveHourFormat;
-	}
-
-	public String getAttributes() {
-		return attributes;
-	}
-
-	public void setAttributes(String attributes) {
-		this.attributes = attributes;
-	}
+	
 
 	public String getPhoto() {
 		return photo;
@@ -209,12 +163,12 @@ public class User {
 		this.photo = photo;
 	}
 
-	public int getIsCompany() {
-		return isCompany;
+	public Integer getIsCompany() {
+		return IsCompany;
 	}
 
-	public void setIsCompany(int isCompany) {
-		this.isCompany = isCompany;
+	public void setIsCompany(Integer isCompany) {
+		this.IsCompany = isCompany;
 	}
 
     public Set<Device> getDevices() {
@@ -242,10 +196,7 @@ public class User {
 		this.type = type;
 	}*/
 
-	@ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE},
-            mappedBy = "userDriver")
-    private Set<Driver> drivers = new HashSet<>();
-
+	
 
 	public Set<Driver> getDrivers() {
 		return drivers;
@@ -255,9 +206,7 @@ public class User {
 	}
 
 	
-	@ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE},
-            mappedBy = "userGeofence")
-    private Set<Geofence> geofences = new HashSet<>();
+	
 
 
 	public Set<Geofence> getGeofences() {
@@ -267,29 +216,95 @@ public class User {
 		this.geofences = geofences;
 	}
 	
-	@JsonIgnore 
-	@ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(name = "tc_user_user",joinColumns = { @JoinColumn(name = "manageduserid") },
-    inverseJoinColumns = { @JoinColumn(name = "userid") })
-    private Set<User> userUser = new HashSet<>();
 	
-	@ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE},
-            mappedBy = "userUser")
-    private Set<User> users = new HashSet<>();
 
 
-	public Set<User> getUserUser() {
-		return userUser;
+	public Set<User> getUsersOfUser() {
+		return usersOfUser;
 	}
-	public void setUserUser(Set<User> userUser) {
-		this.userUser = userUser;
+	public void setUsersOfUser(Set<User> usersOfUser) {
+		this.usersOfUser = usersOfUser;
 	}
-	public Set<User> getUsers() {
-		return users;
+	public String getPhone() {
+		return phone;
 	}
-	public void setUsers(Set<User> users) {
-		this.users = users;
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
+	public String getCommercial_num() {
+		return commercial_num;
+	}
+	public void setCommercial_num(String commercial_num) {
+		this.commercial_num = commercial_num;
+	}
+	public String getIdentity_num() {
+		return identity_num;
+	}
+	public void setIdentity_num(String identity_num) {
+		this.identity_num = identity_num;
+	}
+	public String getCompany_num() {
+		return company_num;
+	}
+	public void setCompany_num(String company_num) {
+		this.company_num = company_num;
+	}
+	public String getManager_name() {
+		return manager_name;
+	}
+	public void setManager_name(String manager_name) {
+		this.manager_name = manager_name;
+	}
+	public String getManager_phone() {
+		return manager_phone;
+	}
+	public void setManager_phone(String manager_phone) {
+		this.manager_phone = manager_phone;
+	}
+	public String getManager_mobile() {
+		return manager_mobile;
+	}
+	public void setManager_mobile(String manager_mobile) {
+		this.manager_mobile = manager_mobile;
+	}
+	public String getCommercial_reg() {
+		return commercial_reg;
+	}
+	public void setCommercial_reg(String commercial_reg) {
+		this.commercial_reg = commercial_reg;
+	}
+	public String getReference_key() {
+		return reference_key;
+	}
+	public void setReference_key(String reference_key) {
+		this.reference_key = reference_key;
+	}
+	public Integer getIs_deleted() {
+		return is_deleted;
+	}
+	public void setIs_deleted(Integer is_deleted) {
+		this.is_deleted = is_deleted;
+	}
+	public String getCompany_phone() {
+		return company_phone;
+	}
+	public void setCompany_phone(String company_phone) {
+		this.company_phone = company_phone;
+	}
+	public String getDelete_date() {
+		return delete_date;
+	}
+	public void setDelete_date(String delete_date) {
+		this.delete_date = delete_date;
+	}
+	public String getReject_reason() {
+		return reject_reason;
+	}
+	public void setReject_reason(String reject_reason) {
+		this.reject_reason = reject_reason;
+	}
+
+
 	
 	
 
