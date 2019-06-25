@@ -25,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,12 +44,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @RestController
 @RequestMapping(path = "/reports")
+@CrossOrigin
 public class ReportRestController {
 	
 	@Autowired
 	ReportServiceImpl reportServiceImpl;
 	
-	@RequestMapping(value = "/get_events_report/{deviceId}", method = RequestMethod.GET,consumes = MediaType.APPLICATION_JSON_VALUE,produces=MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/get_events_report/{deviceId}", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getEvents(@RequestBody Map<String, Object> event,@PathVariable (value = "deviceId") Long deviceId) {
 		int offset=0;
 		String start=null;
@@ -109,7 +111,7 @@ public class ReportRestController {
 		
 	}
 	
-	@RequestMapping(value = "/get_stops_report", method = RequestMethod.GET,consumes = MediaType.APPLICATION_JSON_VALUE,produces=MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/get_stops_report", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getStops(@Param (value = "deviceId") String deviceId,
 			@Param (value = "type") String type,
 			@Param (value = "from") String from,

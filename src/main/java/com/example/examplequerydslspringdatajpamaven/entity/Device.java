@@ -15,9 +15,11 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "tc_devices" , schema = "sareb_blue")
+@JsonIgnoreProperties(value = { "events" })
 public class Device {
 
 	@Id
