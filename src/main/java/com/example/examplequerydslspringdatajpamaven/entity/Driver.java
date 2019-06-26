@@ -15,10 +15,12 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 
 @Entity
 @Table(name = "tc_drivers" , schema = "sareb_blue")
+@JsonIgnoreProperties(value = { "device" })
 public class Driver {
 	
 	

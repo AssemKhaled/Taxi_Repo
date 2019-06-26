@@ -2,9 +2,7 @@ package com.example.examplequerydslspringdatajpamaven.entity;
 
 import java.sql.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-
 import javax.jdo.annotations.Column;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -14,16 +12,14 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "tc_devices" , schema = "sareb_blue")
+@JsonIgnoreProperties(value = { "events" })
 public class Device {
 
 	@Id
@@ -498,6 +494,21 @@ public class Device {
 		this.geofence = geofence;
 	}
 
+	
+	@OneToMany(mappedBy="device", cascade = CascadeType.ALL,
+	        orphanRemoval = true)
+	private Set<Event> events;
+
+	public Set<Event> getEvents() {
+		return events;
+	}
+
+	public void setEvents(Set<Event> events) {
+		this.events = events;
+	}
+	
+ 
+ 
 	
 }
 

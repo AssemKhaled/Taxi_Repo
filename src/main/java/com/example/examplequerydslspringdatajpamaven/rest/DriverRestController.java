@@ -3,8 +3,10 @@ package com.example.examplequerydslspringdatajpamaven.rest;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,22 +20,13 @@ import com.example.service.DriverServiceImpl;
 
 @RestController
 @RequestMapping(path = "/drivers")
+@CrossOrigin
 public class DriverRestController {
 	
 	@Autowired
 	DriverServiceImpl driverServiceImpl;
 
-	@RequestMapping(value = "/")
-	public ResponseEntity<?> noService1() {
-		return ResponseEntity.ok("no service available");
-		
-	}
-	@RequestMapping(value = "")
-	public ResponseEntity<?> noService2() {
-		return ResponseEntity.ok("no service available");
-		
-	}
-	@RequestMapping(value = "/get_all_drivers/{userId}", method = RequestMethod.GET,consumes = MediaType.APPLICATION_JSON_VALUE,produces=MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/get_all_drivers/{userId}", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getDrivers(@PathVariable (value = "userId") Long id) {
 		
 		if(id != 0) {
@@ -50,7 +43,7 @@ public class DriverRestController {
 		
 	}
 	
-	@RequestMapping(value = "/get_driver_by_id/{driverId}", method = RequestMethod.GET,consumes = MediaType.APPLICATION_JSON_VALUE,produces=MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/get_driver_by_id/{driverId}", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getDriverById(@PathVariable (value = "driverId") Long driverId) {
 		
 		if(driverId != 0) {
@@ -80,7 +73,7 @@ public class DriverRestController {
 	}
 	
 	
-	@RequestMapping(value = "/delete_driver/{driverId}", method = RequestMethod.GET,consumes = MediaType.APPLICATION_JSON_VALUE,produces=MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/delete_driver/{driverId}", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> deleteDriver(@PathVariable (value = "driverId") Long driverId) {
 		
 		if(driverId != 0) {
@@ -106,7 +99,7 @@ public class DriverRestController {
 		
 	}
 	
-	@RequestMapping(value = "/add_driver/{userId}", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE,produces=MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/add_driver/{userId}", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<?> addDriver(@RequestBody Map<String, Object> driver,@PathVariable (value = "userId") Long id) {
 		if(id != 0) {
 			Driver queryData=new Driver();
@@ -204,7 +197,7 @@ public class DriverRestController {
 		}
 		
 	}	
-	@RequestMapping(value = "/edit_driver/{userId}", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE,produces=MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/edit_driver/{userId}", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<?> editDriver(@RequestBody Map<String, Object> driver,@PathVariable (value = "userId") Long id) {
 		
 		if(id != 0) {

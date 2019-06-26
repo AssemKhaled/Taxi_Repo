@@ -4,12 +4,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,6 +27,7 @@ public class UserRestController {
 
 	
 	@Autowired
+
 	UserServiceImpl userService;
 	
 	@RequestMapping(value = "/")
@@ -49,7 +52,7 @@ public class UserRestController {
 		//S x = userService.getName();
 		return userService.usersOfUser(userId);
 	}
-	
+
 	@PostMapping(path ="/createUser/{userId}")
 	public ResponseEntity<User> createDevice(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) User user) {
 		Set<User> userCreater=new HashSet<>() ;

@@ -1,13 +1,14 @@
 package com.example.examplequerydslspringdatajpamaven;
 
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.web.bind.annotation.CrossOrigin;
+
 import com.example.service.DeviceServiceImpl;
 import com.example.service.DriverServiceImpl;
 import com.example.service.GeofenceServiceImpl;
+import com.example.service.ReportServiceImpl;
 import com.example.service.UserServiceImpl;
 
 @SpringBootApplication
@@ -38,6 +39,11 @@ public class ExampleQuerydslSpringDataJpaMavenApplication  {
 	@Bean
 	public GeofenceServiceImpl testGeofence() {
 		return new GeofenceServiceImpl();
+	}
+	
+	@Bean
+	public ReportServiceImpl testReport() {
+		return new ReportServiceImpl();
 	}
 	
 //	@Bean(name = "mainDataSource")

@@ -1,6 +1,7 @@
 package com.example.service;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -23,7 +24,7 @@ public class DriverServiceImpl implements DriverService{
 	public Set<Driver> getAllDrivers(Long id) {
 		
 		User user=userRepository.getUserData(id);
-		Set<Driver> drivers = user.getDrivers();		
+		Set<Driver> drivers = user.getDrivers();
 		return drivers;
 	
 	}

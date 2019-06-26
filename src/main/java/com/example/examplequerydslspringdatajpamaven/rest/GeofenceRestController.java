@@ -5,6 +5,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,23 +17,13 @@ import com.example.service.GeofenceServiceImpl;
 
 @RestController
 @RequestMapping(path = "/geofences")
+@CrossOrigin
 public class GeofenceRestController {
 	
 	@Autowired
 	GeofenceServiceImpl geofenceServiceImpl;
 
-	@RequestMapping(value = "/")
-	public ResponseEntity<?> noService1() {
-		return ResponseEntity.ok("no service available");
-		
-	}
-	@RequestMapping(value = "")
-	public ResponseEntity<?> noService2() {
-		return ResponseEntity.ok("no service available");
-		
-	}
-	
-	@RequestMapping(value = "/get_all_geofences/{userId}", method = RequestMethod.GET,consumes = MediaType.APPLICATION_JSON_VALUE,produces=MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/get_all_geofences/{userId}", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getGeofences(@PathVariable (value = "userId") Long id) {
 		
 		if(id != 0) {
@@ -49,7 +40,7 @@ public class GeofenceRestController {
 		
 	}
 	
-	@RequestMapping(value = "/get_geofence_by_id/{geofenceId}", method = RequestMethod.GET,consumes = MediaType.APPLICATION_JSON_VALUE,produces=MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/get_geofence_by_id/{geofenceId}", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getGeofenceById(@PathVariable (value = "geofenceId") Long geofenceId) {
 		
 		if(geofenceId != 0) {
@@ -80,7 +71,7 @@ public class GeofenceRestController {
 		
 	}
 	
-	@RequestMapping(value = "/delete_geofence/{geofenceId}", method = RequestMethod.GET,consumes = MediaType.APPLICATION_JSON_VALUE,produces=MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/delete_geofence/{geofenceId}", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> deleteDriver(@PathVariable (value = "geofenceId") Long geofenceId) {
 		
 		if(geofenceId != 0) {
@@ -106,7 +97,7 @@ public class GeofenceRestController {
 		
 	}
 	
-	@RequestMapping(value = "/add_geofence/{userId}", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE,produces=MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/add_geofence/{userId}", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<?> addDriver(@RequestBody Map<String, Object> geofence,@PathVariable (value = "userId") Long id) {
 		if(id != 0) {
 			
@@ -165,7 +156,7 @@ public class GeofenceRestController {
 		
 	}
 	
-	@RequestMapping(value = "/edit_geofence/{userId}", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE,produces=MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/edit_geofence/{userId}", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<?> editGeofence(@RequestBody Map<String, Object> geofence,@PathVariable (value = "userId") Long id) {
 		
 		if(id != 0) {
