@@ -164,7 +164,7 @@ public class DeviceRestController {
 	@PostMapping(path = "/assignDeviceToDriver/{driverId}")
 	public ResponseEntity<String> assignDeviceToDriver(@PathVariable (value = "driverId") Long driverId,@RequestBody(required = false) Device device) {
 		
-		if(device.getId() != null) {
+		if(device.getId() == null) {
 			return new	ResponseEntity<>("bad request",  HttpStatus.BAD_REQUEST);
 		}
 		Set<Driver> driver=new HashSet<>() ;
@@ -188,7 +188,9 @@ public class DeviceRestController {
 		}
 	@PostMapping(path = "/assignGeofencesToDevice/{geoIds}")
 	public ResponseEntity<?> assignGeofencesToDevice(@PathVariable (value = "geoIds")Long [] geoIds,@RequestBody(required = false) Device device) {
-		if(device.getId() != null) {
+	
+		
+		if(device.getId()==null) {
 			return new	ResponseEntity<>("bad request",  HttpStatus.BAD_REQUEST);
 		}
 		Set<Geofence> geofence=new HashSet<>();
