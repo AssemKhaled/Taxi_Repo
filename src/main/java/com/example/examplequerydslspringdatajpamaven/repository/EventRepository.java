@@ -9,7 +9,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.Event;
 
 public interface EventRepository  extends JpaRepository<Event, Long>, QueryDslPredicateExecutor<Event>{
 
-	@Query(value ="SELECT tc_events.* FROM tc_events INNER JOIN tc_devices ON tc_devices.id=tc_events.deviceid "
+	@Query(value ="SELECT * FROM tc_events INNER JOIN tc_devices ON tc_devices.id=tc_events.deviceid "
 			+ " where tc_events.deviceid=:deviceId "
 			+ " and tc_events.servertime BETWEEN :start and :end "
 			+ " ORDER BY tc_events.servertime DESC LIMIT :offset,10", nativeQuery = true)
