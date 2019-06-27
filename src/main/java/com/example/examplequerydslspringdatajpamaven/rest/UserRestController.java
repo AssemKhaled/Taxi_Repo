@@ -40,12 +40,7 @@ public class UserRestController {
 		return ResponseEntity.ok("no service available");
 		
 	}
-	@GetMapping("/deviceslist")
-	public Set<Device> devicesList() {
-		
-		//S x = userService.getName();
-		return userService.UserDevice();
-	}
+	
 	@GetMapping("/userslist/{userId}")
 	public Set<User> usersList(@PathVariable (value = "userId") Long userId) {
 		

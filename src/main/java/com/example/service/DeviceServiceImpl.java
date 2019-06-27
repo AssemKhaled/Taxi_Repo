@@ -32,7 +32,7 @@ public class DeviceServiceImpl implements DeviceService {
 	}
 
 	@Override
-	public Device createDevice(Device device) {
+	public String createDevice(Device device) {
 		// TODO Auto-generated method stub
 		logger.info("************************ createDevices STARTED ***************************");
 	    Device data=device;
@@ -41,13 +41,13 @@ public class DeviceServiceImpl implements DeviceService {
 	    if(duplictionList.size()>0)
 	    {
 	    	//throw duplication exception with duplication list
-	    	return null;
+	    	return duplictionList.toString();
 	    }
 	    else
 	    {
 	    	deviceRepository.save(device);
 			logger.info("************************ createDevices ENDED ***************************");
-			return data;
+			return "added successfully";
 	    }
 	    
 		

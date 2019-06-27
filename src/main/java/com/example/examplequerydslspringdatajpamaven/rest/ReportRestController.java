@@ -84,6 +84,7 @@ public class ReportRestController {
 					 }
 					 result.put("attributes", events.get(i).getAttributes());
 					 result.put("servertime", events.get(i).getServertime().toString());
+<<<<<<< HEAD
 					 result.put("deviceName", events.get(i).getDevice().getName());	
 					 //result.put("positionId", events.get(i).getPositionid());
 					 result.put("geofenceId", events.get(i).getGeofenceid());
@@ -102,6 +103,10 @@ public class ReportRestController {
 						 result.put("geofenceName", null);
 					 }
 					 
+=======
+				//	 result.put("deviceName", events.get(i).getDevice().getName());
+					 //result.put("driverName", events.get(i).getDevice().getDriver());
+>>>>>>> 521f5f606cbf0e74d72b88480c91a30ec587f605
 					 
 					 data.add(i, result);
 

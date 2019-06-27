@@ -7,6 +7,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,7 +23,7 @@ import com.example.service.DeviceServiceImpl;
 import com.example.service.DriverServiceImpl;
 import com.example.service.GeofenceServiceImpl;
 import com.example.service.UserServiceImpl;
-
+@CrossOrigin
 @RestController
 @RequestMapping(path = "/devices")
 public class DeviceRestController {
@@ -38,33 +39,49 @@ public class DeviceRestController {
 	//selection of all devices from user controller not device controller
 	@Autowired 
 	GeofenceServiceImpl geofenceService;
-	@GetMapping(path = "/getAllUserDevices")
-	public List<Device> getAllUserDevices() {
+	
+	
+	@GetMapping("/getUserDevices/{userId}")
+	public Set<Device> devicesList(@PathVariable (value = "userId") Long userId) {
 		
-		return deviceService.getAllUserDevices();
+		//S x = userService.getName();
+		return userService.UserDevice(userId);
 	}
 	
 	@PostMapping(path ="/createDevice/{userId}")
-	public ResponseEntity<Device> createDevice(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) Device device) {
+	public ResponseEntity<?> createDevice(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) Device device) {
+		if(device.getId() != null || device.getName()== null || device.getUniqueId()== null
+		   || device.getSequenceNumber() == null) {
+			
+			return new	ResponseEntity<>("bad request",  HttpStatus.BAD_REQUEST);
+		}
+		//System.out.println("bad request"+device.getId());
 		Set<User> user=new HashSet<>() ;
 		user.add(userService.findById(userId));
 //		Set<User> user= userService.findById(userId);
         device.setUser(user);
             
-	/*	if(device == null) {
+		//*if(device == null) {
 			//throw bad request
 //			return "bad request";
-			return new ResponseEntity<>(device, HttpStatus.BAD_REQUEST);
-		}
-		else
-		{*/
-			 Device newDevice= deviceService.createDevice(device);
+//			System.out.println("bad request");
+//			return new ResponseEntity<>(device, HttpStatus.BAD_REQUEST);
+//		}
+		//else
+		//{*/
+			 String newDevice= deviceService.createDevice(device);
+			 
 			 return new ResponseEntity<>(newDevice, HttpStatus.OK);
 		//}	 
 				
 	}
 	@PostMapping(path ="/editDevice/{userId}")
-	public ResponseEntity<Device> editDevice(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) Device device) {
+	public ResponseEntity<?> editDevice(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) Device device) {
+		if(device.getId() == null || device.getName()== null || device.getUniqueId()== null
+				   || device.getSequenceNumber() == null) {
+					
+					return new	ResponseEntity<>("bad request",  HttpStatus.BAD_REQUEST);
+		}
 		Set<User> user=new HashSet<>() ;
 		user.add(userService.findById(userId));
 //		Set<User> user= userService.findById(userId);
@@ -77,14 +94,19 @@ public class DeviceRestController {
 		}
 		else
 		{*/
-			 Device newDevice= deviceService.createDevice(device);
+			 String newDevice= deviceService.createDevice(device);
 			 return new ResponseEntity<>(newDevice, HttpStatus.OK);
 		//}	 
 				
 	}
 	@PostMapping(path ="/deleteDevice/{userId}")
 	public ResponseEntity<String> deleteDevice(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) Device device) {
-	//	Set<User> user=new HashSet<>() ;
+		if(device.getId() == null || device.getName()== null || device.getUniqueId()== null
+				   || device.getSequenceNumber() == null) {
+					
+					return new	ResponseEntity<>("bad request",  HttpStatus.BAD_REQUEST);
+		}
+		//	Set<User> user=new HashSet<>() ;
 		//user.add(userService.findById(userId));
 //		Set<User> user= userService.findById(userId);
       //  device.setUser(user);
@@ -142,6 +164,9 @@ public class DeviceRestController {
 	@PostMapping(path = "/assignDeviceToDriver/{driverId}")
 	public ResponseEntity<String> assignDeviceToDriver(@PathVariable (value = "driverId") Long driverId,@RequestBody(required = false) Device device) {
 		
+		if(device.getId() != null) {
+			return new	ResponseEntity<>("bad request",  HttpStatus.BAD_REQUEST);
+		}
 		Set<Driver> driver=new HashSet<>() ;
 		driver.add(driverService.getDriverById(driverId));
 //		Set<User> user= userService.findById(userId);
@@ -162,8 +187,10 @@ public class DeviceRestController {
 					
 		}
 	@PostMapping(path = "/assignGeofencesToDevice/{geoIds}")
-	public ResponseEntity<List<Geofence>> assignGeofencesToDevice(@PathVariable (value = "geoIds")Long [] geoIds,@RequestBody(required = false) Device device) {
-		
+	public ResponseEntity<?> assignGeofencesToDevice(@PathVariable (value = "geoIds")Long [] geoIds,@RequestBody(required = false) Device device) {
+		if(device.getId() != null) {
+			return new	ResponseEntity<>("bad request",  HttpStatus.BAD_REQUEST);
+		}
 		Set<Geofence> geofence=new HashSet<>();
 		//selectMultiple geofences
 		List<Geofence> geofences = geofenceService.getMultipleGeofencesById(geoIds);

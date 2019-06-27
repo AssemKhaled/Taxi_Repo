@@ -8,7 +8,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.User;
 public interface IUserService {
 
 	public User getName();
-	public Set<Device> UserDevice();
+	public Set<Device> UserDevice(Long userId);
 	public User findById(Long userId);
 	public Set<User> usersOfUser(Long userId);
 	public User createUser(User user);
