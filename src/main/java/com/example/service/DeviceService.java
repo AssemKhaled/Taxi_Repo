@@ -8,7 +8,7 @@ public interface DeviceService {
 
 	public List<Device> getAllUserDevices();
 	
-	public Device createDevice(Device device);
+	public String createDevice(Device device);
 	
 	public List<Integer> checkDeviceDuplication(Device device);
 	

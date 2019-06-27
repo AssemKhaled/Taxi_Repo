@@ -28,11 +28,19 @@ public class UserServiceImpl implements IUserService {
 	}
 
 	@Override
-	public Set<Device> UserDevice() {
+	public Set<Device> UserDevice(Long userId) {
 		// TODO Auto-generated method stub
-		User x=userRepository.getAll();
-	    Set<Device> devices = x.getDevices();
-		return devices ;
+		User x=userRepository.getUserData(userId);
+		if(x.getName() == null) {
+			System.out.println("no user");
+			return null;
+		}
+		else
+		{
+			Set<Device> devices = x.getDevices();
+			return devices ;
+		}
+	    
 	}
 
 	@Override

@@ -70,7 +70,7 @@ public class Device {
 	private Integer plate_type;
 	
 	@Column(name = "reference_key")
-	private String referenceKey;
+	private String reference_key;
 	
 	//should be isDeleted
 	@Column(name = "is_deleted")
@@ -80,7 +80,7 @@ public class Device {
 //	@CsvBindByName
 //	@CsvDate(value = "E MMM d HH:mm:ss zzz yyyy")
 //	@Temporal(TemporalType.TIMESTAMP)
-	private String deleteDate;
+	private String delete_date;
 	
 	//should by initSensor
    @Column(name = "init_sensor")
@@ -95,7 +95,7 @@ public class Device {
 	private Integer car_weight;
 	
 	@Column(name = "reject_reason")
-	private String rejectReason;
+	private String reject_reason;
 	
 	@Column(name = "sequence_number")
 	private String sequence_number;
@@ -113,25 +113,25 @@ public class Device {
 	private Integer lastWeight;
 	
 	@Column(name = "owner_name")
-	private String ownerName;
+	private String owner_name;
 	
 	@Column(name = "username")
-	private String userName;
+	private String username;
 	
 	@Column(name = "owner_id")
-	private String ownerId;
+	private String owner_id;
 	
 	@Column(name = "brand")
 	private String brand;
 	
 	@Column(name = "made_year")
-	private String madeYear;
+	private String made_year;
 	
 	@Column(name = "color")
 	private String color;
 	
 	@Column(name = "license_exp")
-	private Date licenseExp;
+	private Date license_exp;
 	
 	//should be date_type
 	@Column(name = "date_type")
@@ -303,11 +303,11 @@ public class Device {
 	}
 
 	public String getReferenceKey() {
-		return referenceKey;
+		return reference_key;
 	}
 
 	public void setReferenceKey(String referenceKey) {
-		this.referenceKey = referenceKey;
+		this.reference_key = referenceKey;
 	}
 
 	public Integer getIsDeleted() {
@@ -319,11 +319,11 @@ public class Device {
 	}
 
 	public String getDeleteDate() {
-		return deleteDate;
+		return delete_date;
 	}
 
 	public void setDeleteDate(String deleteDate) {
-		this.deleteDate = deleteDate;
+		this.delete_date = deleteDate;
 	}
 
 	public Integer getInitSensor() {
@@ -351,11 +351,11 @@ public class Device {
 	}
 
 	public String getRejectReason() {
-		return rejectReason;
+		return reject_reason;
 	}
 
 	public void setRejectReason(String rejectReason) {
-		this.rejectReason = rejectReason;
+		this.reject_reason = rejectReason;
 	}
 
 	public String getSequenceNumber() {
@@ -399,27 +399,27 @@ public class Device {
 	}
 
 	public String getOwnerName() {
-		return ownerName;
+		return owner_name;
 	}
 
 	public void setOwnerName(String ownerName) {
-		this.ownerName = ownerName;
+		this.owner_name = ownerName;
 	}
 
 	public String getUserName() {
-		return userName;
+		return username;
 	}
 
 	public void setUserName(String userName) {
-		this.userName = userName;
+		this.username = userName;
 	}
 
 	public String getOwnerId() {
-		return ownerId;
+		return owner_id;
 	}
 
 	public void setOwnerId(String ownerId) {
-		this.ownerId = ownerId;
+		this.owner_id = ownerId;
 	}
 
 	public String getBrand() {
@@ -431,11 +431,11 @@ public class Device {
 	}
 
 	public String getMadeYear() {
-		return madeYear;
+		return made_year;
 	}
 
 	public void setMadeYear(String madeYear) {
-		this.madeYear = madeYear;
+		this.made_year = madeYear;
 	}
 
 	public String getColor() {
@@ -447,11 +447,11 @@ public class Device {
 	}
 
 	public Date getLicenseExp() {
-		return licenseExp;
+		return license_exp;
 	}
 
 	public void setLicenseExp(Date licenseExp) {
-		this.licenseExp = licenseExp;
+		this.license_exp = licenseExp;
 	}
 
 	public Integer getDateType() {
@@ -495,8 +495,7 @@ public class Device {
 	}
 
 	
-	@OneToMany(mappedBy="device", cascade = CascadeType.ALL,
-	        orphanRemoval = true)
+	@OneToMany(mappedBy="device", cascade = CascadeType.ALL)
 	private Set<Event> events;
 
 	public Set<Event> getEvents() {
