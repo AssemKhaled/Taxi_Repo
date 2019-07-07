@@ -3,7 +3,6 @@ package com.example.examplequerydslspringdatajpamaven.rest;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,16 +12,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
+import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
 import com.example.service.DeviceServiceImpl;
 import com.example.service.DriverServiceImpl;
 import com.example.service.GeofenceServiceImpl;
 import com.example.service.UserServiceImpl;
+
 @CrossOrigin
 @RestController
 @RequestMapping(path = "/devices")
@@ -69,6 +71,18 @@ public class DeviceRestController {
 //		}
 		//else
 		//{*/
+        if(device.getPhoto() !=null) {
+			
+			//base64_Image
+        	String photo=device.getPhoto();
+			DecodePhoto decodePhoto=new DecodePhoto();
+			device.setPhoto(decodePhoto.Base64_Image(photo));				
+			
+		}
+		else {
+			device.setPhoto("Not-available.png");
+		}	
+        
 			 String newDevice= deviceService.createDevice(device);
 			 
 			 return new ResponseEntity<>(newDevice, HttpStatus.OK);
@@ -94,6 +108,17 @@ public class DeviceRestController {
 		}
 		else
 		{*/
+        if(device.getPhoto() !=null) {
+			
+			//base64_Image
+        	String photo=device.getPhoto();
+			DecodePhoto decodePhoto=new DecodePhoto();
+			device.setPhoto(decodePhoto.Base64_Image(photo));				
+			
+		}
+		else {
+			device.setPhoto("Not-available.png");
+		}	
 			 String newDevice= deviceService.createDevice(device);
 			 return new ResponseEntity<>(newDevice, HttpStatus.OK);
 		//}	 
@@ -215,6 +240,52 @@ public class DeviceRestController {
 					
 		}
 	
+	@RequestMapping(value = "/getDeviceDriver/{deviceId}", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getDeviceDriver(@PathVariable (value = "deviceId") Long deviceId) {
+		
+		if(deviceId != 0) {
+			Device device= deviceService.findById(deviceId);
+			return ResponseEntity.ok(device.getDriver());	
+		
+		}
+		else {
+			
+			return ResponseEntity.ok("no device selected");
+
+		}
+		
+	}
 	
+	@RequestMapping(value = "/getDeviceGeofences/{deviceId}", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getDeviceGeofences(@PathVariable (value = "deviceId") Long deviceId) {
+		
+		if(deviceId != 0) {
+			Device device= deviceService.findById(deviceId);
+			return ResponseEntity.ok(device.getGeofence());	
+		
+		}
+		else {
+			
+			return ResponseEntity.ok("no device selected");
+
+		}
+		
+	}
+	@RequestMapping(value = "/getDeviceSelect/{userId}", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getDeviceSelect(@PathVariable (value = "userId") Long userId) {
+		
+		if(userId != 0) {
+			
+			return ResponseEntity.ok(deviceService.getDeviceSelect(userId));	
+	
+		}
+		else {
+			
+			return ResponseEntity.ok("no device selected");
+
+		}
+		
+	}
+
 
 }

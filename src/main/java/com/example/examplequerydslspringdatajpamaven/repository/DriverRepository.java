@@ -31,5 +31,10 @@ public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslP
 			+ " where ( tc_drivers.name=:name OR tc_drivers.mobile_num=:mobileNum OR tc_drivers.uniqueid=:uniqueId) and tc_drivers.id !=:driverId and tc_user_driver.userid=:userId and tc_drivers.delete_date IS NULL", nativeQuery = true)
 	public List<Driver> checkDublicateDriverInEdit(@Param("driverId") Long driverId,@Param("userId") Long userId,@Param("name") String name,@Param("uniqueId") String uniqueId,@Param("mobileNum") String mobileNum);
 	
+	@Query(value = "SELECT tc_drivers.* FROM tc_drivers INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id"
+			+ " WHERE tc_user_driver.userid=:userId"
+			+ " and ((tc_drivers.name Like %:search%) OR (tc_drivers.uniqueid Like %:search%) OR (tc_drivers.mobile_num Like %:search%) OR (tc_drivers.birth_date Like %:search%))"
+			+ " LIMIT :offset,10", nativeQuery = true)
+	public List<Driver> getAllDrivers(@Param("userId") Long userId,@Param("offset") int offset,@Param("search") String search);
 	
 }

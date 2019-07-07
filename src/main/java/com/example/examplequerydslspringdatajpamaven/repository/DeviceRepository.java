@@ -1,16 +1,14 @@
 package com.example.examplequerydslspringdatajpamaven.repository;
 
 import java.util.List;
-
 import javax.transaction.Transactional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
-
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
+import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 
 
 public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDslPredicateExecutor<Device> {
@@ -30,5 +28,11 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
     @Transactional
 	@Query(value = "delete  from tc_user_device where deviceid = :deviceId", nativeQuery = true )
 	public void deleteUserDevice(@Param("deviceId")Long deviceId);
+	
+	@Query(value = "SELECT tc_devices.id,tc_devices.name FROM tc_devices"
+			+ " INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id"
+			+ " WHERE tc_user_device.userid=:userId",nativeQuery = true)
+	public List<DeviceSelect> getDeviceSelect(@Param("userId")Long userId);
+	
 }
 

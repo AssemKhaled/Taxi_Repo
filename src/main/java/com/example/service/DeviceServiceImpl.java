@@ -7,9 +7,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
-
+import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
 
 
@@ -159,6 +158,13 @@ public class DeviceServiceImpl implements DeviceService {
 		// TODO Auto-generated method stub
 		deviceRepository.save(device);
 		return "ok";
+	}
+
+	@Override
+	public List<DeviceSelect> getDeviceSelect(Long userId) {
+
+		return deviceRepository.getDeviceSelect(userId);
+	
 	}
 
 }

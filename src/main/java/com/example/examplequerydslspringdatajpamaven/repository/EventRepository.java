@@ -13,6 +13,7 @@ public interface EventRepository  extends JpaRepository<Event, Long>, QueryDslPr
 			+ " where tc_events.deviceid=:deviceId "
 			+ " and tc_events.servertime BETWEEN :start and :end "
 			+ " ORDER BY tc_events.servertime DESC LIMIT :offset,10", nativeQuery = true)
-	public List<Event> getEvents(@Param("deviceId") Long deviceId,@Param("offset") int offset,@Param("start") String start,@Param("end") String end);
+	public List<Event> getEvents(@Param("deviceId") Long deviceId,@Param("offset") int offset,
+			@Param("start") String start,@Param("end") String end);
 	
 }

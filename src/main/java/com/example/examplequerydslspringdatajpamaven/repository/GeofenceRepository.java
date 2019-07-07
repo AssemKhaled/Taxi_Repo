@@ -9,6 +9,7 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 
 public interface GeofenceRepository extends JpaRepository<Geofence, Long>, QueryDslPredicateExecutor<Geofence>{
@@ -34,5 +35,12 @@ public interface GeofenceRepository extends JpaRepository<Geofence, Long>, Query
 	
 	@Query(value = "select * from tc_geofences where id in :ids",nativeQuery = true)
 	public List<Geofence> getMultipleGeofencesById(@Param("ids")Long [] ids);
+	
+	@Query(value = "SELECT tc_geofences.* FROM tc_geofences INNER JOIN tc_user_geofence ON tc_user_geofence.geofenceid = tc_geofences.id"
+			+ " WHERE tc_user_geofence.userid=:userId"
+			+ " and ((tc_geofences.name Like %:search%) OR (tc_geofences.type Like %:search%))"
+			+ " LIMIT :offset,10", nativeQuery = true)
+	public List<Geofence> getAllGeofences(@Param("userId") Long userId,@Param("offset") int offset,@Param("search") String search);
+	
 	
 }

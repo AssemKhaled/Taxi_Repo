@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import com.example.service.DeviceServiceImpl;
 import com.example.service.DriverServiceImpl;
 import com.example.service.GeofenceServiceImpl;
+import com.example.service.ProfileServiceImpl;
 import com.example.service.ReportServiceImpl;
 import com.example.service.UserServiceImpl;
 
@@ -44,6 +45,11 @@ public class ExampleQuerydslSpringDataJpaMavenApplication  {
 	@Bean
 	public ReportServiceImpl testReport() {
 		return new ReportServiceImpl();
+	}
+	
+	@Bean
+	public ProfileServiceImpl testProfile() {
+		return new ProfileServiceImpl();
 	}
 	
 //	@Bean(name = "mainDataSource")

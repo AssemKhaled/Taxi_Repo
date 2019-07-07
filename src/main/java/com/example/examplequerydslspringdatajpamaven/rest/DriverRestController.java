@@ -3,6 +3,7 @@ package com.example.examplequerydslspringdatajpamaven.rest;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,11 +28,18 @@ public class DriverRestController {
 	DriverServiceImpl driverServiceImpl;
 
 	@RequestMapping(value = "/get_all_drivers/{userId}", method = RequestMethod.GET)
-	public @ResponseBody ResponseEntity<?> getDrivers(@PathVariable (value = "userId") Long id) {
+	public @ResponseBody ResponseEntity<?> getDrivers(@PathVariable (value = "userId") Long id,
+			@Param (value = "offset") int offset,
+			@Param (value = "search") String search) {
+		
+		offset=offset-1;
+		if(offset <0) {
+			offset=0;
+		}
 		
 		if(id != 0) {
 			
-			return ResponseEntity.ok(driverServiceImpl.getAllDrivers(id));
+			return ResponseEntity.ok(driverServiceImpl.getAllDrivers(id,offset,search));
 
 		}
 		else {
