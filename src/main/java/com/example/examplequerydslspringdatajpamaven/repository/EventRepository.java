@@ -5,8 +5,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
-import com.example.examplequerydslspringdatajpamaven.entity.Event;
+import org.springframework.stereotype.Component;
 
+import com.example.examplequerydslspringdatajpamaven.entity.Event;
+@Component
 public interface EventRepository  extends JpaRepository<Event, Long>, QueryDslPredicateExecutor<Event>{
 
 	@Query(value ="SELECT * FROM tc_events INNER JOIN tc_devices ON tc_devices.id=tc_events.deviceid "

@@ -6,6 +6,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,14 +20,17 @@ import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
+
+import com.example.examplequerydslspringdatajpamaven.service.DeviceServiceImpl;
+import com.example.examplequerydslspringdatajpamaven.service.DriverServiceImpl;
+import com.example.examplequerydslspringdatajpamaven.service.GeofenceServiceImpl;
+import com.example.examplequerydslspringdatajpamaven.service.UserServiceImpl;
+
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
-import com.example.service.DeviceServiceImpl;
-import com.example.service.DriverServiceImpl;
-import com.example.service.GeofenceServiceImpl;
-import com.example.service.UserServiceImpl;
+
 
 @CrossOrigin
-@RestController
+@Component
 @RequestMapping(path = "/devices")
 public class DeviceRestController {
 	
@@ -189,7 +193,7 @@ public class DeviceRestController {
 	@PostMapping(path = "/assignDeviceToDriver/{driverId}")
 	public ResponseEntity<String> assignDeviceToDriver(@PathVariable (value = "driverId") Long driverId,@RequestBody(required = false) Device device) {
 		
-		if(device.getId() != null) {
+		if(device.getId() == null) {
 			return new	ResponseEntity<>("bad request",  HttpStatus.BAD_REQUEST);
 		}
 		Set<Driver> driver=new HashSet<>() ;
@@ -213,7 +217,9 @@ public class DeviceRestController {
 		}
 	@PostMapping(path = "/assignGeofencesToDevice/{geoIds}")
 	public ResponseEntity<?> assignGeofencesToDevice(@PathVariable (value = "geoIds")Long [] geoIds,@RequestBody(required = false) Device device) {
-		if(device.getId() != null) {
+	
+		
+		if(device.getId()==null) {
 			return new	ResponseEntity<>("bad request",  HttpStatus.BAD_REQUEST);
 		}
 		Set<Geofence> geofence=new HashSet<>();
@@ -239,6 +245,10 @@ public class DeviceRestController {
 			//}	 
 					
 		}
+	 @GetMapping(path = "/testResponse")
+	  public ResponseEntity<?> testResponse(){
+		 return deviceService.testgetDeviceById();
+	 }
 	
 	@RequestMapping(value = "/getDeviceDriver/{deviceId}", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getDeviceDriver(@PathVariable (value = "deviceId") Long deviceId) {

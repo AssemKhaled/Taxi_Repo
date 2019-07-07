@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
-import com.example.service.UserServiceImpl;
+
 
 @RestController
 public class HelloRestController {

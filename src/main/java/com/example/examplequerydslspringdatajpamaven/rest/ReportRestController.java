@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.Collections;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -38,12 +37,13 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.Event;
-import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
+
 import com.example.examplequerydslspringdatajpamaven.entity.Stop;
-import com.example.examplequerydslspringdatajpamaven.entity.Trip;
-import com.example.service.GeofenceServiceImpl;
-import com.example.service.ReportServiceImpl;
+import com.example.examplequerydslspringdatajpamaven.service.ReportServiceImpl;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
+import com.example.examplequerydslspringdatajpamaven.service.GeofenceServiceImpl;
+import com.example.examplequerydslspringdatajpamaven.service.ReportServiceImpl;
 
 
 @RestController

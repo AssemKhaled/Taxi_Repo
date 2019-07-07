@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
-import com.example.service.GeofenceServiceImpl;
+import com.example.examplequerydslspringdatajpamaven.service.GeofenceServiceImpl;
+
 
 @RestController
 @RequestMapping(path = "/geofences")

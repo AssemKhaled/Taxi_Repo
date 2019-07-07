@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
-import com.example.service.ProfileServiceImpl;
-import com.example.service.UserServiceImpl;
+import com.example.examplequerydslspringdatajpamaven.service.ProfileServiceImpl;
+import com.example.examplequerydslspringdatajpamaven.service.UserServiceImpl;
 
 @CrossOrigin
 @RestController

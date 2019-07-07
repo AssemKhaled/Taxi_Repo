@@ -1,4 +1,4 @@
-package com.example.service;
+package com.example.examplequerydslspringdatajpamaven.service;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -6,11 +6,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.repository.GeofenceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
-
+@Component
 public class GeofenceServiceImpl implements GeofenceService {
 	
 	@Autowired
