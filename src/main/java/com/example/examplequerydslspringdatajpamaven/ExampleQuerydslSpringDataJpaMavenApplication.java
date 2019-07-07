@@ -6,9 +6,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
+
 import com.example.examplequerydslspringdatajpamaven.Validator.JWKValidator;
 
 
+
+
+import com.example.examplequerydslspringdatajpamaven.service.DeviceServiceImpl;
+import com.example.examplequerydslspringdatajpamaven.service.DriverServiceImpl;
+import com.example.examplequerydslspringdatajpamaven.service.GeofenceServiceImpl;
+import com.example.examplequerydslspringdatajpamaven.service.ProfileServiceImpl;
+import com.example.examplequerydslspringdatajpamaven.service.ReportServiceImpl;
+import com.example.examplequerydslspringdatajpamaven.service.UserServiceImpl;
 
 
 @SpringBootApplication
@@ -54,6 +63,11 @@ public class ExampleQuerydslSpringDataJpaMavenApplication  {
 	public JWKValidator  testJWKValidator() {
 		return new JWKValidator();
 	}*/
+	
+	@Bean
+	public ProfileServiceImpl testProfile() {
+		return new ProfileServiceImpl();
+	}
 	
 //	@Bean(name = "mainDataSource")
 //	@Primary

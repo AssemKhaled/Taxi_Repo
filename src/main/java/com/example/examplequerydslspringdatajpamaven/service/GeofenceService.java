@@ -6,7 +6,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 
 public interface GeofenceService {
 
-	public Set<Geofence> getAllGeofences(Long id);
+	public List<Geofence> getAllGeofences(Long id,int offset,String search);
 	public Geofence getGeofenceById(Long geofenceId);
 	public void deleteGeofence(Long geofenceId);
 	public List<Geofence> checkDublicateGeofenceInAdd(Long userId,String name);

@@ -3,6 +3,7 @@ package com.example.examplequerydslspringdatajpamaven.rest;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -25,11 +26,17 @@ public class GeofenceRestController {
 	GeofenceServiceImpl geofenceServiceImpl;
 
 	@RequestMapping(value = "/get_all_geofences/{userId}", method = RequestMethod.GET)
-	public @ResponseBody ResponseEntity<?> getGeofences(@PathVariable (value = "userId") Long id) {
+	public @ResponseBody ResponseEntity<?> getGeofences(@PathVariable (value = "userId") Long id,
+			@Param (value = "offset") int offset,
+			@Param (value = "search") String search) {
+		offset=offset-1;
+		if(offset <0) {
+			offset=0;
+		}
 		
 		if(id != 0) {
 			
-			return ResponseEntity.ok(geofenceServiceImpl.getAllGeofences(id));
+			return ResponseEntity.ok(geofenceServiceImpl.getAllGeofences(id,offset,search));
 
 		}
 		else{

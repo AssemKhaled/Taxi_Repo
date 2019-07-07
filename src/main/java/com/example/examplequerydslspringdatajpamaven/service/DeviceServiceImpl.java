@@ -10,9 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
-
+import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 
@@ -169,6 +168,7 @@ public class DeviceServiceImpl implements DeviceService {
 	}
 
 	@Override
+
 	public ResponseEntity<?> testgetDeviceById() {
 		// TODO Auto-generateds method stub
 		Device device ;
@@ -178,6 +178,13 @@ public class DeviceServiceImpl implements DeviceService {
 	
 		 getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "login successfully",devices);
 		return  ResponseEntity.ok().body(getObjectResponse) ;
+	}
+
+	public List<DeviceSelect> getDeviceSelect(Long userId) {
+
+		return deviceRepository.getDeviceSelect(userId);
+	
+
 	}
 
 }

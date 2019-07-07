@@ -114,7 +114,7 @@ public class UserServiceImpl implements IUserService {
 
 	@Override
 	public List<Integer> checkUserDuplication(User user) {
-		// TODO Auto-generated method stubt
+		 // TODO Auto-generated method stubt
 		 String email = user.getEmail();
 		 String identityNum = user.getIdentity_num();
 		 String commercialNum = user.getCommercial_num();

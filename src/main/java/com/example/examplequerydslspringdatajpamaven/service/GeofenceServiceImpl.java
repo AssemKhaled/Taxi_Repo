@@ -22,11 +22,11 @@ public class GeofenceServiceImpl implements GeofenceService {
 	UserRepository userRepository;
 
 	@Override
-	public Set<Geofence> getAllGeofences(Long id) {
+	public List<Geofence> getAllGeofences(Long id,int offset,String search) {
 
-		User user=userRepository.getUserData(id);
-		Set<Geofence> geofences = user.getGeofences();
-		
+		//User user=userRepository.getUserData(id);
+		//Set<Geofence> geofences = user.getGeofences();
+		List<Geofence> geofences = geofenceRepository.getAllGeofences(id,offset,search);
 		return geofences;
 	}
 
