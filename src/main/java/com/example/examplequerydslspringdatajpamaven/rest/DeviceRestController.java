@@ -48,10 +48,11 @@ public class DeviceRestController {
 	
 	
 	@GetMapping("/getUserDevices/{userId}")
-	public Set<Device> devicesList(@PathVariable (value = "userId") Long userId) {
+	public ResponseEntity<?> devicesList(@PathVariable (value = "userId") Long userId) {
 		
 		//S x = userService.getName();
-		return userService.UserDevice(userId);
+		return new ResponseEntity<>(userService.UserDevice(userId), HttpStatus.OK);
+		//return userService.UserDevice(userId);
 	}
 	
 	@PostMapping(path ="/createDevice/{userId}")

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.example.examplequerydslspringdatajpamaven.entity.Event;
+import com.example.examplequerydslspringdatajpamaven.entity.EventReport;
 import com.example.examplequerydslspringdatajpamaven.repository.EventRepository;
 @Component
 public class ReportServiceImpl implements ReportService {
@@ -13,7 +14,7 @@ public class ReportServiceImpl implements ReportService {
 	EventRepository eventRepository;
 
 	@Override
-	public List<Event> getEventsReport(Long deviceId,int offset,String start,String end) {
+	public List<EventReport> getEventsReport(Long deviceId,int offset,String start,String end) {
 		
 
 		return eventRepository.getEvents(deviceId,offset,start,end);

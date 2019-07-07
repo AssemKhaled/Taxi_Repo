@@ -27,14 +27,9 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import com.example.examplequerydslspringdatajpamaven.entity.Event;
-
-import com.example.examplequerydslspringdatajpamaven.entity.Stop;
 import com.example.examplequerydslspringdatajpamaven.service.ReportServiceImpl;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 import com.example.examplequerydslspringdatajpamaven.service.GeofenceServiceImpl;
-import com.example.examplequerydslspringdatajpamaven.service.ReportServiceImpl;
 
 
 @RestController
@@ -50,7 +45,6 @@ public class ReportRestController {
 	
 	@RequestMapping(value = "/get_events_report", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<?> getEvents(@RequestBody Map<String, String> request) {
-		
 		Integer offset =0;
 		String start="";
 		String end="";
@@ -94,51 +88,11 @@ public class ReportRestController {
 		
 		
 		if(deviceId != 0) {
-			List<Event> events=reportServiceImpl.getEventsReport(deviceId,offset,start,end);
-			ArrayList<Map<String,Object>> data = new ArrayList<Map<String,Object>>();
-			if(!events.isEmpty()) {
-			    for(int i=0;i<events.size();i++) {
-					 Map<String, Object> result = new HashMap<>();
-					 if(events.get(i).getType().equalsIgnoreCase("alarm")) {
-					JSONObject obj= new JSONObject(events.get(i).getAttributes());
-						 result.put("eventType", obj.get("alarm"));
-					 
-					 }
-					 else {
-						 
-						 result.put("eventType", events.get(i).getType());
-					 
-					 }
-					 result.put("attributes", events.get(i).getAttributes());
-					 result.put("servertime", events.get(i).getServertime().toString());
-					 result.put("deviceName", events.get(i).getDevice().getName());	
-					 //result.put("positionId", events.get(i).getPositionid());
-					 //result.put("geofenceId", events.get(i).getGeofenceid());
-					 if(events.get(i).getGeofenceid() != null) {
-						 Geofence geofence=geofenceServiceImpl.getGeofenceById(Long.parseLong(events.get(i).getGeofenceid().toString()));
-						 if(geofence != null) {
-							 result.put("geoName", geofence.getName());
-						 }
-						 else {
-							 result.put("geoName", null);
-						 } 
-					 }
-					 else {
-						 result.put("geoName", null);
-					 }
-					 
-					 
-					 data.add(i, result);
-
-				}
-			    return ResponseEntity.ok(data);
-			}
-			else {
-				return ResponseEntity.ok("no data available");
-
-			}
 			
+			//List<Event> events=reportServiceImpl.getEventsReport(deviceId,offset,start,end);
+			return ResponseEntity.ok(reportServiceImpl.getEventsReport(deviceId,offset,start,end));			
 
+		
 		}
 		else{
 			
