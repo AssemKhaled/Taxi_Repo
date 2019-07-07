@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
@@ -42,67 +43,45 @@ public class UserRestController {
 		
 	}
 	
-	@GetMapping("/userslist/{userId}")
-	public Set<User> usersList(@PathVariable (value = "userId") Long userId) {
-		
-		//S x = userService.getName();
-		return userService.usersOfUser(userId);
+	@GetMapping("/usersList")
+	public ResponseEntity<?> usersList(@RequestParam (value = "userId") Long userId,@RequestParam(value = "offset", defaultValue = "0") int offset,
+            @RequestParam(value = "search", defaultValue = "") String search) {
+		return userService.usersOfUser(userId,offset,search);
+	}
+	
+	@GetMapping("/getUserById")
+	public ResponseEntity<?> getUserById(@RequestParam (value = "userId") Long userId) {
+		return userService.findUserById(userId);
 	}
 
 	@PostMapping(path ="/createUser/{userId}")
-	public ResponseEntity<User> createDevice(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) User user) {
-		Set<User> userCreater=new HashSet<>() ;
-		userCreater.add(userService.findById(userId));
-//		Set<User> user= userService.findById(userId);
-        user.setUsersOfUser(userCreater);
-            
-	/*	if(device == null) {
-			//throw bad request
-//			return "bad request";
-			return new ResponseEntity<>(device, HttpStatus.BAD_REQUEST);
-		}
-		else
-		{*/
-			 User newUser= userService.createUser(user);
-			 return new ResponseEntity<>(newUser, HttpStatus.OK);
-		//}	 
+	public ResponseEntity<?> createDevice(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) User user) {
+         if(user.getId() != null) {
+        	 new ResponseEntity<>("badRequest", HttpStatus.BAD_REQUEST);
+         }
+	   
+		return userService.createUser(user,userId);
 				
 	}
 	
 	@PostMapping(path ="/editUser/{userId}")
-	public ResponseEntity<User> editDevice(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) User user) {
-		Set<User> userCreater=new HashSet<>() ;
-		userCreater.add(userService.findById(userId));
-//		Set<User> user= userService.findById(userId);
-        user.setUsersOfUser(userCreater);
-            
-	/*	if(device == null) {
-			//throw bad request
-//			return "bad request";
-			return new ResponseEntity<>(device, HttpStatus.BAD_REQUEST);
-		}
-		else
-		{*/
-			 User newUser= userService.createUser(user);
-			 return new ResponseEntity<>(newUser, HttpStatus.OK);
-		//}	 
+	public ResponseEntity<?> editDevice(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) User user) {
+		
+		 if(user.getId() == null) {
+        	 new ResponseEntity<>("badRequest", HttpStatus.BAD_REQUEST);
+         }
+		 return  userService.editUser(user,userId);
+		
 				
 	}
 	@PostMapping(path ="/deleteUser/{userId}")
-	public ResponseEntity<String> deleteDevice(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) User user) {
-	
-//		
-            
-	/*	if(device == null) {
-			//throw bad request
-//			return "bad request";
-			return new ResponseEntity<>(device, HttpStatus.BAD_REQUEST);
-		}
-		else
-		{*/
-			 String deleted= userService.deleteUser(user);
-			 return new ResponseEntity<>(deleted, HttpStatus.OK);
-		//}	 
+	public ResponseEntity<?> deleteDevice(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) User user) {
+		 if(user.getId() == null) {
+        	 new ResponseEntity<>("badRequest", HttpStatus.BAD_REQUEST);
+         }
+			 
+		return userService.deleteUser(user);
+		
 				
 	}
 
