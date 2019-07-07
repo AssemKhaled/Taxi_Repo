@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "tc_devices" , schema = "sareb_blue")
-@JsonIgnoreProperties(value = { "events" })
+@JsonIgnoreProperties(value = { "events","hibernateLazyInitializer", "handler" })
 public class Device {
 
 	@Id

@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -21,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Entity
 @Table(name = "tc_geofences" , schema = "sareb_blue")
 @JsonIgnoreProperties(value = { "device" })
+//@JsonIgnoreProperties(value = { "hibernateLazyInitializer", "handler" })
+
 public class Geofence {
 	
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -156,6 +159,18 @@ public class Geofence {
 	public void setDevice(Set<Device> device) {
 		this.device = device;
 	}
+	
+	/*@OneToMany(mappedBy="geofence", fetch=FetchType.EAGER)
+	private Set<Event> events;
+
+	public Set<Event> getEvents() {
+		return events;
+	}
+
+	public void setEvents(Set<Event> events) {
+		this.events = events;
+	}*/
+	
 	
 	
 

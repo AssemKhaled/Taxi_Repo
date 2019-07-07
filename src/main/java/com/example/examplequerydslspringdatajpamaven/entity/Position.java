@@ -1,7 +1,7 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
 import java.util.Date;
-
+import java.util.Set;
 import javax.jdo.annotations.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -9,16 +9,18 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvDate;
 
 @Entity
 @Table(name = "tc_positions" , schema = "sareb_blue")
+//@JsonIgnoreProperties(value = { "hibernateLazyInitializer", "handler" })
 public class Position {
 
 	@Id
@@ -84,7 +86,7 @@ public class Position {
 	private Integer is_offline;
 	
 	@Column(name = "weight")
-	private float weight;
+	private Float weight;
 	
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "deviceid", nullable = false)
@@ -227,11 +229,11 @@ public class Position {
 		this.is_offline = is_offline;
 	}
 
-	public float getWeight() {
+	public Float getWeight() {
 		return weight;
 	}
 
-	public void setWeight(float weight) {
+	public void setWeight(Float weight) {
 		this.weight = weight;
 	}
 
@@ -242,6 +244,18 @@ public class Position {
 	public void setDevice(Device device) {
 		this.device = device;
 	}
+	
+	/*@OneToMany(mappedBy="position", fetch=FetchType.EAGER)
+	private Set<Event> events;
+
+	public Set<Event> getEvents() {
+		return events;
+	}
+
+	public void setEvents(Set<Event> events) {
+		this.events = events;
+	}
+	*/
 	
 
 }

@@ -139,7 +139,30 @@ public class Event {
 		this.device = device;
 	}
 	
+	/*@ManyToOne(fetch=FetchType.EAGER)
+    @JoinColumn(name="geofenceid", nullable=false,insertable=false, updatable=false)
+    private Geofence geofence;
 
+	public Geofence getGeofence() {
+		return geofence;
+	}
+
+	public void setGeofence(Geofence geofence) {
+		this.geofence = geofence;
+	}
+	
+	@ManyToOne(fetch=FetchType.EAGER)
+    @JoinColumn(name="positionid", nullable=false,insertable=false, updatable=false)
+    private Position position;
+
+	public Position getPosition() {
+		return position;
+	}
+
+	public void setPosition(Position position) {
+		this.position = position;
+	}*/
+	
 
 	
 }
