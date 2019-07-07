@@ -1,4 +1,4 @@
-package com.example.service;
+package com.example.examplequerydslspringdatajpamaven.service;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -6,20 +6,27 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
+import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 
 
-@Service
+
+@Component
 public class DeviceServiceImpl implements DeviceService {
 
 	private static final Log logger = LogFactory.getLog(DeviceServiceImpl.class);
 	
 	@Autowired 
 	DeviceRepository deviceRepository;
+	
+	GetObjectResponse getObjectResponse;
 	
 	@Override
 	public List<Device> getAllUserDevices() {
@@ -159,6 +166,18 @@ public class DeviceServiceImpl implements DeviceService {
 		// TODO Auto-generated method stub
 		deviceRepository.save(device);
 		return "ok";
+	}
+
+	@Override
+	public ResponseEntity<?> testgetDeviceById() {
+		// TODO Auto-generateds method stub
+		Device device ;
+		 device = deviceRepository.findOne((long) 73);
+		List<Device> devices = new ArrayList<>();
+		devices.add(device);
+	
+		 getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "login successfully",devices);
+		return  ResponseEntity.ok().body(getObjectResponse) ;
 	}
 
 }

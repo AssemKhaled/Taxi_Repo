@@ -19,7 +19,8 @@ import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.exceptions.UserExceptionEnum;
 import com.example.examplequerydslspringdatajpamaven.exceptions.UserExceptions;
-import com.example.service.UserServiceImpl;
+import com.example.examplequerydslspringdatajpamaven.service.UserServiceImpl;
+
 
 @RestController
 @RequestMapping(path = "/users")

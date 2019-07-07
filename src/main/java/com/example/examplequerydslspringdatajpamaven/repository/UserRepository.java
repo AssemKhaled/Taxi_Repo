@@ -10,15 +10,16 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 
-@Service
+@Component
 public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredicateExecutor<User> {
 
-	@Query(value = " select  * from tc_users u where u.id=1", nativeQuery = true)
-	public User getName();
+	@Query(value = " select  * from tc_users u where u.email = :email and hashedpassword = :hashedPassword  and  delete_date is null", nativeQuery = true)
+	public User getUserByEmailAndPassword(@Param("email")String email,@Param("hashedPassword")String hashedPassword );
 	
 	@Query(value = "select * from tc_users u where u.id =1",nativeQuery = true)
 	public User getAll();

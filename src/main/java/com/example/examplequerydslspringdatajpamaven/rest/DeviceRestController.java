@@ -7,6 +7,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,12 +20,13 @@ import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
-import com.example.service.DeviceServiceImpl;
-import com.example.service.DriverServiceImpl;
-import com.example.service.GeofenceServiceImpl;
-import com.example.service.UserServiceImpl;
+import com.example.examplequerydslspringdatajpamaven.service.DeviceServiceImpl;
+import com.example.examplequerydslspringdatajpamaven.service.DriverServiceImpl;
+import com.example.examplequerydslspringdatajpamaven.service.GeofenceServiceImpl;
+import com.example.examplequerydslspringdatajpamaven.service.UserServiceImpl;
+
 @CrossOrigin
-@RestController
+@Component
 @RequestMapping(path = "/devices")
 public class DeviceRestController {
 	
@@ -216,6 +218,10 @@ public class DeviceRestController {
 			//}	 
 					
 		}
+	 @GetMapping(path = "/testResponse")
+	  public ResponseEntity<?> testResponse(){
+		 return deviceService.testgetDeviceById();
+	 }
 	
 	
 

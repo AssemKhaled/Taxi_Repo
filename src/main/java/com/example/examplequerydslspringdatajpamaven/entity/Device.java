@@ -39,10 +39,10 @@ public class Device {
 //	@Temporal(TemporalType.TIMESTAMP)
 	private String lastUpdate;
 	
-	/*@Column(name = "positionid")
-	private Integer positionId;
+	@Column(name = "positionid")
+	private Integer positionid;
 	
-	@Column(name = "groupid")
+	/*@Column(name = "groupid")
 	private Integer groupId;*/
 	
 	@Column(name = "attributes")
@@ -221,15 +221,8 @@ public class Device {
 		this.lastUpdate = lastUpdate;
 	}
 
-	/*public Integer getPositionId() {
-		return positionId;
-	}
-
-	public void setPositionId(Integer positionId) {
-		this.positionId = positionId;
-	}
-
-	public Integer getGroupId() {
+	
+	/*public Integer getGroupId() {
 		return groupId;
 	}
 
@@ -504,6 +497,14 @@ public class Device {
 
 	public void setEvents(Set<Event> events) {
 		this.events = events;
+	}
+
+	public Integer getPositionid() {
+		return positionid;
+	}
+
+	public void setPositionid(Integer positionid) {
+		this.positionid = positionid;
 	}
 	
  

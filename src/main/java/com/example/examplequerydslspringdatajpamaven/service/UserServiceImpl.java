@@ -1,4 +1,4 @@
-package com.example.service;
+package com.example.examplequerydslspringdatajpamaven.service;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -8,12 +8,13 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 
-@Service
+@Component
 public class UserServiceImpl implements IUserService {
 
 	@Autowired
@@ -21,7 +22,8 @@ public class UserServiceImpl implements IUserService {
 
 	@Override
 	public User getName() {
-		User x = userRepository.getName();
+		Long id =(long) 1;
+		User x = userRepository.findOne(id);
 		//System.out.println(userRepository);
 
 		return x;

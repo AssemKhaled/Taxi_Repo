@@ -1,6 +1,8 @@
-package com.example.service;
+package com.example.examplequerydslspringdatajpamaven.service;
 
 import java.util.List;
+
+import org.springframework.http.ResponseEntity;
 
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 
@@ -19,4 +21,6 @@ public interface DeviceService {
 	public String assignDeviceToDriver(Device device);
 	
 	public String assignDeviceToGeofences(Device device);
+	
+	public ResponseEntity<?> testgetDeviceById();
 }

@@ -38,7 +38,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.example.examplequerydslspringdatajpamaven.entity.Event;
 import com.example.examplequerydslspringdatajpamaven.entity.Stop;
-import com.example.service.ReportServiceImpl;
+import com.example.examplequerydslspringdatajpamaven.service.ReportServiceImpl;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 

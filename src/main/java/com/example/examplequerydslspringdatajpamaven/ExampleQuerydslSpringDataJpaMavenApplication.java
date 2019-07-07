@@ -3,16 +3,17 @@ package com.example.examplequerydslspringdatajpamaven;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
-import com.example.service.DeviceServiceImpl;
-import com.example.service.DriverServiceImpl;
-import com.example.service.GeofenceServiceImpl;
-import com.example.service.ReportServiceImpl;
-import com.example.service.UserServiceImpl;
+import com.example.examplequerydslspringdatajpamaven.Validator.JWKValidator;
+
+
+
 
 @SpringBootApplication
 //@Configuration
+@ComponentScan(basePackages = { "com.example.examplequerydslspringdatajpamaven.*"})
 public class ExampleQuerydslSpringDataJpaMavenApplication  {
 
 	
@@ -21,30 +22,38 @@ public class ExampleQuerydslSpringDataJpaMavenApplication  {
 		SpringApplication.run(ExampleQuerydslSpringDataJpaMavenApplication.class, args);
 	}
 
-	@Bean
-	public UserServiceImpl test() {
-		return new UserServiceImpl();
-	}
+//	@Bean
+//	public UserServiceImpl test() {
+//		return new UserServiceImpl();
+//	}
 	
-	@Bean
-	public DeviceServiceImpl testDevice() {
-		return new DeviceServiceImpl();
-	}
+//	@Bean
+//	public DeviceServiceImpl testDevice() {
+//		return new DeviceServiceImpl();
+//	}
 	
-	@Bean
-	public DriverServiceImpl testDriver() {
-		return new DriverServiceImpl();
-	}
+//	@Bean
+//	public DriverServiceImpl testDriver() {
+//		return new DriverServiceImpl();
+//	}
 	
-	@Bean
-	public GeofenceServiceImpl testGeofence() {
-		return new GeofenceServiceImpl();
-	}
+//	@Bean
+//	public GeofenceServiceImpl testGeofence() {
+//		return new GeofenceServiceImpl();
+//	}
 	
-	@Bean
-	public ReportServiceImpl testReport() {
-		return new ReportServiceImpl();
-	}
+//	@Bean
+//	public ReportServiceImpl testReport() {
+//		return new ReportServiceImpl();
+//	}
+//	@Bean
+//	public LoginServiceImpl testLogin() {
+//		return new LoginServiceImpl();
+//	}
+	/*@Bean
+	public JWKValidator  testJWKValidator() {
+		return new JWKValidator();
+	}*/
 	
 //	@Bean(name = "mainDataSource")
 //	@Primary
