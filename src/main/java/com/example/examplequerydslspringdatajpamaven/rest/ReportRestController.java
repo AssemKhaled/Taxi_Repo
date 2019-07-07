@@ -5,19 +5,28 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collection;
+import java.util.Collections;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.FormHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -26,10 +35,15 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.Event;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
+import com.example.examplequerydslspringdatajpamaven.entity.Stop;
+import com.example.examplequerydslspringdatajpamaven.entity.Trip;
 import com.example.service.GeofenceServiceImpl;
 import com.example.service.ReportServiceImpl;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 @RestController
@@ -45,7 +59,6 @@ public class ReportRestController {
 	
 	@RequestMapping(value = "/get_events_report", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<?> getEvents(@RequestBody Map<String, String> request) {
-		
 		Integer offset =0;
 		String start="";
 		String end="";
@@ -133,6 +146,9 @@ public class ReportRestController {
 
 			}
 			
+			
+			
+
 
 		}
 		else{
