@@ -5,20 +5,31 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
+import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 
 @Component
 public class UserServiceImpl implements IUserService {
 
 	@Autowired
 	private UserRepository userRepository;
+	
+	private static final Log logger = LogFactory.getLog(DeviceServiceImpl.class);
+	
+	GetObjectResponse getObjectResponse;
 
 	@Override
 	public User getName() {
@@ -51,27 +62,65 @@ public class UserServiceImpl implements IUserService {
 		User user=userRepository.findOne(userId);
 		return user;
 	}
-
+	
 	@Override
-	public Set<User> usersOfUser(Long userId) {
-		// User x=userRepository.getAll();
-		 Set<User> users = userRepository.getUsersOfUser(userId);
-		return users;
+	public  ResponseEntity<?> findUserById(Long userId) {
+		// TODO Auto-generated method stub
+		logger.info("************************ getUserById STARTED ***************************");
+		User user=userRepository.findOne(userId);
+		if(user == null)
+		{
+			List<User> users = null;
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "success",users);
+			logger.info("************************ getUserById STARTED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+		}
+		else
+		{
+			if(user.getDelete_date()!= null)
+			{
+				List<User> users = null;
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "success",users);
+				logger.info("************************ getUserById STARTED ***************************");
+				return ResponseEntity.ok().body(getObjectResponse);
+			}
+			List<User> users= new ArrayList<>();
+			users.add(user);
+			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users);
+			logger.info("************************ getUserById STARTED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+		}
+		
 	}
 
 	@Override
-	public User createUser(User user) {
-		// TODO Auto-generated method stub
+	public ResponseEntity<?> usersOfUser(Long userId,int offset,String search) {
+		logger.info("************************ getAllUsersOfUser STARTED ***************************");
+		 List<User> users = userRepository.getUsersOfUser(userId,offset,search);
+		 getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users);
+		 logger.info("************************ getAllUsersOfUser ENDED ***************************");
+		return  ResponseEntity.ok().body(getObjectResponse);
+	}
+
+	@Override
+	public ResponseEntity<?> createUser(User user,Long userId) {
+		
+		logger.info("************************createUser STARTED ***************************");
+		
+		Set<User> userCreater=new HashSet<>() ;
+		userCreater.add(findById(userId));
+        user.setUsersOfUser(userCreater);
 		String password = user.getPassword();
-	    String hashedPassword = getMd5(password);
-	    
+	    String hashedPassword = getMd5(password);  
 	    user.setPassword(hashedPassword);
 	    List<Integer> duplictionList = checkUserDuplication(user);
 	    if(duplictionList.size()>0)
 	    {
 	    	System.out.println("duplication" +duplictionList.toString() );
 	    	//throw duplication exception with duplication list
-	    	return null;
+	    	getObjectResponse = new GetObjectResponse(101, "Duplication Erorr",duplictionList);
+	    	logger.info("************************createUser ENDED ***************************");
+	    	return ResponseEntity.ok().body(getObjectResponse);
 	    }
 	    else
 	    {
@@ -79,7 +128,51 @@ public class UserServiceImpl implements IUserService {
 			
 	    
 	    	userRepository.save(user);
-	    	return user;
+	    	List<User> users = null;
+	    	getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users);
+	    	logger.info("************************createUser ENDED ***************************");
+	    	return ResponseEntity.ok().body(getObjectResponse);
+	    }
+	}
+	@Override
+	public ResponseEntity<?> editUser(User user,Long userId) {
+		
+		logger.info("************************editUser STARTED ***************************");	
+		//to set the users of updateduser
+		User oldOne = findById(user.getId());
+		
+		Set<User> userCreater=new HashSet<>();
+		
+		userCreater = oldOne.getUsersOfUser();
+		
+        user.setUsersOfUser(userCreater);
+        
+		String password = user.getPassword();
+		
+	    String hashedPassword = getMd5(password);  
+	    
+	    user.setPassword(hashedPassword);
+	    
+	    List<Integer> duplictionList = checkUserDuplication(user);
+	    
+	    if(duplictionList.size()>0)
+	    {
+	    	System.out.println("duplication" +duplictionList.toString() );
+	    	//throw duplication exception with duplication list
+	    	getObjectResponse = new GetObjectResponse(101, "Duplication Erorr",duplictionList);
+	    	logger.info("************************editUser ENDED ***************************");
+	    	return ResponseEntity.ok().body(getObjectResponse);
+	    }
+	    else
+	    {
+	    
+			
+	    
+	    	userRepository.save(user);
+	    	List<User> users = null;
+	    	getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users);
+	    	logger.info("************************createUser ENDED ***************************");
+	    	return ResponseEntity.ok().body(getObjectResponse);
 	    }
 	}
 	
@@ -172,7 +265,8 @@ public class UserServiceImpl implements IUserService {
 	}
 
 	@Override
-	public String deleteUser(User user) {
+	public ResponseEntity<?> deleteUser(User user) {
+		logger.info("************************deleteUser STARTED ***************************");	
 		 Calendar cal = Calendar.getInstance();
 		 int day = cal.get(Calendar.DATE);
 	     int month = cal.get(Calendar.MONTH) + 1;
@@ -180,8 +274,11 @@ public class UserServiceImpl implements IUserService {
 	     String date =  Integer.toString(year)+"-"+ Integer.toString(month)+"-"+ Integer.toString(day);
 	     user.setDelete_date(date);
 	     userRepository.save(user);
-	    userRepository.deleteUserOfUser(user.getId());
-		return "deleted successfully";
+	     userRepository.deleteUserOfUser(user.getId());
+	     List<User> users= null;
+	      getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users);
+	    logger.info("************************deleteUser ENDED ***************************");
+	    return ResponseEntity.ok().body(getObjectResponse);
 	} 
 
 	

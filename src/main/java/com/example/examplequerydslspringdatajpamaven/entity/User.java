@@ -95,8 +95,8 @@ public class User {
 	    )
 	    @JoinTable(
 	            name = "tc_user_user",
-	            joinColumns = { @JoinColumn(name = "userid") },
-	            inverseJoinColumns = { @JoinColumn(name = "manageduserid") }
+	            joinColumns = { @JoinColumn(name = "manageduserid") },
+	            inverseJoinColumns = { @JoinColumn(name = "userid") }
 	    )
 //	    @OnDelete(action = OnDeleteAction.CASCADE)
 		private Set<User> usersOfUser = new HashSet<>();

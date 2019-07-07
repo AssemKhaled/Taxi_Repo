@@ -27,8 +27,11 @@ public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredi
 	@Query(value = "select * from tc_users u where u.id =:userId and u.delete_date Is null",nativeQuery = true)
 	public User getUserData(@Param("userId") Long userId);
 	
-	@Query(value = "SELECT tc_users.* FROM tc_user_user inner join tc_users on tc_user_user.manageduserid=tc_users.id where tc_user_user.userid = :userId and delete_date is null limit 0,10", nativeQuery = true)
-	public Set<User> getUsersOfUser(@Param("userId") Long userId); 
+	@Query(value = "SELECT tc_users.* FROM tc_user_user inner join tc_users on tc_user_user.manageduserid=tc_users.id where tc_user_user.userid = :userId and delete_date is null AND  "
+			+ "(tc_users.name LIKE %:search% OR "
+			+ "tc_users.email LIKE %:search% OR tc_users.commercial_num LIKE %:search% OR "
+			+ "tc_users.identity_num LIKE %:search%) limit :offset,20", nativeQuery = true)
+	public List<User> getUsersOfUser(@Param("userId") Long userId,@Param("offset")int offset,@Param("search")String search); 
 	
 	@Query(value = "SELECT * from tc_users where delete_date is null and (email = :email or "
 			+ "identity_num = :identityNum or commercial_num = :commercialNum or "
@@ -42,5 +45,7 @@ public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredi
     @Transactional
 	@Query(value = "delete  from tc_user_user where manageduserid = :userId", nativeQuery = true )
 	public void deleteUserOfUser(@Param("userId")Long deviceId);
+	
+	
 	
 }
