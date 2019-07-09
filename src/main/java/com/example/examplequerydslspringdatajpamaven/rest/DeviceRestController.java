@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
@@ -37,8 +38,6 @@ public class DeviceRestController {
 	@Autowired
 	private DeviceServiceImpl deviceService;
 	
-	@Autowired
-	private UserServiceImpl userService;
 	
 	@Autowired
 	private DriverServiceImpl driverService;
@@ -47,148 +46,35 @@ public class DeviceRestController {
 	GeofenceServiceImpl geofenceService;
 	
 	
-	@GetMapping("/getUserDevices/{userId}")
-	public ResponseEntity<?> devicesList(@PathVariable (value = "userId") Long userId) {
+	@GetMapping("/getUserDevices")
+	public ResponseEntity<?> devicesList(@RequestParam (value = "userId") Long userId,@RequestParam(value = "offset", defaultValue = "0") int offset,
+            @RequestParam(value = "search", defaultValue = "") String search) {
+ 
+		return new ResponseEntity<>(deviceService.getAllUserDevices(userId,offset,search), HttpStatus.OK);
 		
-		//S x = userService.getName();
-		return new ResponseEntity<>(userService.UserDevice(userId), HttpStatus.OK);
-		//return userService.UserDevice(userId);
 	}
 	
 	@PostMapping(path ="/createDevice/{userId}")
 	public ResponseEntity<?> createDevice(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) Device device) {
-		if(device.getId() != null || device.getName()== null || device.getUniqueId()== null
-		   || device.getSequenceNumber() == null) {
-			
-			return new	ResponseEntity<>("bad request",  HttpStatus.BAD_REQUEST);
-		}
-		//System.out.println("bad request"+device.getId());
-		Set<User> user=new HashSet<>() ;
-		user.add(userService.findById(userId));
-//		Set<User> user= userService.findById(userId);
-        device.setUser(user);
-            
-		//*if(device == null) {
-			//throw bad request
-//			return "bad request";
-//			System.out.println("bad request");
-//			return new ResponseEntity<>(device, HttpStatus.BAD_REQUEST);
-//		}
-		//else
-		//{*/
-        if(device.getPhoto() !=null) {
-			
-			//base64_Image
-        	String photo=device.getPhoto();
-			DecodePhoto decodePhoto=new DecodePhoto();
-			device.setPhoto(decodePhoto.Base64_Image(photo));				
-			
-		}
-		else {
-			device.setPhoto("Not-available.png");
-		}	
-        
-			 String newDevice= deviceService.createDevice(device);
-			 
-			 return new ResponseEntity<>(newDevice, HttpStatus.OK);
-		//}	 
-				
+			 return deviceService.createDevice(device,userId);				
 	}
+	
 	@PostMapping(path ="/editDevice/{userId}")
 	public ResponseEntity<?> editDevice(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) Device device) {
-		if(device.getId() == null || device.getName()== null || device.getUniqueId()== null
-				   || device.getSequenceNumber() == null) {
-					
-					return new	ResponseEntity<>("bad request",  HttpStatus.BAD_REQUEST);
-		}
-		Set<User> user=new HashSet<>() ;
-		user.add(userService.findById(userId));
-//		Set<User> user= userService.findById(userId);
-        device.setUser(user);
-            
-	/*	if(device == null) {
-			//throw bad request
-//			return "bad request";
-			return new ResponseEntity<>(device, HttpStatus.BAD_REQUEST);
-		}
-		else
-		{*/
-        if(device.getPhoto() !=null) {
+		
+			 return deviceService.editDevice(device,userId);	
+	}
+	
+	@GetMapping(path ="/deleteDevice")
+	public ResponseEntity<?> deleteDevice(@RequestParam  (value = "userId") Long userId,@RequestParam (value = "deviceId") Long deviceId ) {
 			
-			//base64_Image
-        	String photo=device.getPhoto();
-			DecodePhoto decodePhoto=new DecodePhoto();
-			device.setPhoto(decodePhoto.Base64_Image(photo));				
-			
-		}
-		else {
-			device.setPhoto("Not-available.png");
-		}	
-			 String newDevice= deviceService.createDevice(device);
-			 return new ResponseEntity<>(newDevice, HttpStatus.OK);
-		//}	 
-				
+			 return deviceService.deleteDevice(userId,deviceId);			
 	}
-	@PostMapping(path ="/deleteDevice/{userId}")
-	public ResponseEntity<String> deleteDevice(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) Device device) {
-		if(device.getId() == null || device.getName()== null || device.getUniqueId()== null
-				   || device.getSequenceNumber() == null) {
-					
-					return new	ResponseEntity<>("bad request",  HttpStatus.BAD_REQUEST);
-		}
-		//	Set<User> user=new HashSet<>() ;
-		//user.add(userService.findById(userId));
-//		Set<User> user= userService.findById(userId);
-      //  device.setUser(user);
-            
-	/*	if(device == null) {
-			//throw bad request
-//			return "bad request";
-			return new ResponseEntity<>(device, HttpStatus.BAD_REQUEST);
-		}
-		else
-		{*/
-			String deleted= deviceService.deleteDevice(device);
-			 return new ResponseEntity<>(deleted, HttpStatus.OK);
-		//}	 
-				
-	}
-	@PostMapping(path ="/checkDuplication/{userId}")
-	public ResponseEntity<List<Integer>> checkDulication(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) Device device) {
-		Set<User> user=new HashSet<>() ;
-		user.add(userService.findById(userId));
-//		Set<User> user= userService.findById(userId);
-        device.setUser(user);
-            
-	/*	if(device == null) {
-			//throw bad request
-//			return "bad request";
-			return new ResponseEntity<>(device, HttpStatus.BAD_REQUEST);
-		}
-		else
-		{*/
-			 //Device newDevice= deviceService.createDevice(device);
-        List<Integer> newDevice =deviceService.checkDeviceDuplication(device);
-			 return new ResponseEntity<>(newDevice, HttpStatus.OK);
-		//}	 
-				
-	}
-	@GetMapping(path ="/getDevicebyId/{deviceId}")
-	public ResponseEntity<Device> getDevicebyId(@PathVariable (value = "deviceId") Long deviceId) {
-      Device device = deviceService.findById(deviceId);
-            
-	/*	if(device == null) {
-			//throw bad request
-//			return "bad request";
-			return new ResponseEntity<>(device, HttpStatus.BAD_REQUEST);
-		}
-		else
-		{*/
-			 //Device newDevice= deviceService.createDevice(device);
-      
-			 return new ResponseEntity<>(device, HttpStatus.OK);
-		//}	 
-				
+	
+	@GetMapping(path ="/getDevicebyId")
+	public ResponseEntity<?> getDevicebyId(@RequestParam (value = "deviceId") Long deviceId) {
+
+			 return  deviceService.findDeviceById(deviceId);
 	}
 	
 	@PostMapping(path = "/assignDeviceToDriver/{driverId}")

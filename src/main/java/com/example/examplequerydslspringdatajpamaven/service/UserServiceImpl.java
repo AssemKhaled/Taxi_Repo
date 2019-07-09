@@ -40,21 +40,21 @@ public class UserServiceImpl implements IUserService {
 		return x;
 	}
 
-	@Override
-	public Set<Device> UserDevice(Long userId) {
-		// TODO Auto-generated method stub
-		User x=userRepository.getUserData(userId);
-		if(x.getName() == null) {
-			System.out.println("no user");
-			return null;
-		}
-		else
-		{
-			Set<Device> devices = x.getDevices();
-			return devices ;
-		}
-	    
-	}
+//	@Override
+//	public ResponseEntity<?> UserDevice(Long userId,int offset,String search) {
+//		// TODO Auto-generated method stub
+//		User x=userRepository.getUserData(userId);
+//		if(x.getName() == null) {
+//			System.out.println("no user");
+//			return null;
+//		}
+//		else
+//		{
+//			Set<Device> devices = x.getDevices();
+//			return devices ;
+//		}
+//	    
+//	}
 
 	@Override
 	public User findById(Long userId) {
@@ -266,7 +266,10 @@ public class UserServiceImpl implements IUserService {
 
 	@Override
 	public ResponseEntity<?> deleteUser(User user) {
-		logger.info("************************deleteUser STARTED ***************************");	
+	logger.info("************************deleteUser STARTED ***************************");	
+		String password = user.getPassword();
+	    String hashedPassword = getMd5(password);     
+	    user.setPassword(hashedPassword);
 		 Calendar cal = Calendar.getInstance();
 		 int day = cal.get(Calendar.DATE);
 	     int month = cal.get(Calendar.MONTH) + 1;

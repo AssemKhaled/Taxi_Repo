@@ -57,7 +57,7 @@ public class UserRestController {
 	@PostMapping(path ="/createUser/{userId}")
 	public ResponseEntity<?> createDevice(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) User user) {
          if(user.getId() != null) {
-        	 new ResponseEntity<>("badRequest", HttpStatus.BAD_REQUEST);
+        	return  new ResponseEntity<>("badRequest", HttpStatus.BAD_REQUEST);
          }
 	   
 		return userService.createUser(user,userId);
@@ -68,7 +68,7 @@ public class UserRestController {
 	public ResponseEntity<?> editDevice(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) User user) {
 		
 		 if(user.getId() == null) {
-        	 new ResponseEntity<>("badRequest", HttpStatus.BAD_REQUEST);
+        	return  new ResponseEntity<>("badRequest", HttpStatus.BAD_REQUEST);
          }
 		 return  userService.editUser(user,userId);
 		
@@ -77,7 +77,7 @@ public class UserRestController {
 	@PostMapping(path ="/deleteUser/{userId}")
 	public ResponseEntity<?> deleteDevice(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) User user) {
 		 if(user.getId() == null) {
-        	 new ResponseEntity<>("badRequest", HttpStatus.BAD_REQUEST);
+        	return new ResponseEntity<>("badRequest", HttpStatus.BAD_REQUEST);
          }
 			 
 		return userService.deleteUser(user);

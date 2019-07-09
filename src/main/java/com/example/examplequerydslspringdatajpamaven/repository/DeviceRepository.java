@@ -10,15 +10,16 @@ import org.springframework.data.repository.query.Param;
 
 import org.springframework.stereotype.Component;
 
-
+import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceEntity;
+import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceProjection;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 
 @Component
 public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDslPredicateExecutor<Device> {
 
-	@Query(value = " select  * from tc_devices d where d.delete_date is NULL", nativeQuery = true)
-	public List<Device> getName();
+	@Query(value = " select  d.id ,d.name  as name,d.uniqueid as uniqueid ,d.sequence_number as sequence_number,d.lastupdate as  lastupdate from tc_devices d inner join tc_user_device on tc_user_device.deviceid = d.id  where tc_user_device.userid = :userId and  d.delete_date is NULL  limit :offset,10", nativeQuery = true)
+	public List<CustomDeviceProjection> getUserDevices(@Param("userId")Long userId,@Param("offset") int offset);
 	
 	@Query (value = "select * from tc_devices d where d.delete_date is NULL and (d.name = :deviceName or d.uniqueid = :deviceUniqueId "
 			+ "or d.sequence_number = :deviceSequenceNumber or (d.plate_num = :devicePlateNum and d.left_letter = :deviceLeftLetter and"

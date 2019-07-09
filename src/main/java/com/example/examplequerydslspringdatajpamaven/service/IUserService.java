@@ -11,7 +11,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.User;
 public interface IUserService {
 
 	public User getName();
-	public Set<Device> UserDevice(Long userId);
+//	public ResponseEntity<?> UserDevice(Long userId,int offset, String search);
 	public User findById(Long userId);
 	public ResponseEntity<?> findUserById(Long userId);
 	public ResponseEntity<?> usersOfUser(Long userId,int offset,String search);
