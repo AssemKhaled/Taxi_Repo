@@ -43,6 +43,12 @@ public class ReportRestController {
 	@Autowired
 	GeofenceServiceImpl geofenceServiceImpl;
 	
+	@RequestMapping(value = "/get_events_report1", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<?> getEv(@RequestBody Map<String, String> request) {
+		
+		return ResponseEntity.ok(reportServiceImpl.getEventsReport1());
+	}
+	
 	@RequestMapping(value = "/get_events_report", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<?> getEvents(@RequestBody Map<String, String> request) {
 		Integer offset =0;

@@ -1,6 +1,9 @@
 package com.example.examplequerydslspringdatajpamaven.service;
 
 import java.util.List;
+
+import javax.persistence.EntityManager;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,9 +18,15 @@ public class ReportServiceImpl implements ReportService {
 
 	@Override
 	public List<EventReport> getEventsReport(Long deviceId,int offset,String start,String end) {
-		
 
-		return eventRepository.getEvents(deviceId,offset,start,end);
+		return eventRepository.getEvents();
+	}
+
+	@Override
+	public List<EventReport> getEventsReport1() {
+		// TODO Auto-generated method stub
+		return eventRepository.getEventsTest();
+
 	}
 
 }
