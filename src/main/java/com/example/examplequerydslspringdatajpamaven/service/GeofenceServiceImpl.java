@@ -60,6 +60,8 @@ public class GeofenceServiceImpl implements GeofenceService {
 
 		geofenceRepository.deleteGeofence(geofenceId,currentDate);
 		geofenceRepository.deleteGeofenceId(geofenceId);
+		geofenceRepository.deleteGeofenceDeviceId(geofenceId);
+
 		
 	}
 
