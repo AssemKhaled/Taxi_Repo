@@ -12,13 +12,6 @@ import com.example.examplequerydslspringdatajpamaven.entity.User;
 @Service
 public interface ProfileRepository extends JpaRepository<User, Long>, QueryDslPredicateExecutor<User> {
 
-	@Query(value = "SELECT * from tc_users where delete_date is null and (email = :email or "
-			+ "identity_num = :identityNum or commercial_num = :commercialNum or "
-			+ "company_phone = :companyPhone or manager_phone = :managerPhone or "
-			+ "manager_mobile = :managerMobile or phone = :phone) and tc_users.id !=:id", nativeQuery = true)
-	public List<User> checkUserDuplication(@Param("id") Long id,@Param("email") String email, @Param("identityNum")String identityNum,
-            @Param("commercialNum")String commercialNum , @Param("companyPhone")String companyPhone,
-            @Param("managerPhone")String managerPhone , @Param("managerMobile")String managerMobile,
-            @Param("phone")String phone);
+	
 	
 }

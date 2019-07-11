@@ -7,7 +7,6 @@ import com.example.examplequerydslspringdatajpamaven.entity.EventReport;
 public interface ReportService {
 	
 	public List<EventReport> getEventsReport(Long deviceId,int offset,String start,String end);
-	public List<EventReport> getEventsReport1();
 
 
 

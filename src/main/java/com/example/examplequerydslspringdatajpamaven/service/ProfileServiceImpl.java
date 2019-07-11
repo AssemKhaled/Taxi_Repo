@@ -1,7 +1,5 @@
 package com.example.examplequerydslspringdatajpamaven.service;
 
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,10 +38,5 @@ public class ProfileServiceImpl implements ProfileService{
 
 	}
 
-	@Override
-	public List<User> checkDublicate(Long id,String email, String identityNum, String commercialNum, String companyPhone,
-			String managerPhone, String managerMobile, String phone) {
-		return profileRepository.checkUserDuplication(id, email, identityNum, commercialNum, companyPhone, managerPhone, managerMobile, phone);
-	}
 
 }

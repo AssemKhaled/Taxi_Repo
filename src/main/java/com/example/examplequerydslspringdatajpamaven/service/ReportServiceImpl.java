@@ -22,11 +22,6 @@ public class ReportServiceImpl implements ReportService {
 		return eventRepository.getEvents();
 	}
 
-	@Override
-	public List<EventReport> getEventsReport1() {
-		// TODO Auto-generated method stub
-		return eventRepository.getEventsTest();
-
-	}
+	
 
 }
