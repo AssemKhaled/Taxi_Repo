@@ -5,20 +5,15 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-
-import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceEntity;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceProjection;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
-import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
 import com.example.examplequerydslspringdatajpamaven.repository.CustomDeviceRepository;

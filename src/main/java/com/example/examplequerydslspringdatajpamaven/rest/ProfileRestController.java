@@ -4,16 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
+import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.service.ProfileServiceImpl;
 import com.example.examplequerydslspringdatajpamaven.service.UserServiceImpl;
 
@@ -28,64 +33,92 @@ public class ProfileRestController {
 	@Autowired
 	UserServiceImpl userServiceImpl;
 	
-	@RequestMapping(value = "/getProfileInfo/{userId}", method = RequestMethod.GET)
-	public @ResponseBody ResponseEntity<?> getProfileInfo(@PathVariable (value = "userId") Long userId) {
+	@RequestMapping(value = "/getProfileInfo", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getProfileInfo(@RequestParam (value = "userId", defaultValue = "0") Long userId) {
 		
+		GetObjectResponse getObjectResponse ;
+		List<User> users = new ArrayList<User>();
 		if(userId != 0) {
-			
-			return  ResponseEntity.ok(profileServiceImpl.getUserInfo(userId));
+			User user =profileServiceImpl.getUserInfo(userId);
+			if(user == null) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",users);
+
+			}
+			else {
+				if(user.getDelete_date() == null) {
+					
+					users.add(user);
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",users);
+
+				}
+				else {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",users);
+
+				}
+			}
 						
 		}
 		else {
 			
-			return ResponseEntity.ok("no user selected");
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",users);
 
 		}
-		
+    	return  ResponseEntity.ok(getObjectResponse);
+
 	}
 	
-	@RequestMapping(value = "/changePassowrd/{userId}", method = RequestMethod.POST)
-	public @ResponseBody ResponseEntity<?> changePassowrd(@RequestBody Map<String, String> data ,@PathVariable (value = "userId") Long userId) {
+	@RequestMapping(value = "/changePassowrd", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<?> changePassowrd(@RequestBody Map<String, String> data ,@RequestParam (value = "userId", defaultValue = "0") Long userId) {
 
-		User user= new User();
-		String hashedPassword =null;
-		String newPassword=null;
-		String oldPassword=null;
-
-		if(data.get("oldPassword")!=null) {
-			hashedPassword = userServiceImpl.getMd5(data.get("oldPassword").toString());
-			user = profileServiceImpl.getUserInfo(userId);
-			oldPassword = user.getPassword();
-			
-			if(hashedPassword.equalsIgnoreCase(oldPassword)) {
-				
-				if(data.get("newPassword")!=null) {
-					newPassword = userServiceImpl.getMd5(data.get("newPassword").toString());
-					user.setId(userId);
-					user.setPassword(newPassword);
-					return  ResponseEntity.ok(profileServiceImpl.updatePassword(user));
-
-
-				}
-				else {
-					return  ResponseEntity.ok("no new password to update");
-	
-				}
-
+		GetObjectResponse getObjectResponse ;
+		List<User> users = new ArrayList<User>();
+		if(userId != 0) {
+			User user =profileServiceImpl.getUserInfo(userId);
+			if(user == null) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",users);
 
 			}
 			else {
-				return  ResponseEntity.ok("wrong old password");
+				if(user.getDelete_date() == null) {
+					
+					if(data.get("oldPassword") == null || data.get("newPassword") == null) {
+						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "newPassword and oldPassword is Required",users);
 
+					}
+					else {
+						String hashedPassword = userServiceImpl.getMd5(data.get("oldPassword").toString());
+						String newPassword= userServiceImpl.getMd5(data.get("newPassword").toString());
+						String oldPassword= user.getPassword();
+						
+						if(hashedPassword.equals(oldPassword)){
+							user.setPassword(newPassword);
+							String result = profileServiceImpl.updateProfile(user);
+							users.add(user);
+							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), result ,users);
+
+						}
+						else {
+							getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Wrong oldPassword",users);
+
+						}
+						
+
+					}
+					
+
+				}
+				else {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",users);
+
+				}
 			}
+		
 		}
 		else {
-			
-			return  ResponseEntity.ok("no old password to check");
-		
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",users);
 		}
-		
-		
+    	return  ResponseEntity.ok(getObjectResponse);
+
 	}
 	
 	@RequestMapping(value = "/updateProfile/{userId}", method = RequestMethod.POST)
@@ -153,26 +186,50 @@ public class ProfileRestController {
 		
 	}
 	
-	@RequestMapping(value = "/updatePhoto/{userId}", method = RequestMethod.POST)
-	public @ResponseBody ResponseEntity<?> updatePhoto(@RequestBody Map<String, String> data ,@PathVariable (value = "userId") Long userId) {
-		User user=profileServiceImpl.getUserInfo(userId);
-		if(data.get("photo")!=null) {
-			String photo =data.get("photo");
-			if(photo.equals("")) {
-				user.setPhoto("Not-available.png");				
+	@RequestMapping(value = "/updatePhoto", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<?> updatePhoto(@RequestBody Map<String, String> data ,@RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		GetObjectResponse getObjectResponse ;
+		List<User> users = new ArrayList<User>();
+		if(userId !=0) {
+			User user =profileServiceImpl.getUserInfo(userId);
+			if(user == null) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",users);
+
 			}
 			else {
-				//base64_Image
-				DecodePhoto decodePhoto=new DecodePhoto();
-				user.setPhoto(decodePhoto.Base64_Image(photo));
-			}
-			return ResponseEntity.ok(profileServiceImpl.updateProfile(user));
+				if(user.getDelete_date() == null) {
+					if(data.get("photo") ==null) {
+						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "photo is Required",users);
 
-			
+					}
+					else {
+						String photo = data.get("photo").toString();
+						if(photo.equals("")) {
+							user.setPhoto("Not-available.png");				
+						}
+						else {
+							//base64_Image
+							DecodePhoto decodePhoto=new DecodePhoto();
+							user.setPhoto(decodePhoto.Base64_Image(photo));
+					    }
+						String result = profileServiceImpl.updateProfile(user);
+						users.add(user);
+						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), result ,users);
+
+					}
+					
+				}
+				else {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",users);
+
+				}
+			}
 		}
 		else {
-			return ResponseEntity.ok("no photo selected");
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",users);
 		}
+    	return  ResponseEntity.ok(getObjectResponse);
+
 	}
 	
 }

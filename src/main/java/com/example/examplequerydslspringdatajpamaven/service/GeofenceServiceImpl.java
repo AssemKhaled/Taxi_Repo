@@ -2,19 +2,20 @@ package com.example.examplequerydslspringdatajpamaven.service;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
-import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.repository.GeofenceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
+
 @Component
 public class GeofenceServiceImpl implements GeofenceService {
 	
+	private static final Log logger = LogFactory.getLog(GeofenceServiceImpl.class);
+
 	@Autowired
 	GeofenceRepository geofenceRepository;
 	
@@ -26,23 +27,37 @@ public class GeofenceServiceImpl implements GeofenceService {
 
 		//User user=userRepository.getUserData(id);
 		//Set<Geofence> geofences = user.getGeofences();
+		logger.info("************************ getAllUserGeofences STARTED ***************************");
+
 		List<Geofence> geofences = geofenceRepository.getAllGeofences(id,offset,search);
+		
+		logger.info("************************ getAllUserGeofences ENDED ***************************");
+
 		return geofences;
 	}
 
 	@Override
 	public Geofence getGeofenceById(Long geofenceId) {
+		logger.info("************************ getGeofenceById STARTED ***************************");
+
+		Geofence geofence=geofenceRepository.findOne(geofenceId);
 		
-		return geofenceRepository.findOne(geofenceId);
+		logger.info("************************ getGeofenceById ENDED ***************************");
+
+		return geofence;
 
 	}
 
 	@Override
 	public void deleteGeofence(Long geofenceId) {
 
+		logger.info("************************ deleteGeofence STARTED ***************************");
+
 		Date date = new Date();
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd"); 
 		String currentDate=formatter.format(date);
+		logger.info("************************ deleteGeofence ENDED ***************************");
+
 		geofenceRepository.deleteGeofence(geofenceId,currentDate);
 		geofenceRepository.deleteGeofenceId(geofenceId);
 		
@@ -56,18 +71,15 @@ public class GeofenceServiceImpl implements GeofenceService {
 	}
 	
 	@Override
-	public String addGeofence(Geofence geofence,Long id) {
-		User userData = userRepository.getUserData(id);
-		if(userData != null) {
-			Set<User> usergeofence = new HashSet<>();
-			usergeofence.add(userData);
-			geofence.setUserGeofence(usergeofence);
-			geofenceRepository.save(geofence);
-			return "Add successfully";
-		}
-		else {
-			return "no user by this id";
-		}
+	public String addGeofence(Geofence geofence) {
+		logger.info("************************ addGeofence STARTED ***************************");
+
+		geofenceRepository.save(geofence);
+
+		logger.info("************************ addGeofence ENDED ***************************");
+
+		return "Add successfully";
+	
 		
 		
 	}
