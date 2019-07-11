@@ -32,4 +32,5 @@ public interface DeviceService {
 	public String assignDeviceToGeofences(Device device);
 	
 	public ResponseEntity<?> testgetDeviceById();
+	
 }

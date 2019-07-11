@@ -1,5 +1,6 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
+import java.beans.ConstructorProperties;
 import java.util.Optional;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -18,22 +19,20 @@ public class EventReport {
 	private String type;
 	private String name;
 
+	
 	public EventReport (int id ,String type,String name){
 		
 	   this.id = id;
        this.type = "";
        this.name= null;
-	   
 	
 	}
-	
+
 	public EventReport (int id ,String name){
 		
-		   this.id = id;
-	       this.name= name;
-		  
-	       
-		
+		this.id = id;
+	    this.name= name;
+		  	
 	}
 		
 	

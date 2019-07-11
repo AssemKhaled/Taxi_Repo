@@ -2,18 +2,19 @@ package com.example.examplequerydslspringdatajpamaven.service;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
-import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.repository.DriverRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
+
 @Component
 public class DriverServiceImpl implements DriverService{
+
+	private static final Log logger = LogFactory.getLog(DriverServiceImpl.class);
 
 	@Autowired
 	DriverRepository driverRepository;
@@ -26,7 +27,12 @@ public class DriverServiceImpl implements DriverService{
 		
 		//User user=userRepository.getUserData(id);
 		//Set<Driver> drivers = user.getDrivers();
+		logger.info("************************ getAllDrivers STARTED ***************************");
+
 		List<Driver> drivers = driverRepository.getAllDrivers(id,offset,search);
+		
+		logger.info("************************ getAllDrivers ENDED ***************************");
+		
 		return drivers;
 	
 	}
@@ -39,18 +45,15 @@ public class DriverServiceImpl implements DriverService{
 	}
 	
 	@Override
-	public String addDriver(Driver driver,Long id) {
-		User userData = userRepository.getUserData(id);
-		if(userData != null) {
-			Set<User> userDriver = new HashSet<>();
-			userDriver.add(userData);
-			driver.setUserDriver(userDriver);
-			driverRepository.save(driver);
-			return "Add successfully";
-		}
-		else {
-			return "no user by this id";
-		}
+	public String addDriver(Driver driver) {
+		
+		logger.info("************************ addDriver STARTED ***************************");
+
+		driverRepository.save(driver);
+		
+		logger.info("************************ addDriver ENDED ***************************");
+
+		return "Added successfully";
 		
 		
 	}
@@ -65,16 +68,25 @@ public class DriverServiceImpl implements DriverService{
 	
 	@Override
 	public void editDriver(Driver driver) {
-		
+		logger.info("************************ editDriver STARTED ***************************");
+
 		driverRepository.save(driver);
+		
+		logger.info("************************ editDriver ENDED ***************************");
+
 		
 	}
 
 
 	@Override
 	public Driver getDriverById(Long driverId) {
+		logger.info("************************ getAllDrivers STARTED ***************************");
 		
-		return driverRepository.findOne(driverId);
+		Driver driver= driverRepository.findOne(driverId);
+
+		logger.info("************************ getAllDrivers ENDED ***************************");
+
+		return driver;
 	}
 	
 	@Override
@@ -83,10 +95,13 @@ public class DriverServiceImpl implements DriverService{
 		Date date = new Date();
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd"); 
 		String currentDate=formatter.format(date);
+		logger.info("************************ deleteDriver STARTED ***************************");
+
 		driverRepository.deleteDriver(driverId,currentDate);
 		driverRepository.deleteDriverId(driverId);
 
-		
+		logger.info("************************ deleteDriver ENDED ***************************");
+
 	}
 
 	

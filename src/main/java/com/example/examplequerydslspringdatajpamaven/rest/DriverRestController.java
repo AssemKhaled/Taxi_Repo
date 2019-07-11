@@ -1,23 +1,25 @@
 package com.example.examplequerydslspringdatajpamaven.rest;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
+import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
+import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.service.DriverServiceImpl;
+import com.example.examplequerydslspringdatajpamaven.service.UserServiceImpl;
 
 
 
@@ -28,300 +30,315 @@ public class DriverRestController {
 	
 	@Autowired
 	DriverServiceImpl driverServiceImpl;
+	
+	@Autowired
+	UserServiceImpl userServiceImpl;
 
-	@RequestMapping(value = "/get_all_drivers/{userId}", method = RequestMethod.GET)
-	public @ResponseBody ResponseEntity<?> getDrivers(@PathVariable (value = "userId") Long id,
-			@Param (value = "offset") int offset,
-			@Param (value = "search") String search) {
+	@RequestMapping(value = "/getAllDrivers", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getDrivers(@RequestParam (value = "userId", defaultValue = "0") Long id,
+			@RequestParam (value = "offset", defaultValue = "0") int offset,
+			@RequestParam (value = "search", defaultValue = "") String search) {
 		
 		offset=offset-1;
 		if(offset <0) {
 			offset=0;
 		}
-		
+		GetObjectResponse getObjectResponse ;
+		List<Driver> drivers = new ArrayList<Driver>();
 		if(id != 0) {
-			
-			return ResponseEntity.ok(driverServiceImpl.getAllDrivers(id,offset,search));
+			User user = userServiceImpl.findById(id);
+			if(user == null ) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User is not Found",drivers);
+			}
+			else {
+				if(user.getDelete_date() == null) {
+					drivers =driverServiceImpl.getAllDrivers(id,offset,search);
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",drivers);
+				}
+				else {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User is not Found",drivers);
+				}
+				
+			}
 
 		}
 		else {
-			
-			return ResponseEntity.ok("no user selected to get his own drivers");			
-		
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",drivers);
+
 		}
 		
-		
+    	return  ResponseEntity.ok(getObjectResponse);
+
 	}
 	
-	@RequestMapping(value = "/get_driver_by_id/{driverId}", method = RequestMethod.GET)
-	public @ResponseBody ResponseEntity<?> getDriverById(@PathVariable (value = "driverId") Long driverId) {
+	@RequestMapping(value = "/getDriverById", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getDriverById(@RequestParam (value = "driverId", defaultValue = "0") Long driverId) {
 		
+		GetObjectResponse getObjectResponse;
+		List<Driver> drivers = new ArrayList<Driver>();
+
 		if(driverId != 0) {
 			
 			Driver driver=driverServiceImpl.getDriverById(driverId);
 			if(driver != null) {
 				if(driver.getDelete_date() == null) {
-					return ResponseEntity.ok(driver);
+					
+					drivers.add(driver);
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",drivers);
 				}
 				else {
-					return ResponseEntity.ok("no data for this driver may be deleted");
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This Driver ID is not Found",drivers);
 
 				}
 			}
 			else {
-				return ResponseEntity.ok("no data for this driver");
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This Driver ID is not Found",drivers);
 			}
 			
 						
 		}
 		else {
-			
-			return ResponseEntity.ok("no driver selected");
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Driver ID is Required",drivers);
+
 
 		}
-		
+		return ResponseEntity.ok(getObjectResponse);
+
 	}
 	
 	
-	@RequestMapping(value = "/delete_driver/{driverId}", method = RequestMethod.GET)
-	public @ResponseBody ResponseEntity<?> deleteDriver(@PathVariable (value = "driverId") Long driverId) {
+	@RequestMapping(value = "/deleteDriver", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> deleteDriver(@RequestParam (value = "driverId", defaultValue = "0") Long driverId) {
 		
+		GetObjectResponse getObjectResponse;
+		List<Driver> drivers = new ArrayList<Driver>();
 		if(driverId != 0) {
-			Driver res= driverServiceImpl.getDriverById(driverId);
-			if(res != null) {
+			Driver driver= driverServiceImpl.getDriverById(driverId);
+			if(driver != null) {
+				if(driver.getDelete_date() == null) {
 				
-				driverServiceImpl.deleteDriver(driverId);
-				return ResponseEntity.ok("Deleted successfully.");
-				
-			}
-			else {
-
-				return ResponseEntity.ok("not allow to delete this driver.");
-
-			}
-						
-		}
-		else {
-			
-			return ResponseEntity.ok("no driver selected");
-
-		}
-		
-	}
-	
-	@RequestMapping(value = "/add_driver/{userId}", method = RequestMethod.POST)
-	public @ResponseBody ResponseEntity<?> addDriver(@RequestBody Map<String, Object> driver,@PathVariable (value = "userId") Long id) {
-		if(id != 0) {
-			Driver queryData=new Driver();
-			if(driver.get("name")!=null) {
-				queryData.setName(driver.get("name").toString());
-				
-			}
-			else {
-				queryData.setName("");
-			}
-			
-			if(driver.get("uniqueId")!=null) {
-				queryData.setUniqueid(driver.get("uniqueId").toString());
-				
-			}
-			else {
-				queryData.setUniqueid("");
-			}
-			
-			if(driver.get("mobileNum")!=null) {
-				queryData.setMobile_num(driver.get("mobileNum").toString());
-				
-			}
-			else {
-				queryData.setMobile_num("");
-			}
-			
-			if(driver.get("attributes")!=null) {
-				queryData.setAttributes(driver.get("attributes").toString());
-				
-			}
-			else {
-				queryData.setAttributes("");
-			}
-
-			if(driver.get("dateType")!=null) {
-				queryData.setDate_type(Integer.parseInt(driver.get("dateType").toString()));
-				
-			}
-			else {
-				queryData.setDate_type(null);
-			}
-			
-			if(driver.get("day")!=null && driver.get("month")!=null && driver.get("year")!=null) {
-				String date=driver.get("year")+"-"+driver.get("month")+"-"+driver.get("day");
-				queryData.setBirth_date(date);
-			}
-			else {
-				queryData.setBirth_date("");
-			}
-			if(driver.get("photo")!=null) {
-				
-				//base64_Image
-				DecodePhoto decodePhoto=new DecodePhoto();
-				queryData.setPhoto(decodePhoto.Base64_Image(driver.get("photo").toString()));				
-				
-			}
-			else {
-				queryData.setPhoto("Not-available.png");
-			}	
-			List<Driver> res=driverServiceImpl.checkDublicateDriverInAdd(id,queryData.getName(),queryData.getUniqueid(),queryData.getMobile_num());
-			if(!res.isEmpty()) {
-				String message="";
-				for(int i=0;i<res.size();i++) {
-					if(res.get(i).getName().equalsIgnoreCase(queryData.getName())) {
-						message="name was add before";
-													
-					}
-					if(res.get(i).getUniqueid().equalsIgnoreCase(queryData.getUniqueid())) {
-						message= "uniqueId was add before";
-												
-					}
-					else if(res.get(i).getMobile_num().equalsIgnoreCase(queryData.getMobile_num())) {
-						message="mobile num was add before";
-						
-					}
-					
-				}
-				return ResponseEntity.ok(message);
-
-			}
-			else {
-				String resut=driverServiceImpl.addDriver(queryData,id);
-				return ResponseEntity.ok(resut);
-
-			
-			}
-
-		}
-		else {
-			
-			return ResponseEntity.ok("no user selected to add his own driver");
-
-			
-		}
-		
-	}	
-	@RequestMapping(value = "/edit_driver/{userId}", method = RequestMethod.POST)
-	public @ResponseBody ResponseEntity<?> editDriver(@RequestBody Map<String, Object> driver,@PathVariable (value = "userId") Long id) {
-		
-		if(id != 0) {
-			Driver queryData=new Driver();
-			if(driver.get("name")!=null) {
-				queryData.setName(driver.get("name").toString());
-				
-			}
-			else {
-				queryData.setName("");
-			}
-			
-			if(driver.get("uniqueId")!=null) {
-				queryData.setUniqueid(driver.get("uniqueId").toString());
-				
-			}
-			else {
-				queryData.setUniqueid("");
-			}
-			
-			if(driver.get("mobileNum")!=null) {
-				queryData.setMobile_num(driver.get("mobileNum").toString());
-				
-			}
-			else {
-				queryData.setMobile_num("");
-			}
-			
-			if(driver.get("attributes")!=null) {
-				queryData.setAttributes(driver.get("attributes").toString());
-				
-			}
-			else {
-				queryData.setAttributes("");
-			}
-
-			if(driver.get("dateType")!=null) {
-				queryData.setDate_type(Integer.parseInt(driver.get("dateType").toString()));
-				
-			}
-			else {
-				queryData.setDate_type(null);
-			}
-			
-			if(driver.get("day")!=null && driver.get("month")!=null && driver.get("year")!=null) {
-				String date=driver.get("year")+"-"+driver.get("month")+"-"+driver.get("day");
-				queryData.setBirth_date(date);
-			}
-			else {
-				queryData.setBirth_date("");
-			}
-			if(driver.get("photo")!=null) {
-				
-				//base64_Image
-				DecodePhoto decodePhoto=new DecodePhoto();
-				queryData.setPhoto(decodePhoto.Base64_Image(driver.get("photo").toString()));				
-				
-			}
-			else {
-				queryData.setPhoto("Not-available.png");
-			}	
-			if(driver.get("driverId") != null) {
-				Driver driverData=driverServiceImpl.getDriverById(Long.parseLong(driver.get("driverId").toString()));
-				if(driverData == null) {
-					
-					return ResponseEntity.ok("no data for this driverId");
-
+					driverServiceImpl.deleteDriver(driverId);
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Deleted Successfully",drivers);
 				}
 				else {
-					List<Driver> checkDublicateInEdit=driverServiceImpl.checkDublicateDriverInEdit(Long.parseLong(driver.get("driverId").toString()),id,queryData.getName(),queryData.getUniqueid(),queryData.getMobile_num());
-					if(!checkDublicateInEdit.isEmpty()) {
-						String message="";
-						for(int i=0;i<checkDublicateInEdit.size();i++) {
-							if(checkDublicateInEdit.get(i).getName().equalsIgnoreCase(queryData.getName())) {
-								message="name was add before";
-															
-							}
-							if(checkDublicateInEdit.get(i).getUniqueid().equalsIgnoreCase(queryData.getUniqueid())) {
-								message= "uniqueId was add before";
-														
-							}
-							else if(checkDublicateInEdit.get(i).getMobile_num().equalsIgnoreCase(queryData.getMobile_num())) {
-								message="mobile num was add before";
-								
-							}
-							
-						}
-						return ResponseEntity.ok(message);
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This Driver was Deleted Before",drivers);
+
+				}
+				
+				
+			}
+			else {
+
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This Driver ID is not Found",drivers);
+
+			}
 						
+		}
+		else {
+			
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Driver ID is Required",drivers);
+
+		}
+		
+		return ResponseEntity.ok(getObjectResponse);
+
+	}
+	
+	@RequestMapping(value = "/addDriver", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<?> addDriver(@RequestBody(required = false) Driver driver,@RequestParam (value = "userId", defaultValue = "0") Long id) {
+		
+		GetObjectResponse getObjectResponse;
+		List<Driver> drivers = new ArrayList<Driver>();
+		if(id != 0) {
+			User user = userServiceImpl.findById(id);
+			if(user == null ) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",drivers);
+			}
+			else {
+				if(user.getDelete_date()==null) {
+					
+					if(driver.getName()== null || driver.getUniqueid()== null
+							   || driver.getMobile_num() == null) {
+						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Driver name , uniqueid and mobile number is Required",drivers);
+
 					}
 					else {
-						//edit
-						Long driverID=Long.parseLong(driver.get("driverId").toString());
-						queryData.setId(driverID);
-						driverServiceImpl.editDriver(queryData);
-						return ResponseEntity.ok("Updated successfully.");
-
-					}
-					
-				}
+						if(driver.getPhoto() != null) {
+							
+							//base64_Image
+							DecodePhoto decodePhoto=new DecodePhoto();
+							String photo=driver.getPhoto().toString();
+							driver.setPhoto(decodePhoto.Base64_Image(photo));				
+							
+						}
+						else {
+							driver.setPhoto("Not-available.png");
+						}
+						
+						List<Driver> res=driverServiceImpl.checkDublicateDriverInAdd(id,driver.getName(),driver.getUniqueid(),driver.getMobile_num());
+					    List<Integer> duplictionList =new ArrayList<Integer>();
+						if(!res.isEmpty()) {
+							for(int i=0;i<res.size();i++) {
+								if(res.get(i).getName().equalsIgnoreCase(driver.getName())) {
+									duplictionList.add(1);				
+								}
+								if(res.get(i).getUniqueid().equalsIgnoreCase(driver.getUniqueid())) {
+									duplictionList.add(2);				
 				
-			}
-			else {
-				return ResponseEntity.ok("no driver to edit his data");				
+								}
+								if(res.get(i).getMobile_num().equalsIgnoreCase(driver.getMobile_num())) {
+									duplictionList.add(3);				
+
+								}
+								
+							}
+					    	getObjectResponse = new GetObjectResponse( 301, "This Driver was found before",duplictionList);
+
+						}
+						else {
+							Set<User> userDriver = new HashSet<>();
+							userDriver.add(user);
+							driver.setUserDriver(userDriver);
+							String resut=driverServiceImpl.addDriver(driver);
+							drivers.add(driver);
+							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),resut,drivers);
+
+							
+						
+						}
+						
+					}
+				}
+				else {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",drivers);
+				}
 			}
 			
+			
+
+		}
+		else {
+			
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",drivers);
+			
+		}
+		return ResponseEntity.ok(getObjectResponse);
+
+		
+	}	
+	@RequestMapping(value = "/editDriver", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<?> editDriver(@RequestBody(required = false) Driver driver,@RequestParam (value = "userId", defaultValue = "0") Long id) {
+		
+		GetObjectResponse getObjectResponse;
+		List<Driver> drivers = new ArrayList<Driver>();
+		if(id != 0) {
+			User user = userServiceImpl.findById(id);
+			if(user == null ) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",drivers);
+			}
+			else {
+                if(user.getDelete_date()==null) {
+                	if(driver.getId() != null) {
+                		   	
+						Driver driverCheck = driverServiceImpl.getDriverById(driver.getId());
+						if(driverCheck != null) {
+							if(driverCheck.getDelete_date() == null) {
+								
+								if(driver.getName()== null || driver.getUniqueid()== null
+										   || driver.getMobile_num() == null) {
+									getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Driver name , uniqueid and mobile number is Required",drivers);
+			
+								}
+								else {
+									if(driver.getPhoto() != null) {
+										
+										//base64_Image
+										DecodePhoto decodePhoto=new DecodePhoto();
+										String photo=driver.getPhoto().toString();
+										driver.setPhoto(decodePhoto.Base64_Image(photo));				
+										
+									}
+									else {
+										driver.setPhoto("Not-available.png");
+									}
+									
+									List<Driver> res=driverServiceImpl.checkDublicateDriverInEdit(driver.getId(),id,driver.getName(),driver.getUniqueid(),driver.getMobile_num());
+								    List<Integer> duplictionList =new ArrayList<Integer>();
+									if(!res.isEmpty()) {
+										for(int i=0;i<res.size();i++) {
+											if(res.get(i).getName().equalsIgnoreCase(driver.getName())) {
+												duplictionList.add(1);				
+											}
+											if(res.get(i).getUniqueid().equalsIgnoreCase(driver.getUniqueid())) {
+												duplictionList.add(2);				
+							
+											}
+											if(res.get(i).getMobile_num().equalsIgnoreCase(driver.getMobile_num())) {
+												duplictionList.add(3);				
+			
+											}
+											
+										}
+								    	getObjectResponse = new GetObjectResponse( 301, "This Driver was found before",duplictionList);
+			
+									}
+									else {
+										
+										Set<User> userDriver = new HashSet<>();
+										userDriver.add(user);
+										driver.setUserDriver(userDriver);
+										if(driverCheck.getUserDriver().equals(driver.getUserDriver())) {
+											driverServiceImpl.editDriver(driver);
+											drivers.add(driver);
+											getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Updated Successfully",drivers);
+				
+										}
+										else {
+											getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(),"Not allow to edit this driver it belongs to another user",drivers);
+
+										}
+										
+										
+									
+									}
+								}
+							}
+							else {
+								getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This Driver ID is not Found",drivers);
+
+							}
+							
+							
+							
+						}
+						else{
+							getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This Driver ID is not Found",drivers);
+	
+						}
+                	}
+                	else {
+            			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Driver ID is Required",drivers);
+
+                	}
+					
+				}
+				else {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",drivers);
+				}
+				
+				
+			}
 			
 		}
 		else {
 			
-			return ResponseEntity.ok("no user selected to edit his own driver");
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",drivers);
 
 			
 		}
+		
+		return ResponseEntity.ok(getObjectResponse);
+
 	}	
 	
 

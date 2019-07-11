@@ -80,30 +80,13 @@ public class DeviceRestController {
 	@GetMapping(path = "/assignDeviceToDriver")
 	public ResponseEntity<?> assignDeviceToDriver(@RequestParam (value = "driverId", defaultValue = "0") Long driverId,@RequestParam(value = "deviceId" ,defaultValue = "0") Long deviceId) {
 		
-//		if(device.getId() == null) {
-//			return new	ResponseEntity<>("bad request",  HttpStatus.BAD_REQUEST);
-//		}
-//		Set<Driver> driver=new HashSet<>() ;
-//		driver.add(driverService.getDriverById(driverId));
-////		Set<User> user= userService.findById(userId);
-//        device.setDriver(driver);
-////		Device device = deviceService.findById(deviceId);
-//	            
-//		/*	if(device == null) {
-//				//throw bad request
-////				return "bad request";
-//				return new ResponseEntity<>(device, HttpStatus.BAD_REQUEST);
-//			}
-//			else
-//			{*/
-//				String assignDevice = deviceService.assignDeviceToDriver(device);
-//	      
-//				 return new ResponseEntity<>(assignDevice, HttpStatus.OK);
-//			//}	 
-		return deviceService.assignDeviceToDriver(deviceId,driverId);		
-		}
-	@PostMapping(path = "/assignGeofencesToDevice/{geoIds}")
-	public ResponseEntity<?> assignGeofencesToDevice(@PathVariable (value = "geoIds")Long [] geoIds,@RequestBody(required = false) Device device) {
+
+		return deviceService.assignDeviceToDriver(deviceId,driverId);	
+		
+	}
+	
+	@PostMapping(path = "/assignGeofencesToDevice")
+	public ResponseEntity<?> assignGeofencesToDevice(@RequestParam (value = "geoIds")Long [] geoIds,@RequestBody(required = false) Device device) {
 	
 		
 		if(device.getId()==null) {
