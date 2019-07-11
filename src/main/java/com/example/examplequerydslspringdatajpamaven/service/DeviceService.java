@@ -13,7 +13,7 @@ public interface DeviceService {
 	
 	public Device findById(Long deviceId);
 
-	public List<?> getAllUserDevices(Long userId , int offset, String search);
+	public ResponseEntity<?>  getAllUserDevices(Long userId , int offset, String search);
 	
 	public ResponseEntity<?> createDevice(Device device,Long userId);
 	
@@ -27,7 +27,7 @@ public interface DeviceService {
 
 	public  List<DeviceSelect> getDeviceSelect(Long userId);
 
-	public String assignDeviceToDriver(Device device);
+	public ResponseEntity<?> assignDeviceToDriver(Long deviceId , Long driverId);
 	
 	public String assignDeviceToGeofences(Device device);
 	
