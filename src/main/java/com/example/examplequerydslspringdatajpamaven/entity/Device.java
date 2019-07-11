@@ -1,10 +1,13 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
 import java.sql.Date;
+
 import java.util.HashSet;
 import java.util.Set;
 import javax.jdo.annotations.Column;
 import javax.persistence.CascadeType;
+import javax.persistence.ColumnResult;
+import javax.persistence.ConstructorResult;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -12,10 +15,55 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.NamedNativeQueries;
+import javax.persistence.NamedNativeQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.SqlResultSetMapping;
+import javax.persistence.SqlResultSetMappings;
 import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@SqlResultSetMappings({
+	@SqlResultSetMapping(
+	        name="DevicesList",
+	        classes={
+	           @ConstructorResult(
+	                targetClass=CustomDeviceList.class,
+	                  columns={
+	                     @ColumnResult(name="id"),
+	                     @ColumnResult(name="deviceName"),
+	                     @ColumnResult(name="uniqueId"),
+	                     @ColumnResult(name="sequenceNumber"),
+	                     @ColumnResult(name="referenceKey"),
+	                     @ColumnResult(name="geofenceName"),
+	                     @ColumnResult(name="driverName"),
+	                     @ColumnResult(name="lastUpdate")
+	                     }
+	           )
+	        }
+	)
+})
+
+@NamedNativeQueries({
+	
+@NamedNativeQuery(name="getDevicesList", 
+     resultSetMapping="DevicesList", 
+     query=" SELECT tc_devices.id as id ,tc_devices.name as deviceName, tc_devices.uniqueid as uniqueId,"
+     		+ " tc_devices.sequence_number as sequenceNumber ,tc_devices.lastupdate as lastUpdate "
+     		+ " ,tc_devices.reference_key as referenceKey, "
+     		+ " tc_drivers.name as driverName ,GROUP_CONCAT(tc_geofences.name )AS geofenceName"
+     		+ " FROM tc_devices LEFT JOIN  tc_device_driver ON tc_devices.id=tc_device_driver.deviceid"
+     		+ " LEFT JOIN  tc_drivers ON tc_drivers.id=tc_device_driver.driverid and tc_drivers.delete_date is null" 
+     		+ " LEFT JOIN  tc_device_geofence ON tc_devices.id=tc_device_geofence.deviceid" 
+     		+ " LEFT JOIN  tc_geofences ON tc_geofences.id=tc_device_geofence.geofenceid and tc_geofences.delete_date"
+     		+ " is null INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id "
+     		+ " where tc_user_device.userid =:userId and tc_devices.delete_date is null"
+     		+ " AND (tc_devices.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.uniqueid LIKE LOWER(CONCAT('%',:search, '%'))"
+     		+ " OR tc_devices.sequence_number LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))"
+     		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%')) ) "
+     		+ "GROUP BY tc_devices.id,tc_drivers.id LIMIT :offset,10")
+})
 
 @Entity
 @Table(name = "tc_devices" , schema = "sareb_blue")

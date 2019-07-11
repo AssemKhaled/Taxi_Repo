@@ -11,12 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceProjection;
+import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceList;
+
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
+import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
-import com.example.examplequerydslspringdatajpamaven.repository.CustomDeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 
@@ -34,26 +35,21 @@ public class DeviceServiceImpl implements DeviceService {
 	GetObjectResponse getObjectResponse;
 	
 	@Autowired
-	CustomDeviceRepository customDeviceRepository;
-	
-	@Autowired
 	private UserServiceImpl userService;
 	
+	@Autowired
+	private DriverServiceImpl driverService;
+	
 	@Override
-	public List<?> getAllUserDevices(Long userId , int offset, String search) {
+	public ResponseEntity<?> getAllUserDevices(Long userId , int offset, String search) {
 		// TODO Auto-generated method stub
 		
 		logger.info("************************ getAllUserDevices STARTED ***************************");
 		
-	    List<CustomDeviceProjection> data=customDeviceRepository.getUserDevices(userId, offset);
-//	    List< CustomDeviceProjection> data2= null;
-//	     Set<Driver> drivers = new HashSet<>();
-//	     drivers =  data.get(0).getDriver();
-//		List<String> data= new ArrayList<>();
-//		data.add("mariam");
-	     
-		logger.info("************************ getAllUserDevices ENDED ***************************");
-		return data;
+		 List<CustomDeviceList> devices= deviceRepository.getDevicesList(userId,offset,search);
+		 getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
+		 logger.info("************************ getAllUserDevices ENDED ***************************");
+		return  ResponseEntity.ok().body(getObjectResponse);
 	}
 
 	@Override
@@ -320,11 +316,97 @@ public class DeviceServiceImpl implements DeviceService {
 	}
 
 	@Override
-	public String assignDeviceToDriver(Device device) {
-		// TODO Auto-generated method stub
-		deviceRepository.save(device);
-		
-		return "ok";
+	public ResponseEntity<?> assignDeviceToDriver(Long deviceId,Long driverId) {
+		logger.info("************************ assignDeviceToDriver STARTED ***************************");
+		if(deviceId == 0) {
+			List<Device> devices = null;
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",devices);
+			logger.info("************************ assignDeviceToDriver ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+		}
+		else {
+			Device device = findById(deviceId);
+			if(device == null) {
+				List<Device> devices = null;
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",devices);
+				logger.info("************************ assignDeviceToDriver ENDED ***************************");
+				return ResponseEntity.ok().body(getObjectResponse);
+			}
+			else {
+				if(driverId == 0) {
+					Set<Driver> drivers=new HashSet<>() ;
+					drivers= device.getDriver();
+			        if(drivers.isEmpty()) {
+			        	List<Device> devices = null;
+						getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "No driver to assign or remove",devices);
+						logger.info("************************ assignDeviceToDriver ENDED ***************************");
+						return ResponseEntity.ok().body(getObjectResponse);
+			        }
+			        else {
+			        	Set<Driver> oldDrivers =new HashSet<>() ;
+			        	oldDrivers= drivers;
+			        	drivers.removeAll(oldDrivers);
+			        	 device.setDriver(drivers);
+						 deviceRepository.save(device);
+			        	List<Device> devices = null;
+			        	getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "driver removed successfully",devices);
+						logger.info("************************ assignDeviceToDriver ENDED ***************************");
+						return ResponseEntity.ok().body(getObjectResponse);
+			        }
+				}
+				Driver driver = driverService.getDriverById(driverId);
+				if(driver == null) {
+					List<Device> devices = null;
+					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This driver is not found",devices);
+					logger.info("************************ assignDeviceToDriver ENDED ***************************");
+					return ResponseEntity.ok().body(getObjectResponse);
+				}
+				else {
+					if(driver.getDelete_date() != null) {
+						List<Device> devices = null;
+						getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This driver is not found",devices);
+						logger.info("************************ assignDeviceToDriver ENDED ***************************");
+						return ResponseEntity.ok().body(getObjectResponse);
+					}
+					else {
+						Set<Driver> OldAssignedDrivers=new HashSet<>() ;
+						OldAssignedDrivers= device.getDriver();
+						if(!OldAssignedDrivers.isEmpty()) {
+							Set<Driver> oldDrivers =new HashSet<>() ;
+				        	oldDrivers= OldAssignedDrivers;
+				        	OldAssignedDrivers.removeAll(oldDrivers);
+						}
+						Set<Device> assignedDevices=driver.getDevice();
+						if(!assignedDevices.isEmpty()) {
+							for( Device assignedDevice :assignedDevices) {
+							 if(assignedDevice.getId() == device.getId()) {
+								 List<Device> devices = null;
+									getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
+									logger.info("************************ assignDeviceToDriver ENDED ***************************");
+									return ResponseEntity.ok().body(getObjectResponse); 
+							 }
+							 else {
+								 List<Device> devices = null;
+								 getObjectResponse = new GetObjectResponse(203, "this driver is assigned to another device",devices);
+									logger.info("************************ assignDeviceToDriver ENDED ***************************");
+									return ResponseEntity.ok().body(getObjectResponse); 
+							 }
+							}
+						}
+						
+						Set<Driver> drivers=new HashSet<>() ;
+						drivers.add(driver);
+				        device.setDriver(drivers);
+						deviceRepository.save(device);
+						List<Device> devices = null;
+						getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
+						logger.info("************************ assignDeviceToDriver ENDED ***************************");
+						return ResponseEntity.ok().body(getObjectResponse);
+					}
+				}
+			}
+			
+		}
 	}
 
 	@Override
@@ -353,7 +435,7 @@ public class DeviceServiceImpl implements DeviceService {
 	
 
 	}
-
+   
 
 
 }
