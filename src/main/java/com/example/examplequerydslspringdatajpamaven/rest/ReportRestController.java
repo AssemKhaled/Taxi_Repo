@@ -60,9 +60,21 @@ public class ReportRestController {
 		GetObjectResponse getObjectResponse ;
 		List<EventReport> eventReport = new ArrayList<EventReport>();
 		if(deviceId != 0) {
+			offset=offset-1;
+			if(offset <0) {
+				offset=0;
+			}
 			
 			eventReport=reportServiceImpl.getEventsReport(deviceId, offset, start, end);
-			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Device ID is Required",eventReport);
+			/*if(eventReport.size()>0) {
+				for(int i=0;i<eventReport.size();i++) {
+					if(eventReport.get(i).getEventType().equals("alarm")) {
+						JSONObject obj = new JSONObject(eventReport.get(i).getAttributes());
+						eventReport.get(i).setEventType(obj.getString("alarm"));
+					}
+				}
+			}*/
+			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",eventReport);
 
 		}
 		else {
