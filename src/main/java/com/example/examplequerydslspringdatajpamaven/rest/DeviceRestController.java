@@ -85,55 +85,44 @@ public class DeviceRestController {
 		
 	}
 	
-	@PostMapping(path = "/assignGeofencesToDevice")
-	public ResponseEntity<?> assignGeofencesToDevice(@RequestParam (value = "geoIds")Long [] geoIds,@RequestBody(required = false) Device device) {
+	@GetMapping(path = "/assignGeofencesToDevice")
+	public ResponseEntity<?> assignGeofencesToDevice(@RequestParam (value = "geoIds")Long [] geoIds,@RequestParam(value = "deviceId" ,defaultValue = "0") Long deviceId) {
 	
-		
-		if(device.getId()==null) {
-			return new	ResponseEntity<>("bad request",  HttpStatus.BAD_REQUEST);
-		}
-		Set<Geofence> geofence=new HashSet<>();
-		//selectMultiple geofences
-		List<Geofence> geofences = geofenceService.getMultipleGeofencesById(geoIds);
-		for ( Geofence geo : geofences) 
-		{ 
-			geofence.add(geo);
-		}
-        device.setGeofence(geofence);
-//		Device device = deviceService.findById(deviceId);
-	            
-		/*	if(device == null) {
-				//throw bad request
-//				return "bad request";
-				return new ResponseEntity<>(device, HttpStatus.BAD_REQUEST);
-			}
-			else
-			{*/
-				String assignDevice = deviceService.assignDeviceToGeofences(device);
-	      
-				 return new ResponseEntity<>(geofences, HttpStatus.OK);
-			//}	 
-					
+//		
+//		if(device.getId()==null) {
+//			return new	ResponseEntity<>("bad request",  HttpStatus.BAD_REQUEST);
+//		}
+//		Set<Geofence> geofence=new HashSet<>();
+//		//selectMultiple geofences
+//		List<Geofence> geofences = geofenceService.getMultipleGeofencesById(geoIds);
+//		for ( Geofence geo : geofences) 
+//		{ 
+//			geofence.add(geo);
+//		}
+//        device.setGeofence(geofence);
+////		Device device = deviceService.findById(deviceId);
+//	            
+//		/*	if(device == null) {
+//				//throw bad request
+////				return "bad request";
+//				return new ResponseEntity<>(device, HttpStatus.BAD_REQUEST);
+//			}
+//			else
+//			{*/
+//				String assignDevice = deviceService.assignDeviceToGeofences(device);
+//	      
+//				 return new ResponseEntity<>(geofences, HttpStatus.OK);
+//			//}	 
+				return null;	
 		}
 	 @GetMapping(path = "/testResponse")
 	  public ResponseEntity<?> testResponse(){
 		 return deviceService.testgetDeviceById();
 	 }
 	
-	@RequestMapping(value = "/getDeviceDriver/{deviceId}", method = RequestMethod.GET)
-	public @ResponseBody ResponseEntity<?> getDeviceDriver(@PathVariable (value = "deviceId") Long deviceId) {
-		
-		if(deviceId != 0) {
-			Device device= deviceService.findById(deviceId);
-			return ResponseEntity.ok(device.getDriver());	
-		
-		}
-		else {
-			
-			return ResponseEntity.ok("no device selected");
-
-		}
-		
+	@GetMapping(value = "/getDeviceDriver")
+	public @ResponseBody ResponseEntity<?> getDeviceDriver(@RequestParam (value = "deviceId",defaultValue = "0") Long deviceId) {
+		return deviceService.getDeviceDriver(deviceId);
 	}
 	
 	@RequestMapping(value = "/getDeviceGeofences/{deviceId}", method = RequestMethod.GET)

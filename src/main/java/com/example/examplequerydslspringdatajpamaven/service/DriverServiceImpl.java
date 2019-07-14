@@ -1,15 +1,19 @@
 package com.example.examplequerydslspringdatajpamaven.service;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.repository.DriverRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
+import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 
 @Component
 public class DriverServiceImpl implements DriverService{
@@ -21,6 +25,8 @@ public class DriverServiceImpl implements DriverService{
 	
 	@Autowired
 	UserRepository userRepository;
+	
+	GetObjectResponse getObjectResponse;
 	
 	@Override
 	public List<Driver> getAllDrivers(Long id,int offset,String search) {
@@ -102,6 +108,27 @@ public class DriverServiceImpl implements DriverService{
 
 		logger.info("************************ deleteDriver ENDED ***************************");
 
+	}
+
+	@Override
+	public ResponseEntity<?> getUnassignedDrivers(Long userId) {
+		// TODO Auto-generated method stub
+		
+		logger.info("************************ getUnassignedDrivers STARETED ***************************");
+		if(userId == 0) {
+			List<Driver> unAssignedDrivers = new ArrayList<>();
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",unAssignedDrivers);
+			
+			logger.info("************************ getUnassignedDrivers ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+		}
+		List<Driver> unAssignedDrivers = driverRepository.getUnassignedDrivers(userId);
+		
+		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",unAssignedDrivers);
+		logger.info("************************ getUnassignedDrivers ENDED ***************************");
+		return ResponseEntity.ok().body(getObjectResponse);
+		
 	}
 
 	

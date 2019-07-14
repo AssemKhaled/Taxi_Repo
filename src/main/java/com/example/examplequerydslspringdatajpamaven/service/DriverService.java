@@ -1,6 +1,9 @@
 package com.example.examplequerydslspringdatajpamaven.service;
 
 import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 
 public interface DriverService {
@@ -12,6 +15,9 @@ public interface DriverService {
 	public String addDriver(Driver driver);
 	public List<Driver> checkDublicateDriverInEdit(Long driverId,Long userId,String name,String uniqueId,String mobileNum);
 	public void editDriver(Driver driver);
+	
+	// added by maryam 
+	public ResponseEntity<?> getUnassignedDrivers(Long userId);
 
 
 

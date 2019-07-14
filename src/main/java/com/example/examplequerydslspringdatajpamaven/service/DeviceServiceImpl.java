@@ -255,8 +255,20 @@ public class DeviceServiceImpl implements DeviceService {
 		     int year = cal.get(Calendar.YEAR);
 		     String date =  Integer.toString(year)+"-"+ Integer.toString(month)+"-"+ Integer.toString(day);
 		     device.setDeleteDate(date);
-		     deviceRepository.save(device);
-		     deviceRepository.deleteUserDevice(device.getId());
+		     Set<Driver> drivers =new HashSet<>() ;
+		     drivers = device.getDriver();
+		     Set<Driver> oldDrivers =new HashSet<>() ;
+	         oldDrivers= drivers;
+	         drivers.removeAll(oldDrivers);
+	         device.setDriver(drivers);
+			 Set<User> user =new HashSet<>() ;
+		     user = device.getUser();
+		     Set<User> oldUser =new HashSet<>() ;
+	         oldUser= user;
+	         user.removeAll(oldUser);
+	         device.setUser(user);
+			 deviceRepository.save(device);
+		     
 		     List<Device> devices = null;
 			 getObjectResponse = new GetObjectResponse( HttpStatus.OK.value(), "success",devices);
 		     logger.info("************************ deleteDevice ENDED ***************************");
@@ -434,6 +446,51 @@ public class DeviceServiceImpl implements DeviceService {
 		return deviceRepository.getDeviceSelect(userId);
 	
 
+	}
+
+	@Override
+	public ResponseEntity<?> getDeviceDriver(Long deviceId) {
+		// TODO Auto-generated method stub
+		logger.info("************************ getDeviceToDriver STARTED ***************************");
+		if(deviceId == 0) {
+			List<Device> devices = null;
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",devices);
+			logger.info("************************ getDeviceToDriver ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+		}
+		else {
+			Device device = findById(deviceId);
+			if(device == null) {
+				List<Device> devices = null;
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this device is not found",devices);
+				logger.info("************************ getDeviceToDriver ENDED ***************************");
+				return ResponseEntity.ok().body(getObjectResponse);
+			}
+			else
+			{
+				Set<Driver> drivers=new HashSet<>() ;
+				drivers = device.getDriver();
+				if(drivers.isEmpty()) {
+					List<Device> devices = null;
+					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "no drivers assigned to this device",devices);
+					logger.info("************************ getDeviceToDriver ENDED ***************************");
+					return ResponseEntity.ok().body(getObjectResponse);
+				}
+				else {
+					List<Driver> deviceDriver = new ArrayList<>();
+					for(Driver driver : drivers ) {
+						//hint only one driver assigned to device
+						deviceDriver.add(driver);
+					}
+					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",deviceDriver);
+					logger.info("************************ getDeviceToDriver ENDED ***************************");
+					return ResponseEntity.ok().body(getObjectResponse);
+					
+				}
+			}
+		}
+		
+		
 	}
    
 
