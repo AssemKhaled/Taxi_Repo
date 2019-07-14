@@ -7,15 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
@@ -121,69 +118,58 @@ public class ProfileRestController {
 
 	}
 	
-	@RequestMapping(value = "/updateProfile/{userId}", method = RequestMethod.POST)
-	public @ResponseBody ResponseEntity<?> updateProfile(@RequestBody(required = false) User user ,@PathVariable (value = "userId") Long userId) {
+	@RequestMapping(value = "/updateProfile", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<?> updateProfile(@RequestBody(required = false) User user ,@RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		GetObjectResponse getObjectResponse ;
+		List<User> users = new ArrayList<User>();
+		if(userId != 0) {
+			User Data =profileServiceImpl.getUserInfo(userId);
+			if(Data == null) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",users);
 
-		User Data= profileServiceImpl.getUserInfo(userId);
-		
-		String password=Data.getPassword();
-		user.setId(userId);
-		user.setPassword(password);
-		user.setUsersOfUser(Data.getUsersOfUser());
-		 Long id = user.getId();
-		 String email = user.getEmail();
-		 String identityNum = user.getIdentity_num();
-		 String commercialNum = user.getCommercial_num();
-		 String	companyPhone = user.getCompany_phone();
-		 String managerPhone = user.getManager_phone();
-		 String managerMobile = user.getManager_mobile();
-		 String phone = user.getPhone();
-		
-		List<User> checkDublicate=profileServiceImpl.checkDublicate(id,email, identityNum, commercialNum, companyPhone, managerPhone, managerMobile,phone);
-		if(!checkDublicate.isEmpty()) {
-			List<Integer>duplicationCodes = new ArrayList<Integer>();
-			for(int i=0;i<checkDublicate.size();i++) {
-				if(checkDublicate.get(i).getEmail().equalsIgnoreCase(email)) {
-					duplicationCodes.add(1);
-		
-				}
-				else if(checkDublicate.get(i).getIdentity_num().equalsIgnoreCase(identityNum)) {
-					duplicationCodes.add(2);
-	
-				}
-				else if(checkDublicate.get(i).getCommercial_num().equalsIgnoreCase(commercialNum)) {
-					duplicationCodes.add(3);
-
-				}
-				else if(checkDublicate.get(i).getCompany_phone().equalsIgnoreCase(companyPhone)) {
-					duplicationCodes.add(4);
-
-				}
-				else if(checkDublicate.get(i).getManager_phone().equalsIgnoreCase(managerPhone)) {
-					duplicationCodes.add(5);
-
-				}
-				else if(checkDublicate.get(i).getManager_mobile().equalsIgnoreCase(managerMobile)) {
-					duplicationCodes.add(6);
-
-				}
-				else if(checkDublicate.get(i).getPhone().equalsIgnoreCase(phone)) {
-					duplicationCodes.add(7);
-
-				}
-				
 			}
-			return ResponseEntity.ok(duplicationCodes);
+			else {
+				if(Data.getDelete_date() == null) {
+					if(user.getEmail() == null || user.getIdentity_num() == null || user.getCommercial_num() == null 
+							|| user.getCompany_phone() == null || user.getManager_phone() == null
+							|| user.getManager_mobile() ==null ||user.getPhone() == null) {
+						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User {Email , Identity Number , commercial Numebr , Company Phone , Phone Manager , Manager Mobile , Phone } is Required",users);
+
+					}
+					else {
+						user.setId(userId);
+						user.setPassword(Data.getPassword());
+						user.setUsersOfUser(Data.getUsersOfUser());
+						user.setDevices(Data.getDevices());
+						user.setDrivers(Data.getDrivers());
+						user.setGeofences(Data.getGeofences());
+					    List<Integer> duplictionList = userServiceImpl.checkUserDuplication(user);
+					    if(duplictionList.size()>0) {
+					    	getObjectResponse= new GetObjectResponse(501, "was found before",duplictionList);
+					    }
+					    else {
+					    	String result = profileServiceImpl.updateProfile(user);
+					    	users.add(user);
+							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), result ,users);
+
+					    }
 
 
+					}
+					
+
+				}
+				else {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",users);
+
+				}
+		    }
 		}
 		else {
-			
-			return ResponseEntity.ok(profileServiceImpl.updateProfile(user));
-
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",users);
 		}
-	
-		
+    	return  ResponseEntity.ok(getObjectResponse);
+
 	}
 	
 	@RequestMapping(value = "/updatePhoto", method = RequestMethod.POST)

@@ -105,6 +105,7 @@ public class DriverServiceImpl implements DriverService{
 
 		driverRepository.deleteDriver(driverId,currentDate);
 		driverRepository.deleteDriverId(driverId);
+		driverRepository.deleteDriverDeviceId(driverId);
 
 		logger.info("************************ deleteDriver ENDED ***************************");
 

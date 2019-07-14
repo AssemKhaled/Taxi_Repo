@@ -21,49 +21,47 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-@SqlResultSetMappings({
-	@SqlResultSetMapping(
-	        name="myMapping",
-	        classes={
-	           @ConstructorResult(
-	                targetClass=EventReport.class,
-	                  columns={
-	                     @ColumnResult(name="id"),
-	                     @ColumnResult(name="type"),
-	                     @ColumnResult(name="name")
-	                     }
-	           )
-	        }
-	)
-,
+
 @SqlResultSetMapping(
-        name="myMappingTest",
+        name="myMapping",
         classes={
            @ConstructorResult(
                 targetClass=EventReport.class,
                   columns={
-                     @ColumnResult(name="id"),
-                     @ColumnResult(name="name")
+                     @ColumnResult(name="eventId",type=Long.class),
+                     @ColumnResult(name="eventType",type=String.class),
+                     @ColumnResult(name="serverTime",type=String.class),
+                     @ColumnResult(name="attributes",type=String.class),
+                     @ColumnResult(name="deviceId",type=Long.class),
+                     @ColumnResult(name="deviceName",type=String.class),
+                     @ColumnResult(name="driverId",type=Long.class),
+                     @ColumnResult(name="driverName",type=String.class),
+                     @ColumnResult(name="geofenceId",type=Long.class),
+                     @ColumnResult(name="geofenceName",type=String.class),
+                     @ColumnResult(name="positionId",type=Long.class),
+                     @ColumnResult(name="latitude",type=String.class),
+                     @ColumnResult(name="longitude",type=String.class)
+                     
                      }
            )
         }
 )
 
 	
-})
-
-@NamedNativeQueries({
-	
 @NamedNativeQuery(name="Event.getEvents", 
      resultSetMapping="myMapping", 
-     query="SELECT tc_events.id, tc_events.type , tc_devices.name FROM tc_events"
-     		+ " INNER JOIN tc_devices ON tc_devices.id=tc_events.deviceid where tc_events.deviceid = 25")
-,
-@NamedNativeQuery(name="Event.getEventsTest", 
-resultSetMapping="myMappingTest", 
-query="SELECT tc_events.id, tc_devices.name FROM tc_events"
-		+ " INNER JOIN tc_devices ON tc_devices.id=tc_events.deviceid where tc_events.deviceid = 25")
-})
+     query="SELECT tc_events.id as eventId,tc_events.type as eventType, tc_events.servertime as serverTime,tc_events.attributes as attributes,"
+     		+ " tc_devices.id as deviceId,tc_devices.name as deviceName,"
+     		+ " tc_drivers.id as driverId,tc_drivers.name as driverName ,"
+     		+ " tc_geofences.id as geofenceId,tc_geofences.name as geofenceName,"
+     		+ " tc_positions.id as positionId,tc_positions.latitude as latitude ,tc_positions.longitude as longitude"
+     		+ " FROM tc_events INNER JOIN tc_devices ON tc_devices.id=tc_events.deviceid"
+     		+ " LEFT JOIN tc_positions ON tc_positions.id=tc_events.positionid "
+     		+ " LEFT JOIN tc_geofences ON tc_geofences.id=tc_events.geofenceid"
+     		+ " LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_events.deviceid"
+     		+ " LEFT JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id"
+     		+ " WHERE tc_events.deviceid =25 AND tc_devices.delete_date IS NULL AND tc_drivers.delete_date IS NULL AND tc_geofences.delete_date IS NULL")
+
 
 @Entity
 @Table(name = "tc_events" , schema = "sareb_blue")

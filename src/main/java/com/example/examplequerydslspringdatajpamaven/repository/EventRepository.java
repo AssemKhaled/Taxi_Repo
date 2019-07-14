@@ -15,7 +15,6 @@ public interface EventRepository  extends JpaRepository<Event, Long>, QueryDslPr
 
 	
 	public List<EventReport> getEvents();
-	public List<EventReport> getEventsTest();
 
 	
 }

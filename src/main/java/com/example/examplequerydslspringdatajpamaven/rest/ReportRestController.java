@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Base64;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -21,14 +23,19 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.Event;
+import com.example.examplequerydslspringdatajpamaven.entity.EventReport;
 import com.example.examplequerydslspringdatajpamaven.service.ReportServiceImpl;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
+import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.service.GeofenceServiceImpl;
 
 
@@ -43,70 +50,31 @@ public class ReportRestController {
 	@Autowired
 	GeofenceServiceImpl geofenceServiceImpl;
 	
-	@RequestMapping(value = "/get_events_report1", method = RequestMethod.POST)
-	public @ResponseBody ResponseEntity<?> getEv(@RequestBody Map<String, String> request) {
-		
-		return ResponseEntity.ok(reportServiceImpl.getEventsReport1());
-	}
-	
-	@RequestMapping(value = "/get_events_report", method = RequestMethod.POST)
-	public @ResponseBody ResponseEntity<?> getEvents(@RequestBody Map<String, String> request) {
-		Integer offset =0;
-		String start="";
-		String end="";
-		String type="";
 
-		if(request.get("offset")!=null) {
-			offset = Integer.parseInt(request.get("offset"));
-			offset=offset-1;
-	        if(offset <0) {
-	        	offset=0;
-	        }
-		}
+	@RequestMapping(value = "/getEventsReport", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getEvents(@RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+			@RequestParam (value = "offset", defaultValue = "0") int offset,
+			@RequestParam (value = "start", defaultValue = "0") String start,
+			@RequestParam (value = "end", defaultValue = "0") String end) {
 		
-		if(request.get("startDate") != null) {
-			start = request.get("startDate");
-		}
-		
-		if(request.get("endDate") != null) {
-			end = request.get("endDate");
-		}
-		if(request.get("eventType") != null) {
-			type = request.get("eventType");
-		}
-		
-		
-		 
-		Long deviceId = Long.parseLong(request.get("selectedDevices"));
-		SimpleDateFormat dateformater_Java = new SimpleDateFormat("YYYY-mm-dd HH:mm:ss");
-		
-		try {
-			
-			Date st=dateformater_Java.parse(start);
-			Date en=dateformater_Java.parse(end);
-			start = dateformater_Java.format(st);
-			end = dateformater_Java.format(en);
-			
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-		
-		
-		
+		GetObjectResponse getObjectResponse ;
+		List<EventReport> eventReport = new ArrayList<EventReport>();
 		if(deviceId != 0) {
 			
-			//List<Event> events=reportServiceImpl.getEventsReport(deviceId,offset,start,end);
-			return ResponseEntity.ok(reportServiceImpl.getEventsReport(deviceId,offset,start,end));			
+			eventReport=reportServiceImpl.getEventsReport(deviceId, offset, start, end);
+			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Device ID is Required",eventReport);
 
-		
 		}
-		else{
-			
-			return ResponseEntity.ok("no device selected to get his own events");			
-		
+		else {
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",eventReport);
+
 		}
 		
+    	return  ResponseEntity.ok(getObjectResponse);
 		
+		
+		
+	
 	}
 	
 	@RequestMapping(value = "/get_stops_report", method = RequestMethod.GET)
