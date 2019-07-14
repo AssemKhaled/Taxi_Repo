@@ -44,4 +44,14 @@ public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslP
 			+ " LIMIT :offset,10", nativeQuery = true)
 	public List<Driver> getAllDrivers(@Param("userId") Long userId,@Param("offset") int offset,@Param("search") String search);
 	
+	//added by maryam
+	@Query(value = "SELECT  * FROM tc_drivers A " + 
+			" INNER JOIN tc_user_driver ON tc_user_driver.driverid =A.id " + 
+			" WHERE tc_user_driver.userid= :userId AND delete_date IS NULL " + 
+			" And Not EXISTS " + 
+			" (SELECT *  FROM tc_drivers B " + 
+			" INNER JOIN tc_user_driver ON tc_user_driver.driverid =B.id " + 
+			" INNER JOIN tc_device_driver ON tc_device_driver.driverid =B.id " + 
+			" WHERE A.id=B.id AND tc_user_driver.userid= :userId AND delete_date IS NULL )", nativeQuery = true)
+	public List<Driver> getUnassignedDrivers(@Param("userId") Long userId);
 }
