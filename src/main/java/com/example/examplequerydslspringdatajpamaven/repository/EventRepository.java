@@ -14,7 +14,8 @@ import com.example.examplequerydslspringdatajpamaven.entity.EventReport;
 public interface EventRepository  extends JpaRepository<Event, Long>, QueryDslPredicateExecutor<Event>{
 
 	
-	public List<EventReport> getEvents();
+	public List<EventReport> getEvents(@Param("deviceId")Long deviceId,@Param("offset")int offset,
+			@Param("start")String start,@Param("end")String end);
 
 	
 }

@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,11 +17,15 @@ public class ReportServiceImpl implements ReportService {
 	
 	@Autowired
 	EventRepository eventRepository;
+	private static final Log logger = LogFactory.getLog(ReportServiceImpl.class);
 
 	@Override
 	public List<EventReport> getEventsReport(Long deviceId,int offset,String start,String end) {
+		logger.info("************************ getEventsReport STARTED ***************************");
+		List<EventReport> events = eventRepository.getEvents(deviceId, offset, start, end);
+		logger.info("************************ getEventsReport ENDED ***************************");
 
-		return eventRepository.getEvents();
+		return events;
 	}
 
 	

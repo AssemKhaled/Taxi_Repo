@@ -50,7 +50,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 	
 @NamedNativeQuery(name="Event.getEvents", 
      resultSetMapping="myMapping", 
-     query="SELECT tc_events.id as eventId,tc_events.type as eventType, tc_events.servertime as serverTime,tc_events.attributes as attributes,"
+     query="SELECT tc_events.id as eventId,"
+     		+ " tc_events.type as eventType"
+     		+ " , tc_events.servertime as serverTime,tc_events.attributes as attributes,"
      		+ " tc_devices.id as deviceId,tc_devices.name as deviceName,"
      		+ " tc_drivers.id as driverId,tc_drivers.name as driverName ,"
      		+ " tc_geofences.id as geofenceId,tc_geofences.name as geofenceName,"
@@ -60,7 +62,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
      		+ " LEFT JOIN tc_geofences ON tc_geofences.id=tc_events.geofenceid"
      		+ " LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_events.deviceid"
      		+ " LEFT JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id"
-     		+ " WHERE tc_events.deviceid =25 AND tc_devices.delete_date IS NULL AND tc_drivers.delete_date IS NULL AND tc_geofences.delete_date IS NULL")
+     		+ " WHERE tc_events.servertime BETWEEN :start AND :end "
+     		+ " and tc_events.deviceid =:deviceId AND tc_devices.delete_date IS NULL AND"
+     		+ " tc_drivers.delete_date IS NULL AND tc_geofences.delete_date IS NULL"
+     		+ " ORDER BY tc_events.servertime DESC LIMIT :offset, 10")
 
 
 @Entity
