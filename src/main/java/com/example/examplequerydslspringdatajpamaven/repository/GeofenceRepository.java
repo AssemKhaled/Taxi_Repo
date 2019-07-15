@@ -38,7 +38,7 @@ public interface GeofenceRepository extends JpaRepository<Geofence, Long>, Query
 			+ " where tc_geofences.name=:name and tc_geofences.id !=:geofenceId and tc_user_geofence.userid=:userId and tc_geofences.delete_date IS NULL", nativeQuery = true)
 	public List<Geofence> checkDublicateGeofenceInEdit(@Param("geofenceId") Long geofenceId,@Param("userId") Long userId,@Param("name") String name);
 	
-	@Query(value = "select * from tc_geofences where id in :ids",nativeQuery = true)
+	@Query(value = "select * from tc_geofences where id in :ids and delete_date is null",nativeQuery = true)
 	public List<Geofence> getMultipleGeofencesById(@Param("ids")Long [] ids);
 	
 	@Query(value = "SELECT tc_geofences.* FROM tc_geofences INNER JOIN tc_user_geofence ON tc_user_geofence.geofenceid = tc_geofences.id"

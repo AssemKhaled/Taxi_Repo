@@ -2,7 +2,10 @@ package com.example.examplequerydslspringdatajpamaven.service;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,10 +104,15 @@ public class GeofenceServiceImpl implements GeofenceService {
 	}
 
 	@Override
-	public List<Geofence> getMultipleGeofencesById(Long [] ids) {
+	public Set<Geofence> getMultipleGeofencesById(Long [] ids) {
 		// TODO Auto-generated method stub
+		Set<Geofence> geofences = new HashSet<>();
+		List<Geofence> geos = geofenceRepository.getMultipleGeofencesById(ids);
+		for( Geofence geo : geos) {
+			geofences.add(geo);
+		}
 		
-		return geofenceRepository.getMultipleGeofencesById(ids);
+		return geofences;
 	}
 	
 

@@ -54,4 +54,10 @@ public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslP
 			" INNER JOIN tc_device_driver ON tc_device_driver.driverid =B.id " + 
 			" WHERE A.id=B.id AND tc_user_driver.userid= :userId AND delete_date IS NULL )", nativeQuery = true)
 	public List<Driver> getUnassignedDrivers(@Param("userId") Long userId);
+	
+	@Query(value = "SELECT count(tc_drivers.id) FROM tc_drivers INNER JOIN tc_user_driver "
+			+ "ON tc_user_driver.driverid = tc_drivers.id AND "
+			+ "tc_user_driver.userid = :userId WHERE tc_drivers.delete_date is null",nativeQuery = true)
+	
+	public Integer getTotalNumberOfUserDrivers(@Param("userId") Long userId);
 }

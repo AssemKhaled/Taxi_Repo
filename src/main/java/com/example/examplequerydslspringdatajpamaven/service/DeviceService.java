@@ -29,9 +29,14 @@ public interface DeviceService {
 
 	public ResponseEntity<?> assignDeviceToDriver(Long deviceId , Long driverId);
 	
-	public String assignDeviceToGeofences(Device device);
+	public ResponseEntity<?> assignDeviceToGeofences(Long deviceId,Long [] geoIds );
 
 	public ResponseEntity<?> testgetDeviceById();
 
 	public ResponseEntity<?> getDeviceDriver(Long deviceId);
+	
+		
+	public ResponseEntity<?> getDeviceGeofences(Long deviceId);
+	
+	public ResponseEntity<?> getDeviceStatus(Long userId);
 }

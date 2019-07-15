@@ -37,5 +37,22 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 			+ " WHERE tc_user_device.userid=:userId",nativeQuery = true)
 	public List<DeviceSelect> getDeviceSelect(@Param("userId")Long userId);
 	
+	@Query(value = "SELECT count(tc_positions.devicetime) FROM tc_devices INNER JOIN tc_positions ON tc_positions.id=tc_devices.positionid AND\n" + 
+			" tc_devices.lastupdate<date_sub(now(), interval 3 minute)=false  AND tc_devices.lastupdate>date_sub(now(), interval 0 minute)=false AND  \n" + 
+			" tc_devices.lastupdate=date_sub(now(), interval 0 minute)=false INNER JOIN tc_user_device ON tc_user_device.deviceid=tc_devices.id\n" + 
+			" AND tc_user_device.userid = :userId" , nativeQuery = true)
+	public Integer getNumberOfOnlineDevices(@Param("userId")Long userId);
+	
+	@Query(value = "SELECT count(tc_positions.devicetime) FROM tc_devices INNER JOIN tc_positions ON tc_positions.id=tc_devices.positionid AND \n" + 
+			"tc_devices.lastupdate>date_sub(now(), interval 3 minute)=false  AND tc_devices.lastupdate<date_sub(now(), interval 8 minute)=false INNER JOIN \n" + 
+			" tc_user_device ON tc_user_device.deviceid=tc_devices.id AND tc_user_device.userid = :userId", nativeQuery = true)
+	public Integer getNumberOfOutOfNetworkDevices(@Param("userId")Long userId);
+	
+	@Query(value = "SELECT count(tc_devices.id) FROM tc_devices INNER JOIN sareb_blue.tc_user_device ON tc_devices.id = tc_user_device.deviceid \n" + 
+			"AND tc_user_device.userid = :userId WHERE tc_devices.delete_date is null ",nativeQuery = true )
+	public Integer getTotalNumberOfUserDevices(@Param("userId")Long userId);
+	
+	
+	
 }
 

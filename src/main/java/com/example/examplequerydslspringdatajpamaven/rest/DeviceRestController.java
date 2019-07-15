@@ -86,34 +86,10 @@ public class DeviceRestController {
 	}
 	
 	@GetMapping(path = "/assignGeofencesToDevice")
-	public ResponseEntity<?> assignGeofencesToDevice(@RequestParam (value = "geoIds")Long [] geoIds,@RequestParam(value = "deviceId" ,defaultValue = "0") Long deviceId) {
+	public ResponseEntity<?> assignGeofencesToDevice(@RequestParam (value = "geoIds", defaultValue = "")Long [] geoIds,@RequestParam(value = "deviceId" ,defaultValue = "0") Long deviceId) {
 	
-//		
-//		if(device.getId()==null) {
-//			return new	ResponseEntity<>("bad request",  HttpStatus.BAD_REQUEST);
-//		}
-//		Set<Geofence> geofence=new HashSet<>();
-//		//selectMultiple geofences
-//		List<Geofence> geofences = geofenceService.getMultipleGeofencesById(geoIds);
-//		for ( Geofence geo : geofences) 
-//		{ 
-//			geofence.add(geo);
-//		}
-//        device.setGeofence(geofence);
-////		Device device = deviceService.findById(deviceId);
-//	            
-//		/*	if(device == null) {
-//				//throw bad request
-////				return "bad request";
-//				return new ResponseEntity<>(device, HttpStatus.BAD_REQUEST);
-//			}
-//			else
-//			{*/
-//				String assignDevice = deviceService.assignDeviceToGeofences(device);
-//	      
-//				 return new ResponseEntity<>(geofences, HttpStatus.OK);
-//			//}	 
-				return null;	
+				return deviceService.assignDeviceToGeofences(deviceId,geoIds);	
+				
 		}
 	 @GetMapping(path = "/testResponse")
 	  public ResponseEntity<?> testResponse(){
@@ -125,19 +101,13 @@ public class DeviceRestController {
 		return deviceService.getDeviceDriver(deviceId);
 	}
 	
-	@RequestMapping(value = "/getDeviceGeofences/{deviceId}", method = RequestMethod.GET)
-	public @ResponseBody ResponseEntity<?> getDeviceGeofences(@PathVariable (value = "deviceId") Long deviceId) {
+	@	GetMapping(value = "/getDeviceGeofences")
+	public @ResponseBody ResponseEntity<?> getDeviceGeofences(@RequestParam (value = "deviceId",defaultValue = "0") Long deviceId) {
 		
-		if(deviceId != 0) {
-			Device device= deviceService.findById(deviceId);
-			return ResponseEntity.ok(device.getGeofence());	
-		
-		}
-		else {
 			
-			return ResponseEntity.ok("no device selected");
+			return deviceService.getDeviceGeofences(deviceId);
 
-		}
+		
 		
 	}
 	@RequestMapping(value = "/getDeviceSelect/{userId}", method = RequestMethod.GET)

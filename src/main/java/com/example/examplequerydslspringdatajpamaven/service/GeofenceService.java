@@ -1,6 +1,8 @@
 package com.example.examplequerydslspringdatajpamaven.service;
 
 import java.util.List;
+import java.util.Set;
+
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 
 public interface GeofenceService {
@@ -13,7 +15,7 @@ public interface GeofenceService {
 	public List<Geofence> checkDublicateGeofenceInEdit(Long geofenceId,Long userId,String name);
 	public void editGeofence(Geofence geofence);
 	
-	public List<Geofence> getMultipleGeofencesById(Long [] ids);
+	public Set<Geofence> getMultipleGeofencesById(Long [] ids);
 
 
 

@@ -2,8 +2,10 @@ package com.example.examplequerydslspringdatajpamaven.service;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -16,6 +18,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceList;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
+import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
@@ -39,6 +42,9 @@ public class DeviceServiceImpl implements DeviceService {
 	
 	@Autowired
 	private DriverServiceImpl driverService;
+	
+	@Autowired
+	 private GeofenceServiceImpl geofenceService;
 	
 	@Override
 	public ResponseEntity<?> getAllUserDevices(Long userId , int offset, String search) {
@@ -422,10 +428,62 @@ public class DeviceServiceImpl implements DeviceService {
 	}
 
 	@Override
-	public String assignDeviceToGeofences(Device device) {
-		// TODO Auto-generated method stub
-		deviceRepository.save(device);
-		return "ok";
+	public ResponseEntity<?> assignDeviceToGeofences(Long deviceId , Long [] geoIds) {
+		logger.info("************************ assignDeviceToGeofences STARTED ***************************");
+		
+		if(deviceId ==0){
+			List<Device> devices = null;
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",devices);
+			logger.info("************************ assignDeviceToGeofences ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+		}else {
+			 Device device = findById(deviceId);
+			 if(device == null) {
+				  List<Device> devices = null;
+					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this device is not found",devices);
+					logger.info("************************ assignDeviceToGeofences ENDED ***************************");
+					return ResponseEntity.ok().body(getObjectResponse);
+			 }
+			if(geoIds.length == 0) {
+				//if device has geofences remove it 
+                Set<Geofence> geofences = device.getGeofence();
+                if(geofences.isEmpty()) {
+                	 List<Device> devices = null;
+ 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "no geofences to assign or remove",devices);
+ 					logger.info("************************ assignDeviceToGeofences ENDED ***************************");
+ 					return ResponseEntity.ok().body(getObjectResponse);
+                }
+                else {
+                	// else if device hasn't geofences return error
+    				
+                	Set<Geofence> oldGeofences = geofences;
+                	geofences.removeAll(oldGeofences);
+                	device.setGeofence(geofences);
+                	deviceRepository.save(device);
+                	List<Device> devices = null;
+                	getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "geofences removed successfully",devices);
+					logger.info("************************ assignDeviceToGeofences ENDED ***************************");
+					return ResponseEntity.ok().body(getObjectResponse);
+                }
+			   
+			}else {
+					Set<Geofence> geofences = device.getGeofence();
+					Set<Geofence> oldGeoffences = geofences;
+					geofences.removeAll(oldGeoffences);
+					device.setGeofence(geofences);
+					deviceRepository.save(device);
+					Set<Geofence> newGeofences = geofenceService.getMultipleGeofencesById(geoIds);
+					device.setGeofence(newGeofences);
+					deviceRepository.save(device);
+					List<Device> devices = null;
+					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
+					logger.info("************************ assignDeviceToGeofences ENDED ***************************");
+					return ResponseEntity.ok().body(getObjectResponse);
+					
+			}
+			
+		}
+		
 	}
 
 	@Override
@@ -491,6 +549,78 @@ public class DeviceServiceImpl implements DeviceService {
 		}
 		
 		
+	}
+	@Override
+	public ResponseEntity<?> getDeviceGeofences(Long deviceId) {
+		// TODO Auto-generated method stub
+		logger.info("************************ getDeviceGeofences STARTED ***************************");
+		if(deviceId == 0) {
+			List<Device> devices = null;
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",devices);
+			logger.info("************************ getDeviceGeofences ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+		}
+		else {
+			Device device = findById(deviceId);
+			if(device == null) {
+				List<Device> devices = null;
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this device is not found",devices);
+				logger.info("************************ getDeviceGeofences ENDED ***************************");
+				return ResponseEntity.ok().body(getObjectResponse);
+			}
+			else
+			{
+				Set<Geofence> geofences=new HashSet<>() ;
+				geofences = device.getGeofence();
+				if(geofences.isEmpty()) {
+					List<Device> devices = null;
+					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "no geofences assigned to this device",devices);
+					logger.info("************************ getDeviceGeofences ENDED ***************************");
+					return ResponseEntity.ok().body(getObjectResponse);
+				}
+				else {
+					List<Geofence> deviceGeofences = new ArrayList<>();
+					for(Geofence geofence : geofences ) {
+						//hint only one driver assigned to device
+						deviceGeofences.add(geofence);
+					}
+					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",deviceGeofences);
+					logger.info("************************ getDeviceGeofences ENDED ***************************");
+					return ResponseEntity.ok().body(getObjectResponse);
+					
+				}
+			}
+		}
+		
+		
+	}
+
+	@Override
+	public ResponseEntity<?> getDeviceStatus(Long userId) {
+		logger.info("************************ getDevicesStatusAndDrives STARTED ***************************");
+		if(userId == 0) {
+			List<Device> devices = null;
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",devices);
+			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+		}
+		Integer onlineDevices = deviceRepository.getNumberOfOnlineDevices(userId);
+		Integer outOfNetworkDevices = deviceRepository.getNumberOfOutOfNetworkDevices(userId);
+		Integer totalDevices = deviceRepository.getTotalNumberOfUserDevices(userId);
+		Integer offlineDevices = totalDevices - onlineDevices - outOfNetworkDevices;
+		Integer drivers = driverService.getTotalNumberOfUserDrivers(userId);
+		
+		Map devicesStatus = new HashMap();
+		devicesStatus.put("online_devices", onlineDevices);
+		devicesStatus.put("unknown_devices" ,outOfNetworkDevices);
+		devicesStatus.put("offline_devices", offlineDevices);
+		devicesStatus.put("total_drivers", drivers);
+		List<Map> data = new ArrayList<>();
+		data.add(devicesStatus);
+		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",data);
+		System.out.println("online devices"+ onlineDevices);
+		logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+		return ResponseEntity.ok().body(getObjectResponse);
 	}
    
 

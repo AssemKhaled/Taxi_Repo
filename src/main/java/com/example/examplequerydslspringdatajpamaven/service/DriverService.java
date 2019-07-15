@@ -18,6 +18,8 @@ public interface DriverService {
 	
 	// added by maryam 
 	public ResponseEntity<?> getUnassignedDrivers(Long userId);
+	
+	public Integer getTotalNumberOfUserDrivers(Long userId);
 
 
 

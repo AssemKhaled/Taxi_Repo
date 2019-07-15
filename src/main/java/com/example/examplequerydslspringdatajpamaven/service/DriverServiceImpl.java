@@ -132,6 +132,13 @@ public class DriverServiceImpl implements DriverService{
 		
 	}
 
+	@Override
+	public Integer getTotalNumberOfUserDrivers(Long userId) {
+		// TODO Auto-generated method stub
+		 Integer totalNumberOfUserDrivers = driverRepository.getTotalNumberOfUserDrivers(userId);
+		return totalNumberOfUserDrivers;
+	}
+
 	
 	
 	
