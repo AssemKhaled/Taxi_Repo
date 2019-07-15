@@ -51,7 +51,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @NamedNativeQuery(name="Event.getEvents", 
      resultSetMapping="myMapping", 
      query="SELECT tc_events.id as eventId,"
-     		+ "  CASE WHEN tc_events.type='alarm' then tc_events.attributes ELSE tc_events.type END as eventType"
+     		+ " tc_events.type as eventType"
      		+ " , tc_events.servertime as serverTime,tc_events.attributes as attributes,"
      		+ " tc_devices.id as deviceId,tc_devices.name as deviceName,"
      		+ " tc_drivers.id as driverId,tc_drivers.name as driverName ,"
