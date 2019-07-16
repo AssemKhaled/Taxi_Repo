@@ -2,7 +2,6 @@ package com.example.examplequerydslspringdatajpamaven.repository;
 
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -15,7 +14,9 @@ public interface EventRepository  extends JpaRepository<Event, Long>, QueryDslPr
 
 	
 	public List<EventReport> getEvents(@Param("deviceId")Long deviceId,@Param("offset")int offset,
-			@Param("start")String start,@Param("end")String end);
+			@Param("start")String start,@Param("end")String end,@Param("search")String search);
+	
+	public List<EventReport> getNotifications(@Param("userId")Long userId,@Param("offset")int offset,@Param("search")String search);
 
 	
 }

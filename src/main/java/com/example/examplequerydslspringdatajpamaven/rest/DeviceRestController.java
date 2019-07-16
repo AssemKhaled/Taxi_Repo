@@ -110,19 +110,12 @@ public class DeviceRestController {
 		
 		
 	}
-	@RequestMapping(value = "/getDeviceSelect/{userId}", method = RequestMethod.GET)
-	public @ResponseBody ResponseEntity<?> getDeviceSelect(@PathVariable (value = "userId") Long userId) {
+	@RequestMapping(value = "/getDeviceSelect", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getDeviceSelect(@RequestParam (value = "userId", defaultValue = "0") Long userId) {
 		
-		if(userId != 0) {
-			
-			return ResponseEntity.ok(deviceService.getDeviceSelect(userId));	
 	
-		}
-		else {
-			
-			return ResponseEntity.ok("no device selected");
+    	return  ResponseEntity.ok(deviceService.getDeviceSelect(userId).getBody());
 
-		}
 		
 	}
 

@@ -372,7 +372,7 @@ public class DeviceServiceImpl implements DeviceService {
 						return ResponseEntity.ok().body(getObjectResponse);
 			        }
 				}
-				Driver driver = driverService.getDriverById(driverId);
+				Driver driver = driverService.findById(driverId);
 				if(driver == null) {
 					List<Device> devices = null;
 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This driver is not found",devices);
@@ -499,10 +499,40 @@ public class DeviceServiceImpl implements DeviceService {
 		return  ResponseEntity.ok().body(getObjectResponse) ;
 	}
 
-	public List<DeviceSelect> getDeviceSelect(Long userId) {
+	public  ResponseEntity<?> getDeviceSelect(Long userId) {
 
-		return deviceRepository.getDeviceSelect(userId);
+		logger.info("************************ getDeviceSelect STARTED ***************************");
+		List<DeviceSelect> devices = new ArrayList<DeviceSelect>();
+
+	    if(userId != 0) {
+	    	User user = userService.findById(userId);
+	    	if(user != null) {
+	    		if(user.getDelete_date() == null) {
+	    			devices = deviceRepository.getDeviceSelect(userId);
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
+			
+	    		}
+	    		else {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",devices);
+
+	    		}
+	    	
+	    	}
+	    	else {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",devices);
+
+	    	}
+			
+		}
+		else {
+			
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",devices);
+
+		}
 	
+		logger.info("************************ getDeviceSelect ENDED ***************************");
+		
+		return ResponseEntity.ok(getObjectResponse);
 
 	}
 

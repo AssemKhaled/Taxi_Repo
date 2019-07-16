@@ -48,7 +48,7 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 			" tc_user_device ON tc_user_device.deviceid=tc_devices.id AND tc_user_device.userid = :userId", nativeQuery = true)
 	public Integer getNumberOfOutOfNetworkDevices(@Param("userId")Long userId);
 	
-	@Query(value = "SELECT count(tc_devices.id) FROM tc_devices INNER JOIN sareb_blue.tc_user_device ON tc_devices.id = tc_user_device.deviceid \n" + 
+	@Query(value = "SELECT count(tc_devices.id) FROM tc_devices INNER JOIN tc_user_device ON tc_devices.id = tc_user_device.deviceid \n" + 
 			"AND tc_user_device.userid = :userId WHERE tc_devices.delete_date is null ",nativeQuery = true )
 	public Integer getTotalNumberOfUserDevices(@Param("userId")Long userId);
 	
