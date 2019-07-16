@@ -39,4 +39,6 @@ public interface DeviceService {
 	public ResponseEntity<?> getDeviceGeofences(Long deviceId);
 	
 	public ResponseEntity<?> getDeviceStatus(Long userId);
+	
+	public ResponseEntity<?> getAllDeviceLiveData(Long userId,int offset,String search);
 }
