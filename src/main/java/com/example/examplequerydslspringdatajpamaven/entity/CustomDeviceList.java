@@ -13,17 +13,6 @@ public class CustomDeviceList{
 	private String driverName;
 	private String geofenceName;
 	
-//	public CustomDeviceList(Long id , String deviceName , String uniqueId , String sequenceNumber ,
-//			                String lastUpdate, String referenceKey, String driverName ,String geofenceName ) {
-//		this.id = id;
-//		this.uniqueId = uniqueId;
-//		this.deviceName = deviceName;
-//		this.geofenceName = geofenceName;
-//		this.sequenceNumber = sequenceNumber;
-//		this.referenceKey = referenceKey;
-//		this.lastUpdate = lastUpdate;
-//		
-//	}
 	public CustomDeviceList(int id ,String deviceName,String uniqueId , String sequenceNumber, String referenceKey , String driverName ,String geofenceName ,Date lastUpdate ) {
 		this.id = id;
 		this.deviceName = deviceName;

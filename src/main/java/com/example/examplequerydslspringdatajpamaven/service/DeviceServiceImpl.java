@@ -14,7 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceList;
-
+import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceLiveData;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
@@ -619,6 +619,23 @@ public class DeviceServiceImpl implements DeviceService {
 		data.add(devicesStatus);
 		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",data);
 		System.out.println("online devices"+ onlineDevices);
+		logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+		return ResponseEntity.ok().body(getObjectResponse);
+	}
+
+	@Override
+	public ResponseEntity<?> getAllDeviceLiveData(Long userId, int offset, String search) {
+		// TODO Auto-generated method stub
+		if(userId==0) {
+			 List<CustomDeviceLiveData> allDevicesLiveData=	null;
+		    getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",allDevicesLiveData);
+			
+			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+		}
+	    List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getAllDevicesLiveData(userId, offset, search);
+	    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevicesLiveData);
+		
 		logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
 		return ResponseEntity.ok().body(getObjectResponse);
 	}

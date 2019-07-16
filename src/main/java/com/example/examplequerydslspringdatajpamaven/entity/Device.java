@@ -42,7 +42,29 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 	                     }
 	           )
 	        }
+	),
+	@SqlResultSetMapping(
+	        name="DevicesLiveData",
+	        classes={
+	           @ConstructorResult(
+	                targetClass=CustomDeviceLiveData.class,
+	                  columns={
+	                     @ColumnResult(name="id"),
+	                     @ColumnResult(name="deviceName"),
+	                     @ColumnResult(name="lastUpdate"),
+	                     @ColumnResult(name="address"),
+	                     @ColumnResult(name="attributes"),
+	                     @ColumnResult(name="latitude"),
+	                     @ColumnResult(name="longitude"),
+	                     @ColumnResult(name="speed"),
+	                     @ColumnResult(name="photo"),
+	                     @ColumnResult(name="positionId")
+	                     
+	                     }
+	           )
+	        }
 	)
+	
 })
 
 @NamedNativeQueries({
@@ -62,7 +84,21 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
      		+ " AND (tc_devices.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.uniqueid LIKE LOWER(CONCAT('%',:search, '%'))"
      		+ " OR tc_devices.sequence_number LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))"
      		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%')) ) "
-     		+ "GROUP BY tc_devices.id,tc_drivers.id LIMIT :offset,10")
+     		+ "GROUP BY tc_devices.id,tc_drivers.id LIMIT :offset,10"),
+
+@NamedNativeQuery(name="getDevicesLiveData", 
+	resultSetMapping="DevicesLiveData", 
+	query=" SELECT tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.lastupdate as lastUpdate, "
+			+ " tc_positions.address , tc_positions.attributes ,tc_positions.latitude , tc_positions.longitude, "
+			+ " tc_positions.speed,tc_devices.photo , tc_positions.id as positionId  FROM tc_devices "
+			+ " INNER JOIN  tc_user_device ON tc_devices.id=tc_user_device.deviceid " 
+			+ " LEFT JOIN tc_positions ON tc_positions.id=tc_devices.positionid"
+			+ "  where tc_user_device.userid= :userId and tc_devices.delete_date is null "
+			+ "  AND ((tc_devices.name LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))) "
+			+ " OR (tc_positions.address LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_positions.latitude LIKE LOWER(CONCAT('%',:search, '%'))) "
+			+ " OR (tc_positions.longitude LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_positions.speed LIKE LOWER(CONCAT('%',:search, '%'))))"
+			+ " GROUP BY tc_devices.id LIMIT :offset,10")
+
 })
 
 @Entity

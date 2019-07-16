@@ -28,9 +28,9 @@ public class DashBoardRestController {
 	@GetMapping(path = "/getAllDevicesLastInfo")
 	public ResponseEntity<?> getAllDevicesLastInfo(@RequestParam (value = "userId", defaultValue = "0") Long userId,
 													@RequestParam (value = "offset", defaultValue = "0")int offset,
-													@RequestParam (value = "search", defaultValue = "0") String sarech ){
+													@RequestParam (value = "search", defaultValue = "0") String search ){
 		
-		return null;
+		return deviceService.getAllDeviceLiveData(userId, offset, search);
 	}
 	
 	
