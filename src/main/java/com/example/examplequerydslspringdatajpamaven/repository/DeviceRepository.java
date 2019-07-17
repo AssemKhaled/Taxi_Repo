@@ -13,6 +13,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceList;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceLiveData;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
+import com.example.examplequerydslspringdatajpamaven.entity.EventReport;
 
 @Component
 public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDslPredicateExecutor<Device> {
@@ -49,16 +50,21 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 			" tc_user_device ON tc_user_device.deviceid=tc_devices.id AND tc_user_device.userid = :userId", nativeQuery = true)
 	public Integer getNumberOfOutOfNetworkDevices(@Param("userId")Long userId);
 	
-	@Query(value = "SELECT count(tc_devices.id) FROM tc_devices INNER JOIN sareb_blue.tc_user_device ON tc_devices.id = tc_user_device.deviceid \n" + 
+	@Query(value = "SELECT count(tc_devices.id) FROM tc_devices INNER JOIN tc_user_device ON tc_devices.id = tc_user_device.deviceid \n" + 
 			"AND tc_user_device.userid = :userId WHERE tc_devices.delete_date is null ",nativeQuery = true )
 	public Integer getTotalNumberOfUserDevices(@Param("userId")Long userId);
 	
 	@Query(nativeQuery = true, name = "getDevicesLiveData")
 	List<CustomDeviceLiveData> getAllDevicesLiveData(@Param("userId")Long userId,@Param("offset") int offset,@Param("search") String search);
 	
+
 	@Query(nativeQuery = true, name = "getDeviceLiveData")
 	List<CustomDeviceLiveData> getDeviceLiveData(@Param("deviceId")Long deviceId);
 	
+
+	@Query(nativeQuery = true, name = "vehicleInfo")
+	public List<CustomDeviceList> vehicleInfo(@Param("deviceId")Long deviceId);
+
 	
 	
 }

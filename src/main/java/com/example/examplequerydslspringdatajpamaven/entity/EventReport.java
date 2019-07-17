@@ -42,6 +42,19 @@ public class EventReport {
 		this.latitude = latitude;
 		this.longitude = longitude;
 	}
+	public EventReport(Long eventId, String eventType, String serverTime, String attributes, Long deviceId,
+			String deviceName, Long driverId, String driverName) {
+		super();
+		this.eventId = eventId;
+		this.eventType = eventType;
+		this.serverTime = serverTime;
+		this.attributes = attributes;
+		this.deviceId = deviceId;
+		this.deviceName = deviceName;
+		this.driverId = driverId;
+		this.driverName = driverName;
+	}
+	
 	public Long getEventId() {
 		return eventId;
 	}

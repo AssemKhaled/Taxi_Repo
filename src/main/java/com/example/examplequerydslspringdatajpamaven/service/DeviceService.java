@@ -25,7 +25,7 @@ public interface DeviceService {
 	
 	public ResponseEntity<?>  findDeviceById(Long deviceId);
 
-	public  List<DeviceSelect> getDeviceSelect(Long userId);
+	public ResponseEntity<?> getDeviceSelect(Long userId);
 
 	public ResponseEntity<?> assignDeviceToDriver(Long deviceId , Long driverId);
 	
@@ -42,5 +42,10 @@ public interface DeviceService {
 	
 	public ResponseEntity<?> getAllDeviceLiveData(Long userId,int offset,String search);
 	
+
 	public ResponseEntity<?> getDeviceLiveData(Long deviceId);
+
+	public ResponseEntity<?> vehicleInfo(Long deviceId);
+
+
 }
