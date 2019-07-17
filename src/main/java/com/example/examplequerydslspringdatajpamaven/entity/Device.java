@@ -148,7 +148,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 			+ " OR (tc_positions.longitude LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_positions.speed LIKE LOWER(CONCAT('%',:search, '%'))))"
 			+ " GROUP BY tc_devices.id LIMIT :offset,10"),
 
-<<<<<<< HEAD
+
 @NamedNativeQuery(name="getDeviceLiveData", 
 
 resultSetMapping="DevicesLiveData", 
@@ -156,8 +156,8 @@ query=" SELECT tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.l
 		+ " tc_positions.address , tc_positions.attributes ,tc_positions.latitude , tc_positions.longitude, "
 		+ " tc_positions.speed,tc_devices.photo , tc_positions.id as positionId  FROM tc_devices "
 		+ " LEFT JOIN tc_positions ON tc_positions.id=tc_devices.positionid"
-		+ "  where tc_devices.id= :deviceId and tc_devices.delete_date is null ")
-=======
+		+ "  where tc_devices.id= :deviceId and tc_devices.delete_date is null "),
+
 @NamedNativeQuery(name="vehicleInfo", 
 resultSetMapping="vehicleInfoData", 
 query=" SELECT tc_drivers.id as driverId,tc_drivers.name as driverName,tc_drivers.photo as driverPhoto,"
@@ -173,7 +173,7 @@ query=" SELECT tc_drivers.id as driverId,tc_drivers.name as driverName,tc_driver
 		+ " LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_devices.id "
 		+ " LEFT JOIN tc_drivers ON tc_drivers.id=tc_device_driver.driverid "
 		+ " WHERE tc_devices.id=:deviceId AND tc_devices.delete_date IS NULL")
->>>>>>> 5cfa37c4e7120830b0cd7b33f2dc77b4126445b6
+
 
 })
 
