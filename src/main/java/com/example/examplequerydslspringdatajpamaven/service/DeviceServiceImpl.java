@@ -372,7 +372,7 @@ public class DeviceServiceImpl implements DeviceService {
 						return ResponseEntity.ok().body(getObjectResponse);
 			        }
 				}
-				Driver driver = driverService.findById(driverId);
+				Driver driver = driverService.getDriverById(driverId);
 				if(driver == null) {
 					List<Device> devices = null;
 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This driver is not found",devices);

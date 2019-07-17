@@ -7,8 +7,8 @@ import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 public interface DriverService {
 	
 	public ResponseEntity<?> getAllDrivers(Long id,int offset,String search);
-	public ResponseEntity<?> getDriverById(Long driverId);
-	public Driver findById(Long driverId);
+	public Driver getDriverById(Long driverId);
+	public ResponseEntity<?> findById(Long driverId);
 	public ResponseEntity<?> deleteDriver(Long driverId);
 	public List<Driver> checkDublicateDriverInAdd(Long userId,String name,String uniqueId,String mobileNum);
 	public ResponseEntity<?> addDriver(Driver driver,Long id);
