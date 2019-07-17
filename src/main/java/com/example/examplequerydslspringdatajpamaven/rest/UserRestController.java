@@ -46,43 +46,37 @@ public class UserRestController {
 	}
 	
 	@GetMapping("/usersList")
-	public ResponseEntity<?> usersList(@RequestParam (value = "userId") Long userId,@RequestParam(value = "offset", defaultValue = "0") int offset,
+	public ResponseEntity<?> usersList(@RequestParam (value = "userId", defaultValue = "0") Long userId,@RequestParam(value = "offset", defaultValue = "0") int offset,
             @RequestParam(value = "search", defaultValue = "") String search) {
 		return userService.usersOfUser(userId,offset,search);
 	}
 	
 	@GetMapping("/getUserById")
-	public ResponseEntity<?> getUserById(@RequestParam (value = "userId") Long userId) {
+	public ResponseEntity<?> getUserById(@RequestParam (value = "userId", defaultValue = "0") Long userId) {
 		return userService.findUserById(userId);
 	}
 
-	@PostMapping(path ="/createUser/{userId}")
-	public ResponseEntity<?> createDevice(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) User user) {
-         if(user.getId() != null) {
-        	return  new ResponseEntity<>("badRequest", HttpStatus.BAD_REQUEST);
-         }
+	@PostMapping(path ="/createUser")
+	public ResponseEntity<?> createDevice(@RequestParam (value = "userId", defaultValue = "0") Long userId,@RequestBody(required = false) User user) {
+        
 	   
 		return userService.createUser(user,userId);
 				
 	}
 	
-	@PostMapping(path ="/editUser/{userId}")
-	public ResponseEntity<?> editDevice(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) User user) {
+	@PostMapping(path ="/editUser")
+	public ResponseEntity<?> editDevice(@RequestParam (value = "userId", defaultValue = "0") Long userId,@RequestBody(required = false) User user) {
 		
-		 if(user.getId() == null) {
-        	return  new ResponseEntity<>("badRequest", HttpStatus.BAD_REQUEST);
-         }
+		
 		 return  userService.editUser(user,userId);
 		
 				
 	}
-	@PostMapping(path ="/deleteUser/{userId}")
-	public ResponseEntity<?> deleteDevice(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) User user) {
-		 if(user.getId() == null) {
-        	return new ResponseEntity<>("badRequest", HttpStatus.BAD_REQUEST);
-         }
+	@GetMapping(path ="/deleteUser")
+	public ResponseEntity<?> deleteDevice(@RequestParam (value = "userId", defaultValue = "0") Long userId,@RequestParam (value = "deleteUserId", defaultValue = "0") Long deleteUserId) {
+		
 			 
-		return userService.deleteUser(user);
+		return userService.deleteUser(userId,deleteUserId);
 		
 				
 	}

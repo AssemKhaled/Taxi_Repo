@@ -18,7 +18,7 @@ public interface IUserService {
 	public ResponseEntity<?> createUser(User user,Long userId);
 	public ResponseEntity<?> editUser(User user,Long userId);
 	public List<Integer> checkUserDuplication(User user);
-	public ResponseEntity<?> deleteUser(User user);
+	public ResponseEntity<?> deleteUser(Long userId , Long deleteUserId);
 
 
 }

@@ -639,6 +639,29 @@ public class DeviceServiceImpl implements DeviceService {
 		logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
 		return ResponseEntity.ok().body(getObjectResponse);
 	}
+
+	@Override
+	public ResponseEntity<?> getDeviceLiveData(Long deviceId) {
+		// TODO Auto-generated method stub
+		if(deviceId == 0) {
+			 List<CustomDeviceLiveData> allDevicesLiveData=	null;
+			    getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",allDevicesLiveData);
+				
+				logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+				return ResponseEntity.ok().body(getObjectResponse);
+		}
+		else {
+			List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getDeviceLiveData(deviceId);
+			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevicesLiveData);
+			
+			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+//			return null;
+			
+		}
+		
+		
+	}
    
 
 

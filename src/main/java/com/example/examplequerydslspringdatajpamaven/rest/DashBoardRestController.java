@@ -32,6 +32,11 @@ public class DashBoardRestController {
 		
 		return deviceService.getAllDeviceLiveData(userId, offset, search);
 	}
+	@GetMapping(path = "/getDevicesLiveData")
+	public ResponseEntity<?> getDevicesLiveData(@RequestParam (value = "deviceId", defaultValue = "0") Long deviceId){
+		
+		return deviceService.getDeviceLiveData(deviceId);
+	}
 	
 	
 }

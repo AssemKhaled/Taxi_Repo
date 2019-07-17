@@ -1,5 +1,6 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -33,8 +34,10 @@ public class CustomDeviceLiveData {
 	private Double sensor2;
 	private String hours;
 	private Boolean motion;
-	private Double totalDistance;
+	private String totalDistance;
 	private Boolean ignition;
+	private String alarm;
+	private Double battery;
 	
 	
 	
@@ -94,7 +97,7 @@ public class CustomDeviceLiveData {
 				this.power =0.0;
 			}
 			if(jsonObject.has("alarm")) {
-				String alarm = jsonObject.getString("alarm");
+				this.alarm = jsonObject.getString("alarm");
 				if(alarm.equals("crash")) {
 					this.crash = "Yes";
 					this.batteryUnpluged = "No";
@@ -130,7 +133,31 @@ public class CustomDeviceLiveData {
 				this.deviceWorkingHoursPerDay = 0.0;
 				this.driverWorkingHoursPerDay = 0.0;
 			}
-			
+			if(jsonObject.has("hours")){
+				DecimalFormat df = new DecimalFormat("###.###");
+				String minutes = df.format((jsonObject.getDouble("hours")/ (1000*60))% 60);
+				String hour = df.format(jsonObject.getDouble("hours")/ (1000*60*60));
+				this.hours = hour+" h "+minutes+" m ";
+			}
+			if(jsonObject.has("battery")) {
+				this.battery = jsonObject.getDouble("battery");
+			}
+			if(jsonObject.has("motion")) {
+				this.motion = jsonObject.getBoolean("motion");
+			}
+			if(jsonObject.has("totalDistance")) {
+				DecimalFormat df = new DecimalFormat("######.##");
+				this.totalDistance = df.format((jsonObject.getDouble("totalDistance")/1000));
+			}
+			if(jsonObject.has("ignition")) {
+				this.ignition = jsonObject.getBoolean("ignition");
+			}
+			if(jsonObject.has("adc1")) {
+				this.sensor1 = jsonObject.getDouble("adc1");
+			}
+			if(jsonObject.has("adc2")) {
+				this.sensor2 = jsonObject.getDouble("adc2");
+			}
 			
 		}else {
 			this.weight =0.0;
@@ -348,12 +375,12 @@ public class CustomDeviceLiveData {
 	}
 
 
-	public Double getTotalDistance() {
+	public String getTotalDistance() {
 		return totalDistance;
 	}
 
 
-	public void setTotalDistance(Double totalDistance) {
+	public void setTotalDistance(String totalDistance) {
 		this.totalDistance = totalDistance;
 	}
 
@@ -370,6 +397,26 @@ public class CustomDeviceLiveData {
 
 	public void setLongitude(Double longitude) {
 		this.longitude = longitude;
+	}
+
+
+	public String getAlarm() {
+		return alarm;
+	}
+
+
+	public void setAlarm(String alarm) {
+		this.alarm = alarm;
+	}
+
+
+	public Double getBattery() {
+		return battery;
+	}
+
+
+	public void setBattery(Double battery) {
+		this.battery = battery;
 	}
 	
 	

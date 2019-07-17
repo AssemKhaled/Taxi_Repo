@@ -44,6 +44,27 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 	        }
 	),
 	@SqlResultSetMapping(
+	        name="DeviceLiveData",
+	        classes={
+	           @ConstructorResult(
+	                targetClass=CustomDeviceLiveData.class,
+	                  columns={
+	                     @ColumnResult(name="id"),
+	                     @ColumnResult(name="deviceName"),
+	                     @ColumnResult(name="lastUpdate"),
+	                     @ColumnResult(name="address"),
+	                     @ColumnResult(name="attributes"),
+	                     @ColumnResult(name="latitude"),
+	                     @ColumnResult(name="longitude"),
+	                     @ColumnResult(name="speed"),
+	                     @ColumnResult(name="photo"),
+	                     @ColumnResult(name="positionId")
+	                     
+	                     }
+	           )
+	        }
+	),
+	@SqlResultSetMapping(
 	        name="DevicesLiveData",
 	        classes={
 	           @ConstructorResult(
@@ -64,7 +85,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 	           )
 	        }
 	)
-	
+
 })
 
 @NamedNativeQueries({
@@ -97,7 +118,16 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 			+ "  AND ((tc_devices.name LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))) "
 			+ " OR (tc_positions.address LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_positions.latitude LIKE LOWER(CONCAT('%',:search, '%'))) "
 			+ " OR (tc_positions.longitude LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_positions.speed LIKE LOWER(CONCAT('%',:search, '%'))))"
-			+ " GROUP BY tc_devices.id LIMIT :offset,10")
+			+ " GROUP BY tc_devices.id LIMIT :offset,10"),
+
+@NamedNativeQuery(name="getDeviceLiveData", 
+
+resultSetMapping="DevicesLiveData", 
+query=" SELECT tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.lastupdate as lastUpdate, "
+		+ " tc_positions.address , tc_positions.attributes ,tc_positions.latitude , tc_positions.longitude, "
+		+ " tc_positions.speed,tc_devices.photo , tc_positions.id as positionId  FROM tc_devices "
+		+ " LEFT JOIN tc_positions ON tc_positions.id=tc_devices.positionid"
+		+ "  where tc_devices.id= :deviceId and tc_devices.delete_date is null ")
 
 })
 

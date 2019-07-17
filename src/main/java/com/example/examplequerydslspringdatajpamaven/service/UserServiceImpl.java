@@ -60,18 +60,35 @@ public class UserServiceImpl implements IUserService {
 	public User findById(Long userId) {
 		// TODO Auto-generated method stub
 		User user=userRepository.findOne(userId);
-		return user;
+		if(user == null) {
+			return null;
+		}
+		if(user.getDelete_date() != null) {
+			//throw not found 
+			return null;
+		}
+		else
+		{
+			return user;
+		}
+		
 	}
 	
 	@Override
 	public  ResponseEntity<?> findUserById(Long userId) {
 		// TODO Auto-generated method stub
 		logger.info("************************ getUserById STARTED ***************************");
+		if(userId == 0) {
+			List<User> users = null;
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",users);
+			logger.info("************************ getUserById STARTED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+		}
 		User user=userRepository.findOne(userId);
 		if(user == null)
 		{
 			List<User> users = null;
-			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "success",users);
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Not Found",users);
 			logger.info("************************ getUserById STARTED ***************************");
 			return ResponseEntity.ok().body(getObjectResponse);
 		}
@@ -80,7 +97,7 @@ public class UserServiceImpl implements IUserService {
 			if(user.getDelete_date()!= null)
 			{
 				List<User> users = null;
-				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "success",users);
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Not Found",users);
 				logger.info("************************ getUserById STARTED ***************************");
 				return ResponseEntity.ok().body(getObjectResponse);
 			}
@@ -96,84 +113,187 @@ public class UserServiceImpl implements IUserService {
 	@Override
 	public ResponseEntity<?> usersOfUser(Long userId,int offset,String search) {
 		logger.info("************************ getAllUsersOfUser STARTED ***************************");
-		 List<User> users = userRepository.getUsersOfUser(userId,offset,search);
-		 getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users);
-		 logger.info("************************ getAllUsersOfUser ENDED ***************************");
-		return  ResponseEntity.ok().body(getObjectResponse);
+		if(userId == 0) {
+			 List<User> users = null;
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "BadRequest",users);
+			 logger.info("************************ getAllUsersOfUser ENDED ***************************");
+			return  ResponseEntity.ok().body(getObjectResponse);
+		}
+		else {
+			User user = findById(userId);
+			if(user == null) {
+				 List<User> users = null;
+				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value() ,"this user is not found",users);
+				 logger.info("************************ getAllUsersOfUser ENDED ***************************");
+				return  ResponseEntity.ok().body(getObjectResponse);
+			}
+			else {
+				List<User> users = userRepository.getUsersOfUser(userId,offset,search);
+				 getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users);
+				 logger.info("************************ getAllUsersOfUser ENDED ***************************");
+				return  ResponseEntity.ok().body(getObjectResponse);
+			}
+			
+		}
+		 
 	}
 
 	@Override
 	public ResponseEntity<?> createUser(User user,Long userId) {
 		
 		logger.info("************************createUser STARTED ***************************");
-		
-		Set<User> userCreater=new HashSet<>() ;
-		userCreater.add(findById(userId));
-        user.setUsersOfUser(userCreater);
-		String password = user.getPassword();
-	    String hashedPassword = getMd5(password);  
-	    user.setPassword(hashedPassword);
-	    List<Integer> duplictionList = checkUserDuplication(user);
-	    if(duplictionList.size()>0)
-	    {
-	    	System.out.println("duplication" +duplictionList.toString() );
+		if(userId == 0) {
+			List<User> users = null;
 	    	//throw duplication exception with duplication list
-	    	getObjectResponse = new GetObjectResponse(101, "Duplication Erorr",duplictionList);
+	    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",users);
 	    	logger.info("************************createUser ENDED ***************************");
 	    	return ResponseEntity.ok().body(getObjectResponse);
-	    }
-	    else
-	    {
-	    
-			
-	    
-	    	userRepository.save(user);
-	    	List<User> users = null;
-	    	getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users);
-	    	logger.info("************************createUser ENDED ***************************");
-	    	return ResponseEntity.ok().body(getObjectResponse);
-	    }
+		}
+		else {
+			User creater = findById(userId);
+			if(creater == null) {
+				List<User> users = null;
+		    	//throw duplication exception with duplication list
+		    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), " This user is not Found",users);
+		    	logger.info("************************createUser ENDED ***************************");
+		    	return ResponseEntity.ok().body(getObjectResponse);
+			}
+			else {
+				if(user.getEmail() == null || user.getEmail() == "" || user.getPassword() == null
+					|| user.getPassword() == "" || user.getName() == null || user.getName() == "" 
+					|| user.getIdentity_num() == null || user.getIdentity_num() == ""
+					|| user.getCommercial_num() == null ||user.getCommercial_num() == ""
+					|| user.getCompany_phone() == null || user.getCompany_phone() == ""
+					|| user.getManager_phone() == null || user.getManager_phone() == ""
+					|| user.getManager_mobile() == null || user.getManager_mobile() == ""
+					|| user.getPhone() == null || user.getPhone() == "") {
+					List<User> users = null;
+					String message= "attributes [email , password, name, identityNumber ,commercialNumber,"
+							+ "companyPhone ,Managerphone, ManagerMobile ] are required";
+			    	//throw duplication exception with duplication list
+			    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), message,users);
+			    	logger.info("************************createUser ENDED ***************************");
+			    	return ResponseEntity.ok().body(getObjectResponse);
+				}
+					Set<User> userCreater=new HashSet<>() ;
+					userCreater.add(findById(userId));
+					user.setUsersOfUser(userCreater);
+					String password = user.getPassword();
+					String hashedPassword = getMd5(password);  
+					user.setPassword(hashedPassword);
+					List<Integer> duplictionList = checkUserDuplication(user);
+					if(duplictionList.size()>0)
+					{
+						System.out.println("duplication" +duplictionList.toString() );
+						//throw duplication exception with duplication list
+						getObjectResponse = new GetObjectResponse(101, "Duplication Erorr",duplictionList);
+						logger.info("************************createUser ENDED ***************************");
+						return ResponseEntity.ok().body(getObjectResponse);
+					}
+					else
+					{
+						userRepository.save(user);
+						List<User> users = null;
+						getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users);
+						logger.info("************************createUser ENDED ***************************");
+						return ResponseEntity.ok().body(getObjectResponse);
+					}
+				}		
+		}
+		
 	}
 	@Override
 	public ResponseEntity<?> editUser(User user,Long userId) {
 		
-		logger.info("************************editUser STARTED ***************************");	
-		//to set the users of updateduser
-		User oldOne = findById(user.getId());
-		
-		Set<User> userCreater=new HashSet<>();
-		
-		userCreater = oldOne.getUsersOfUser();
-		
-        user.setUsersOfUser(userCreater);
-        
-		String password = user.getPassword();
-		
-	    String hashedPassword = getMd5(password);  
-	    
-	    user.setPassword(hashedPassword);
-	    
-	    List<Integer> duplictionList = checkUserDuplication(user);
-	    
-	    if(duplictionList.size()>0)
-	    {
-	    	System.out.println("duplication" +duplictionList.toString() );
+		logger.info("************************editUser STARTED ***************************");
+		if(userId == 0) {
+			List<User> users = null;
 	    	//throw duplication exception with duplication list
-	    	getObjectResponse = new GetObjectResponse(101, "Duplication Erorr",duplictionList);
+	    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",users);
 	    	logger.info("************************editUser ENDED ***************************");
 	    	return ResponseEntity.ok().body(getObjectResponse);
-	    }
-	    else
-	    {
-	    
+		}else {
+			  User loggedUser =  findById(userId);
+			  if(loggedUser == null) {
+				  List<User> users = null;
+			    	//throw duplication exception with duplication list
+			    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",users);
+			    	logger.info("************************editUser ENDED ***************************");
+			    	return ResponseEntity.ok().body(getObjectResponse); 
+			  }
+			//to set the users of updateduser
+			if( user.getId() == null || user.getId() == 0|| user.getEmail() == null || user.getEmail() == "" ||
+					 user.getName() == null || user.getName() == "" 
+					|| user.getIdentity_num() == null || user.getIdentity_num() == ""
+					|| user.getCommercial_num() == null ||user.getCommercial_num() == ""
+					|| user.getCompany_phone() == null || user.getCompany_phone() == ""
+					|| user.getManager_phone() == null || user.getManager_phone() == ""
+					|| user.getManager_mobile() == null || user.getManager_mobile() == ""
+					|| user.getPhone() == null || user.getPhone() == "") {
+					List<User> users = null;
+					String message= "attributes [id,email , name, identityNumber ,commercialNumber,"
+							+ "companyPhone ,Managerphone, ManagerMobile ] are required";
+			    	//throw duplication exception with duplication list
+			    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), message,users);
+			    	logger.info("************************createUser ENDED ***************************");
+			    	return ResponseEntity.ok().body(getObjectResponse);
+				}else {
+					if(user.getPassword()!= null) {
+						List<User> users = null;
+						String message= "you are not alllowed to edit password";
+				    	//throw duplication exception with duplication list
+				    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), message,users);
+				    	logger.info("************************createUser ENDED ***************************");
+				    	return ResponseEntity.ok().body(getObjectResponse);
+					}
+					User oldOne = findById(user.getId());
+					if(oldOne == null) {
+						List<User> users = null;
+				    	//throw duplication exception with duplication list
+				    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this userId is not found",users);
+				    	logger.info("************************editUser ENDED ***************************");
+				    	return ResponseEntity.ok().body(getObjectResponse);
+					}else {
+						
+						
+						Set<User> userCreater=new HashSet<>();
+						
+						userCreater = oldOne.getUsersOfUser();
+						
+				        user.setUsersOfUser(userCreater);
+				        
+						String password = oldOne.getPassword();
+						user.setPassword(password);
+					    
+					    List<Integer> duplictionList = checkUserDuplication(user);
+					    
+					    if(duplictionList.size()>0)
+					    {
+					    	System.out.println("duplication" +duplictionList.toString() );
+					    	//throw duplication exception with duplication list
+					    	getObjectResponse = new GetObjectResponse(101, "Duplication Erorr",duplictionList);
+					    	logger.info("************************editUser ENDED ***************************");
+					    	return ResponseEntity.ok().body(getObjectResponse);
+					    }
+					    else
+					    {
+					    
+							
+					    
+					    	userRepository.save(user);
+					    	List<User> users = null;
+					    	getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users);
+					    	logger.info("************************createUser ENDED ***************************");
+					    	return ResponseEntity.ok().body(getObjectResponse);
+					    }
+					}
+				}
 			
-	    
-	    	userRepository.save(user);
-	    	List<User> users = null;
-	    	getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users);
-	    	logger.info("************************createUser ENDED ***************************");
-	    	return ResponseEntity.ok().body(getObjectResponse);
-	    }
+			
+			
+		}
+		
+		
 	}
 	
 	
@@ -265,25 +385,47 @@ public class UserServiceImpl implements IUserService {
 	}
 
 	@Override
-	public ResponseEntity<?> deleteUser(User user) {
-	logger.info("************************deleteUser STARTED ***************************");	
-		String password = user.getPassword();
-	    String hashedPassword = getMd5(password);     
-	    user.setPassword(hashedPassword);
-		 Calendar cal = Calendar.getInstance();
-		 int day = cal.get(Calendar.DATE);
-	     int month = cal.get(Calendar.MONTH) + 1;
-	     int year = cal.get(Calendar.YEAR);
-	     String date =  Integer.toString(year)+"-"+ Integer.toString(month)+"-"+ Integer.toString(day);
-	     user.setDelete_date(date);
-	     userRepository.save(user);
-	     userRepository.deleteUserOfUser(user.getId());
-	     List<User> users= null;
-	      getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users);
-	    logger.info("************************deleteUser ENDED ***************************");
-	    return ResponseEntity.ok().body(getObjectResponse);
-	} 
-
-	
-
+	public ResponseEntity<?> deleteUser(Long userId,Long deleteUserId) {
+		System.out.println("userid"+userId+"delete"+deleteUserId);
+		logger.info("************************deleteUser STARTED ***************************");
+		if(userId == 0 || deleteUserId == 0) {
+			 List<User> users= null;
+		      getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",users);
+		    logger.info("************************deleteUser ENDED ***************************");
+		    return ResponseEntity.ok().body(getObjectResponse);
+		}
+		else {
+			 User loggedUser = findById(userId);
+	            if(loggedUser== null) {
+						 List<User> users= null;
+					      getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this logged user is not found to delete",users);
+					    logger.info("************************deleteUser ENDED ***************************");
+					    return ResponseEntity.ok().body(getObjectResponse);
+	            }else {
+	            	User deletedUser = findById(deleteUserId);
+	    			if(deletedUser == null) {
+	    				logger.info("************************deleteUser STARTED ***************************");
+	    				
+	    					 List<User> users= null;
+	    				      getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this user is not found to delete",users);
+	    				    logger.info("************************deleteUser ENDED ***************************");
+	    				    return ResponseEntity.ok().body(getObjectResponse);
+	    			}else {
+	    				Calendar cal = Calendar.getInstance();
+	    				int day = cal.get(Calendar.DATE);
+	    				int month = cal.get(Calendar.MONTH) + 1;
+	    				int year = cal.get(Calendar.YEAR);
+	    				String date =  Integer.toString(year)+"-"+ Integer.toString(month)+"-"+ Integer.toString(day);
+	    				deletedUser.setDelete_date(date);
+	    				userRepository.save(deletedUser);
+	    				userRepository.deleteUserOfUser(deletedUser.getId());
+	    				List<User> users= null;
+	    				getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users);
+	    				logger.info("************************deleteUser ENDED ***************************");
+	    				return ResponseEntity.ok().body(getObjectResponse);
+	    			}
+	            }
+		}
+		
+	}
 }

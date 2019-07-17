@@ -56,6 +56,9 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	@Query(nativeQuery = true, name = "getDevicesLiveData")
 	List<CustomDeviceLiveData> getAllDevicesLiveData(@Param("userId")Long userId,@Param("offset") int offset,@Param("search") String search);
 	
+	@Query(nativeQuery = true, name = "getDeviceLiveData")
+	List<CustomDeviceLiveData> getDeviceLiveData(@Param("deviceId")Long deviceId);
+	
 	
 	
 }
