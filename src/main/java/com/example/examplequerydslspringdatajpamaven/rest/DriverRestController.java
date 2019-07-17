@@ -46,7 +46,7 @@ public class DriverRestController {
 	public @ResponseBody ResponseEntity<?> getDriverById(@RequestParam (value = "driverId", defaultValue = "0") Long driverId) {
 		
 		
-		return ResponseEntity.ok(driverServiceImpl.getDriverById(driverId).getBody());
+		return ResponseEntity.ok(driverServiceImpl.findById(driverId).getBody());
 
 	}
 	

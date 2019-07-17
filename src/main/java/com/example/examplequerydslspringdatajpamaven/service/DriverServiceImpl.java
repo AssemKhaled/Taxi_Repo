@@ -304,7 +304,7 @@ public class DriverServiceImpl implements DriverService{
 
 
 	@Override
-	public ResponseEntity<?> getDriverById(Long driverId) {
+	public ResponseEntity<?> findById(Long driverId) {
 		logger.info("************************ getDriverById STARTED ***************************");
 		List<Driver> drivers = new ArrayList<Driver>();
 
@@ -416,7 +416,7 @@ public class DriverServiceImpl implements DriverService{
 	}
 
 	@Override
-	public Driver findById(Long driverId) {
+	public Driver getDriverById(Long driverId) {
 		Driver driver = driverRepository.findOne(driverId);
 		if(driver == null) {
 			return null;
