@@ -41,4 +41,7 @@ public interface DeviceService {
 	public ResponseEntity<?> getDeviceStatus(Long userId);
 	
 	public ResponseEntity<?> getAllDeviceLiveData(Long userId,int offset,String search);
+	
+	public ResponseEntity<?> vehicleInfo(Long deviceId);
+
 }

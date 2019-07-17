@@ -63,6 +63,34 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 	                     }
 	           )
 	        }
+	),
+	@SqlResultSetMapping(
+	        name="vehicleInfoData",
+	        classes={
+	           @ConstructorResult(
+	                targetClass=CustomDeviceList.class,
+	                  columns={
+	 	                 @ColumnResult(name="id",type=int.class),
+	                     @ColumnResult(name="uniqueId",type=String.class),
+	                     @ColumnResult(name="sequenceNumber",type=String.class),
+	                     @ColumnResult(name="driverName",type=String.class),
+	                     @ColumnResult(name="driverId",type=Long.class),
+	                     @ColumnResult(name="driverPhoto",type=String.class),
+	                     @ColumnResult(name="plateType",type=String.class),
+	                     @ColumnResult(name="vehiclePlate",type=String.class),
+	                     @ColumnResult(name="ownerName",type=String.class),
+	                     @ColumnResult(name="ownerId",type=String.class),
+	                     @ColumnResult(name="userName",type=String.class),
+	                     @ColumnResult(name="brand",type=String.class),
+	                     @ColumnResult(name="model",type=String.class),
+	                     @ColumnResult(name="madeYear",type=String.class),
+	                     @ColumnResult(name="color",type=String.class),
+	                     @ColumnResult(name="licenceExptDate",type=String.class),
+	                     @ColumnResult(name="carWeight",type=String.class)	                     
+	             	
+	                     }
+	           )
+	        }
 	)
 	
 })
@@ -97,7 +125,23 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 			+ "  AND ((tc_devices.name LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))) "
 			+ " OR (tc_positions.address LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_positions.latitude LIKE LOWER(CONCAT('%',:search, '%'))) "
 			+ " OR (tc_positions.longitude LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_positions.speed LIKE LOWER(CONCAT('%',:search, '%'))))"
-			+ " GROUP BY tc_devices.id LIMIT :offset,10")
+			+ " GROUP BY tc_devices.id LIMIT :offset,10"),
+
+@NamedNativeQuery(name="vehicleInfo", 
+resultSetMapping="vehicleInfoData", 
+query=" SELECT tc_drivers.id as driverId,tc_drivers.name as driverName,tc_drivers.photo as driverPhoto,"
+		+ " tc_devices.id as id,tc_devices.uniqueid as uniqueId,tc_devices.sequence_number as sequenceNumber,"
+		+ " tc_devices.owner_name as ownerName,tc_devices.owner_id as ownerId, "
+		+ " tc_devices.username as userName,tc_devices.model as model ,"
+		+ " tc_devices.brand as brand,tc_devices.made_year as madeYear,"
+		+ " tc_devices.color as color,tc_devices.car_weight as carWeight,"
+		+ " tc_devices.license_exp as licenceExptDate,"
+		+ " CONCAT_WS(' ',tc_devices.plate_num,tc_devices.right_letter,tc_devices.middle_letter,tc_devices.left_letter) as vehiclePlate,"
+		+ " tc_devices.plate_type as plateType"
+		+ " FROM tc_devices "
+		+ " LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_devices.id "
+		+ " LEFT JOIN tc_drivers ON tc_drivers.id=tc_device_driver.driverid "
+		+ " WHERE tc_devices.id=:deviceId AND tc_devices.delete_date IS NULL")
 
 })
 

@@ -13,6 +13,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceList;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceLiveData;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
+import com.example.examplequerydslspringdatajpamaven.entity.EventReport;
 
 @Component
 public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDslPredicateExecutor<Device> {
@@ -56,6 +57,8 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	@Query(nativeQuery = true, name = "getDevicesLiveData")
 	List<CustomDeviceLiveData> getAllDevicesLiveData(@Param("userId")Long userId,@Param("offset") int offset,@Param("search") String search);
 	
+	@Query(nativeQuery = true, name = "vehicleInfo")
+	public List<CustomDeviceList> vehicleInfo(@Param("deviceId")Long deviceId);
 	
 	
 }

@@ -669,6 +669,38 @@ public class DeviceServiceImpl implements DeviceService {
 		logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
 		return ResponseEntity.ok().body(getObjectResponse);
 	}
+
+	@Override
+	public ResponseEntity<?> vehicleInfo(Long deviceId) {
+		 List<CustomDeviceList> vehicleInfo= new ArrayList<CustomDeviceList>();
+
+		if(deviceId != 0) {
+			Device device = findById(deviceId);
+			if(device != null) {
+				if(device.getDeleteDate()==null) {
+					vehicleInfo = deviceRepository.vehicleInfo(deviceId);
+				    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",vehicleInfo);
+					
+				}
+				else {
+				    getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Device ID is not found",vehicleInfo);
+				}
+				
+			}
+			else {
+			    getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Device ID is not found",vehicleInfo);
+
+			}
+			
+			
+		}
+		else {
+		    getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is required",vehicleInfo);
+
+		}
+		
+		return ResponseEntity.ok().body(getObjectResponse);
+	}
    
 
 

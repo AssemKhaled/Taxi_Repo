@@ -80,7 +80,10 @@ public class ProfileServiceImpl implements ProfileService{
 				if(Data.getDelete_date() == null) {
 					if(user.getEmail() == null || user.getIdentity_num() == null || user.getCommercial_num() == null 
 							|| user.getCompany_phone() == null || user.getManager_phone() == null
-							|| user.getManager_mobile() ==null ||user.getPhone() == null) {
+							|| user.getManager_mobile() ==null ||user.getPhone() == null
+							|| user.getEmail() == "" || user.getIdentity_num() == "" || user.getCommercial_num() == "" 
+							|| user.getCompany_phone() == "" || user.getManager_phone() == ""
+							|| user.getManager_mobile() =="" ||user.getPhone() == "") {
 						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User {Email , Identity Number , commercial Numebr , Company Phone , Phone Manager , Manager Mobile , Phone } is Required",users);
 
 					}
@@ -137,7 +140,8 @@ public class ProfileServiceImpl implements ProfileService{
 			else {
 				if(user.getDelete_date() == null) {
 					
-					if(data.get("oldPassword") == null || data.get("newPassword") == null) {
+					if(data.get("oldPassword") == null || data.get("newPassword") == null ||
+							data.get("oldPassword") == "" || data.get("newPassword") == "") {
 						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "newPassword and oldPassword is Required",users);
 
 					}

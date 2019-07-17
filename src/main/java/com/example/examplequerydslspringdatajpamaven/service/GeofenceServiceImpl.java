@@ -136,7 +136,7 @@ public class GeofenceServiceImpl implements GeofenceService {
 
 				}
 				else {
-					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This Geofence was Deleted Before",geofences);
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This Geofence ID was Deleted before",geofences);
 
 				}
 				
@@ -144,7 +144,7 @@ public class GeofenceServiceImpl implements GeofenceService {
 			}
 			else {
 
-				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This Geofence ID is not Found",geofences);
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This Geofence ID was not found",geofences);
 
 			}
 						
@@ -181,7 +181,8 @@ public class GeofenceServiceImpl implements GeofenceService {
 			else {
 				if(user.getDelete_date()==null) {
 					if(geofence.getName()== null || geofence.getType()== null
-							   || geofence.getArea() == null) {
+							   || geofence.getArea() == null || geofence.getName()== "" || geofence.getType()== ""
+							   || geofence.getArea() == "") {
 						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Geofence name , type and area is Required",geofences);
 
 					}
@@ -268,7 +269,8 @@ public class GeofenceServiceImpl implements GeofenceService {
 						if(geofneceCheck != null) {
 							if(geofneceCheck.getDelete_date() == null) {
 								if(geofence.getName()== null || geofence.getType()== null
-										   || geofence.getArea() == null) {
+										   || geofence.getArea() == null || geofence.getName()== "" || geofence.getType()== ""
+										   || geofence.getArea() == "") {
 									getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Geofence name , type and area is Required",geofences);
 
 								}

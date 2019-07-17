@@ -51,13 +51,21 @@ public class DashBoardRestController {
 		return deviceService.getAllDeviceLiveData(userId, offset, search);
 	}
 	@RequestMapping(value = "/getNotifications", method = RequestMethod.GET)
-	public @ResponseBody ResponseEntity<?> getEvents(@RequestParam (value = "userId", defaultValue = "0") Long userId,
+	public @ResponseBody ResponseEntity<?> getNotifications(@RequestParam (value = "userId", defaultValue = "0") Long userId,
 			@RequestParam (value = "offset", defaultValue = "0") int offset,
 			@RequestParam (value = "search", defaultValue = "") String search) {
 		
 
 		
     	return  ResponseEntity.ok(reportServiceImpl.getNotifications(userId, offset,search).getBody());
+
+	}
+	@RequestMapping(value = "/vehicleInfo", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> vehicleInfo(@RequestParam (value = "deviceId", defaultValue = "0") Long deviceId){
+		
+
+		
+    	return  ResponseEntity.ok(deviceService.vehicleInfo(deviceId).getBody());
 
 	}
 	

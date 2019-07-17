@@ -94,7 +94,8 @@ public class DriverServiceImpl implements DriverService{
 				if(user.getDelete_date()==null) {
 					
 					if(driver.getName()== null || driver.getUniqueid()== null
-							   || driver.getMobile_num() == null) {
+							   || driver.getMobile_num() == null || driver.getName()== "" || driver.getUniqueid()== ""
+							   || driver.getMobile_num() == "") {
 						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Driver name , uniqueid and mobile number is Required",drivers);
 
 					}
@@ -202,7 +203,8 @@ public class DriverServiceImpl implements DriverService{
 							if(driverCheck.getDelete_date() == null) {
 								
 								if(driver.getName()== null || driver.getUniqueid()== null
-										   || driver.getMobile_num() == null) {
+										   || driver.getMobile_num() == null || driver.getName()== "" || driver.getUniqueid()== ""
+										   || driver.getMobile_num() == "") {
 									getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Driver name , uniqueid and mobile number is Required",drivers);
 			
 								}

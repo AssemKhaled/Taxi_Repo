@@ -69,7 +69,7 @@ import javax.persistence.Table;
 })
 
 @NamedNativeQueries({
-	@NamedNativeQuery(name="Event.getEvents", 
+	@NamedNativeQuery(name="getEvents", 
 		     resultSetMapping="eventReport", 
 		     query="SELECT tc_events.id as eventId,"
 		     		+ " tc_events.type as eventType"
@@ -89,7 +89,7 @@ import javax.persistence.Table;
 					+ " and ( (tc_events.type Like :search) OR (tc_events.attributes Like :search) OR (tc_events.servertime Like :search) OR (tc_geofences.name Like :search) OR (tc_drivers.name Like :search)  OR (tc_devices.name Like :search) )"
 		     		+ " ORDER BY tc_events.servertime DESC LIMIT :offset, 10")
 	,
-	@NamedNativeQuery(name="Event.getNotifications", 
+	@NamedNativeQuery(name="getNotifications", 
     resultSetMapping="notification", 
     query="SELECT tc_events.id as eventId,tc_events.type as eventType,tc_events.servertime as serverTime,"
     		+ " tc_events.attributes as attributes,"
@@ -98,9 +98,9 @@ import javax.persistence.Table;
     		+ " FROM tc_user_device " 
     		+ " INNER JOIN tc_events ON tc_user_device.deviceid=tc_events.deviceid" 
     		+ " INNER JOIN tc_devices ON tc_events.deviceid=tc_devices.id "
-    		+" LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_events.deviceid "
+    		+ " LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_events.deviceid "
     		+ " LEFT JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id " 
-    		+" WHERE tc_user_device.userid=:userId AND tc_devices.delete_date IS NULL AND tc_drivers.delete_date IS NULL "
+    		+ " WHERE tc_user_device.userid=:userId AND tc_devices.delete_date IS NULL AND tc_drivers.delete_date IS NULL "
     		+ " AND Date(tc_events.servertime)=CURRENT_DATE() " 
     		+ " and ( (tc_events.type Like :search)  OR (tc_events.attributes Like :search) OR (tc_events.servertime Like :search) OR (tc_drivers.name Like :search)  OR (tc_devices.name Like :search) )"
     		+ " ORDER BY tc_events.servertime DESC LIMIT :offset, 10")
