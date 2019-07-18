@@ -36,8 +36,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 	                     @ColumnResult(name="uniqueId"),
 	                     @ColumnResult(name="sequenceNumber"),
 	                     @ColumnResult(name="referenceKey"),
-	                     @ColumnResult(name="geofenceName"),
 	                     @ColumnResult(name="driverName"),
+	                     @ColumnResult(name="geofenceName"),
 	                     @ColumnResult(name="lastUpdate")
 	                     }
 	           )
