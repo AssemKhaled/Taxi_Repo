@@ -47,32 +47,32 @@ public class DeviceRestController {
 	
 	
 	@GetMapping("/getUserDevices")
-	public ResponseEntity<?> devicesList(@RequestParam (value = "userId") Long userId,@RequestParam(value = "offset", defaultValue = "0") int offset,
+	public ResponseEntity<?> devicesList(@RequestParam (value = "userId",defaultValue = "0") Long userId,@RequestParam(value = "offset", defaultValue = "0") int offset,
             @RequestParam(value = "search", defaultValue = "") String search) {
  
 		return deviceService.getAllUserDevices(userId,offset,search);
 		
 	}
 	
-	@PostMapping(path ="/createDevice/{userId}")
-	public ResponseEntity<?> createDevice(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) Device device) {
+	@PostMapping(path ="/createDevice")
+	public ResponseEntity<?> createDevice(@RequestParam (value = "userId",defaultValue = "0") Long userId,@RequestBody(required = false) Device device) {
 			 return deviceService.createDevice(device,userId);				
 	}
 	
-	@PostMapping(path ="/editDevice/{userId}")
-	public ResponseEntity<?> editDevice(@PathVariable (value = "userId") Long userId,@RequestBody(required = false) Device device) {
+	@PostMapping(path ="/editDevice")
+	public ResponseEntity<?> editDevice(@RequestParam (value = "userId",defaultValue = "0") Long userId,@RequestBody(required = false) Device device) {
 		
 			 return deviceService.editDevice(device,userId);	
 	}
 	
 	@GetMapping(path ="/deleteDevice")
-	public ResponseEntity<?> deleteDevice(@RequestParam  (value = "userId") Long userId,@RequestParam (value = "deviceId") Long deviceId ) {
+	public ResponseEntity<?> deleteDevice(@RequestParam  (value = "userId",defaultValue = "0") Long userId,@RequestParam (value = "deviceId",defaultValue = "0") Long deviceId ) {
 			
 			 return deviceService.deleteDevice(userId,deviceId);			
 	}
 	
 	@GetMapping(path ="/getDevicebyId")
-	public ResponseEntity<?> getDevicebyId(@RequestParam (value = "deviceId") Long deviceId) {
+	public ResponseEntity<?> getDevicebyId(@RequestParam (value = "deviceId",defaultValue = "0") Long deviceId) {
 
 			 return  deviceService.findDeviceById(deviceId);
 	}
@@ -86,7 +86,7 @@ public class DeviceRestController {
 	}
 	
 	@GetMapping(path = "/assignGeofencesToDevice")
-	public ResponseEntity<?> assignGeofencesToDevice(@RequestParam (value = "geoIds", defaultValue = "")Long [] geoIds,@RequestParam(value = "deviceId" ,defaultValue = "0") Long deviceId) {
+	public ResponseEntity<?> assignGeofencesToDevice(@RequestParam(value = "deviceId" ,defaultValue = "0") Long deviceId,@RequestParam (value = "geoIds", defaultValue = "")Long [] geoIds) {
 	
 				return deviceService.assignDeviceToGeofences(deviceId,geoIds);	
 				
