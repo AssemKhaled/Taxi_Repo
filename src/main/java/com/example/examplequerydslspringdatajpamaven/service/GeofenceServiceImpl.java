@@ -374,10 +374,6 @@ public class GeofenceServiceImpl implements GeofenceService {
 		if(geofence == null) {
 			return null;
 		}
-		if(geofence.getDelete_date() != null) {
-			//throw not found 
-			return null;
-		}
 		else
 		{
 			return geofence;
