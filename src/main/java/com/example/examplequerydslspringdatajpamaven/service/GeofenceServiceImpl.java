@@ -129,6 +129,7 @@ public class GeofenceServiceImpl implements GeofenceService {
 			if(geofence != null) {
 				
 				if(geofence.getDelete_date()==null) {
+					
 					geofenceRepository.deleteGeofence(geofenceId,currentDate);
 					geofenceRepository.deleteGeofenceId(geofenceId);
 					geofenceRepository.deleteGeofenceDeviceId(geofenceId);
@@ -136,6 +137,7 @@ public class GeofenceServiceImpl implements GeofenceService {
 
 				}
 				else {
+					
 					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This Geofence ID was Deleted before",geofences);
 
 				}
@@ -372,10 +374,6 @@ public class GeofenceServiceImpl implements GeofenceService {
 		
 		Geofence geofence = geofenceRepository.findOne(geofenceId);
 		if(geofence == null) {
-			return null;
-		}
-		if(geofence.getDelete_date() != null) {
-			//throw not found 
 			return null;
 		}
 		else

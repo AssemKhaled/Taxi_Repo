@@ -1,6 +1,7 @@
 package com.example.examplequerydslspringdatajpamaven.service;
 
 import java.nio.charset.Charset;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -61,18 +62,37 @@ public class ReportServiceImpl implements ReportService {
 				else {
 					SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 					SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+					inputFormat.setLenient(false);
+					outputFormat.setLenient(false);
+
 					Date dateFrom;
 					Date dateTo;
 					try {
 						dateFrom = inputFormat.parse(start);
 						dateTo = inputFormat.parse(end);
-
+						
 						start = outputFormat.format(dateFrom);
 						end = outputFormat.format(dateTo);
+						
+						Date today=new Date();
+
+						if(dateFrom.getTime() > dateTo.getTime()) {
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",eventReport);
+							return  ResponseEntity.ok(getObjectResponse);
+						}
+						if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",eventReport);
+							return  ResponseEntity.ok(getObjectResponse);
+						}
+						
+						
+
 
 					} catch (ParseException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
+						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",eventReport);
+						return  ResponseEntity.ok(getObjectResponse);
+
 					}
 					search = "%"+search+"%";
 					eventReport = eventRepository.getEvents(deviceId, offset, start, end,search);
@@ -189,10 +209,26 @@ public class ReportServiceImpl implements ReportService {
 
 						from = outputFormat.format(dateFrom);
 						to = outputFormat.format(dateTo);
+						
+						Date today=new Date();
+
+						if(dateFrom.getTime() > dateTo.getTime()) {
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",stopReport);
+							return  ResponseEntity.ok(getObjectResponse);
+						}
+						if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",stopReport);
+							return  ResponseEntity.ok(getObjectResponse);
+						}
+						
+						
 
 					} catch (ParseException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
+						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",stopReport);
+						return  ResponseEntity.ok(getObjectResponse);
+
+
 					}
 
 					String plainCreds = "admin@fuinco.com:admin";
@@ -271,10 +307,23 @@ public class ReportServiceImpl implements ReportService {
 
 						from = outputFormat.format(dateFrom);
 						to = outputFormat.format(dateTo);
+						
+						Date today=new Date();
+
+						if(dateFrom.getTime() > dateTo.getTime()) {
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",tripReport);
+							return  ResponseEntity.ok(getObjectResponse);
+						}
+						if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",tripReport);
+							return  ResponseEntity.ok(getObjectResponse);
+						}
 
 					} catch (ParseException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
+						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",tripReport);
+						return  ResponseEntity.ok(getObjectResponse);
+
 					}
 
 					String plainCreds = "admin@fuinco.com:admin";
