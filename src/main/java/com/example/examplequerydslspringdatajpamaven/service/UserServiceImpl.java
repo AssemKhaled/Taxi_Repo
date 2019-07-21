@@ -80,7 +80,7 @@ public class UserServiceImpl implements IUserService {
 		logger.info("************************ getUserById STARTED ***************************");
 		if(userId == 0) {
 			List<User> users = null;
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",users);
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request Missing User Id ",users);
 			logger.info("************************ getUserById STARTED ***************************");
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
@@ -88,7 +88,7 @@ public class UserServiceImpl implements IUserService {
 		if(user == null)
 		{
 			List<User> users = null;
-			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Not Found",users);
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this user is not found ",users);
 			logger.info("************************ getUserById STARTED ***************************");
 			return ResponseEntity.status(404).body(getObjectResponse);
 		}
@@ -97,7 +97,7 @@ public class UserServiceImpl implements IUserService {
 			if(user.getDelete_date()!= null)
 			{
 				List<User> users = null;
-				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Not Found",users);
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this user is not found",users);
 				logger.info("************************ getUserById STARTED ***************************");
 				return ResponseEntity.status(404).body(getObjectResponse);
 			}
@@ -115,7 +115,7 @@ public class UserServiceImpl implements IUserService {
 		logger.info("************************ getAllUsersOfUser STARTED ***************************");
 		if(userId == 0) {
 			 List<User> users = null;
-			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "BadRequest",users);
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "BadRequest Missing user id ",users);
 			 logger.info("************************ getAllUsersOfUser ENDED ***************************");
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
@@ -145,7 +145,7 @@ public class UserServiceImpl implements IUserService {
 		if(userId == 0) {
 			List<User> users = null;
 	    	//throw duplication exception with duplication list
-	    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",users);
+	    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request Missing user id ",users);
 	    	logger.info("************************createUser ENDED ***************************");
 	    	return ResponseEntity.badRequest().body(getObjectResponse);
 		}
@@ -159,6 +159,14 @@ public class UserServiceImpl implements IUserService {
 		    	return ResponseEntity.status(404).body(getObjectResponse);
 			}
 			else {
+				if(user.getId() != null) {
+					List<User> users = null;
+					String message= "create doesn't accept id";
+			    	//throw duplication exception with duplication list
+			    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), message,users);
+			    	logger.info("************************createUser ENDED ***************************");
+			    	return ResponseEntity.ok().body(getObjectResponse);
+				}
 				if(user.getEmail() == null || user.getEmail() == "" || user.getPassword() == null
 					|| user.getPassword() == "" || user.getName() == null || user.getName() == "" 
 					|| user.getIdentity_num() == null || user.getIdentity_num() == ""
@@ -209,7 +217,7 @@ public class UserServiceImpl implements IUserService {
 		if(userId == 0) {
 			List<User> users = null;
 	    	//throw duplication exception with duplication list
-	    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",users);
+	    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request Missing user Id",users);
 	    	logger.info("************************editUser ENDED ***************************");
 	    	return ResponseEntity.badRequest().body(getObjectResponse);
 		}else {
@@ -240,7 +248,7 @@ public class UserServiceImpl implements IUserService {
 				}else {
 					if(user.getPassword()!= null) {
 						List<User> users = null;
-						String message= "you are not alllowed to edit password";
+						String message= "you are not allowed to edit password";
 				    	//throw duplication exception with duplication list
 				    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), message,users);
 				    	logger.info("************************createUser ENDED ***************************");
