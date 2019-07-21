@@ -159,6 +159,14 @@ public class UserServiceImpl implements IUserService {
 		    	return ResponseEntity.ok().body(getObjectResponse);
 			}
 			else {
+				if(user.getId() != null) {
+					List<User> users = null;
+					String message= "create doesn't accept id";
+			    	//throw duplication exception with duplication list
+			    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), message,users);
+			    	logger.info("************************createUser ENDED ***************************");
+			    	return ResponseEntity.ok().body(getObjectResponse);
+				}
 				if(user.getEmail() == null || user.getEmail() == "" || user.getPassword() == null
 					|| user.getPassword() == "" || user.getName() == null || user.getName() == "" 
 					|| user.getIdentity_num() == null || user.getIdentity_num() == ""
