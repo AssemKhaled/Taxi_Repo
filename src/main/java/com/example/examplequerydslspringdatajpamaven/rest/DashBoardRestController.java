@@ -65,7 +65,7 @@ public class DashBoardRestController {
 		
 
 		
-    	return  ResponseEntity.ok(reportServiceImpl.getNotifications(userId, offset,search).getBody());
+    	return  reportServiceImpl.getNotifications(userId, offset,search);
 
 	}
 	@RequestMapping(value = "/vehicleInfo", method = RequestMethod.GET)
@@ -73,7 +73,7 @@ public class DashBoardRestController {
 		
 
 		
-    	return  ResponseEntity.ok(deviceService.vehicleInfo(deviceId).getBody());
+    	return  deviceService.vehicleInfo(deviceId);
 
 	}
 

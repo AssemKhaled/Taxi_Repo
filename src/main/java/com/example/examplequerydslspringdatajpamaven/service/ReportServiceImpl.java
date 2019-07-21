@@ -57,6 +57,7 @@ public class ReportServiceImpl implements ReportService {
 			if(device != null) {
 				if(start.equals("0") || end.equals("0")) {
 					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",eventReport);
+					return  ResponseEntity.badRequest().body(getObjectResponse);
 
 				}
 				else {
@@ -78,11 +79,11 @@ public class ReportServiceImpl implements ReportService {
 
 						if(dateFrom.getTime() > dateTo.getTime()) {
 							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",eventReport);
-							return  ResponseEntity.ok(getObjectResponse);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
 						}
 						if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
 							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",eventReport);
-							return  ResponseEntity.ok(getObjectResponse);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
 						}
 						
 						
@@ -91,7 +92,7 @@ public class ReportServiceImpl implements ReportService {
 					} catch (ParseException e) {
 						// TODO Auto-generated catch block
 						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",eventReport);
-						return  ResponseEntity.ok(getObjectResponse);
+						return  ResponseEntity.badRequest().body(getObjectResponse);
 
 					}
 					search = "%"+search+"%";
@@ -107,11 +108,15 @@ public class ReportServiceImpl implements ReportService {
 						
 					}
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",eventReport);
+					logger.info("************************ getEventsReport ENDED ***************************");
+					return  ResponseEntity.ok().body(getObjectResponse);
+
 				}
 				
 			}
 			else {
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Device ID is not found",eventReport);
+				return  ResponseEntity.status(404).body(getObjectResponse);
 
 			}
 			
@@ -120,13 +125,12 @@ public class ReportServiceImpl implements ReportService {
 		}
 		else {
 			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",eventReport);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
 		
 		
-		logger.info("************************ getEventsReport ENDED ***************************");
 
-		return  ResponseEntity.ok(getObjectResponse);
 	}
 
 	@Override
@@ -155,15 +159,19 @@ public class ReportServiceImpl implements ReportService {
 							
 					}
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",notifications);
+					logger.info("************************ getNotifications ENDED ***************************");
+					return  ResponseEntity.ok().body(getObjectResponse);
 
 				}
 				else {
 					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",notifications);
+					return  ResponseEntity.status(404).body(getObjectResponse);
 
 				}
 			}
 			else {
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",notifications);
+				return  ResponseEntity.status(404).body(getObjectResponse);
 
 			}
 			
@@ -172,13 +180,12 @@ public class ReportServiceImpl implements ReportService {
 		}
 		else {
 			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",notifications);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
 		
 		
-		logger.info("************************ getNotifications ENDED ***************************");
 
-		return  ResponseEntity.ok(getObjectResponse);
 	}
 
 	@Override
@@ -196,6 +203,7 @@ public class ReportServiceImpl implements ReportService {
 				
 				if(from.equals("0") || to.equals("0")) {
 					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date from and to is Required",stopReport);
+					return  ResponseEntity.badRequest().body(getObjectResponse);
 
 				}
 				else {
@@ -214,11 +222,11 @@ public class ReportServiceImpl implements ReportService {
 
 						if(dateFrom.getTime() > dateTo.getTime()) {
 							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",stopReport);
-							return  ResponseEntity.ok(getObjectResponse);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
 						}
 						if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
 							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",stopReport);
-							return  ResponseEntity.ok(getObjectResponse);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
 						}
 						
 						
@@ -226,7 +234,7 @@ public class ReportServiceImpl implements ReportService {
 					} catch (ParseException e) {
 						// TODO Auto-generated catch block
 						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",stopReport);
-						return  ResponseEntity.ok(getObjectResponse);
+						return  ResponseEntity.badRequest().body(getObjectResponse);
 
 
 					}
@@ -256,6 +264,9 @@ public class ReportServiceImpl implements ReportService {
 					  HttpEntity<String> request = new HttpEntity<String>(headers);
 					  stopReport=restTemplate.exchange(builder.toString(), HttpMethod.GET, request,List.class).getBody();
 					  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",stopReport);
+					  logger.info("************************ getStopsReport ENDED ***************************");
+						return  ResponseEntity.ok().body(getObjectResponse);
+
 
 					
 				}
@@ -263,7 +274,8 @@ public class ReportServiceImpl implements ReportService {
 			}
 			else {
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Device ID is not found",stopReport);
-		
+				return  ResponseEntity.status(404).body(getObjectResponse);
+
 			}
 			
 			
@@ -271,12 +283,11 @@ public class ReportServiceImpl implements ReportService {
 		}
 		else {
 			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",stopReport);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
 		
-		logger.info("************************ getStopsReport ENDED ***************************");
 
-		return  ResponseEntity.ok(getObjectResponse);
 	}
 
 	@Override
@@ -294,6 +305,7 @@ public class ReportServiceImpl implements ReportService {
 			if(device != null) {
 				if(from.equals("0") || to.equals("0")) {
 					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date from and to is Required",tripReport);
+					return  ResponseEntity.badRequest().body(getObjectResponse);
 
 				}
 				else {
@@ -312,17 +324,17 @@ public class ReportServiceImpl implements ReportService {
 
 						if(dateFrom.getTime() > dateTo.getTime()) {
 							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",tripReport);
-							return  ResponseEntity.ok(getObjectResponse);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
 						}
 						if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
 							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",tripReport);
-							return  ResponseEntity.ok(getObjectResponse);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
 						}
 
 					} catch (ParseException e) {
 						// TODO Auto-generated catch block
 						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",tripReport);
-						return  ResponseEntity.ok(getObjectResponse);
+						return  ResponseEntity.badRequest().body(getObjectResponse);
 
 					}
 
@@ -351,25 +363,27 @@ public class ReportServiceImpl implements ReportService {
 					  HttpEntity<String> request = new HttpEntity<String>(headers);
 					  tripReport=restTemplate.exchange(builder.toString(), HttpMethod.GET, request,List.class).getBody();
 					  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",tripReport);
+					  logger.info("************************ getTripsReport ENDED ***************************");
+						return  ResponseEntity.ok().body(getObjectResponse);
 
 				}
 				
 			}
 			else {
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Device ID is not found",tripReport);
-		
+				return  ResponseEntity.status(404).body(getObjectResponse);
+
 			}
 			
 			
 		}
 		else {
 			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",tripReport);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
 		
-		logger.info("************************ getTripsReport ENDED ***************************");
 
-		return  ResponseEntity.ok(getObjectResponse);
 
 	}
 

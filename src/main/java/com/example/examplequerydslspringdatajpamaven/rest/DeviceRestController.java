@@ -114,7 +114,7 @@ public class DeviceRestController {
 	public @ResponseBody ResponseEntity<?> getDeviceSelect(@RequestParam (value = "userId", defaultValue = "0") Long userId) {
 		
 	
-    	return  ResponseEntity.ok(deviceService.getDeviceSelect(userId).getBody());
+    	return  deviceService.getDeviceSelect(userId);
 
 		
 	}

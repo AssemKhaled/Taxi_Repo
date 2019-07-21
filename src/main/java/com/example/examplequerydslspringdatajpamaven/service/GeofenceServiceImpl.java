@@ -47,14 +47,20 @@ public class GeofenceServiceImpl implements GeofenceService {
 			User user = userServiceImpl.findById(id);
 			if(user == null ) {
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User is not Found",geofences);
+				return  ResponseEntity.status(404).body(getObjectResponse);
+
 			}
 			else {
 				if(user.getDelete_date() == null) {
 					geofences = geofenceRepository.getAllGeofences(id,offset,search);
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",geofences);
+					logger.info("************************ getAllUserGeofences ENDED ***************************");
+					return  ResponseEntity.ok().body(getObjectResponse);
+
 				}
 				else {
 					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User is not Found",geofences);
+					return  ResponseEntity.status(404).body(getObjectResponse);
 
 				}
 				
@@ -64,13 +70,11 @@ public class GeofenceServiceImpl implements GeofenceService {
 		else{
 			
 			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",geofences);
-		
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+
 		}
 
-		
-		logger.info("************************ getAllUserGeofences ENDED ***************************");
-
-		return  ResponseEntity.ok(getObjectResponse);
+	
 	}
 
 	@Override
@@ -88,15 +92,20 @@ public class GeofenceServiceImpl implements GeofenceService {
 					
 					geofences.add(geofence);
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",geofences);
+					logger.info("************************ getGeofenceById ENDED ***************************");
+					return  ResponseEntity.ok().body(getObjectResponse);
 
 				}
 				else {
 					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This Geofence ID is not Found",geofences);
+					return  ResponseEntity.status(404).body(getObjectResponse);
 
 				}
 			}
 			else {
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This Geofence ID is not Found",geofences);
+				return  ResponseEntity.status(404).body(getObjectResponse);
+
 			}
 			
 						
@@ -104,12 +113,11 @@ public class GeofenceServiceImpl implements GeofenceService {
 		else {
 			
 			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Geofence ID is Required",geofences);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
 		
-		logger.info("************************ getGeofenceById ENDED ***************************");
 
-		return  ResponseEntity.ok(getObjectResponse);
 
 	}
 
@@ -134,11 +142,14 @@ public class GeofenceServiceImpl implements GeofenceService {
 					geofenceRepository.deleteGeofenceId(geofenceId);
 					geofenceRepository.deleteGeofenceDeviceId(geofenceId);
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Deleted Successfully",geofences);
+					logger.info("************************ deleteGeofence ENDED ***************************");
+					return  ResponseEntity.ok().body(getObjectResponse);
 
 				}
 				else {
 					
 					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This Geofence ID was Deleted before",geofences);
+					return  ResponseEntity.status(404).body(getObjectResponse);
 
 				}
 				
@@ -147,6 +158,7 @@ public class GeofenceServiceImpl implements GeofenceService {
 			else {
 
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This Geofence ID was not found",geofences);
+				return  ResponseEntity.status(404).body(getObjectResponse);
 
 			}
 						
@@ -154,11 +166,10 @@ public class GeofenceServiceImpl implements GeofenceService {
 		else {
 			
 			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Geofence ID is Required",geofences);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
 
-		logger.info("************************ deleteGeofence ENDED ***************************");
-		return  ResponseEntity.ok(getObjectResponse);
 
 
 	}
@@ -179,6 +190,8 @@ public class GeofenceServiceImpl implements GeofenceService {
 			User user = userServiceImpl.findById(id);
 			if(user == null ) {
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",geofences);
+				return ResponseEntity.status(404).body(getObjectResponse);
+
 			}
 			else {
 				if(user.getDelete_date()==null) {
@@ -186,6 +199,7 @@ public class GeofenceServiceImpl implements GeofenceService {
 							   || geofence.getArea() == null || geofence.getName()== "" || geofence.getType()== ""
 							   || geofence.getArea() == "") {
 						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Geofence name , type and area is Required",geofences);
+						return ResponseEntity.badRequest().body(getObjectResponse);
 
 					}
 					else {
@@ -198,6 +212,7 @@ public class GeofenceServiceImpl implements GeofenceService {
 								}
 							}
 					    	getObjectResponse = new GetObjectResponse( 401, "This Geofence was found before",duplictionList);
+							return ResponseEntity.ok().body(getObjectResponse);
 
 						}
 						else {
@@ -208,11 +223,14 @@ public class GeofenceServiceImpl implements GeofenceService {
 								geofenceRepository.save(geofence);
 								geofences.add(geofence);
 								getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"sucsess",geofences);
+								logger.info("************************ addGeofence ENDED ***************************");
 
+								return ResponseEntity.ok().body(getObjectResponse);
 
 							}
 							else {
 								getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not allow to update Geofence ID",geofences);
+								return ResponseEntity.badRequest().body(getObjectResponse);
 
 							}
 						}
@@ -220,27 +238,21 @@ public class GeofenceServiceImpl implements GeofenceService {
 				}
 				else {
 					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",geofences);
+					return ResponseEntity.status(404).body(getObjectResponse);
+
 				}
 
 			}
-           
-			
-		
-			
+           			
 			
 		}
 		else {
 			
 			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",geofences);
+			return ResponseEntity.badRequest().body(getObjectResponse);
 
 			
-		}
-		
-
-		logger.info("************************ addGeofence ENDED ***************************");
-
-		return ResponseEntity.ok(getObjectResponse);
-	
+		}	
 		
 		
 	}
@@ -263,6 +275,8 @@ public class GeofenceServiceImpl implements GeofenceService {
 			User user = userServiceImpl.findById(id);
 			if(user == null ) {
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",geofences);
+				return ResponseEntity.status(404).body(getObjectResponse);
+
 			}
 			else {
 				 if(user.getDelete_date()==null) {
@@ -274,6 +288,7 @@ public class GeofenceServiceImpl implements GeofenceService {
 										   || geofence.getArea() == null || geofence.getName()== "" || geofence.getType()== ""
 										   || geofence.getArea() == "") {
 									getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Geofence name , type and area is Required",geofences);
+									return ResponseEntity.badRequest().body(getObjectResponse);
 
 								}
 								else {
@@ -282,13 +297,15 @@ public class GeofenceServiceImpl implements GeofenceService {
 									if(!checkDublicateInEdit.isEmpty()) {
 				    					for(int i=0;i<checkDublicateInEdit.size();i++) {
 				    						if(checkDublicateInEdit.get(i).getName().equalsIgnoreCase(geofence.getName())) {
-				    														
+												duplictionList.add(1);						
+			
 				    						}
 				    						
 				    						
 				    					}
 								    	getObjectResponse = new GetObjectResponse( 401, "This Geofence was found before",duplictionList);
-				    					
+										return ResponseEntity.ok().body(getObjectResponse);
+
 				    				}
 				    				else {
 				    					Set<User> userDriver = new HashSet<>();
@@ -298,10 +315,13 @@ public class GeofenceServiceImpl implements GeofenceService {
 											geofenceRepository.save(geofence);
 											geofences.add(geofence);
 											getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Updated Successfully",geofences);
-				
+											logger.info("************************ editGeofence ENDED ***************************");
+											return ResponseEntity.ok().body(getObjectResponse);
+
 										}
 										else {
 											getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(),"Not allow to edit this geofence it belongs to another user",geofences);
+											return ResponseEntity.status(404).body(getObjectResponse);
 
 										}
 				    					
@@ -312,6 +332,7 @@ public class GeofenceServiceImpl implements GeofenceService {
 							}
 							else {
 								getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This Geofence ID is not Found",geofences);
+								return ResponseEntity.status(404).body(getObjectResponse);
 
 							}
 
@@ -319,41 +340,35 @@ public class GeofenceServiceImpl implements GeofenceService {
 						}
 						else {
 							getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This Geofence ID is not Found",geofences);
+							return ResponseEntity.status(404).body(getObjectResponse);
 
 						}
 					 }
 					 else {
 							getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Geofence ID is Required",geofences);
+							return ResponseEntity.status(404).body(getObjectResponse);
 
 					 }
 					 
 				 }
 				 else {
 						getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",geofences);
+						return ResponseEntity.status(404).body(getObjectResponse);
 
 				 }
 				
 			}
 		   
-    			
-    				
-    				
-    			
-
-			
 			
 		}
 		else {
 			
 			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",geofences);
+			return ResponseEntity.badRequest().body(getObjectResponse);
 
 			
 		}
 		
-		logger.info("************************ editGeofence ENDED ***************************");
-
-		return ResponseEntity.ok(getObjectResponse);
-
 
 	}
 

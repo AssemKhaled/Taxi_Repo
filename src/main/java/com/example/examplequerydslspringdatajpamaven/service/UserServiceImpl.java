@@ -82,7 +82,7 @@ public class UserServiceImpl implements IUserService {
 			List<User> users = null;
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",users);
 			logger.info("************************ getUserById STARTED ***************************");
-			return ResponseEntity.ok().body(getObjectResponse);
+			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		User user=userRepository.findOne(userId);
 		if(user == null)
@@ -90,7 +90,7 @@ public class UserServiceImpl implements IUserService {
 			List<User> users = null;
 			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Not Found",users);
 			logger.info("************************ getUserById STARTED ***************************");
-			return ResponseEntity.ok().body(getObjectResponse);
+			return ResponseEntity.status(404).body(getObjectResponse);
 		}
 		else
 		{
@@ -99,7 +99,7 @@ public class UserServiceImpl implements IUserService {
 				List<User> users = null;
 				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Not Found",users);
 				logger.info("************************ getUserById STARTED ***************************");
-				return ResponseEntity.ok().body(getObjectResponse);
+				return ResponseEntity.status(404).body(getObjectResponse);
 			}
 			List<User> users= new ArrayList<>();
 			users.add(user);
@@ -117,7 +117,7 @@ public class UserServiceImpl implements IUserService {
 			 List<User> users = null;
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "BadRequest",users);
 			 logger.info("************************ getAllUsersOfUser ENDED ***************************");
-			return  ResponseEntity.ok().body(getObjectResponse);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		else {
 			User user = findById(userId);
@@ -125,7 +125,7 @@ public class UserServiceImpl implements IUserService {
 				 List<User> users = null;
 				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value() ,"this user is not found",users);
 				 logger.info("************************ getAllUsersOfUser ENDED ***************************");
-				return  ResponseEntity.ok().body(getObjectResponse);
+				return  ResponseEntity.status(404).body(getObjectResponse);
 			}
 			else {
 				List<User> users = userRepository.getUsersOfUser(userId,offset,search);
@@ -147,7 +147,7 @@ public class UserServiceImpl implements IUserService {
 	    	//throw duplication exception with duplication list
 	    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",users);
 	    	logger.info("************************createUser ENDED ***************************");
-	    	return ResponseEntity.ok().body(getObjectResponse);
+	    	return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		else {
 			User creater = findById(userId);
@@ -156,7 +156,7 @@ public class UserServiceImpl implements IUserService {
 		    	//throw duplication exception with duplication list
 		    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), " This user is not Found",users);
 		    	logger.info("************************createUser ENDED ***************************");
-		    	return ResponseEntity.ok().body(getObjectResponse);
+		    	return ResponseEntity.status(404).body(getObjectResponse);
 			}
 			else {
 				if(user.getEmail() == null || user.getEmail() == "" || user.getPassword() == null
@@ -173,7 +173,7 @@ public class UserServiceImpl implements IUserService {
 			    	//throw duplication exception with duplication list
 			    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), message,users);
 			    	logger.info("************************createUser ENDED ***************************");
-			    	return ResponseEntity.ok().body(getObjectResponse);
+			    	return ResponseEntity.badRequest().body(getObjectResponse);
 				}
 					Set<User> userCreater=new HashSet<>() ;
 					userCreater.add(findById(userId));
@@ -211,7 +211,7 @@ public class UserServiceImpl implements IUserService {
 	    	//throw duplication exception with duplication list
 	    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",users);
 	    	logger.info("************************editUser ENDED ***************************");
-	    	return ResponseEntity.ok().body(getObjectResponse);
+	    	return ResponseEntity.badRequest().body(getObjectResponse);
 		}else {
 			  User loggedUser =  findById(userId);
 			  if(loggedUser == null) {
@@ -219,7 +219,7 @@ public class UserServiceImpl implements IUserService {
 			    	//throw duplication exception with duplication list
 			    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",users);
 			    	logger.info("************************editUser ENDED ***************************");
-			    	return ResponseEntity.ok().body(getObjectResponse); 
+			    	return ResponseEntity.status(404).body(getObjectResponse); 
 			  }
 			//to set the users of updateduser
 			if( user.getId() == null || user.getId() == 0|| user.getEmail() == null || user.getEmail() == "" ||
@@ -236,7 +236,7 @@ public class UserServiceImpl implements IUserService {
 			    	//throw duplication exception with duplication list
 			    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), message,users);
 			    	logger.info("************************createUser ENDED ***************************");
-			    	return ResponseEntity.ok().body(getObjectResponse);
+			    	return ResponseEntity.badRequest().body(getObjectResponse);
 				}else {
 					if(user.getPassword()!= null) {
 						List<User> users = null;
@@ -244,7 +244,7 @@ public class UserServiceImpl implements IUserService {
 				    	//throw duplication exception with duplication list
 				    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), message,users);
 				    	logger.info("************************createUser ENDED ***************************");
-				    	return ResponseEntity.ok().body(getObjectResponse);
+				    	return ResponseEntity.badRequest().body(getObjectResponse);
 					}
 					User oldOne = findById(user.getId());
 					if(oldOne == null) {
@@ -252,7 +252,7 @@ public class UserServiceImpl implements IUserService {
 				    	//throw duplication exception with duplication list
 				    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this userId is not found",users);
 				    	logger.info("************************editUser ENDED ***************************");
-				    	return ResponseEntity.ok().body(getObjectResponse);
+				    	return ResponseEntity.status(404).body(getObjectResponse);
 					}else {
 						
 						
@@ -392,7 +392,7 @@ public class UserServiceImpl implements IUserService {
 			 List<User> users= null;
 		      getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",users);
 		    logger.info("************************deleteUser ENDED ***************************");
-		    return ResponseEntity.ok().body(getObjectResponse);
+		    return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		else {
 			 User loggedUser = findById(userId);
@@ -400,7 +400,7 @@ public class UserServiceImpl implements IUserService {
 						 List<User> users= null;
 					      getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this logged user is not found to delete",users);
 					    logger.info("************************deleteUser ENDED ***************************");
-					    return ResponseEntity.ok().body(getObjectResponse);
+					    return ResponseEntity.status(404).body(getObjectResponse);
 	            }else {
 	            	User deletedUser = findById(deleteUserId);
 	    			if(deletedUser == null) {
@@ -409,7 +409,7 @@ public class UserServiceImpl implements IUserService {
 	    					 List<User> users= null;
 	    				      getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this user is not found to delete",users);
 	    				    logger.info("************************deleteUser ENDED ***************************");
-	    				    return ResponseEntity.ok().body(getObjectResponse);
+	    				    return ResponseEntity.status(404).body(getObjectResponse);
 	    			}else {
 	    				Calendar cal = Calendar.getInstance();
 	    				int day = cal.get(Calendar.DATE);
