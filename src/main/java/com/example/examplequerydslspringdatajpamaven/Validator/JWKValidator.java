@@ -49,7 +49,7 @@ public class JWKValidator {
 	
 	public String createJWT(String string, Long ttlMillis) {
 
-		System.out.println("base64SecretBytes");
+		System.out.println("base64SecretBytes9999");
 		System.out.println(base64SecretBytes);
 
 		// The JWT signature algorithm we will be using to sign the token
