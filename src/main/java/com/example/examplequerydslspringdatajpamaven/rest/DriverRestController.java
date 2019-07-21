@@ -38,7 +38,7 @@ public class DriverRestController {
 		}
 
 		
-    	return  ResponseEntity.ok(driverServiceImpl.getAllDrivers(id,offset,search).getBody());
+    	return  driverServiceImpl.getAllDrivers(id,offset,search);
 
 	}
 	
@@ -46,7 +46,7 @@ public class DriverRestController {
 	public @ResponseBody ResponseEntity<?> getDriverById(@RequestParam (value = "driverId", defaultValue = "0") Long driverId) {
 		
 		
-		return ResponseEntity.ok(driverServiceImpl.findById(driverId).getBody());
+		return driverServiceImpl.findById(driverId);
 
 	}
 	
@@ -56,7 +56,7 @@ public class DriverRestController {
 		
 		
 		
-		return ResponseEntity.ok(driverServiceImpl.deleteDriver(driverId).getBody());
+		return driverServiceImpl.deleteDriver(driverId);
 
 	}
 	
@@ -64,7 +64,7 @@ public class DriverRestController {
 	public @ResponseBody ResponseEntity<?> addDriver(@RequestBody(required = false) Driver driver,@RequestParam (value = "userId", defaultValue = "0") Long id) {
 		
 		
-		return ResponseEntity.ok(driverServiceImpl.addDriver(driver,id).getBody());
+		return driverServiceImpl.addDriver(driver,id);
 
 		
 	}	
@@ -73,7 +73,7 @@ public class DriverRestController {
 		
 		
 		
-		return ResponseEntity.ok(driverServiceImpl.editDriver(driver,id).getBody());
+		return driverServiceImpl.editDriver(driver,id);
 
 
 	}	

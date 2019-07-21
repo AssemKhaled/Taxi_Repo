@@ -48,14 +48,21 @@ public class DriverServiceImpl implements DriverService{
 			User user = userServiceImpl.findById(id);
 			if(user == null ) {
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User is not Found",drivers);
+				return ResponseEntity.status(404).body(getObjectResponse);
+
 			}
 			else {
 				if(user.getDelete_date() == null) {
 					drivers = driverRepository.getAllDrivers(id,offset,search);
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",drivers);
+					logger.info("************************ getAllDrivers ENDED ***************************");
+					return ResponseEntity.ok().body(getObjectResponse);
+
 				}
 				else {
 					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User is not Found",drivers);
+					return ResponseEntity.status(404).body(getObjectResponse);
+
 				}
 				
 			}
@@ -63,12 +70,11 @@ public class DriverServiceImpl implements DriverService{
 		}
 		else {
 			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",drivers);
+			return ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
 		
-		logger.info("************************ getAllDrivers ENDED ***************************");
 		
-		return ResponseEntity.ok(getObjectResponse);
 	
 	}
 
@@ -89,6 +95,8 @@ public class DriverServiceImpl implements DriverService{
 			User user = userServiceImpl.findById(id);
 			if(user == null ) {
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",drivers);
+				return ResponseEntity.status(404).body(getObjectResponse);
+
 			}
 			else {
 				if(user.getDelete_date()==null) {
@@ -97,6 +105,7 @@ public class DriverServiceImpl implements DriverService{
 							   || driver.getMobile_num() == null || driver.getName()== "" || driver.getUniqueid()== ""
 							   || driver.getMobile_num() == "") {
 						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Driver name , uniqueid and mobile number is Required",drivers);
+						return ResponseEntity.badRequest().body(getObjectResponse);
 
 					}
 					else {
@@ -130,6 +139,7 @@ public class DriverServiceImpl implements DriverService{
 								
 							}
 					    	getObjectResponse = new GetObjectResponse( 301, "This Driver was found before",duplictionList);
+							return ResponseEntity.ok().body(getObjectResponse);
 
 						}
 						else {
@@ -140,11 +150,14 @@ public class DriverServiceImpl implements DriverService{
 								driverRepository.save(driver);
 								drivers.add(driver);
 								getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",drivers);
+								logger.info("************************ addDriver ENDED ***************************");
 
-								
+								return ResponseEntity.ok().body(getObjectResponse);
+
 							}
 							else {
 								getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not allow to update this Driver ID",drivers);
+								return ResponseEntity.badRequest().body(getObjectResponse);
 
 							}
 							
@@ -155,6 +168,8 @@ public class DriverServiceImpl implements DriverService{
 				}
 				else {
 					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",drivers);
+					return ResponseEntity.status(404).body(getObjectResponse);
+
 				}
 			}
 			
@@ -164,13 +179,12 @@ public class DriverServiceImpl implements DriverService{
 		else {
 			
 			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",drivers);
-			
+			return ResponseEntity.badRequest().body(getObjectResponse);
+
 		}
 		
 		
-		logger.info("************************ addDriver ENDED ***************************");
 
-		return ResponseEntity.ok(getObjectResponse);
 		
 		
 	}
@@ -192,6 +206,8 @@ public class DriverServiceImpl implements DriverService{
 			User user = userServiceImpl.findById(id);
 			if(user == null ) {
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",drivers);
+				return ResponseEntity.status(404).body(getObjectResponse);
+
 			}
 			else {
                 if(user.getDelete_date()==null) {
@@ -206,7 +222,8 @@ public class DriverServiceImpl implements DriverService{
 										   || driver.getMobile_num() == null || driver.getName()== "" || driver.getUniqueid()== ""
 										   || driver.getMobile_num() == "") {
 									getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Driver name , uniqueid and mobile number is Required",drivers);
-			
+									return ResponseEntity.badRequest().body(getObjectResponse);
+
 								}
 								else {
 									if(driver.getPhoto() != null) {
@@ -239,7 +256,8 @@ public class DriverServiceImpl implements DriverService{
 											
 										}
 								    	getObjectResponse = new GetObjectResponse( 301, "This Driver was found before",duplictionList);
-			
+										return ResponseEntity.ok().body(getObjectResponse);
+
 									}
 									else {
 										
@@ -250,10 +268,13 @@ public class DriverServiceImpl implements DriverService{
 											driverRepository.save(driver);
 											drivers.add(driver);
 											getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Updated Successfully",drivers);
-				
+											logger.info("************************ editDriver ENDED ***************************");
+											return ResponseEntity.ok().body(getObjectResponse);
+
 										}
 										else {
 											getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(),"Not allow to edit this driver it belongs to another user",drivers);
+											return ResponseEntity.status(404).body(getObjectResponse);
 
 										}
 										
@@ -264,6 +285,7 @@ public class DriverServiceImpl implements DriverService{
 							}
 							else {
 								getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This Driver ID is not Found",drivers);
+								return ResponseEntity.status(404).body(getObjectResponse);
 
 							}
 							
@@ -272,17 +294,21 @@ public class DriverServiceImpl implements DriverService{
 						}
 						else{
 							getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This Driver ID is not Found",drivers);
-	
+							return ResponseEntity.status(404).body(getObjectResponse);
+
 						}
                 	}
                 	else {
             			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Driver ID is Required",drivers);
+            			return ResponseEntity.badRequest().body(getObjectResponse);
 
                 	}
 					
 				}
 				else {
 					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",drivers);
+					return ResponseEntity.status(404).body(getObjectResponse);
+
 				}
 				
 				
@@ -292,12 +318,11 @@ public class DriverServiceImpl implements DriverService{
 		else {
 			
 			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",drivers);
+			return ResponseEntity.badRequest().body(getObjectResponse);
 
 			
 		}
 		
-		logger.info("************************ editDriver ENDED ***************************");
-		return ResponseEntity.ok(getObjectResponse);
 
 		
 	}
@@ -317,27 +342,32 @@ public class DriverServiceImpl implements DriverService{
 					
 					drivers.add(driver);
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",drivers);
+					logger.info("************************ getDriverById ENDED ***************************");
+					return  ResponseEntity.ok().body(getObjectResponse);
+
 				}
 				else {
 					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This Driver ID is not Found",drivers);
+					return  ResponseEntity.status(404).body(getObjectResponse);
 
 				}
 			}
 			else {
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This Driver ID is not Found",drivers);
+				return  ResponseEntity.status(404).body(getObjectResponse);
+
 			}
 			
 						
 		}
 		else {
 			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Driver ID is Required",drivers);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 
 		}
 
-		logger.info("************************ getDriverById ENDED ***************************");
 
-		return  ResponseEntity.ok(getObjectResponse);
 	}
 	
 	@Override
@@ -358,9 +388,13 @@ public class DriverServiceImpl implements DriverService{
 					driverRepository.deleteDriverId(driverId);
 					driverRepository.deleteDriverDeviceId(driverId);
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Deleted Successfully",drivers);
+					logger.info("************************ deleteDriver ENDED ***************************");
+					return  ResponseEntity.ok().body(getObjectResponse);
+
 				}
 				else {
 					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This Driver was Deleted Before",drivers);
+					return  ResponseEntity.status(404).body(getObjectResponse);
 
 				}
 				
@@ -369,6 +403,7 @@ public class DriverServiceImpl implements DriverService{
 			else {
 
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This Driver ID is not Found",drivers);
+				return  ResponseEntity.status(404).body(getObjectResponse);
 
 			}
 						
@@ -376,14 +411,13 @@ public class DriverServiceImpl implements DriverService{
 		else {
 			
 			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Driver ID is Required",drivers);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
 		
 		
 
-		logger.info("************************ deleteDriver ENDED ***************************");
 		
-		return  ResponseEntity.ok(getObjectResponse);
 
 	}
 
@@ -398,7 +432,7 @@ public class DriverServiceImpl implements DriverService{
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",unAssignedDrivers);
 			
 			logger.info("************************ getUnassignedDrivers ENDED ***************************");
-			return ResponseEntity.ok().body(getObjectResponse);
+			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		List<Driver> unAssignedDrivers = driverRepository.getUnassignedDrivers(userId);
 		
