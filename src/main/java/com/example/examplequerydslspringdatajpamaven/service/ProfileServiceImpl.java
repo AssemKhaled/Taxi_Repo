@@ -216,14 +216,14 @@ public class ProfileServiceImpl implements ProfileService{
 			else {
 				if(user.getDelete_date() == null) {
 					if(data.get("photo") ==null) {
-						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "photo is Required",users);
+						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Photo is Required",users);
 						return ResponseEntity.badRequest().body(getObjectResponse);
 
 					}
 					else {
 						String photo = data.get("photo").toString();
 						if(photo.equals("")) {
-							user.setPhoto("Not-available.png");				
+							user.setPhoto("Not-available.jpg");				
 						}
 						else {
 							//base64_Image

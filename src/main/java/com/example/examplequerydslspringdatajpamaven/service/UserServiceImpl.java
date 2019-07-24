@@ -80,7 +80,7 @@ public class UserServiceImpl implements IUserService {
 		logger.info("************************ getUserById STARTED ***************************");
 		if(userId == 0) {
 			List<User> users = null;
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request Missing User Id ",users);
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",users);
 			logger.info("************************ getUserById STARTED ***************************");
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
@@ -88,7 +88,7 @@ public class UserServiceImpl implements IUserService {
 		if(user == null)
 		{
 			List<User> users = null;
-			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this user is not found ",users);
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This user is not found",users);
 			logger.info("************************ getUserById STARTED ***************************");
 			return ResponseEntity.status(404).body(getObjectResponse);
 		}
@@ -97,7 +97,7 @@ public class UserServiceImpl implements IUserService {
 			if(user.getDelete_date()!= null)
 			{
 				List<User> users = null;
-				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this user is not found",users);
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This user is not found",users);
 				logger.info("************************ getUserById STARTED ***************************");
 				return ResponseEntity.status(404).body(getObjectResponse);
 			}
@@ -115,7 +115,7 @@ public class UserServiceImpl implements IUserService {
 		logger.info("************************ getAllUsersOfUser STARTED ***************************");
 		if(userId == 0) {
 			 List<User> users = null;
-			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "BadRequest Missing user id ",users);
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",users);
 			 logger.info("************************ getAllUsersOfUser ENDED ***************************");
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
@@ -123,7 +123,7 @@ public class UserServiceImpl implements IUserService {
 			User user = findById(userId);
 			if(user == null) {
 				 List<User> users = null;
-				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value() ,"this user is not found",users);
+				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value() ,"This user is not found",users);
 				 logger.info("************************ getAllUsersOfUser ENDED ***************************");
 				return  ResponseEntity.status(404).body(getObjectResponse);
 			}
@@ -145,7 +145,7 @@ public class UserServiceImpl implements IUserService {
 		if(userId == 0) {
 			List<User> users = null;
 	    	//throw duplication exception with duplication list
-	    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request Missing user id ",users);
+	    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",users);
 	    	logger.info("************************createUser ENDED ***************************");
 	    	return ResponseEntity.badRequest().body(getObjectResponse);
 		}
@@ -154,7 +154,7 @@ public class UserServiceImpl implements IUserService {
 			if(creater == null) {
 				List<User> users = null;
 		    	//throw duplication exception with duplication list
-		    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), " This user is not Found",users);
+		    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This user is not Found",users);
 		    	logger.info("************************createUser ENDED ***************************");
 		    	return ResponseEntity.status(404).body(getObjectResponse);
 			}
@@ -217,7 +217,7 @@ public class UserServiceImpl implements IUserService {
 		if(userId == 0) {
 			List<User> users = null;
 	    	//throw duplication exception with duplication list
-	    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request Missing user Id",users);
+	    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",users);
 	    	logger.info("************************editUser ENDED ***************************");
 	    	return ResponseEntity.badRequest().body(getObjectResponse);
 		}else {
@@ -225,7 +225,7 @@ public class UserServiceImpl implements IUserService {
 			  if(loggedUser == null) {
 				  List<User> users = null;
 			    	//throw duplication exception with duplication list
-			    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",users);
+			    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This user ID is not Found",users);
 			    	logger.info("************************editUser ENDED ***************************");
 			    	return ResponseEntity.status(404).body(getObjectResponse); 
 			  }
@@ -258,7 +258,7 @@ public class UserServiceImpl implements IUserService {
 					if(oldOne == null) {
 						List<User> users = null;
 				    	//throw duplication exception with duplication list
-				    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this userId is not found",users);
+				    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not found",users);
 				    	logger.info("************************editUser ENDED ***************************");
 				    	return ResponseEntity.status(404).body(getObjectResponse);
 					}else {
@@ -394,19 +394,18 @@ public class UserServiceImpl implements IUserService {
 
 	@Override
 	public ResponseEntity<?> deleteUser(Long userId,Long deleteUserId) {
-		System.out.println("userid"+userId+"delete"+deleteUserId);
 		logger.info("************************deleteUser STARTED ***************************");
 		if(userId == 0 || deleteUserId == 0) {
 			 List<User> users= null;
-		      getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",users);
+		      getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",users);
 		    logger.info("************************deleteUser ENDED ***************************");
 		    return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		else {
 			 User loggedUser = findById(userId);
 	            if(loggedUser== null) {
-						 List<User> users= null;
-					      getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this logged user is not found to delete",users);
+						List<User> users= null;
+					    getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged user is not found",users);
 					    logger.info("************************deleteUser ENDED ***************************");
 					    return ResponseEntity.status(404).body(getObjectResponse);
 	            }else {
@@ -414,8 +413,8 @@ public class UserServiceImpl implements IUserService {
 	    			if(deletedUser == null) {
 	    				logger.info("************************deleteUser STARTED ***************************");
 	    				
-	    					 List<User> users= null;
-	    				      getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this user is not found to delete",users);
+	    					List<User> users= null;
+	    				    getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This user is not found",users);
 	    				    logger.info("************************deleteUser ENDED ***************************");
 	    				    return ResponseEntity.status(404).body(getObjectResponse);
 	    			}else {

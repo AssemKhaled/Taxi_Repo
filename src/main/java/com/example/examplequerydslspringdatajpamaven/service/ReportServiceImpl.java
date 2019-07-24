@@ -209,6 +209,8 @@ public class ReportServiceImpl implements ReportService {
 				else {
 					SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 					SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+					inputFormat.setLenient(false);
+					outputFormat.setLenient(false);
 					Date dateFrom;
 					Date dateTo;
 					try {
@@ -311,6 +313,8 @@ public class ReportServiceImpl implements ReportService {
 				else {
 					SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 					SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+					inputFormat.setLenient(false);
+					outputFormat.setLenient(false);
 					Date dateFrom;
 					Date dateTo;
 					try {
