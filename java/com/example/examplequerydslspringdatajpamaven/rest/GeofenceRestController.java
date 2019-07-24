@@ -35,7 +35,7 @@ public class GeofenceRestController {
 		}
 		
 		
-    	return  ResponseEntity.ok(geofenceServiceImpl.getAllGeofences(id,offset,search).getBody());
+    	return  geofenceServiceImpl.getAllGeofences(id,offset,search);
 
 	}
 	
@@ -43,14 +43,14 @@ public class GeofenceRestController {
 	public @ResponseBody ResponseEntity<?> getGeofenceById(@RequestParam (value = "geofenceId", defaultValue = "0") Long geofenceId) {
 		
 		
-    	return  ResponseEntity.ok(geofenceServiceImpl.getGeofenceById(geofenceId).getBody());
+    	return  geofenceServiceImpl.getGeofenceById(geofenceId);
 
 	}
 	
 	@RequestMapping(value = "/deleteGeofence", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> deleteDriver(@RequestParam (value = "geofenceId", defaultValue = "0") Long geofenceId) {
 
-    	return  ResponseEntity.ok(geofenceServiceImpl.deleteGeofence(geofenceId).getBody());
+    	return  geofenceServiceImpl.deleteGeofence(geofenceId);
 
 
 	}
@@ -59,7 +59,7 @@ public class GeofenceRestController {
 	public @ResponseBody ResponseEntity<?> addDriver(@RequestBody(required = false) Geofence geofence,@RequestParam (value = "userId", defaultValue = "0") Long id) {
 		
 
-		return ResponseEntity.ok(geofenceServiceImpl.addGeofence(geofence,id).getBody());
+		return geofenceServiceImpl.addGeofence(geofence,id);
 
 	}
 	
@@ -67,7 +67,7 @@ public class GeofenceRestController {
 	public @ResponseBody ResponseEntity<?> editGeofence(@RequestBody(required = false) Geofence geofence,@RequestParam (value = "userId", defaultValue = "0") Long id) {
 		
 		
-		return ResponseEntity.ok(geofenceServiceImpl.editGeofence(geofence,id).getBody());
+		return geofenceServiceImpl.editGeofence(geofence,id);
 
 	}	
 

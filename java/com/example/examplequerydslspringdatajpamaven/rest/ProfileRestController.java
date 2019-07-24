@@ -29,7 +29,7 @@ public class ProfileRestController {
 	public @ResponseBody ResponseEntity<?> getProfileInfo(@RequestParam (value = "userId", defaultValue = "0") Long userId) {
 		
 	
-    	return  ResponseEntity.ok(profileServiceImpl.getUserInfo(userId).getBody());
+    	return  profileServiceImpl.getUserInfo(userId);
 
 	}
 	
@@ -37,21 +37,21 @@ public class ProfileRestController {
 	public @ResponseBody ResponseEntity<?> changePassowrd(@RequestBody Map<String, String> data ,@RequestParam (value = "userId", defaultValue = "0") Long userId) {
 
 		
-    	return  ResponseEntity.ok(profileServiceImpl.updateProfilePassword(data,userId).getBody());
+    	return profileServiceImpl.updateProfilePassword(data,userId);
 
 	}
 	
 	@RequestMapping(value = "/updateProfile", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<?> updateProfile(@RequestBody(required = false) User user ,@RequestParam (value = "userId", defaultValue = "0") Long userId) {
 		
-    	return  ResponseEntity.ok(profileServiceImpl.updateProfileInfo(user,userId).getBody());
+    	return  profileServiceImpl.updateProfileInfo(user,userId);
 
 	}
 	
 	@RequestMapping(value = "/updatePhoto", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<?> updatePhoto(@RequestBody Map<String, String> data ,@RequestParam (value = "userId", defaultValue = "0") Long userId) {
 
-    	return  ResponseEntity.ok(profileServiceImpl.updateProfilePhoto(data,userId).getBody());
+    	return  profileServiceImpl.updateProfilePhoto(data,userId);
 
 	}
 	

@@ -35,6 +35,7 @@ public class ProfileServiceImpl implements ProfileService{
 			User user = profileRepository.findOne(userId);
 			if(user == null) {
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",users);
+				return ResponseEntity.status(404).body(getObjectResponse);
 
 			}
 			else {
@@ -42,10 +43,13 @@ public class ProfileServiceImpl implements ProfileService{
 					
 					users.add(user);
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",users);
+					logger.info("************************ getUserInfo ENDED ***************************");
+					return ResponseEntity.ok().body(getObjectResponse);
 
 				}
 				else {
 					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",users);
+					return ResponseEntity.status(404).body(getObjectResponse);
 
 				}
 			}
@@ -54,12 +58,11 @@ public class ProfileServiceImpl implements ProfileService{
 		else {
 			
 			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",users);
+			return ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
 		
-		logger.info("************************ getUserInfo ENDED ***************************");
 
-		return ResponseEntity.ok(getObjectResponse);
 	}
 
 
@@ -74,6 +77,7 @@ public class ProfileServiceImpl implements ProfileService{
 			User Data =getUserInfoObj(userId);
 			if(Data == null) {
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",users);
+				return ResponseEntity.status(404).body(getObjectResponse);
 
 			}
 			else {
@@ -85,6 +89,7 @@ public class ProfileServiceImpl implements ProfileService{
 							|| user.getCompany_phone() == "" || user.getManager_phone() == ""
 							|| user.getManager_mobile() =="" ||user.getPhone() == "") {
 						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User {Email , Identity Number , commercial Numebr , Company Phone , Phone Manager , Manager Mobile , Phone } is Required",users);
+						return ResponseEntity.badRequest().body(getObjectResponse);
 
 					}
 					else {
@@ -97,11 +102,15 @@ public class ProfileServiceImpl implements ProfileService{
 					    List<Integer> duplictionList = userServiceImpl.checkUserDuplication(user);
 					    if(duplictionList.size()>0) {
 					    	getObjectResponse= new GetObjectResponse(501, "was found before",duplictionList);
+							return ResponseEntity.ok().body(getObjectResponse);
+
 					    }
 					    else {
 							profileRepository.save(user);
 					    	users.add(user);
 							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success" ,users);
+							logger.info("************************ updateProfile ENDED ***************************");
+							return ResponseEntity.ok().body(getObjectResponse);
 
 					    }
 
@@ -112,16 +121,17 @@ public class ProfileServiceImpl implements ProfileService{
 				}
 				else {
 					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",users);
+					return ResponseEntity.status(404).body(getObjectResponse);
 
 				}
 		    }
 		}
 		else {
 			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",users);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+
 		}
 		
-		logger.info("************************ updateProfile ENDED ***************************");
-		return ResponseEntity.ok(getObjectResponse);
 
 	}
 
@@ -135,6 +145,7 @@ public class ProfileServiceImpl implements ProfileService{
 			User user =getUserInfoObj(userId);
 			if(user == null) {
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",users);
+				return ResponseEntity.status(404).body(getObjectResponse);
 
 			}
 			else {
@@ -143,6 +154,7 @@ public class ProfileServiceImpl implements ProfileService{
 					if(data.get("oldPassword") == null || data.get("newPassword") == null ||
 							data.get("oldPassword") == "" || data.get("newPassword") == "") {
 						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "newPassword and oldPassword is Required",users);
+						return ResponseEntity.badRequest().body(getObjectResponse);
 
 					}
 					else {
@@ -155,10 +167,13 @@ public class ProfileServiceImpl implements ProfileService{
 							profileRepository.save(user);
 							users.add(user);
 							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success" ,users);
+							logger.info("************************ updateProfilePassword ENDED ***************************");
+							return ResponseEntity.ok().body(getObjectResponse);
 
 						}
 						else {
 							getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Wrong oldPassword",users);
+							return ResponseEntity.status(404).body(getObjectResponse);
 
 						}
 						
@@ -169,6 +184,7 @@ public class ProfileServiceImpl implements ProfileService{
 				}
 				else {
 					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",users);
+					return ResponseEntity.status(404).body(getObjectResponse);
 
 				}
 			}
@@ -176,13 +192,11 @@ public class ProfileServiceImpl implements ProfileService{
 		}
 		else {
 			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",users);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+
 		}
 		
 		
-		logger.info("************************ updateProfilePassword ENDED ***************************");
-		
-		return ResponseEntity.ok(getObjectResponse);
-
 	}
 	
 	@Override
@@ -196,18 +210,20 @@ public class ProfileServiceImpl implements ProfileService{
 			User user = getUserInfoObj(userId);
 			if(user == null) {
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",users);
+				return ResponseEntity.status(404).body(getObjectResponse);
 
 			}
 			else {
 				if(user.getDelete_date() == null) {
 					if(data.get("photo") ==null) {
-						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "photo is Required",users);
+						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Photo is Required",users);
+						return ResponseEntity.badRequest().body(getObjectResponse);
 
 					}
 					else {
 						String photo = data.get("photo").toString();
 						if(photo.equals("")) {
-							user.setPhoto("Not-available.png");				
+							user.setPhoto("Not-available.jpg");				
 						}
 						else {
 							//base64_Image
@@ -217,23 +233,26 @@ public class ProfileServiceImpl implements ProfileService{
 						profileRepository.save(user);
 						users.add(user);
 						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success" ,users);
+						logger.info("************************ updateProfile ENDED ***************************");
+						return ResponseEntity.ok().body(getObjectResponse);
 
 					}
 					
 				}
 				else {
 					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",users);
+					return ResponseEntity.status(404).body(getObjectResponse);
 
 				}
 			}
 		}
 		else {
 			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",users);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+
 		}
 		
 		
-		logger.info("************************ updateProfile ENDED ***************************");
-		return ResponseEntity.ok(getObjectResponse);
 
 	}
 

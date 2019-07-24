@@ -54,16 +54,16 @@ public class DeviceServiceImpl implements DeviceService {
 		
 		if(userId == 0) {
 			 List<CustomDeviceList> devices= null;
-			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",devices);
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",devices);
 			 logger.info("************************ getAllUserDevices ENDED ***************************");
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		User loggedUser = userService.findById(userId);
 		if(loggedUser == null) {
 			 List<CustomDeviceList> devices= null;
-			 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",devices);
+			 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This user is not found",devices);
 			 logger.info("************************ getAllUserDevices ENDED ***************************");
-			return  ResponseEntity.ok().body(getObjectResponse);
+			return  ResponseEntity.status(404).body(getObjectResponse);
 		}
 		 List<CustomDeviceList> devices= deviceRepository.getDevicesList(userId,offset,search);
 		 getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
@@ -78,7 +78,7 @@ public class DeviceServiceImpl implements DeviceService {
 		if(userId == 0) {
 			List<Device> devices = null;
 			
-			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "BadRequest",devices);
+			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "User ID is Required",devices);
 			logger.info("************************ createDevice ENDED ***************************");
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
@@ -86,9 +86,9 @@ public class DeviceServiceImpl implements DeviceService {
 		if(loggedUser == null) {
 			List<Device> devices = null;
 			
-			getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "this user is not found ",devices);
+			getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "This user is not found",devices);
 			logger.info("************************ createDevice ENDED ***************************");
-			return ResponseEntity.badRequest().body(getObjectResponse);
+			return ResponseEntity.status(404).body(getObjectResponse);
 		}
 		
 		if(device.getId() != null || device.getName()== null ||device.getName() == ""
@@ -117,9 +117,9 @@ public class DeviceServiceImpl implements DeviceService {
 
 				List<Device> devices = null;
 				
-				getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "assigning to not found user",devices);
+				getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "Assigning to not found user",devices);
 				logger.info("************************ createDevice ENDED ***************************");
-				return ResponseEntity.ok().body(getObjectResponse);
+				return ResponseEntity.status(404).body(getObjectResponse);
 			}
 			else {
 				user.add(userCreater);	
@@ -162,7 +162,7 @@ public class DeviceServiceImpl implements DeviceService {
 		if(userId == 0) {
 			List<Device> devices = null;
 			
-			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "BadRequest",devices);
+			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "User ID is Required",devices);
 			logger.info("************************ editDevice ENDED ***************************");
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
@@ -170,9 +170,9 @@ public class DeviceServiceImpl implements DeviceService {
 		if(loggedUser == null) {
 			List<Device> devices = null;
 			
-			getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "logged user is not found",devices);
+			getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "This user is not found",devices);
 			logger.info("************************ editDevice ENDED ***************************");
-			return ResponseEntity.ok().body(getObjectResponse);
+			return ResponseEntity.status(404).body(getObjectResponse);
 		}
 	
 		if(device.getId() == null || device.getName()== null ||device.getName() == "" 
@@ -188,16 +188,16 @@ public class DeviceServiceImpl implements DeviceService {
 			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "atrributes [id ,name, trackerImei , sequence" + 
 					"					Number , plate num , leftLetter , middleLetter,RightLetter ] are required",devices);
 			logger.info("************************ editDevice ENDED ***************************");
-			return ResponseEntity.ok().body(getObjectResponse);
+			return ResponseEntity.badRequest().body(getObjectResponse);
 					
 		}
 		else {
 			Device oldDevice = findById(device.getId());
 			if(oldDevice == null) {
 				List<Device> devices = null;
-				getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "this device not found to be edited",devices);
+				getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "This device not found",devices);
 		    	logger.info("************************ createDevice ENDED ***************************");
-		    	return ResponseEntity.ok().body(getObjectResponse);
+		    	return ResponseEntity.status(404).body(getObjectResponse);
 			}
 			Set<User> userCreater=new HashSet<>();
 			userCreater = oldDevice.getUser();
@@ -304,7 +304,7 @@ public class DeviceServiceImpl implements DeviceService {
 		 logger.info("************************ deleteDevice ENDED ***************************");
 		 if(deviceId == 0 || userId == 0) {
 			 List<Device> devices = null;
-			 getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "Bad Request",devices);
+			 getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "User ID and Device ID are Required",devices);
 		     logger.info("************************ deleteDevice ENDED ***************************");
 		     return ResponseEntity.badRequest().body(getObjectResponse); 
 		 }
@@ -313,18 +313,18 @@ public class DeviceServiceImpl implements DeviceService {
 		 if(device == null)
 		 {
 			 List<Device> devices = null;
-			 getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "this device not found to be deleted",devices);
+			 getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "This device is not found",devices);
 		     logger.info("************************ deleteDevice ENDED ***************************");
-		     return ResponseEntity.ok().body(getObjectResponse);
+		     return ResponseEntity.status(404).body(getObjectResponse);
 		 }
 		 else
 		 {
 			 User creater= userService.findById(userId);
 			 if(creater == null) {
 				 List<Device> devices = null;
-				 getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "logged user is not found",devices);
+				 getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "This user is not found",devices);
 			     logger.info("************************ deleteDevice ENDED ***************************");
-			     return ResponseEntity.ok().body(getObjectResponse);
+			     return ResponseEntity.status(404).body(getObjectResponse);
 			 }
 			 	
 			 Calendar cal = Calendar.getInstance();
@@ -380,22 +380,22 @@ public class DeviceServiceImpl implements DeviceService {
 		logger.info("************************ getDeviceById STARTED ***************************");
 		if(deviceId == 0) {
 			List<Device> devices = null;
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",devices);
-			return ResponseEntity.ok().body(getObjectResponse);
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",devices);
+			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		Device device = deviceRepository.findOne(deviceId);
 		if (device == null) {
 			List<Device> devices = null;
-			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "no device with this id",devices);
-			return ResponseEntity.ok().body(getObjectResponse);
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",devices);
+			return ResponseEntity.status(404).body(getObjectResponse);
 		}
 		else {
 			if(device.getDeleteDate() != null) {
 				//throw not found 
 				List<Device> devices = null;
-				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "no device with this id",devices);
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",devices);
 				logger.info("************************ getDeviceById ENDED ***************************");
-				return ResponseEntity.ok().body(getObjectResponse);
+				return ResponseEntity.status(404).body(getObjectResponse);
 			}
 			else
 			{
@@ -413,11 +413,11 @@ public class DeviceServiceImpl implements DeviceService {
 	@Override
 	public ResponseEntity<?> assignDeviceToDriver(Long deviceId,Long driverId) {
 		logger.info("************************ assignDeviceToDriver STARTED ***************************");
-		if(deviceId == 0) {
+		if(deviceId == 0 ) {
 			List<Device> devices = null;
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",devices);
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",devices);
 			logger.info("************************ assignDeviceToDriver ENDED ***************************");
-			return ResponseEntity.ok().body(getObjectResponse);
+			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		else {
 			Device device = findById(deviceId);
@@ -425,7 +425,7 @@ public class DeviceServiceImpl implements DeviceService {
 				List<Device> devices = null;
 				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",devices);
 				logger.info("************************ assignDeviceToDriver ENDED ***************************");
-				return ResponseEntity.ok().body(getObjectResponse);
+				return ResponseEntity.status(404).body(getObjectResponse);
 			}
 			else {
 				if(driverId == 0) {
@@ -435,7 +435,7 @@ public class DeviceServiceImpl implements DeviceService {
 			        	List<Device> devices = null;
 						getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "No driver to assign or remove",devices);
 						logger.info("************************ assignDeviceToDriver ENDED ***************************");
-						return ResponseEntity.ok().body(getObjectResponse);
+						return ResponseEntity.status(404).body(getObjectResponse);
 			        }
 			        else {
 			        	Set<Driver> oldDrivers =new HashSet<>() ;
@@ -444,7 +444,7 @@ public class DeviceServiceImpl implements DeviceService {
 			        	 device.setDriver(drivers);
 						 deviceRepository.save(device);
 			        	List<Device> devices = null;
-			        	getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "driver removed successfully",devices);
+			        	getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Driver removed successfully",devices);
 						logger.info("************************ assignDeviceToDriver ENDED ***************************");
 						return ResponseEntity.ok().body(getObjectResponse);
 			        }
@@ -454,14 +454,14 @@ public class DeviceServiceImpl implements DeviceService {
 					List<Device> devices = null;
 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This driver is not found",devices);
 					logger.info("************************ assignDeviceToDriver ENDED ***************************");
-					return ResponseEntity.ok().body(getObjectResponse);
+					return ResponseEntity.status(404).body(getObjectResponse);
 				}
 				else {
 					if(driver.getDelete_date() != null) {
 						List<Device> devices = null;
 						getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This driver is not found",devices);
 						logger.info("************************ assignDeviceToDriver ENDED ***************************");
-						return ResponseEntity.ok().body(getObjectResponse);
+						return ResponseEntity.status(404).body(getObjectResponse);
 					}
 					else {
 						Set<Driver> OldAssignedDrivers=new HashSet<>() ;
@@ -482,7 +482,7 @@ public class DeviceServiceImpl implements DeviceService {
 							 }
 							 else {
 								 List<Device> devices = null;
-								 getObjectResponse = new GetObjectResponse(203, "this driver is assigned to another device",devices);
+								 getObjectResponse = new GetObjectResponse(203, "This driver is assigned to another device",devices);
 									logger.info("************************ assignDeviceToDriver ENDED ***************************");
 									return ResponseEntity.ok().body(getObjectResponse); 
 							 }
@@ -507,30 +507,29 @@ public class DeviceServiceImpl implements DeviceService {
 	@Override
 	public ResponseEntity<?> assignDeviceToGeofences(Long deviceId , Long [] geoIds) {
 		logger.info("************************ assignDeviceToGeofences STARTED ***************************");
-		System.out.println("devices"+deviceId);
 		if(deviceId == 0){
 			List<Device> devices = null;
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",devices);
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",devices);
 			logger.info("************************ assignDeviceToGeofences ENDED ***************************");
-			return ResponseEntity.ok().body(getObjectResponse);
+			return ResponseEntity.badRequest().body(getObjectResponse);
 //			return ResponseEntity.status(404).body(getObjectResponse);
 		}else {
 			 Device device = findById(deviceId);
 			 if(device == null) {
 				  List<Device> devices = null;
-					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this device is not found",devices);
+					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",devices);
 					logger.info("************************ assignDeviceToGeofences ENDED ***************************");
 //					return ResponseEntity.ok().body(getObjectResponse);
-					return ResponseEntity.status(400).body(getObjectResponse);
+					return ResponseEntity.status(404).body(getObjectResponse);
 			 }
 			if(geoIds.length == 0) {
 				//if device has geofences remove it 
                 Set<Geofence> geofences = device.getGeofence();
                 if(geofences.isEmpty()) {
                 	 List<Device> devices = null;
- 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "no geofences to assign or remove",devices);
+ 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "No geofences to assign or remove",devices);
  					logger.info("************************ assignDeviceToGeofences ENDED ***************************");
- 					return ResponseEntity.ok().body(getObjectResponse);
+ 					return ResponseEntity.status(404).body(getObjectResponse);
                 }
                 else {
                 	// else if device hasn't geofences return error
@@ -540,7 +539,7 @@ public class DeviceServiceImpl implements DeviceService {
                 	device.setGeofence(geofences);
                 	deviceRepository.save(device);
                 	List<Device> devices = null;
-                	getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "geofences removed successfully",devices);
+                	getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Geofences removed successfully",devices);
 					logger.info("************************ assignDeviceToGeofences ENDED ***************************");
 					return ResponseEntity.ok().body(getObjectResponse);
                 }
@@ -589,16 +588,20 @@ public class DeviceServiceImpl implements DeviceService {
 	    		if(user.getDelete_date() == null) {
 	    			devices = deviceRepository.getDeviceSelect(userId);
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
-			
+					logger.info("************************ getDeviceSelect ENDED ***************************");
+					return ResponseEntity.ok().body(getObjectResponse);
+
 	    		}
 	    		else {
 					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",devices);
+					return ResponseEntity.status(404).body(getObjectResponse);
 
 	    		}
 	    	
 	    	}
 	    	else {
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",devices);
+				return ResponseEntity.status(404).body(getObjectResponse);
 
 	    	}
 			
@@ -606,12 +609,11 @@ public class DeviceServiceImpl implements DeviceService {
 		else {
 			
 			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",devices);
+			return ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
 	
-		logger.info("************************ getDeviceSelect ENDED ***************************");
 		
-		return ResponseEntity.ok(getObjectResponse);
 
 	}
 
@@ -621,17 +623,17 @@ public class DeviceServiceImpl implements DeviceService {
 		logger.info("************************ getDeviceToDriver STARTED ***************************");
 		if(deviceId == 0) {
 			List<Device> devices = null;
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",devices);
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",devices);
 			logger.info("************************ getDeviceToDriver ENDED ***************************");
-			return ResponseEntity.ok().body(getObjectResponse);
+			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		else {
 			Device device = findById(deviceId);
 			if(device == null) {
 				List<Device> devices = null;
-				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this device is not found",devices);
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",devices);
 				logger.info("************************ getDeviceToDriver ENDED ***************************");
-				return ResponseEntity.ok().body(getObjectResponse);
+				return ResponseEntity.status(404).body(getObjectResponse);
 			}
 			else
 			{
@@ -639,7 +641,7 @@ public class DeviceServiceImpl implements DeviceService {
 				drivers = device.getDriver();
 				if(drivers.isEmpty()) {
 					List<Device> devices = null;
-					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "no drivers assigned to this device",devices);
+					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "No drivers assigned to this device",devices);
 					logger.info("************************ getDeviceToDriver ENDED ***************************");
 					return ResponseEntity.ok().body(getObjectResponse);
 				}
@@ -665,17 +667,17 @@ public class DeviceServiceImpl implements DeviceService {
 		logger.info("************************ getDeviceGeofences STARTED ***************************");
 		if(deviceId == 0) {
 			List<Device> devices = null;
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",devices);
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",devices);
 			logger.info("************************ getDeviceGeofences ENDED ***************************");
-			return ResponseEntity.ok().body(getObjectResponse);
+			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		else {
 			Device device = findById(deviceId);
 			if(device == null) {
 				List<Device> devices = null;
-				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this device is not found",devices);
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",devices);
 				logger.info("************************ getDeviceGeofences ENDED ***************************");
-				return ResponseEntity.ok().body(getObjectResponse);
+				return ResponseEntity.status(404).body(getObjectResponse);
 			}
 			else
 			{
@@ -683,7 +685,7 @@ public class DeviceServiceImpl implements DeviceService {
 				geofences = device.getGeofence();
 				if(geofences.isEmpty()) {
 					List<Device> devices = null;
-					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "no geofences assigned to this device",devices);
+					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "No geofences assigned to this device",devices);
 					logger.info("************************ getDeviceGeofences ENDED ***************************");
 					return ResponseEntity.ok().body(getObjectResponse);
 				}
@@ -709,14 +711,14 @@ public class DeviceServiceImpl implements DeviceService {
 		logger.info("************************ getDevicesStatusAndDrives STARTED ***************************");
 		if(userId == 0) {
 			List<Device> devices = null;
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",devices);
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is required",devices);
 			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
-			return ResponseEntity.ok().body(getObjectResponse);
+			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		User loggedUser = userService.findById(userId);
 		if(loggedUser == null) {
 			List<Device> devices = null;
-			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",devices);
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Logged user is not found",devices);
 			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
 			return ResponseEntity.status(404).body(getObjectResponse);
 		}
@@ -744,15 +746,15 @@ public class DeviceServiceImpl implements DeviceService {
 		// TODO Auto-generated method stub
 		if(userId==0) {
 			 List<CustomDeviceLiveData> allDevicesLiveData=	null;
-		    getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",allDevicesLiveData);
+		    getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is required",allDevicesLiveData);
 			
 			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
-			return ResponseEntity.ok().body(getObjectResponse);
+			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 	    User loggedUser = userService.findById(userId);
 	    if( loggedUser == null) {
 	    	 List<CustomDeviceLiveData> allDevicesLiveData=	null;
-			    getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found ",allDevicesLiveData);
+			    getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Logged user is not found ",allDevicesLiveData);
 				
 				logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
 				return ResponseEntity.status(404).body(getObjectResponse);
@@ -769,6 +771,8 @@ public class DeviceServiceImpl implements DeviceService {
 		
 
 	public ResponseEntity<?> vehicleInfo(Long deviceId) {
+		logger.info("************************ vehicleInfo STARTED ***************************");
+
 		 List<CustomDeviceList> vehicleInfo= new ArrayList<CustomDeviceList>();
 
 		if(deviceId != 0) {
@@ -777,15 +781,20 @@ public class DeviceServiceImpl implements DeviceService {
 				if(device.getDeleteDate()==null) {
 					vehicleInfo = deviceRepository.vehicleInfo(deviceId);
 				    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",vehicleInfo);
-					
+					logger.info("************************ vehicleInfo ENDED ***************************");
+					return ResponseEntity.ok().body(getObjectResponse);
+
 				}
 				else {
 				    getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Device ID is not found",vehicleInfo);
+					return ResponseEntity.status(404).body(getObjectResponse);
+
 				}
 				
 			}
 			else {
 			    getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Device ID is not found",vehicleInfo);
+				return ResponseEntity.status(404).body(getObjectResponse);
 
 			}
 			
@@ -793,10 +802,10 @@ public class DeviceServiceImpl implements DeviceService {
 		}
 		else {
 		    getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is required",vehicleInfo);
+			return ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
 		
-		return ResponseEntity.ok().body(getObjectResponse);
 
 	}
 
@@ -805,16 +814,16 @@ public class DeviceServiceImpl implements DeviceService {
 		// TODO Auto-generated method stub
 			if(deviceId == 0) {
 				 List<CustomDeviceLiveData> allDevicesLiveData=	null;
-				    getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",allDevicesLiveData);
+				    getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is required",allDevicesLiveData);
 					
 					logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
-					return ResponseEntity.ok().body(getObjectResponse);
+					return ResponseEntity.badRequest().body(getObjectResponse);
 			}
 			else {
 				 Device device = findById(deviceId);
 				 if(device == null) {
 					 List<CustomDeviceLiveData> allDevicesLiveData=	null;
-					    getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this device is noy found",allDevicesLiveData);
+					    getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is noy found",allDevicesLiveData);
 						
 						logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
 						return ResponseEntity.status(404).body(getObjectResponse);

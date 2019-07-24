@@ -429,16 +429,30 @@ public class DriverServiceImpl implements DriverService{
 		if(userId == 0) {
 			List<Driver> unAssignedDrivers = new ArrayList<>();
 			
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request",unAssignedDrivers);
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",unAssignedDrivers);
 			
 			logger.info("************************ getUnassignedDrivers ENDED ***************************");
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
-		List<Driver> unAssignedDrivers = driverRepository.getUnassignedDrivers(userId);
-		
-		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",unAssignedDrivers);
-		logger.info("************************ getUnassignedDrivers ENDED ***************************");
-		return ResponseEntity.ok().body(getObjectResponse);
+		else {
+			User user = userServiceImpl.findById(userId);
+
+			if(user == null) {
+				List<Driver> unAssignedDrivers = new ArrayList<>();
+				
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",unAssignedDrivers);
+				return ResponseEntity.status(404).body(getObjectResponse);
+			}
+			else {
+				List<Driver> unAssignedDrivers = driverRepository.getUnassignedDrivers(userId);
+				
+				getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",unAssignedDrivers);
+				logger.info("************************ getUnassignedDrivers ENDED ***************************");
+				return ResponseEntity.ok().body(getObjectResponse);
+			}
+			
+			
+		}
 		
 	}
 

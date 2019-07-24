@@ -33,7 +33,7 @@ public class ReportRestController {
 		
 		
 		
-    	return  ResponseEntity.ok(reportServiceImpl.getEventsReport(deviceId, offset, start, end,search).getBody());
+    	return  reportServiceImpl.getEventsReport(deviceId, offset, start, end,search);
 
 	}
 	
@@ -48,7 +48,7 @@ public class ReportRestController {
 		
 
 		
-    	return  ResponseEntity.ok(reportServiceImpl.getStopsReport(deviceId, type, from, to, page, start, limit).getBody());
+    	return reportServiceImpl.getStopsReport(deviceId, type, from, to, page, start, limit);
 		
 		
 	}
@@ -64,7 +64,7 @@ public class ReportRestController {
 			@RequestParam (value = "limit", defaultValue = "25") int limit) {
 		
 
-    	return  ResponseEntity.ok(reportServiceImpl.getTripsReport(deviceId, type, from, to, page, start, limit).getBody());
+    	return  reportServiceImpl.getTripsReport(deviceId, type, from, to, page, start, limit);
 		 
 		
 	}
