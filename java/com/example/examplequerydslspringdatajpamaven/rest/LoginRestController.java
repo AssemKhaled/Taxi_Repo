@@ -30,7 +30,7 @@ import com.example.examplequerydslspringdatajpamaven.service.LoginService;
 		LoginService loginService;
 //		@Autowired
 		JWKValidator jwkValidator;
-		
+	//////
 		@GetMapping(path = "/login")
 		public 	ResponseEntity<?> login(@RequestHeader(value = "Authorization", defaultValue = "")String authtorization ){
 
