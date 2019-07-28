@@ -20,9 +20,10 @@ import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
+import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 
 @Component
-public class UserServiceImpl implements IUserService {
+public class UserServiceImpl extends RestServiceController implements IUserService {
 
 	@Autowired
 	private UserRepository userRepository;
@@ -75,9 +76,19 @@ public class UserServiceImpl implements IUserService {
 	}
 	
 	@Override
-	public  ResponseEntity<?> findUserById(Long userId) {
+	public  ResponseEntity<?> findUserById(String TOKEN,Long userId) {
 		// TODO Auto-generated method stub
 		logger.info("************************ getUserById STARTED ***************************");
+		if(TOKEN.equals("")) {
+			 List<User> users = null;
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",users);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(userId == 0) {
 			List<User> users = null;
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",users);
@@ -111,8 +122,19 @@ public class UserServiceImpl implements IUserService {
 	}
 
 	@Override
-	public ResponseEntity<?> usersOfUser(Long userId,int offset,String search) {
+	public ResponseEntity<?> usersOfUser(String TOKEN,Long userId,int offset,String search) {
 		logger.info("************************ getAllUsersOfUser STARTED ***************************");
+		if(TOKEN.equals("")) {
+			 List<User> users = null;
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",users);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		
 		if(userId == 0) {
 			 List<User> users = null;
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",users);
@@ -139,9 +161,19 @@ public class UserServiceImpl implements IUserService {
 	}
 
 	@Override
-	public ResponseEntity<?> createUser(User user,Long userId) {
+	public ResponseEntity<?> createUser(String TOKEN,User user,Long userId) {
 		
 		logger.info("************************createUser STARTED ***************************");
+		if(TOKEN.equals("")) {
+			 List<User> users = null;
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",users);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(userId == 0) {
 			List<User> users = null;
 	    	//throw duplication exception with duplication list
@@ -211,9 +243,19 @@ public class UserServiceImpl implements IUserService {
 		
 	}
 	@Override
-	public ResponseEntity<?> editUser(User user,Long userId) {
+	public ResponseEntity<?> editUser(String TOKEN,User user,Long userId) {
 		
 		logger.info("************************editUser STARTED ***************************");
+		if(TOKEN.equals("")) {
+			 List<User> users = null;
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",users);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(userId == 0) {
 			List<User> users = null;
 	    	//throw duplication exception with duplication list
@@ -393,8 +435,18 @@ public class UserServiceImpl implements IUserService {
 	}
 
 	@Override
-	public ResponseEntity<?> deleteUser(Long userId,Long deleteUserId) {
+	public ResponseEntity<?> deleteUser(String TOKEN,Long userId,Long deleteUserId) {
 		logger.info("************************deleteUser STARTED ***************************");
+		if(TOKEN.equals("")) {
+			 List<User> users = null;
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",users);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(userId == 0 || deleteUserId == 0) {
 			 List<User> users= null;
 		      getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",users);

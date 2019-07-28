@@ -12,14 +12,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+
+import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.repository.GeofenceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
+import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 
 @Component
-public class GeofenceServiceImpl implements GeofenceService {
+public class GeofenceServiceImpl extends RestServiceController implements GeofenceService {
 	
 	private static final Log logger = LogFactory.getLog(GeofenceServiceImpl.class);
 
@@ -35,13 +38,23 @@ public class GeofenceServiceImpl implements GeofenceService {
 	UserServiceImpl userServiceImpl;
 	
 	@Override
-	public ResponseEntity<?> getAllGeofences(Long id,int offset,String search) {
+	public ResponseEntity<?> getAllGeofences(String TOKEN,Long id,int offset,String search) {
 
 		//User user=userRepository.getUserData(id);
 		//Set<Geofence> geofences = user.getGeofences();
 		logger.info("************************ getAllUserGeofences STARTED ***************************");
 		
 		List<Geofence> geofences = new ArrayList<Geofence>();
+		
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",geofences);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(id != 0) {
 			
 			User user = userServiceImpl.findById(id);
@@ -78,11 +91,19 @@ public class GeofenceServiceImpl implements GeofenceService {
 	}
 
 	@Override
-	public ResponseEntity<?> getGeofenceById(Long geofenceId) {
+	public ResponseEntity<?> getGeofenceById(String TOKEN,Long geofenceId) {
 		logger.info("************************ getGeofenceById STARTED ***************************");
 
 		List<Geofence> geofences = new ArrayList<Geofence>();
-
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",geofences);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(geofenceId != 0) {
 			
 			Geofence geofence=geofenceRepository.findOne(geofenceId);
@@ -122,7 +143,7 @@ public class GeofenceServiceImpl implements GeofenceService {
 	}
 
 	@Override
-	public ResponseEntity<?> deleteGeofence(Long geofenceId) {
+	public ResponseEntity<?> deleteGeofence(String TOKEN,Long geofenceId) {
 
 		logger.info("************************ deleteGeofence STARTED ***************************");
 
@@ -132,6 +153,15 @@ public class GeofenceServiceImpl implements GeofenceService {
 
 		
 		List<Geofence> geofences = new ArrayList<Geofence>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",geofences);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(geofenceId != 0) {
 			Geofence geofence= getById(geofenceId);
 			if(geofence != null) {
@@ -182,10 +212,19 @@ public class GeofenceServiceImpl implements GeofenceService {
 	}
 	
 	@Override
-	public ResponseEntity<?> addGeofence(Geofence geofence,Long id) {
+	public ResponseEntity<?> addGeofence(String TOKEN,Geofence geofence,Long id) {
 		logger.info("************************ addGeofence STARTED ***************************");
 
 		List<Geofence> geofences= new ArrayList<Geofence>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",geofences);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(id != 0) {
 			User user = userServiceImpl.findById(id);
 			if(user == null ) {
@@ -265,12 +304,21 @@ public class GeofenceServiceImpl implements GeofenceService {
 	}
 
 	@Override
-	public ResponseEntity<?> editGeofence(Geofence geofence,Long id) {
+	public ResponseEntity<?> editGeofence(String TOKEN,Geofence geofence,Long id) {
 
 		logger.info("************************ editGeofence STARTED ***************************");
 
 		GetObjectResponse getObjectResponse;
 		List<Geofence> geofences = new ArrayList<Geofence>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",geofences);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(id != 0) {
 			User user = userServiceImpl.findById(id);
 			if(user == null ) {

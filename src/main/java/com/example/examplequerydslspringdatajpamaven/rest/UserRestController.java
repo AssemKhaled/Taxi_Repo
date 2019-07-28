@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,38 +46,45 @@ public class UserRestController {
 	}
 	
 	@GetMapping("/usersList")
-	public ResponseEntity<?> usersList(@RequestParam (value = "userId", defaultValue = "0") Long userId,@RequestParam(value = "offset", defaultValue = "0") int offset,
-            @RequestParam(value = "search", defaultValue = "") String search) {
-		return userService.usersOfUser(userId,offset,search);
+	public ResponseEntity<?> usersList(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+									   @RequestParam (value = "userId", defaultValue = "0") Long userId,
+									   @RequestParam(value = "offset", defaultValue = "0") int offset,
+							           @RequestParam(value = "search", defaultValue = "") String search) {
+		return userService.usersOfUser(TOKEN,userId,offset,search);
 	}
 	
 	@GetMapping("/getUserById")
-	public ResponseEntity<?> getUserById(@RequestParam (value = "userId", defaultValue = "0") Long userId) {
-		return userService.findUserById(userId);
+	public ResponseEntity<?> getUserById(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                             @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		return userService.findUserById(TOKEN,userId);
 	}
 
 	@PostMapping(path ="/createUser")
-	public ResponseEntity<?> createDevice(@RequestParam (value = "userId", defaultValue = "0") Long userId,@RequestBody(required = false) User user) {
+	public ResponseEntity<?> createDevice(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                              @RequestParam (value = "userId", defaultValue = "0") Long userId,
+			                              @RequestBody(required = false) User user) {
         
 	   
-		return userService.createUser(user,userId);
+		return userService.createUser(TOKEN,user,userId);
 				
 	}
 	
 	@PostMapping(path ="/editUser")
-	public ResponseEntity<?> editDevice(@RequestParam (value = "userId", defaultValue = "0") Long userId,@RequestBody(required = false) User user) {
+	public ResponseEntity<?> editDevice(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                            @RequestParam (value = "userId", defaultValue = "0") Long userId,
+			                            @RequestBody(required = false) User user) {
 		
 		
-		 return  userService.editUser(user,userId);
+		 return  userService.editUser(TOKEN,user,userId);
 		
 				
 	}
 	@GetMapping(path ="/deleteUser")
-	public ResponseEntity<?> deleteDevice(@RequestParam (value = "userId", defaultValue = "0") Long userId,@RequestParam (value = "deleteUserId", defaultValue = "0") Long deleteUserId) {
+	public ResponseEntity<?> deleteDevice(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                              @RequestParam (value = "userId", defaultValue = "0") Long userId,
+			                              @RequestParam (value = "deleteUserId", defaultValue = "0") Long deleteUserId) {
 		
-			 
-		return userService.deleteUser(userId,deleteUserId);
-		
+		return userService.deleteUser(TOKEN,userId,deleteUserId);
 				
 	}
 

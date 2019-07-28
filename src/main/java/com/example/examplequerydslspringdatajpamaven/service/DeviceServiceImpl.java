@@ -23,11 +23,12 @@ import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
+import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 
 
 
 @Component
-public class DeviceServiceImpl implements DeviceService {
+public class DeviceServiceImpl extends RestServiceController implements DeviceService {
 
 	private static final Log logger = LogFactory.getLog(DeviceServiceImpl.class);
 	
@@ -47,10 +48,20 @@ public class DeviceServiceImpl implements DeviceService {
 	 private GeofenceServiceImpl geofenceService;
 	
 	@Override
-	public ResponseEntity<?> getAllUserDevices(Long userId , int offset, String search) {
+	public ResponseEntity<?> getAllUserDevices(String TOKEN,Long userId , int offset, String search) {
 		// TODO Auto-generated method stub
 		 
 		logger.info("************************ getAllUserDevices STARTED ***************************");
+		if(TOKEN.equals("")) {
+			 List<Device> devices = null;
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		
 		if(userId == 0) {
 			 List<CustomDeviceList> devices= null;
@@ -72,9 +83,19 @@ public class DeviceServiceImpl implements DeviceService {
 	}
 
 	@Override
-	public ResponseEntity<?> createDevice(Device device,Long userId) {
+	public ResponseEntity<?> createDevice(String TOKEN,Device device,Long userId) {
 		// TODO Auto-generated method stub
 		logger.info("************************ createDevice STARTED ***************************");
+		if(TOKEN.equals("")) {
+			 List<Device> devices = null;
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(userId == 0) {
 			List<Device> devices = null;
 			
@@ -157,8 +178,18 @@ public class DeviceServiceImpl implements DeviceService {
 		
 	}
 	@Override
-	public ResponseEntity<?> editDevice(Device device, Long userId) {
+	public ResponseEntity<?> editDevice(String TOKEN,Device device, Long userId) {
 		logger.info("************************ editDevice STARTED ***************************");
+		if(TOKEN.equals("")) {
+			 List<Device> devices = null;
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(userId == 0) {
 			List<Device> devices = null;
 			
@@ -300,8 +331,18 @@ public class DeviceServiceImpl implements DeviceService {
 	}
 
 	@Override
-	public  ResponseEntity<?> deleteDevice(Long userId,Long deviceId) {
+	public  ResponseEntity<?> deleteDevice(String TOKEN,Long userId,Long deviceId) {
 		 logger.info("************************ deleteDevice ENDED ***************************");
+		if(TOKEN.equals("")) {
+			 List<Device> devices = null;
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		 if(deviceId == 0 || userId == 0) {
 			 List<Device> devices = null;
 			 getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "User ID and Device ID are Required",devices);
@@ -359,6 +400,7 @@ public class DeviceServiceImpl implements DeviceService {
 	@Override
 	public Device findById(Long deviceId) {
 		// TODO Auto-generated method stub
+		
 		Device device = deviceRepository.findOne(deviceId);
 		if(device == null) {
 			return null;
@@ -375,9 +417,19 @@ public class DeviceServiceImpl implements DeviceService {
 	}
 
 	@Override
-	public ResponseEntity<?>  findDeviceById(Long deviceId) {
+	public ResponseEntity<?>  findDeviceById(String TOKEN,Long deviceId) {
 		// TODO Auto-generated method stub
 		logger.info("************************ getDeviceById STARTED ***************************");
+		if(TOKEN.equals("")) {
+			 List<Device> devices = null;
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(deviceId == 0) {
 			List<Device> devices = null;
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",devices);
@@ -411,8 +463,18 @@ public class DeviceServiceImpl implements DeviceService {
 	}
 
 	@Override
-	public ResponseEntity<?> assignDeviceToDriver(Long deviceId,Long driverId) {
+	public ResponseEntity<?> assignDeviceToDriver(String TOKEN,Long deviceId,Long driverId) {
 		logger.info("************************ assignDeviceToDriver STARTED ***************************");
+		if(TOKEN.equals("")) {
+			 List<Device> devices = null;
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(deviceId == 0 ) {
 			List<Device> devices = null;
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",devices);
@@ -505,8 +567,18 @@ public class DeviceServiceImpl implements DeviceService {
 	}
 
 	@Override
-	public ResponseEntity<?> assignDeviceToGeofences(Long deviceId , Long [] geoIds) {
+	public ResponseEntity<?> assignDeviceToGeofences(String TOKEN,Long deviceId , Long [] geoIds) {
 		logger.info("************************ assignDeviceToGeofences STARTED ***************************");
+		if(TOKEN.equals("")) {
+			 List<Device> devices = null;
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(deviceId == 0){
 			List<Device> devices = null;
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",devices);
@@ -577,11 +649,19 @@ public class DeviceServiceImpl implements DeviceService {
 		return  ResponseEntity.ok().body(getObjectResponse) ;
 	}
 
-	public  ResponseEntity<?> getDeviceSelect(Long userId) {
+	public  ResponseEntity<?> getDeviceSelect(String TOKEN,Long userId) {
 
 		logger.info("************************ getDeviceSelect STARTED ***************************");
 		List<DeviceSelect> devices = new ArrayList<DeviceSelect>();
-
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 	    if(userId != 0) {
 	    	User user = userService.findById(userId);
 	    	if(user != null) {
@@ -618,9 +698,19 @@ public class DeviceServiceImpl implements DeviceService {
 	}
 
 	@Override
-	public ResponseEntity<?> getDeviceDriver(Long deviceId) {
+	public ResponseEntity<?> getDeviceDriver(String TOKEN,Long deviceId) {
 		// TODO Auto-generated method stub
 		logger.info("************************ getDeviceToDriver STARTED ***************************");
+		if(TOKEN.equals("")) {
+			 List<Device> devices = null;
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(deviceId == 0) {
 			List<Device> devices = null;
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",devices);
@@ -662,9 +752,19 @@ public class DeviceServiceImpl implements DeviceService {
 		
 	}
 	@Override
-	public ResponseEntity<?> getDeviceGeofences(Long deviceId) {
+	public ResponseEntity<?> getDeviceGeofences(String TOKEN,Long deviceId) {
 		// TODO Auto-generated method stub
 		logger.info("************************ getDeviceGeofences STARTED ***************************");
+		if(TOKEN.equals("")) {
+			 List<Device> devices = null;
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(deviceId == 0) {
 			List<Device> devices = null;
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",devices);
@@ -707,8 +807,20 @@ public class DeviceServiceImpl implements DeviceService {
 	}
 
 	@Override
-	public ResponseEntity<?> getDeviceStatus(Long userId) {
+	public ResponseEntity<?> getDeviceStatus(String TOKEN,Long userId) {
 		logger.info("************************ getDevicesStatusAndDrives STARTED ***************************");
+		if(TOKEN.equals("")) {
+			 List<Device> devices = null;
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		
+		
 		if(userId == 0) {
 			List<Device> devices = null;
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is required",devices);
@@ -742,8 +854,18 @@ public class DeviceServiceImpl implements DeviceService {
 	}
 
 	@Override
-	public ResponseEntity<?> getAllDeviceLiveData(Long userId, int offset, String search) {
+	public ResponseEntity<?> getAllDeviceLiveData(String TOKEN,Long userId, int offset, String search) {
 		// TODO Auto-generated method stub
+		if(TOKEN.equals("")) {
+			 List<Device> devices = null;
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(userId==0) {
 			 List<CustomDeviceLiveData> allDevicesLiveData=	null;
 		    getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is required",allDevicesLiveData);
@@ -770,11 +892,19 @@ public class DeviceServiceImpl implements DeviceService {
 		
 		
 
-	public ResponseEntity<?> vehicleInfo(Long deviceId) {
+	public ResponseEntity<?> vehicleInfo(String TOKEN,Long deviceId) {
 		logger.info("************************ vehicleInfo STARTED ***************************");
 
-		 List<CustomDeviceList> vehicleInfo= new ArrayList<CustomDeviceList>();
-
+		List<CustomDeviceList> vehicleInfo= new ArrayList<CustomDeviceList>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",vehicleInfo);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(deviceId != 0) {
 			Device device = findById(deviceId);
 			if(device != null) {
@@ -810,31 +940,41 @@ public class DeviceServiceImpl implements DeviceService {
 	}
 
 	@Override
-	public ResponseEntity<?> getDeviceLiveData(Long deviceId) {
+	public ResponseEntity<?> getDeviceLiveData(String TOKEN,Long deviceId) {
 		// TODO Auto-generated method stub
-			if(deviceId == 0) {
-				 List<CustomDeviceLiveData> allDevicesLiveData=	null;
-				    getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is required",allDevicesLiveData);
-					
-					logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
-					return ResponseEntity.badRequest().body(getObjectResponse);
-			}
-			else {
-				 Device device = findById(deviceId);
-				 if(device == null) {
-					 List<CustomDeviceLiveData> allDevicesLiveData=	null;
-					    getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is noy found",allDevicesLiveData);
-						
-						logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
-						return ResponseEntity.status(404).body(getObjectResponse);
-				 }
-				List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getDeviceLiveData(deviceId);
-				getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevicesLiveData);
+		if(TOKEN.equals("")) {
+			 List<Device> devices = null;
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(deviceId == 0) {
+			 List<CustomDeviceLiveData> allDevicesLiveData=	null;
+			    getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is required",allDevicesLiveData);
 				
 				logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
-				return ResponseEntity.ok().body(getObjectResponse);
-		
-			}
+				return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		else {
+			 Device device = findById(deviceId);
+			 if(device == null) {
+				 List<CustomDeviceLiveData> allDevicesLiveData=	null;
+				    getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",allDevicesLiveData);
+					
+					logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+					return ResponseEntity.status(404).body(getObjectResponse);
+			 }
+			List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getDeviceLiveData(deviceId);
+			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevicesLiveData);
+			
+			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+	
+		}
 	
 	}
    

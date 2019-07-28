@@ -13,38 +13,37 @@ public interface DeviceService {
 	
 	public Device findById(Long deviceId);
 
-	public ResponseEntity<?>  getAllUserDevices(Long userId , int offset, String search);
+	public ResponseEntity<?>  getAllUserDevices(String TOKEN,Long userId , int offset, String search);
 	
-	public ResponseEntity<?> createDevice(Device device,Long userId);
+	public ResponseEntity<?> createDevice(String TOKEN,Device device,Long userId);
 	
-	public ResponseEntity<?> editDevice(Device device,Long userId);
+	public ResponseEntity<?> editDevice(String TOKEN,Device device,Long userId);
 	
 	public List<Integer> checkDeviceDuplication(Device device);
 	
-	public  ResponseEntity<?> deleteDevice(Long userId, Long deviceId);
+	public  ResponseEntity<?> deleteDevice(String TOKEN,Long userId, Long deviceId);
 	
-	public ResponseEntity<?>  findDeviceById(Long deviceId);
+	public ResponseEntity<?>  findDeviceById(String TOKEN,Long deviceId);
 
-	public ResponseEntity<?> getDeviceSelect(Long userId);
+	public ResponseEntity<?> getDeviceSelect(String TOKEN,Long userId);
 
-	public ResponseEntity<?> assignDeviceToDriver(Long deviceId , Long driverId);
+	public ResponseEntity<?> assignDeviceToDriver(String TOKEN,Long deviceId , Long driverId);
 	
-	public ResponseEntity<?> assignDeviceToGeofences(Long deviceId,Long [] geoIds );
+	public ResponseEntity<?> assignDeviceToGeofences(String TOKEN,Long deviceId,Long [] geoIds );
 
 	public ResponseEntity<?> testgetDeviceById();
 
-	public ResponseEntity<?> getDeviceDriver(Long deviceId);
-	
+	public ResponseEntity<?> getDeviceDriver(String TOKEN,Long deviceId);
 		
-	public ResponseEntity<?> getDeviceGeofences(Long deviceId);
+	public ResponseEntity<?> getDeviceGeofences(String TOKEN,Long deviceId);
 	
-	public ResponseEntity<?> getDeviceStatus(Long userId);
+	public ResponseEntity<?> getDeviceStatus(String TOKEN,Long userId);
 	
-	public ResponseEntity<?> getAllDeviceLiveData(Long userId,int offset,String search);
+	public ResponseEntity<?> getAllDeviceLiveData(String TOKEN,Long userId,int offset,String search);
 	
-	public ResponseEntity<?> getDeviceLiveData(Long deviceId);
+	public ResponseEntity<?> getDeviceLiveData(String TOKEN,Long deviceId);
 
-	public ResponseEntity<?> vehicleInfo(Long deviceId);
+	public ResponseEntity<?> vehicleInfo(String TOKEN,Long deviceId);
 
 
 }

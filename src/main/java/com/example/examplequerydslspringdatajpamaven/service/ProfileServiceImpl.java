@@ -12,8 +12,9 @@ import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
 import com.example.examplequerydslspringdatajpamaven.repository.ProfileRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
+import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 
-public class ProfileServiceImpl implements ProfileService{
+public class ProfileServiceImpl extends RestServiceController implements ProfileService{
 
 	@Autowired
 	ProfileRepository profileRepository;
@@ -26,11 +27,20 @@ public class ProfileServiceImpl implements ProfileService{
 	private static final Log logger = LogFactory.getLog(ProfileServiceImpl.class);
 
 	@Override
-	public ResponseEntity<?> getUserInfo(Long userId) {
+	public ResponseEntity<?> getUserInfo(String TOKEN,Long userId) {
 		
 		logger.info("************************ getUserInfo STARTED ***************************");
 
 		List<User> users = new ArrayList<User>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",users);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(userId != 0) {
 			User user = profileRepository.findOne(userId);
 			if(user == null) {
@@ -67,12 +77,21 @@ public class ProfileServiceImpl implements ProfileService{
 
 
 	@Override
-	public ResponseEntity<?>  updateProfileInfo(User user,Long userId) {
+	public ResponseEntity<?>  updateProfileInfo(String TOKEN,User user,Long userId) {
 		
 		logger.info("************************ updateProfile STARTED ***************************");
 
 		GetObjectResponse getObjectResponse ;
 		List<User> users = new ArrayList<User>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",users);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(userId != 0) {
 			User Data =getUserInfoObj(userId);
 			if(Data == null) {
@@ -136,11 +155,20 @@ public class ProfileServiceImpl implements ProfileService{
 	}
 
 	@Override
-	public ResponseEntity<?> updateProfilePassword(Map<String, String> data,Long userId) {
+	public ResponseEntity<?> updateProfilePassword(String TOKEN,Map<String, String> data,Long userId) {
 		
 		logger.info("************************ updateProfilePassword STARTED ***************************");
 
 		List<User> users = new ArrayList<User>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",users);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(userId != 0) {
 			User user =getUserInfoObj(userId);
 			if(user == null) {
@@ -200,12 +228,21 @@ public class ProfileServiceImpl implements ProfileService{
 	}
 	
 	@Override
-	public ResponseEntity<?> updateProfilePhoto(Map<String, String> data,Long userId){
+	public ResponseEntity<?> updateProfilePhoto(String TOKEN,Map<String, String> data,Long userId){
 		
 		logger.info("************************ updateProfile STARTED ***************************");
 
 		GetObjectResponse getObjectResponse ;
 		List<User> users = new ArrayList<User>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",users);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(userId !=0) {
 			User user = getUserInfoObj(userId);
 			if(user == null) {

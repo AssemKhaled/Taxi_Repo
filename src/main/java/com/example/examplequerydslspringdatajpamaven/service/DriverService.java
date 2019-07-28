@@ -6,17 +6,17 @@ import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 
 public interface DriverService {
 	
-	public ResponseEntity<?> getAllDrivers(Long id,int offset,String search);
+	public ResponseEntity<?> getAllDrivers(String TOKEN,Long id,int offset,String search);
 	public Driver getDriverById(Long driverId);
-	public ResponseEntity<?> findById(Long driverId);
-	public ResponseEntity<?> deleteDriver(Long driverId);
+	public ResponseEntity<?> findById(String TOKEN,Long driverId);
+	public ResponseEntity<?> deleteDriver(String Token,Long driverId);
 	public List<Driver> checkDublicateDriverInAdd(Long userId,String name,String uniqueId,String mobileNum);
-	public ResponseEntity<?> addDriver(Driver driver,Long id);
+	public ResponseEntity<?> addDriver(String TOKEN,Driver driver,Long id);
 	public List<Driver> checkDublicateDriverInEdit(Long driverId,Long userId,String name,String uniqueId,String mobileNum);
-	public ResponseEntity<?> editDriver(Driver driver,Long id);
+	public ResponseEntity<?> editDriver(String TOKEN,Driver driver,Long id);
 	
 	// added by maryam 
-	public ResponseEntity<?> getUnassignedDrivers(Long userId);
+	public ResponseEntity<?> getUnassignedDrivers(String TOKEN,Long userId);
 	
 	public Integer getTotalNumberOfUserDrivers(Long userId);
 

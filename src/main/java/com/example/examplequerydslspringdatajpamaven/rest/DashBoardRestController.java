@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,42 +39,45 @@ public class DashBoardRestController {
 	
  
 	@GetMapping(path ="/getDevicesStatuesAndAllDrivers")
-	public ResponseEntity<?> devicesStatuesAndAllDrivers(@RequestParam (value = "userId", defaultValue = "0") Long userId){
+	public ResponseEntity<?> devicesStatuesAndAllDrivers(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                             @RequestParam (value = "userId", defaultValue = "0") Long userId){
 		
-		return deviceService.getDeviceStatus(userId);
+		return deviceService.getDeviceStatus(TOKEN,userId);
 	}
 	
 	@GetMapping(path = "/getAllDevicesLastInfo")
-	public ResponseEntity<?> getAllDevicesLastInfo(@RequestParam (value = "userId", defaultValue = "0") Long userId,
-													@RequestParam (value = "offset", defaultValue = "0")int offset,
-													@RequestParam (value = "search", defaultValue = "0") String search ){
+	public ResponseEntity<?> getAllDevicesLastInfo(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                       @RequestParam (value = "userId", defaultValue = "0") Long userId,
+												   @RequestParam (value = "offset", defaultValue = "0")int offset,
+												   @RequestParam (value = "search", defaultValue = "0") String search ){
 		
-		return deviceService.getAllDeviceLiveData(userId, offset, search);
+		return deviceService.getAllDeviceLiveData(TOKEN,userId, offset, search);
 	}
 
 	@GetMapping(path = "/getDevicesLiveData")
-	public ResponseEntity<?> getDevicesLiveData(@RequestParam (value = "deviceId", defaultValue = "0") Long deviceId){
+	public ResponseEntity<?> getDevicesLiveData(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                    @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId){
 		
-		return deviceService.getDeviceLiveData(deviceId);
+		return deviceService.getDeviceLiveData(TOKEN,deviceId);
 	}
 	
 
 	@RequestMapping(value = "/getNotifications", method = RequestMethod.GET)
-	public @ResponseBody ResponseEntity<?> getNotifications(@RequestParam (value = "userId", defaultValue = "0") Long userId,
-			@RequestParam (value = "offset", defaultValue = "0") int offset,
-			@RequestParam (value = "search", defaultValue = "") String search) {
+	public @ResponseBody ResponseEntity<?> getNotifications(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+															@RequestParam (value = "userId", defaultValue = "0") Long userId,
+															@RequestParam (value = "offset", defaultValue = "0") int offset,
+															@RequestParam (value = "search", defaultValue = "") String search) {
 		
-
-		
-    	return  reportServiceImpl.getNotifications(userId, offset,search);
+    	return  reportServiceImpl.getNotifications(TOKEN,userId, offset,search);
 
 	}
 	@RequestMapping(value = "/vehicleInfo", method = RequestMethod.GET)
-	public @ResponseBody ResponseEntity<?> vehicleInfo(@RequestParam (value = "deviceId", defaultValue = "0") Long deviceId){
+	public @ResponseBody ResponseEntity<?> vehicleInfo(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                           @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId){
 		
 
 		
-    	return  deviceService.vehicleInfo(deviceId);
+    	return  deviceService.vehicleInfo(TOKEN,deviceId);
 
 	}
 

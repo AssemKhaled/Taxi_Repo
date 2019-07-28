@@ -13,12 +13,12 @@ public interface IUserService {
 	public User getName();
 //	public ResponseEntity<?> UserDevice(Long userId,int offset, String search);
 	public User findById(Long userId);
-	public ResponseEntity<?> findUserById(Long userId);
-	public ResponseEntity<?> usersOfUser(Long userId,int offset,String search);
-	public ResponseEntity<?> createUser(User user,Long userId);
-	public ResponseEntity<?> editUser(User user,Long userId);
+	public ResponseEntity<?> findUserById(String TOKEN,Long userId);
+	public ResponseEntity<?> usersOfUser(String TOKEN,Long userId,int offset,String search);
+	public ResponseEntity<?> createUser(String TOKEN,User user,Long userId);
+	public ResponseEntity<?> editUser(String TOKEN,User user,Long userId);
 	public List<Integer> checkUserDuplication(User user);
-	public ResponseEntity<?> deleteUser(Long userId , Long deleteUserId);
+	public ResponseEntity<?> deleteUser(String TOKEN,Long userId , Long deleteUserId);
 
 
 }

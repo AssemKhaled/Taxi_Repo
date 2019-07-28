@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,32 +27,39 @@ public class ProfileRestController {
 	UserServiceImpl userServiceImpl;
 	
 	@RequestMapping(value = "/getProfileInfo", method = RequestMethod.GET)
-	public @ResponseBody ResponseEntity<?> getProfileInfo(@RequestParam (value = "userId", defaultValue = "0") Long userId) {
+	public @ResponseBody ResponseEntity<?> getProfileInfo(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                              @RequestParam (value = "userId", defaultValue = "0") Long userId) {
 		
 	
-    	return  profileServiceImpl.getUserInfo(userId);
+    	return  profileServiceImpl.getUserInfo(TOKEN,userId);
 
 	}
 	
 	@RequestMapping(value = "/changePassowrd", method = RequestMethod.POST)
-	public @ResponseBody ResponseEntity<?> changePassowrd(@RequestBody Map<String, String> data ,@RequestParam (value = "userId", defaultValue = "0") Long userId) {
+	public @ResponseBody ResponseEntity<?> changePassowrd(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                              @RequestBody Map<String, String> data ,
+			                                              @RequestParam (value = "userId", defaultValue = "0") Long userId) {
 
 		
-    	return profileServiceImpl.updateProfilePassword(data,userId);
+    	return profileServiceImpl.updateProfilePassword(TOKEN,data,userId);
 
 	}
 	
 	@RequestMapping(value = "/updateProfile", method = RequestMethod.POST)
-	public @ResponseBody ResponseEntity<?> updateProfile(@RequestBody(required = false) User user ,@RequestParam (value = "userId", defaultValue = "0") Long userId) {
+	public @ResponseBody ResponseEntity<?> updateProfile(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                             @RequestBody(required = false) User user ,
+			                                             @RequestParam (value = "userId", defaultValue = "0") Long userId) {
 		
-    	return  profileServiceImpl.updateProfileInfo(user,userId);
+    	return  profileServiceImpl.updateProfileInfo(TOKEN,user,userId);
 
 	}
 	
 	@RequestMapping(value = "/updatePhoto", method = RequestMethod.POST)
-	public @ResponseBody ResponseEntity<?> updatePhoto(@RequestBody Map<String, String> data ,@RequestParam (value = "userId", defaultValue = "0") Long userId) {
+	public @ResponseBody ResponseEntity<?> updatePhoto(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                           @RequestBody Map<String, String> data ,
+			                                           @RequestParam (value = "userId", defaultValue = "0") Long userId) {
 
-    	return  profileServiceImpl.updateProfilePhoto(data,userId);
+    	return  profileServiceImpl.updateProfilePhoto(TOKEN,data,userId);
 
 	}
 	

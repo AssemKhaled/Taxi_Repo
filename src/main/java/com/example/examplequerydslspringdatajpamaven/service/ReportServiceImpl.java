@@ -27,8 +27,9 @@ import com.example.examplequerydslspringdatajpamaven.entity.EventReport;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.repository.EventRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
+import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 @Component
-public class ReportServiceImpl implements ReportService {
+public class ReportServiceImpl extends RestServiceController implements ReportService {
 	
 	@Autowired
 	EventRepository eventRepository;
@@ -44,10 +45,19 @@ public class ReportServiceImpl implements ReportService {
 	GetObjectResponse getObjectResponse;
 
 	@Override
-	public ResponseEntity<?> getEventsReport(Long deviceId,int offset,String start,String end,String search) {
+	public ResponseEntity<?> getEventsReport(String TOKEN,Long deviceId,int offset,String start,String end,String search) {
 		logger.info("************************ getEventsReport STARTED ***************************");
-		
+	
 		List<EventReport> eventReport = new ArrayList<EventReport>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",eventReport);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(deviceId != 0) {
 			offset=offset-1;
 			if(offset <0) {
@@ -134,10 +144,20 @@ public class ReportServiceImpl implements ReportService {
 	}
 
 	@Override
-	public ResponseEntity<?> getNotifications(Long userId, int offset,String search) {
+	public ResponseEntity<?> getNotifications(String TOKEN,Long userId, int offset,String search) {
 		logger.info("************************ getNotifications STARTED ***************************");
 		
 		List<EventReport> notifications = new ArrayList<EventReport>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",notifications);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		
 		if(userId != 0) {
 			offset=offset-1;
 			if(offset <0) {
@@ -189,12 +209,21 @@ public class ReportServiceImpl implements ReportService {
 	}
 
 	@Override
-	public ResponseEntity<?> getStopsReport(Long deviceId, String type, String from, String to, int page, int start,
+	public ResponseEntity<?> getStopsReport(String TOKEN,Long deviceId, String type, String from, String to, int page, int start,
 			int limit) {
 
 		logger.info("************************ getStopsReport STARTED ***************************");
 
 		List<?> stopReport = new ArrayList<>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",stopReport);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(deviceId != 0) {
 			
 			Device device = deviceServiceImpl.findById(deviceId);
@@ -293,13 +322,21 @@ public class ReportServiceImpl implements ReportService {
 	}
 
 	@Override
-	public ResponseEntity<?> getTripsReport(Long deviceId, String type, String from, String to, int page, int start,
+	public ResponseEntity<?> getTripsReport(String TOKEN,Long deviceId, String type, String from, String to, int page, int start,
 			int limit) {
 
 		logger.info("************************ getTripsReport STARTED ***************************");
 
 		List<?> tripReport = new ArrayList<>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",tripReport);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
 		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(deviceId != 0) {
 			
             Device device = deviceServiceImpl.findById(deviceId);

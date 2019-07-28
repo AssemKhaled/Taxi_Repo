@@ -18,9 +18,10 @@ import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
 import com.example.examplequerydslspringdatajpamaven.repository.DriverRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
+import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 
 @Component
-public class DriverServiceImpl implements DriverService{
+public class DriverServiceImpl extends RestServiceController implements DriverService{
 
 	private static final Log logger = LogFactory.getLog(DriverServiceImpl.class);
 
@@ -36,14 +37,22 @@ public class DriverServiceImpl implements DriverService{
 	GetObjectResponse getObjectResponse;
 	
 	@Override
-	public ResponseEntity<?> getAllDrivers(Long id,int offset,String search) {
+	public ResponseEntity<?> getAllDrivers(String TOKEN,Long id,int offset,String search) {
 		
 		//User user=userRepository.getUserData(id);
 		//Set<Driver> drivers = user.getDrivers();
 		
 		logger.info("************************ getAllDrivers STARTED ***************************");
 		List<Driver> drivers = new ArrayList<Driver>();
-
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",drivers);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(id != 0) {
 			User user = userServiceImpl.findById(id);
 			if(user == null ) {
@@ -86,11 +95,20 @@ public class DriverServiceImpl implements DriverService{
 	}
 	
 	@Override
-	public ResponseEntity<?> addDriver(Driver driver,Long id) {
+	public ResponseEntity<?> addDriver(String TOKEN,Driver driver,Long id) {
 
 		logger.info("************************ addDriver STARTED ***************************");
 
 		List<Driver> drivers = new ArrayList<Driver>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",drivers);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(id != 0) {
 			User user = userServiceImpl.findById(id);
 			if(user == null ) {
@@ -198,10 +216,19 @@ public class DriverServiceImpl implements DriverService{
 	}
 	
 	@Override
-	public ResponseEntity<?> editDriver(Driver driver,Long id) {
+	public ResponseEntity<?> editDriver(String TOKEN,Driver driver,Long id) {
 		logger.info("************************ editDriver STARTED ***************************");
 
 		List<Driver> drivers = new ArrayList<Driver>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",drivers);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(id != 0) {
 			User user = userServiceImpl.findById(id);
 			if(user == null ) {
@@ -329,9 +356,18 @@ public class DriverServiceImpl implements DriverService{
 
 
 	@Override
-	public ResponseEntity<?> findById(Long driverId) {
+	public ResponseEntity<?> findById(String TOKEN,Long driverId) {
 		logger.info("************************ getDriverById STARTED ***************************");
 		List<Driver> drivers = new ArrayList<Driver>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",drivers);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 
 		if(driverId != 0) {
 			
@@ -371,7 +407,7 @@ public class DriverServiceImpl implements DriverService{
 	}
 	
 	@Override
-	public ResponseEntity<?> deleteDriver(Long driverId) {
+	public ResponseEntity<?> deleteDriver(String TOKEN,Long driverId) {
 		
 		Date date = new Date();
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd"); 
@@ -379,6 +415,15 @@ public class DriverServiceImpl implements DriverService{
 		logger.info("************************ deleteDriver STARTED ***************************");
 
 		List<Driver> drivers = new ArrayList<Driver>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",drivers);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(driverId != 0) {
 			Driver driver= driverRepository.findOne(driverId);
 			if(driver != null) {
@@ -422,10 +467,21 @@ public class DriverServiceImpl implements DriverService{
 	}
 
 	@Override
-	public ResponseEntity<?> getUnassignedDrivers(Long userId) {
+	public ResponseEntity<?> getUnassignedDrivers(String TOKEN,Long userId) {
 		// TODO Auto-generated method stub
 		
 		logger.info("************************ getUnassignedDrivers STARETED ***************************");
+		if(TOKEN.equals("")) {
+			List<Driver> unAssignedDrivers = new ArrayList<>();
+
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",unAssignedDrivers);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(userId == 0) {
 			List<Driver> unAssignedDrivers = new ArrayList<>();
 			
