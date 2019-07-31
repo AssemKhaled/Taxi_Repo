@@ -60,7 +60,7 @@ public class UserRestController {
 	}
 
 	@PostMapping(path ="/createUser")
-	public ResponseEntity<?> createDevice(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+	public ResponseEntity<?> createUser(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 			                              @RequestParam (value = "userId", defaultValue = "0") Long userId,
 			                              @RequestBody(required = false) User user) {
         
@@ -70,7 +70,7 @@ public class UserRestController {
 	}
 	
 	@PostMapping(path ="/editUser")
-	public ResponseEntity<?> editDevice(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+	public ResponseEntity<?> editUser(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 			                            @RequestParam (value = "userId", defaultValue = "0") Long userId,
 			                            @RequestBody(required = false) User user) {
 		
@@ -80,12 +80,18 @@ public class UserRestController {
 				
 	}
 	@GetMapping(path ="/deleteUser")
-	public ResponseEntity<?> deleteDevice(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+	public ResponseEntity<?> deleteUser(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 			                              @RequestParam (value = "userId", defaultValue = "0") Long userId,
 			                              @RequestParam (value = "deleteUserId", defaultValue = "0") Long deleteUserId) {
 		
 		return userService.deleteUser(TOKEN,userId,deleteUserId);
 				
+	}
+	
+	@GetMapping(path="/getUserRole")
+	public ResponseEntity<?> getUserRole(@RequestParam (value = "userId", defaultValue = "0") Long userId){
+		
+		return userService.getUserRole(userId);
 	}
 
 

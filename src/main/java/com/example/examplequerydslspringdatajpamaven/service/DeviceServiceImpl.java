@@ -47,6 +47,8 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	@Autowired
 	 private GeofenceServiceImpl geofenceService;
 	
+	@Autowired
+	private UserRoleService userRoleService;
 	@Override
 	public ResponseEntity<?> getAllUserDevices(String TOKEN,Long userId , int offset, String search) {
 		// TODO Auto-generated method stub
@@ -75,6 +77,11 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This user is not found",devices);
 			 logger.info("************************ getAllUserDevices ENDED ***************************");
 			return  ResponseEntity.status(404).body(getObjectResponse);
+		}
+		if(!userRoleService.checkUserHasPermission(userId, "device", "list")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get devices list",null);
+			 logger.info("************************ getAllUserDevices ENDED ***************************");
+			return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		 List<CustomDeviceList> devices= deviceRepository.getDevicesList(userId,offset,search);
 		 getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
