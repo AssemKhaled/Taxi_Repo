@@ -10,6 +10,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 public interface GeofenceService {
 
 	public ResponseEntity<?> getAllGeofences(String TOKEN,Long id,int offset,String search);
+	public ResponseEntity<?> getAllGeo(String TOKEN,Long id);
 	public ResponseEntity<?> getGeofenceById(String TOKEN,Long geofenceId);
 	public Geofence getById(Long geofenceId);
 	public ResponseEntity<?> deleteGeofence(String TOKEN,Long geofenceId);

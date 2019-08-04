@@ -150,8 +150,9 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 				return  ResponseEntity.status(404).body(getObjectResponse);
 			}
 			else {
-				List<User> users = userRepository.getUsersOfUser(userId,offset,search);
-				 getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users);
+				 List<User> users = userRepository.getUsersOfUser(userId,offset,search);
+				 Integer size=userRepository.getUsersOfUserSize(userId);
+				 getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users,size);
 				 logger.info("************************ getAllUsersOfUser ENDED ***************************");
 				return  ResponseEntity.ok().body(getObjectResponse);
 			}
@@ -191,13 +192,13 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 		    	return ResponseEntity.status(404).body(getObjectResponse);
 			}
 			else {
-				if(user.getId() != null) {
+				if(user.getId() != null && user.getId() != 0 ) {
 					List<User> users = null;
 					String message= "create doesn't accept id";
 			    	//throw duplication exception with duplication list
 			    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), message,users);
 			    	logger.info("************************createUser ENDED ***************************");
-			    	return ResponseEntity.ok().body(getObjectResponse);
+			    	return ResponseEntity.badRequest().body(getObjectResponse);
 				}
 				if(user.getEmail() == null || user.getEmail() == "" || user.getPassword() == null
 					|| user.getPassword() == "" || user.getName() == null || user.getName() == "" 

@@ -9,10 +9,15 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+
+import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
+import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
 import com.example.examplequerydslspringdatajpamaven.repository.DriverRepository;
@@ -63,7 +68,9 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 			else {
 				if(user.getDelete_date() == null) {
 					drivers = driverRepository.getAllDrivers(id,offset,search);
-					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",drivers);
+					Integer size= driverRepository.getAllDriversSize(id);
+					
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",drivers,size);
 					logger.info("************************ getAllDrivers ENDED ***************************");
 					return ResponseEntity.ok().body(getObjectResponse);
 
@@ -161,7 +168,7 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 
 						}
 						else {
-							if(driver.getId() == null) {
+							if(driver.getId() == null || driver.getId() == 0) {
 								Set<User> userDriver = new HashSet<>();
 								userDriver.add(user);
 								driver.setUserDriver(userDriver);
@@ -262,7 +269,7 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 										
 									}
 									else {
-										driver.setPhoto("Not-available.png");
+										driver.setPhoto(driverCheck.getPhoto());
 									}
 									
 									List<Driver> res=checkDublicateDriverInEdit(driver.getId(),id,driver.getName(),driver.getUniqueid(),driver.getMobile_num());
@@ -534,6 +541,57 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 			return driver;
 		}
 	}
+
+	public  ResponseEntity<?> getDriverSelect(String TOKEN,Long userId) {
+
+		logger.info("************************ getDeviceSelect STARTED ***************************");
+		List<DriverSelect> drivers = new ArrayList<DriverSelect>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",drivers);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+	    if(userId != 0) {
+	    	User user = userServiceImpl.findById(userId);
+	    	if(user != null) {
+	    		if(user.getDelete_date() == null) {
+	    			drivers = driverRepository.getDriverSelect(userId);
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
+					logger.info("************************ getDeviceSelect ENDED ***************************");
+					return ResponseEntity.ok().body(getObjectResponse);
+
+	    		}
+	    		else {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",drivers);
+					return ResponseEntity.status(404).body(getObjectResponse);
+
+	    		}
+	    	
+	    	}
+	    	else {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",drivers);
+				return ResponseEntity.status(404).body(getObjectResponse);
+
+	    	}
+			
+		}
+		else {
+			
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",drivers);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
+	
+		
+
+	}
+	
+	
+	
 
 	
 	

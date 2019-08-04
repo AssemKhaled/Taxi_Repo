@@ -7,6 +7,7 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.Event;
 import com.example.examplequerydslspringdatajpamaven.entity.EventReport;
 
@@ -17,8 +18,32 @@ public interface EventRepository  extends JpaRepository<Event, Long>, QueryDslPr
 	public List<EventReport> getEvents(@Param("deviceId")Long deviceId,@Param("offset")int offset,
 			@Param("start")String start,@Param("end")String end,@Param("search")String search);
 	
+	@Query(nativeQuery = true, name = "getEventsToExcel")
+	public List<EventReport> getEventsToExcel(@Param("deviceId")Long deviceId,@Param("start")String start,
+			@Param("end")String end);
+	
+	
+	@Query (value = "SELECT count(tc_events.id) " + 
+			" FROM tc_events INNER JOIN tc_devices ON tc_devices.id=tc_events.deviceid " + 
+			" LEFT JOIN tc_positions ON tc_positions.id=tc_events.positionid " + 
+			" LEFT JOIN tc_geofences ON tc_geofences.id=tc_events.geofenceid " + 
+			" LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_events.deviceid " + 
+			" LEFT JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id " + 
+			" WHERE tc_events.servertime BETWEEN :start AND :end and tc_events.deviceid =:deviceId AND tc_devices.delete_date IS NULL AND " + 
+			" tc_drivers.delete_date IS NULL AND tc_geofences.delete_date IS NULL ",nativeQuery =  true)
+	public Integer getEventsSize(@Param("deviceId")Long deviceId,@Param("start")String start,
+			@Param("end")String end);
+	
 	@Query(nativeQuery = true, name = "getNotifications")
 	public List<EventReport> getNotifications(@Param("userId")Long userId,@Param("offset")int offset,@Param("search")String search);
 
-	
+	@Query (value = "SELECT count(tc_events.id)"+
+			" FROM tc_user_device" + 
+			" INNER JOIN tc_events ON tc_user_device.deviceid=tc_events.deviceid " + 
+			" INNER JOIN tc_devices ON tc_events.deviceid=tc_devices.id " + 
+			" LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_events.deviceid " + 
+			" LEFT JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id " + 
+			" WHERE tc_user_device.userid=:userId AND tc_devices.delete_date IS NULL AND tc_drivers.delete_date IS NULL " + 
+			" AND Date(tc_events.servertime)=CURRENT_DATE() ",nativeQuery =  true)
+	public Integer getNotificationsSize(@Param("userId")Long userId);
 }

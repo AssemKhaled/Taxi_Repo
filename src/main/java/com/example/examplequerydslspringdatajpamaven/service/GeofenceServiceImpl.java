@@ -66,7 +66,8 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 			else {
 				if(user.getDelete_date() == null) {
 					geofences = geofenceRepository.getAllGeofences(id,offset,search);
-					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",geofences);
+					Integer size=geofenceRepository.getAllGeofencesSize(id);
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",geofences,size);
 					logger.info("************************ getAllUserGeofences ENDED ***************************");
 					return  ResponseEntity.ok().body(getObjectResponse);
 
@@ -255,7 +256,7 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 
 						}
 						else {
-							if(geofence.getId()==null) {
+							if(geofence.getId()==null || geofence.getId()==0) {
 								Set<User> userDriver = new HashSet<>();
 								userDriver.add(user);
 								geofence.setUserGeofence(userDriver);
@@ -442,6 +443,54 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 		else
 		{
 			return geofence;
+		}
+	}
+
+	@Override
+	public ResponseEntity<?> getAllGeo(String TOKEN, Long id) {
+logger.info("************************ getAllUserGeofences STARTED ***************************");
+		
+		List<Geofence> geofences = new ArrayList<Geofence>();
+		
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",geofences);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(id != 0) {
+			
+			User user = userServiceImpl.findById(id);
+			if(user == null ) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User is not Found",geofences);
+				return  ResponseEntity.status(404).body(getObjectResponse);
+
+			}
+			else {
+				if(user.getDelete_date() == null) {
+					geofences = geofenceRepository.getAllGeos(id);
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",geofences);
+					logger.info("************************ getAllUserGeofences ENDED ***************************");
+					return  ResponseEntity.ok().body(getObjectResponse);
+
+				}
+				else {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User is not Found",geofences);
+					return  ResponseEntity.status(404).body(getObjectResponse);
+
+				}
+				
+			}
+
+		}
+		else{
+			
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",geofences);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+
 		}
 	}
 	

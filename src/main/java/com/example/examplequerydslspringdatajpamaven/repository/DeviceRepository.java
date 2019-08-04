@@ -13,6 +13,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceList;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceLiveData;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
+import com.example.examplequerydslspringdatajpamaven.entity.DeviceWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.EventReport;
 
 @Component
@@ -36,7 +37,7 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	
 	@Query(value = "SELECT tc_devices.id,tc_devices.name FROM tc_devices"
 			+ " INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id"
-			+ " WHERE tc_user_device.userid=:userId",nativeQuery = true)
+			+ " WHERE tc_user_device.userid=:userId and tc_devices.delete_date is null",nativeQuery = true)
 	public List<DeviceSelect> getDeviceSelect(@Param("userId")Long userId);
 	
 	@Query(value = "SELECT count(tc_positions.devicetime) FROM tc_devices INNER JOIN tc_positions ON tc_positions.id=tc_devices.positionid AND\n" + 
@@ -57,6 +58,15 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	@Query(nativeQuery = true, name = "getDevicesLiveData")
 	List<CustomDeviceLiveData> getAllDevicesLiveData(@Param("userId")Long userId,@Param("offset") int offset,@Param("search") String search);
 	
+	@Query(value = " SELECT count(tc_devices.id) FROM tc_devices "
+			+ " INNER JOIN  tc_user_device ON tc_devices.id=tc_user_device.deviceid " 
+			+ " LEFT JOIN tc_positions ON tc_positions.id=tc_devices.positionid"
+			+ " where tc_user_device.userid= :userId and tc_devices.delete_date is null",nativeQuery = true )
+	public Integer getAllDevicesLiveDataSize(@Param("userId")Long userId);
+	
+	@Query(nativeQuery = true, name = "getDevicesLiveDataMap")
+	List<CustomDeviceLiveData> getAllDevicesLiveDataMap(@Param("userId")Long userId);
+	
 
 	@Query(nativeQuery = true, name = "getDeviceLiveData")
 	List<CustomDeviceLiveData> getDeviceLiveData(@Param("deviceId")Long deviceId);
@@ -66,6 +76,24 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	public List<CustomDeviceList> vehicleInfo(@Param("deviceId")Long deviceId);
 
 	
+	@Query(value = "SELECT count(*) FROM tc_devices "
+			+ " INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id "
+			+ " WHERE tc_user_device.userid=:userId and tc_devices.delete_date is null",nativeQuery = true )
+	public Integer getDevicesListSize(@Param("userId")Long userId);
 	
+	@Query(nativeQuery = true, name = "getDriverWorkingHoursExport")
+	public List<DeviceWorkingHours> getDeviceWorkingHoursExport(@Param("deviceId")Long deviceId,@Param("start")String start,@Param("end")String end);
+	
+	@Query(nativeQuery = true, name = "getDriverWorkingHours")
+	public List<DeviceWorkingHours> getDeviceWorkingHours(@Param("deviceId")Long deviceId,@Param("start")String start,@Param("end")String end,@Param("offset")int offset,@Param("search")String search);
+
+	@Query(value = "SELECT count(CAST(devicetime AS DATE)) FROM tc_positions " + 
+			" INNER JOIN tc_devices ON tc_devices.id=tc_positions.deviceid " + 
+			" WHERE deviceid=:deviceId AND " + 
+			" devicetime IN (SELECT devicetime " + 
+			" FROM (SELECT MAX(devicetime) as devicetime FROM tc_positions " + 
+			" WHERE deviceid=:deviceId AND devicetime<=:end AND  devicetime>=:start group by CAST(devicetime AS DATE) )as t1) order by devicetime DESC",nativeQuery = true )
+	public Integer getDeviceWorkingHoursSize(@Param("deviceId")Long deviceId,@Param("start")String start,@Param("end")String end);
+
 }
 

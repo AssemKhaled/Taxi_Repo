@@ -43,7 +43,11 @@ public interface DeviceService {
 	
 	public ResponseEntity<?> getDeviceLiveData(String TOKEN,Long deviceId);
 
+	public ResponseEntity<?> getDeviceLiveDataMap(String TOKEN,Long deviceId);
+
 	public ResponseEntity<?> vehicleInfo(String TOKEN,Long deviceId);
+	
+	public ResponseEntity<?> getAllDeviceLiveDataMap(String TOKEN,Long userId);
 
 
 }

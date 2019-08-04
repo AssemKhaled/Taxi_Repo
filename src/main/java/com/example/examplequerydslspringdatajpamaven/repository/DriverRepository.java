@@ -10,7 +10,10 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.examplequerydslspringdatajpamaven.entity.DeviceWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
+import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
+import com.example.examplequerydslspringdatajpamaven.entity.DriverWorkingHours;
 @Component
 public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslPredicateExecutor<Driver> {
 
@@ -60,4 +63,32 @@ public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslP
 			+ "tc_user_driver.userid = :userId WHERE tc_drivers.delete_date is null",nativeQuery = true)
 	
 	public Integer getTotalNumberOfUserDrivers(@Param("userId") Long userId);
+	
+	@Query(value = "SELECT count(*) FROM tc_drivers INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id"
+			+ " WHERE tc_user_driver.userid=:userId and tc_drivers.delete_date is null", nativeQuery = true)
+	public Integer getAllDriversSize(@Param("userId") Long userId);
+	
+	
+	@Query(nativeQuery = true, name = "getDriverWorkingHoursExport")
+	public List<DriverWorkingHours> getDriverWorkingHoursExport(@Param("driverId")Long driverId,@Param("start")String start,@Param("end")String end);
+	
+	@Query(nativeQuery = true, name = "getDriverWorkingHours")
+	public List<DriverWorkingHours> getDriverWorkingHours(@Param("driverId")Long driverId,@Param("start")String start,@Param("end")String end,@Param("offset")int offset,@Param("search")String search);
+
+	@Query(value = "SELECT count(CAST(devicetime AS DATE)) "
+			+ " FROM tc_positions INNER JOIN tc_device_driver ON tc_device_driver.deviceid=tc_positions.deviceid  "
+			+ " INNER JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id"
+			+ "  WHERE tc_positions.deviceid=(SELECT tc_device_driver.deviceid FROM tc_drivers INNER JOIN tc_device_driver ON tc_device_driver.driverid=tc_drivers.id WHERE tc_drivers.id=:driverId) AND  devicetime IN (SELECT devicetime "
+			+ "  FROM (SELECT MAX(devicetime) as devicetime FROM tc_positions "
+			+ "  WHERE deviceid=(SELECT tc_device_driver.deviceid FROM tc_drivers "
+			+ "  INNER JOIN tc_device_driver ON tc_device_driver.driverid=tc_drivers.id "
+			+ "  WHERE tc_drivers.id=:driverId) AND devicetime<=:end AND  devicetime>=:start "
+			+ "  group by CAST(devicetime AS DATE) )as t1) order by devicetime DESC",nativeQuery = true )
+	
+	public Integer getDriverWorkingHoursSize(@Param("driverId")Long driverId,@Param("start")String start,@Param("end")String end);
+
+	@Query(value = "SELECT tc_drivers.id,tc_drivers.name FROM tc_drivers"
+			+ " INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id"
+			+ " WHERE tc_user_driver.userid=:userId and tc_drivers.delete_date is null",nativeQuery = true)
+	public List<DriverSelect> getDriverSelect(@Param("userId")Long userId);
 }
