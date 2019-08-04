@@ -10,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.JoinColumn;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -80,6 +81,16 @@ public class User {
 	@Column(name = "Iscompany")
 	private Integer IsCompany;
 	
+	@Column(name = "roleId")
+	private Long roleId;
+	
+	@Column(name = "accountType")
+	private Integer accountType;
+	
+	private Long clientId;
+	
+	private Long vendorId;
+	
 	 @JsonIgnore
 	 @ManyToMany(
 	            fetch = FetchType.LAZY,
@@ -110,6 +121,9 @@ public class User {
 	    @ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE},
 	            mappedBy = "userGeofence")
 	    private Set<Geofence> geofences = new HashSet<>();
+	    
+	    
+	  
 
 	/*@Column(name="active")
 	@CsvBindByName
@@ -303,6 +317,31 @@ public class User {
 	public void setReject_reason(String reject_reason) {
 		this.reject_reason = reject_reason;
 	}
+	public Long getRoleId() {
+		return roleId;
+	}
+	public void setRoleId(Long roleId) {
+		this.roleId = roleId;
+	}
+	public Integer getAccountType() {
+		return accountType;
+	}
+	public void setAccountType(Integer accountType) {
+		this.accountType = accountType;
+	}
+	public Long getClientId() {
+		return clientId;
+	}
+	public void setClientId(Long clientId) {
+		this.clientId = clientId;
+	}
+	public Long getVendorId() {
+		return vendorId;
+	}
+	public void setVendorId(Long vendorId) {
+		this.vendorId = vendorId;
+	}
+	
 
 
 	

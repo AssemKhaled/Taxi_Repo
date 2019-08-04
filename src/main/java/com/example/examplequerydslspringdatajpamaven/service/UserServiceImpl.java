@@ -18,7 +18,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
+import com.example.examplequerydslspringdatajpamaven.entity.UserRole;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.UserRoleRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 
@@ -27,6 +29,9 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private UserRoleRepository roleRepository;
 	
 	private static final Log logger = LogFactory.getLog(DeviceServiceImpl.class);
 	
@@ -175,6 +180,7 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 		{
 			return super.checkActive(TOKEN);
 		}
+		//userId is the user parent of the account user
 		if(userId == 0) {
 			List<User> users = null;
 	    	//throw duplication exception with duplication list
@@ -487,5 +493,24 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	            }
 		}
 		
+	}
+
+	@Override
+	public ResponseEntity<?> getUserRole(Long userId) {
+		// TODO Auto-generated method stub
+		if(userId == 0) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged user is not found",null);
+		    
+		    return ResponseEntity.status(404).body(getObjectResponse);
+		}
+		User user = findById(userId);
+		if(user == null) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This user is not found",null);
+		    return ResponseEntity.status(404).body(getObjectResponse);
+		}
+		List<UserRole> roles = roleRepository.getUserRole(userId);
+		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",roles);
+		
+		return ResponseEntity.ok().body(getObjectResponse);
 	}
 }

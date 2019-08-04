@@ -19,6 +19,7 @@ public interface IUserService {
 	public ResponseEntity<?> editUser(String TOKEN,User user,Long userId);
 	public List<Integer> checkUserDuplication(User user);
 	public ResponseEntity<?> deleteUser(String TOKEN,Long userId , Long deleteUserId);
+	public ResponseEntity<?> getUserRole(Long userId);
 
 
 }
