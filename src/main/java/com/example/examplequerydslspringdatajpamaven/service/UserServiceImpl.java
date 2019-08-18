@@ -230,6 +230,7 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 				return  ResponseEntity.status(404).body(getObjectResponse);
 			}
 			else {
+
 				if(active == 0) {
 					List<User> users = userRepository.getInactiveUsersOfUser(userId,offset,search);
 					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users);
@@ -237,8 +238,10 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 					return  ResponseEntity.ok().body(getObjectResponse);
 				}
 				List<User> users = userRepository.getUsersOfUser(userId,offset,search);
-				getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users);
+				Integer size=userRepository.getUsersOfUserSize(userId);
+				getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users,size);
 				logger.info("************************ getAllUsersOfUser ENDED ***************************");
+
 				return  ResponseEntity.ok().body(getObjectResponse);
 			}
 			
@@ -267,18 +270,15 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 		    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",users);
 		    	logger.info("************************createUser ENDED ***************************");
 		    	return ResponseEntity.badRequest().body(getObjectResponse);
-			}
-			else {
+			}else {
 				User creater = findById(userId);
 				if(creater == null) {
-					List<User> users = null;
-			    	//throw duplication exception with duplication list
-			    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This  creater user is not Found",users);
-			    	logger.info("************************createUser ENDED ***************************");
+					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This  creater user is not Found",null);
+		    	logger.info("************************createUser ENDED ***************************");
+
 			    	return ResponseEntity.status(404).body(getObjectResponse);
-				}
-				else {
-					if(user.getId() != null) {
+				}else {
+					if(user.getId() != null && user.getId() != 0) {
 						List<User> users = null;
 						String message= "create doesn't accept id";
 				    	//throw duplication exception with duplication list
@@ -334,90 +334,92 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 					    	}
 					    }else if(user.getAccountType() == 4) {
 					    	if(creater.getAccountType() == 4) {
-					    		Set<User> userParents = creater.getUsersOfUser();
-					    		if(userParents.isEmpty()) {
-					    			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this  creater user not assigned to any client please assign first to client",null);
+				    		Set<User> userParents = creater.getUsersOfUser();
+				    		if(userParents.isEmpty()) {
+				    			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this  creater user not assigned to any client please assign first to client",null);
+						    	logger.info("************************createUser ENDED ***************************");
+						    	return ResponseEntity.status(404).body(getObjectResponse);
+				    		}
+				    		else {
+				    			User parent = null;
+				    			for(User parentClient : userParents) {
+					    			 parent = parentClient;
+					    			break;
+					    		}
+				    			return saveUser(parent.getId(),user);
+				    		}
+				    		
+				    	}else if(creater.getAccountType() == 3) {
+				    		return saveUser(creater.getId(),user);
+				    	}
+				    	else if(creater.getAccountType()== 2) {
+				    		JSONObject parentUsers = new JSONObject(user.getParents());
+					    	if( !parentUsers.has("clientId")) {
+					    		
+					    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "the parent user of this user must be of type client",null);
+						    	logger.info("************************createUser ENDED ***************************");
+						    	return ResponseEntity.badRequest().body(getObjectResponse);
+					    	}else {
+					    		if(!checkIfParentOrNot(userId,parentUsers.getLong("clientId"),creater.getAccountType(),3)) {
+					    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign user to this client",null);
 							    	logger.info("************************createUser ENDED ***************************");
-							    	return ResponseEntity.status(404).body(getObjectResponse);
+							    	return ResponseEntity.badRequest().body(getObjectResponse);
 					    		}
 					    		else {
-					    			User parent = null;
-					    			for(User parentClient : userParents) {
-						    			 parent = parentClient;
-						    			break;
-						    		}
-					    			return saveUser(parent.getId(),user);
+					    			return saveUser(parentUsers.getLong("clientId"),user);
 					    		}
-					    		
-					    	}else if(creater.getAccountType() == 3) {
-					    		return saveUser(creater.getId(),user);
-					    	}
-					    	else if(creater.getAccountType()== 2) {
-					    		JSONObject parentUsers = new JSONObject(user.getParents());
-						    	if( !parentUsers.has("clientId")) {
+				    	}
+				    	
+				    }else if(creater.getAccountType() ==1) {
+				    	JSONObject parentUsers = new JSONObject(user.getParents());
+				    	if( !parentUsers.has("vendorId")) {
+				    		
+				    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you must select vendor to be parent of this user",null);
+					    	logger.info("************************createUser ENDED ***************************");
+					    	return ResponseEntity.badRequest().body(getObjectResponse);
+				    	}else {
+				    		if(!checkIfParentOrNot(userId,parentUsers.getLong("vendorId"),creater.getAccountType(),2)) {
+				    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign user to this vendor",null);
+						    	logger.info("************************createUser ENDED ***************************");
+						    	return ResponseEntity.badRequest().body(getObjectResponse);
+				    		}
+				    		else {
+				    			if( !parentUsers.has("clientId")) {
 						    		
-						    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "the parent user of this user must be of type client",null);
+						    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you must select client to be parent of this user",null);
 							    	logger.info("************************createUser ENDED ***************************");
 							    	return ResponseEntity.badRequest().body(getObjectResponse);
 						    	}else {
-						    		if(!checkIfParentOrNot(userId,parentUsers.getLong("clientId"),creater.getAccountType(),3)) {
-						    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign user to this client",null);
+						    		if(!checkIfParentOrNot(parentUsers.getLong("vendorId"),parentUsers.getLong("clientId"),2,3)) {
+						    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign user to this client ",null);
 								    	logger.info("************************createUser ENDED ***************************");
 								    	return ResponseEntity.badRequest().body(getObjectResponse);
 						    		}
 						    		else {
 						    			return saveUser(parentUsers.getLong("clientId"),user);
 						    		}
-					    	}
-					    	
-					    }else if(creater.getAccountType() ==1) {
-					    	JSONObject parentUsers = new JSONObject(user.getParents());
-					    	if( !parentUsers.has("vendorId")) {
-					    		
-					    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you must select vendor to be parent of this user",null);
-						    	logger.info("************************createUser ENDED ***************************");
-						    	return ResponseEntity.badRequest().body(getObjectResponse);
-					    	}else {
-					    		if(!checkIfParentOrNot(userId,parentUsers.getLong("vendorId"),creater.getAccountType(),2)) {
-					    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign user to this vendor",null);
-							    	logger.info("************************createUser ENDED ***************************");
-							    	return ResponseEntity.badRequest().body(getObjectResponse);
-					    		}
-					    		else {
-					    			if( !parentUsers.has("clientId")) {
-							    		
-							    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you must select client to be parent of this user",null);
-								    	logger.info("************************createUser ENDED ***************************");
-								    	return ResponseEntity.badRequest().body(getObjectResponse);
-							    	}else {
-							    		if(!checkIfParentOrNot(parentUsers.getLong("vendorId"),parentUsers.getLong("clientId"),2,3)) {
-							    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign user to this client ",null);
-									    	logger.info("************************createUser ENDED ***************************");
-									    	return ResponseEntity.badRequest().body(getObjectResponse);
-							    		}
-							    		else {
-							    			return saveUser(parentUsers.getLong("clientId"),user);
-							    		}
-					    		}
-				    	}
-					   }
-					   }
-					    else {
-					    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "creater must has account type",null);
-					    	logger.info("************************createUser ENDED ***************************");
-					    	return ResponseEntity.badRequest().body(getObjectResponse);
-					    }
-						
-						
-					}	else {
-						getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "user must has account type",null);
+				    		}
+			    	}
+				   }
+				   }
+				    else {
+				    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "creater must has account type",null);
 				    	logger.info("************************createUser ENDED ***************************");
 				    	return ResponseEntity.badRequest().body(getObjectResponse);
-					}
+				    }
+					
+					
+				}else {
+					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "user must has account type",null);
+			    	logger.info("************************createUser ENDED ***************************");
+			    	return ResponseEntity.badRequest().body(getObjectResponse);
+				}
+					
+				}
 			}
-			
 		}
-		}
+	
+
 		
 	}
 	@Override

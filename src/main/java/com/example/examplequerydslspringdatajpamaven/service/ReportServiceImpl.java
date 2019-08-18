@@ -23,8 +23,13 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
+import com.example.examplequerydslspringdatajpamaven.entity.DeviceWorkingHours;
+import com.example.examplequerydslspringdatajpamaven.entity.Driver;
+import com.example.examplequerydslspringdatajpamaven.entity.DriverWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.EventReport;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
+import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.DriverRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.EventRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
@@ -33,9 +38,18 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	
 	@Autowired
 	EventRepository eventRepository;
-
+	
+	@Autowired
+	DeviceRepository deviceRepository;
+	
+	@Autowired
+	DriverRepository driverRepository;
+	
 	@Autowired
 	DeviceServiceImpl deviceServiceImpl;
+	
+	@Autowired
+	DriverServiceImpl driverServiceImpl;
 	
 	@Autowired
 	UserServiceImpl userServiceImpl;
@@ -107,8 +121,9 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 					}
 					search = "%"+search+"%";
 					eventReport = eventRepository.getEvents(deviceId, offset, start, end,search);
+					Integer size = null;
 					if(eventReport.size()>0) {
-						
+						size=eventRepository.getEventsSize(deviceId,start, end);
 						for(int i=0;i<eventReport.size();i++) {
 							if(eventReport.get(i).getEventType().equals("alarm")) {
 								JSONObject obj = new JSONObject(eventReport.get(i).getAttributes());
@@ -117,7 +132,508 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 						}
 						
 					}
-					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",eventReport);
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",eventReport,size);
+					logger.info("************************ getEventsReport ENDED ***************************");
+					return  ResponseEntity.ok().body(getObjectResponse);
+
+				}
+				
+			}
+			else {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Device ID is not found",eventReport);
+				return  ResponseEntity.status(404).body(getObjectResponse);
+
+			}
+			
+			
+
+		}
+		else {
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",eventReport);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
+		
+		
+
+	}
+	@Override
+	public ResponseEntity<?> getDeviceWorkingHours(String TOKEN,Long deviceId,int offset,String start,String end,String search) {
+		logger.info("************************ HoursDev STARTED ***************************");
+	
+		List<DeviceWorkingHours> deviceHours = new ArrayList<DeviceWorkingHours>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",deviceHours);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(deviceId != 0) {
+			offset=offset-1;
+			if(offset <0) {
+				offset=0;
+			}
+			Device device =deviceServiceImpl.findById(deviceId);
+			if(device != null) {
+				if(start.equals("0") || end.equals("0")) {
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",deviceHours);
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+
+				}
+				else {
+					SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+					SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+					inputFormat.setLenient(false);
+					outputFormat.setLenient(false);
+
+					Date dateFrom;
+					Date dateTo;
+					try {
+						dateFrom = inputFormat.parse(start);
+						dateTo = inputFormat.parse(end);
+						
+						start = outputFormat.format(dateFrom);
+						end = outputFormat.format(dateTo);
+						
+						Date today=new Date();
+
+						if(dateFrom.getTime() > dateTo.getTime()) {
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",deviceHours);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}
+						if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",deviceHours);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}
+						
+						
+
+
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",deviceHours);
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+
+					}
+					search = "%"+search+"%";
+					deviceHours = deviceRepository.getDeviceWorkingHours(deviceId,start, end,offset,search);
+					Integer size = null;
+					if(deviceHours.size()>0) {
+       				    size=deviceRepository.getDeviceWorkingHoursSize(deviceId,start, end);
+						for(int i=0;i<deviceHours.size();i++) {
+							JSONObject obj = new JSONObject(deviceHours.get(i).getAttributes());
+							if(obj.has("todayHoursString")) {
+								deviceHours.get(i).setHours(obj.getString("todayHoursString"));
+							}
+							else {
+								deviceHours.get(i).setHours("0");
+	
+							}
+							
+						}
+					
+					}
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",deviceHours,size);
+					logger.info("************************ HoursDev ENDED ***************************");
+					return  ResponseEntity.ok().body(getObjectResponse);
+
+				}
+				
+			}
+			else {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Device ID is not found",deviceHours);
+				return  ResponseEntity.status(404).body(getObjectResponse);
+
+			}
+			
+			
+
+		}
+		else {
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",deviceHours);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
+		
+		
+
+	}
+	@Override
+	public ResponseEntity<?> getDeviceWorkingHoursExport(String TOKEN,Long deviceId,String start,String end) {
+		logger.info("************************ exportHoursDev STARTED ***************************");
+	
+		List<DeviceWorkingHours> deviceHours = new ArrayList<DeviceWorkingHours>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",deviceHours);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(deviceId != 0) {
+			
+			Device device =deviceServiceImpl.findById(deviceId);
+			if(device != null) {
+				if(start.equals("0") || end.equals("0")) {
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",deviceHours);
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+
+				}
+				else {
+					SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+					SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+					inputFormat.setLenient(false);
+					outputFormat.setLenient(false);
+
+					Date dateFrom;
+					Date dateTo;
+					try {
+						dateFrom = inputFormat.parse(start);
+						dateTo = inputFormat.parse(end);
+						
+						start = outputFormat.format(dateFrom);
+						end = outputFormat.format(dateTo);
+						
+						Date today=new Date();
+
+						if(dateFrom.getTime() > dateTo.getTime()) {
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",deviceHours);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}
+						if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",deviceHours);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}
+						
+						
+
+
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",deviceHours);
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+
+					}
+					deviceHours = deviceRepository.getDeviceWorkingHoursExport(deviceId,start, end);
+					Integer size = null;
+					if(deviceHours.size()>0) {
+						//size=deviceRepository.getDeviceWorkingHoursSize(deviceId,start, end);
+						for(int i=0;i<deviceHours.size();i++) {
+							JSONObject obj = new JSONObject(deviceHours.get(i).getAttributes());
+							if(obj.has("todayHoursString")) {
+								deviceHours.get(i).setHours(obj.getString("todayHoursString"));
+							}
+							else {
+								deviceHours.get(i).setHours("0");
+
+							}
+							
+						}
+						
+					}
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",deviceHours,size);
+					logger.info("************************ exportHoursDev ENDED ***************************");
+					return  ResponseEntity.ok().body(getObjectResponse);
+
+				}
+				
+			}
+			else {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Device ID is not found",deviceHours);
+				return  ResponseEntity.status(404).body(getObjectResponse);
+
+			}
+			
+			
+
+		}
+		else {
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",deviceHours);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
+		
+		
+
+	}
+	@Override
+	public ResponseEntity<?> getDriverWorkingHours(String TOKEN,Long driverId,int offset,String start,String end,String search) {
+		logger.info("************************ HoursDev STARTED ***************************");
+	
+		List<DriverWorkingHours> driverHours = new ArrayList<DriverWorkingHours>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",driverHours);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(driverId != 0) {
+			offset=offset-1;
+			if(offset <0) {
+				offset=0;
+			}
+			Driver driver =driverServiceImpl.getDriverById(driverId);
+			if(driver != null) {
+				if(start.equals("0") || end.equals("0")) {
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",driverHours);
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+
+				}
+				else {
+					SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+					SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+					inputFormat.setLenient(false);
+					outputFormat.setLenient(false);
+
+					Date dateFrom;
+					Date dateTo;
+					try {
+						dateFrom = inputFormat.parse(start);
+						dateTo = inputFormat.parse(end);
+						
+						start = outputFormat.format(dateFrom);
+						end = outputFormat.format(dateTo);
+						
+						Date today=new Date();
+
+						if(dateFrom.getTime() > dateTo.getTime()) {
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",driverHours);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}
+						if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",driverHours);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}
+						
+						
+
+
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",driverHours);
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+
+					}
+					search = "%"+search+"%";
+					driverHours = driverRepository.getDriverWorkingHours(driverId,start, end,offset,search);
+					Integer size = null;
+					if(driverHours.size()>0) {
+       				    size=driverRepository.getDriverWorkingHoursSize(driverId,start, end);
+						for(int i=0;i<driverHours.size();i++) {
+							JSONObject obj = new JSONObject(driverHours.get(i).getAttributes());
+							if(obj.has("todayHoursString")) {
+								driverHours.get(i).setHours(obj.getString("todayHoursString"));
+							}
+							else {
+								driverHours.get(i).setHours("0");
+	
+							}
+							
+						}
+					
+					}
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",driverHours,size);
+					logger.info("************************ HoursDev ENDED ***************************");
+					return  ResponseEntity.ok().body(getObjectResponse);
+
+				}
+				
+			}
+			else {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Device ID is not found",driverHours);
+				return  ResponseEntity.status(404).body(getObjectResponse);
+
+			}
+			
+			
+
+		}
+		else {
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",driverHours);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
+		
+		
+
+	}
+	@Override
+	public ResponseEntity<?> getDriverWorkingHoursExport(String TOKEN,Long driverId,String start,String end) {
+		logger.info("************************ exportHoursDev STARTED ***************************");
+	
+		List<DriverWorkingHours> driverHours = new ArrayList<DriverWorkingHours>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",driverHours);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(driverId != 0) {
+			
+			Driver driver =driverServiceImpl.getDriverById(driverId);
+			if(driver != null) {
+				if(start.equals("0") || end.equals("0")) {
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",driverHours);
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+
+				}
+				else {
+					SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+					SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+					inputFormat.setLenient(false);
+					outputFormat.setLenient(false);
+
+					Date dateFrom;
+					Date dateTo;
+					try {
+						dateFrom = inputFormat.parse(start);
+						dateTo = inputFormat.parse(end);
+						
+						start = outputFormat.format(dateFrom);
+						end = outputFormat.format(dateTo);
+						
+						Date today=new Date();
+
+						if(dateFrom.getTime() > dateTo.getTime()) {
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",driverHours);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}
+						if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",driverHours);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}
+						
+						
+
+
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",driverHours);
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+
+					}
+					driverHours = driverRepository.getDriverWorkingHoursExport(driverId,start, end);
+					Integer size = null;
+					if(driverHours.size()>0) {
+						//size=driverRepository.getDriverWorkingHoursSize(driverId,start, end);
+						for(int i=0;i<driverHours.size();i++) {
+							JSONObject obj = new JSONObject(driverHours.get(i).getAttributes());
+							if(obj.has("todayHoursString")) {
+								driverHours.get(i).setHours(obj.getString("todayHoursString"));
+							}
+							else {
+								driverHours.get(i).setHours("0");
+
+							}
+							
+						}
+						
+					}
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",driverHours,size);
+					logger.info("************************ exportHoursDev ENDED ***************************");
+					return  ResponseEntity.ok().body(getObjectResponse);
+
+				}
+				
+			}
+			else {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Driver ID is not found",driverHours);
+				return  ResponseEntity.status(404).body(getObjectResponse);
+
+			}
+			
+			
+
+		}
+		else {
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Driver ID is Required",driverHours);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
+		
+		
+
+	}
+	@Override
+	public ResponseEntity<?> getEventsReportToExcel(String TOKEN,Long deviceId,String start,String end) {
+		logger.info("************************ getEventsReport STARTED ***************************");
+	
+		List<EventReport> eventReport = new ArrayList<EventReport>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",eventReport);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(deviceId != 0) {
+			
+			Device device =deviceServiceImpl.findById(deviceId);
+			if(device != null) {
+				if(start.equals("0") || end.equals("0")) {
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",eventReport);
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+
+				}
+				else {
+					SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+					SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+					inputFormat.setLenient(false);
+					outputFormat.setLenient(false);
+
+					Date dateFrom;
+					Date dateTo;
+					try {
+						dateFrom = inputFormat.parse(start);
+						dateTo = inputFormat.parse(end);
+						
+						start = outputFormat.format(dateFrom);
+						end = outputFormat.format(dateTo);
+						
+						Date today=new Date();
+
+						if(dateFrom.getTime() > dateTo.getTime()) {
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",eventReport);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}
+						if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",eventReport);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}
+						
+						
+
+
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",eventReport);
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+
+					}
+					eventReport = eventRepository.getEventsToExcel(deviceId,start,end);
+					if(eventReport.size()>0) {
+						for(int i=0;i<eventReport.size();i++) {
+							if(eventReport.get(i).getEventType().equals("alarm")) {
+								JSONObject obj = new JSONObject(eventReport.get(i).getAttributes());
+								eventReport.get(i).setEventType(obj.getString("alarm"));
+							}
+						}
+						
+					}
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",eventReport,eventReport.size());
 					logger.info("************************ getEventsReport ENDED ***************************");
 					return  ResponseEntity.ok().body(getObjectResponse);
 
@@ -168,8 +684,9 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				if(user.getDelete_date()==null) {
 					search = "%"+search+"%";
 					notifications= eventRepository.getNotifications(userId, offset,search);
+					Integer size=0;
 					if(notifications.size()>0) {
-						
+						size=eventRepository.getNotificationsSize(userId);
 						for(int i=0;i<notifications.size();i++) {
 							if(notifications.get(i).getEventType().equals("alarm")) {
 								JSONObject obj = new JSONObject(notifications.get(i).getAttributes());
@@ -178,7 +695,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 						}
 							
 					}
-					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",notifications);
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",notifications,size);
 					logger.info("************************ getNotifications ENDED ***************************");
 					return  ResponseEntity.ok().body(getObjectResponse);
 

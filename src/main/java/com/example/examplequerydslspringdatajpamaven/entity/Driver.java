@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ColumnResult;
+import javax.persistence.ConstructorResult;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -12,12 +14,74 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.NamedNativeQueries;
+import javax.persistence.NamedNativeQuery;
+import javax.persistence.SqlResultSetMapping;
+import javax.persistence.SqlResultSetMappings;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@SqlResultSetMappings({
+	@SqlResultSetMapping(
+	        name="DriverWorkingHours",
+	        classes={
+	           @ConstructorResult(
+	                targetClass=DriverWorkingHours.class,
+	                  columns={
+	                     @ColumnResult(name="deviceTime",type=String.class),
+	                     @ColumnResult(name="positionId",type=Long.class),
+	                     @ColumnResult(name="attributes",type=String.class),
+	                     @ColumnResult(name="deviceId",type=Long.class),
+	                     @ColumnResult(name="driverName",type=String.class)
+	                     }
+	           )
+	        }
+	)
+	
+	
+})
+@NamedNativeQueries({
+	
+	@NamedNativeQuery(name="getDriverWorkingHours", 
+			resultSetMapping="DriverWorkingHours", 
+			query="SELECT CAST(devicetime AS DATE) as deviceTime,"
+					+ " tc_positions.id as positionId,"
+					+ " tc_positions.attributes as attributes,"
+					+ " tc_positions.deviceid as deviceId,tc_drivers.name as driverName FROM tc_positions "
+					+ " INNER JOIN tc_device_driver ON tc_device_driver.deviceid=tc_positions.deviceid  "
+					+ " INNER JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id "
+					+ " WHERE  "
+					+ "  ((devicetime Like :search) or (tc_drivers.name Like :search) ) "
+					+ " and tc_positions.deviceid=(SELECT tc_device_driver.deviceid "
+					+ " FROM tc_drivers INNER JOIN tc_device_driver ON tc_device_driver.driverid=tc_drivers.id "
+					+ " WHERE tc_drivers.id=:driverId) AND  devicetime IN (SELECT devicetime " + 
+					" FROM (SELECT MAX(devicetime) as devicetime FROM tc_positions "
+					+ " WHERE deviceid=(SELECT tc_device_driver.deviceid FROM tc_drivers "
+					+ " INNER JOIN tc_device_driver ON tc_device_driver.driverid=tc_drivers.id "
+					+ " WHERE tc_drivers.id=:driverId) AND devicetime<=:end AND  devicetime>=:start "
+					+ " group by CAST(devicetime AS DATE) )as t1) order by devicetime DESC limit :offset,10"),
 
+			@NamedNativeQuery(name="getDriverWorkingHoursExport", 
+			resultSetMapping="DriverWorkingHours", 
+			query="SELECT CAST(devicetime AS DATE) as deviceTime,"
+					+ " tc_positions.id as positionId,"
+					+ " tc_positions.attributes as attributes,"
+					+ " tc_positions.deviceid as deviceId,tc_drivers.name as driverName FROM tc_positions "
+					+ " INNER JOIN tc_device_driver ON tc_device_driver.deviceid=tc_positions.deviceid  "
+					+ " INNER JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id "
+					+ " WHERE tc_positions.deviceid=(SELECT tc_device_driver.deviceid "
+					+ " FROM tc_drivers INNER JOIN tc_device_driver ON tc_device_driver.driverid=tc_drivers.id "
+					+ " WHERE tc_drivers.id=:driverId) AND  devicetime IN (SELECT devicetime " + 
+					" FROM (SELECT MAX(devicetime) as devicetime FROM tc_positions "
+					+ " WHERE deviceid=(SELECT tc_device_driver.deviceid FROM tc_drivers "
+					+ " INNER JOIN tc_device_driver ON tc_device_driver.driverid=tc_drivers.id "
+					+ " WHERE tc_drivers.id=:driverId) AND devicetime<=:end AND  devicetime>=:start "
+					+ " group by CAST(devicetime AS DATE) )as t1) order by devicetime DESC"),
+
+	
+})
 @Entity
 @Table(name = "tc_drivers" , schema = "sareb_blue")
 @JsonIgnoreProperties(value = { "device" })

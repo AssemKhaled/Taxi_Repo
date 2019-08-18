@@ -38,7 +38,11 @@ public class CustomDeviceLiveData {
 	private Boolean ignition;
 	private String alarm;
 	private Double battery;
-	
+	private String driverName;
+	private String leftLetter;
+	private String middleLetter;
+	private String rightLetter;
+
 	
 	
 	public CustomDeviceLiveData(int id ,String deviceName , Date lastUpdate , String address , String attributes ,  Double latitude ,
@@ -88,6 +92,138 @@ public class CustomDeviceLiveData {
 				e.printStackTrace();
 			}  
  
+	    }
+		if(attributes != null) {
+			JSONObject jsonObject = new JSONObject(attributes);
+			if(jsonObject.has("power")) {
+				this.power =  jsonObject.getDouble("power");
+			}else {
+				this.power =0.0;
+			}
+			if(jsonObject.has("alarm")) {
+				this.alarm = jsonObject.getString("alarm");
+				if(alarm.equals("crash")) {
+					this.crash = "Yes";
+					this.batteryUnpluged = "No";
+					this.PowerUnpluged = "No";
+				}
+				else if(alarm.equals("batteryUnpluged")) {
+					this.batteryUnpluged = "Yes";
+					this.crash = "No";
+					this.PowerUnpluged = "No";
+				}else if(alarm.equals("PowerUnpluged")) {
+					this.batteryUnpluged = "No";
+					this.crash = "No";
+					this.PowerUnpluged = "Yes";
+				}else {
+					this.batteryUnpluged = "No";
+					this.crash = "No";
+					this.PowerUnpluged = "No";
+				}
+				
+			}
+			
+			if(jsonObject.has("weight")) {
+				this.weight = jsonObject.getDouble("weight");
+			}else
+			{
+				this.weight =0.0;
+			}
+			if(jsonObject.has("todayHoursString")) {
+				this.deviceWorkingHoursPerDay = jsonObject.getDouble("todayHoursString");
+				this.driverWorkingHoursPerDay = jsonObject.getDouble("todayHoursString");
+			}else
+			{
+				this.deviceWorkingHoursPerDay = 0.0;
+				this.driverWorkingHoursPerDay = 0.0;
+			}
+			if(jsonObject.has("hours")){
+				DecimalFormat df = new DecimalFormat("###.###");
+				String minutes = df.format((jsonObject.getDouble("hours")/ (1000*60))% 60);
+				String hour = df.format(jsonObject.getDouble("hours")/ (1000*60*60));
+				this.hours = hour+" h "+minutes+" m ";
+			}
+			if(jsonObject.has("battery")) {
+				this.battery = jsonObject.getDouble("battery");
+			}
+			if(jsonObject.has("motion")) {
+				this.motion = jsonObject.getBoolean("motion");
+			}
+			if(jsonObject.has("totalDistance")) {
+				DecimalFormat df = new DecimalFormat("######.##");
+				this.totalDistance = df.format((jsonObject.getDouble("totalDistance")/1000));
+			}
+			if(jsonObject.has("ignition")) {
+				this.ignition = jsonObject.getBoolean("ignition");
+			}
+			if(jsonObject.has("adc1")) {
+				this.sensor1 = jsonObject.getDouble("adc1");
+			}
+			if(jsonObject.has("adc2")) {
+				this.sensor2 = jsonObject.getDouble("adc2");
+			}
+			
+		}else {
+			this.weight =0.0;
+			this.deviceWorkingHoursPerDay = 0.0;
+			this.driverWorkingHoursPerDay = 0.0;
+			
+		}
+
+		
+		
+		
+	}
+	public CustomDeviceLiveData(int id ,String deviceName , Date lastUpdate , String address , String attributes ,  Double latitude ,
+			  Double longitude ,Float speed ,Integer positionId, String leftLetter,String middleLetter,String rightLetter,String driverName ) {
+		this.id = id ;
+		this.deviceName = deviceName ;
+		this.lastUpdate = lastUpdate;
+		this.address = address;
+		this.attributes = attributes;
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.speed = speed;
+		this.positionId = positionId;
+		this.leftLetter= leftLetter;
+		this.rightLetter= rightLetter;
+		this.middleLetter= middleLetter;
+		this.driverName= driverName;
+	    if(this.lastUpdate != null) {
+	    	SimpleDateFormat FORMATTER = new SimpleDateFormat("yyyy-MM-dd  HH:MM:ss");
+	    	TimeZone etTimeZone = TimeZone.getTimeZone("Asia/Riyadh"); //Target timezone
+	         
+	        Date currentDate = new Date();
+	        String deviceLastUpdate = FORMATTER.format(lastUpdate);
+	       
+	        System.out.println(FORMATTER.format(currentDate));  //Date in current timezone
+	         
+	        FORMATTER.setTimeZone(etTimeZone);
+	         String now = FORMATTER.format(currentDate);
+	         System.out.println(now);
+	        try {
+				Date date1=new SimpleDateFormat("yyyy-MM-dd  HH:MM:ss").parse(now);
+				Date date2=new SimpleDateFormat("yyyy-MM-dd  HH:MM:ss").parse(deviceLastUpdate);
+				long diff = date1.getTime() - date2.getTime();
+				long diffMinutes = diff / (60 * 1000);  
+				 
+              if(diffMinutes <=3 && diffMinutes >=0)
+              {
+                 this.status="online";
+              }
+              else if(diffMinutes >3 && diffMinutes <8)
+              {
+                 this.status="out of network";
+              }
+              else
+              {
+              	this.status="offline";
+              }
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}  
+
 	    }
 		if(attributes != null) {
 			JSONObject jsonObject = new JSONObject(attributes);
@@ -417,6 +553,30 @@ public class CustomDeviceLiveData {
 
 	public void setBattery(Double battery) {
 		this.battery = battery;
+	}
+	public String getDriverName() {
+		return driverName;
+	}
+	public void setDriverName(String driverName) {
+		this.driverName = driverName;
+	}
+	public String getLeftLetter() {
+		return leftLetter;
+	}
+	public void setLeftLetter(String leftLetter) {
+		this.leftLetter = leftLetter;
+	}
+	public String getMiddleLetter() {
+		return middleLetter;
+	}
+	public void setMiddleLetter(String middleLetter) {
+		this.middleLetter = middleLetter;
+	}
+	public String getRightLetter() {
+		return rightLetter;
+	}
+	public void setRightLetter(String rightLetter) {
+		this.rightLetter = rightLetter;
 	}
 	
 	

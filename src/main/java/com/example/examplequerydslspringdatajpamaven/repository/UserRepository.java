@@ -33,6 +33,7 @@ public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredi
 			+ "tc_users.identity_num LIKE %:search%) limit :offset,10", nativeQuery = true)
 	public List<User> getUsersOfUser(@Param("userId") Long userId,@Param("offset")int offset,@Param("search")String search); 
 	
+
 	@Query(value = "SELECT tc_users.* FROM tc_user_user inner join tc_users on tc_user_user.manageduserid=tc_users.id where tc_user_user.userid = :userId and delete_date is not  null AND  "
 			+ "(tc_users.name LIKE %:search% OR "
 			+ "tc_users.email LIKE %:search% OR tc_users.commercial_num LIKE %:search% OR "
@@ -41,6 +42,14 @@ public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredi
 	
 	@Query(value = "SELECT tc_users.* FROM tc_user_user inner join tc_users on tc_user_user.manageduserid=tc_users.id where tc_user_user.userid = :userId and delete_date is null ", nativeQuery = true)
 	public List<User> getChildrenOfUser(@Param("userId") Long userId);
+
+	@Query(value = "SELECT count(*) FROM tc_user_user "
+			+ " inner join tc_users on tc_user_user.manageduserid=tc_users.id "
+			+ "where tc_user_user.userid = :userId and delete_date is null", nativeQuery = true)
+	public Integer getUsersOfUserSize(@Param("userId") Long userId);
+	
+	
+
 	
 	@Query(value = "SELECT * from tc_users where delete_date is null and (email = :email or "
 			+ "identity_num = :identityNum or commercial_num = :commercialNum or "

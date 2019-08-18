@@ -77,5 +77,13 @@ public class GeofenceRestController {
 		return geofenceServiceImpl.editGeofence(TOKEN,geofence,id);
 
 	}	
+	@RequestMapping(value = "/getAllGeo", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getAllGeo(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                         @RequestParam (value = "userId", defaultValue = "0") Long id) {
+		
+		
+		return geofenceServiceImpl.getAllGeo(TOKEN,id);
+
+	}	
 
 }

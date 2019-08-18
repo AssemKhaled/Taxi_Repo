@@ -102,7 +102,8 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			 }
 		 }
 		 List<CustomDeviceList> devices= deviceRepository.getDevicesList(userId,offset,search);
-		 getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
+		 Integer size=  deviceRepository.getDevicesListSize(userId);
+		 getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",devices,size);
 		 logger.info("************************ getAllUserDevices ENDED ***************************");
 		return  ResponseEntity.ok().body(getObjectResponse);
 	}
@@ -137,7 +138,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			return ResponseEntity.status(404).body(getObjectResponse);
 		}
 		
-		if(device.getId() != null || device.getName()== null ||device.getName() == ""
+		if((device.getId() != null && device.getId() != 0) || device.getName()== null ||device.getName() == ""
 				|| device.getUniqueId()== null || device.getUniqueId() == null
 				|| device.getSequenceNumber() == null || device.getSequenceNumber()==""
 				|| device.getPlateNum() == null || device.getPlateNum() == ""
@@ -916,13 +917,48 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				return ResponseEntity.status(404).body(getObjectResponse);
 	    }
 	    List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getAllDevicesLiveData(userId, offset, search);
-	    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevicesLiveData);
+	    Integer size=deviceRepository.getAllDevicesLiveDataSize(userId);
+	    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevicesLiveData,size);
 		
 		logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
 		return ResponseEntity.ok().body(getObjectResponse);
 	}
 
 	
+	@Override
+	public ResponseEntity<?> getAllDeviceLiveDataMap(String TOKEN,Long userId) {
+		// TODO Auto-generated method stub
+		if(TOKEN.equals("")) {
+			 List<Device> devices = null;
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(userId==0) {
+			 List<CustomDeviceLiveData> allDevicesLiveData=	null;
+		    getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is required",allDevicesLiveData);
+			
+			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+	    User loggedUser = userService.findById(userId);
+	    if( loggedUser == null) {
+	    	 List<CustomDeviceLiveData> allDevicesLiveData=	null;
+			    getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Logged user is not found ",allDevicesLiveData);
+				
+				logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+				return ResponseEntity.status(404).body(getObjectResponse);
+	    }
+	    List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getAllDevicesLiveDataMap(userId);
+	    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevicesLiveData);
+		
+		logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+		return ResponseEntity.ok().body(getObjectResponse);
+	}
 		
 		
 
@@ -944,7 +980,132 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			if(device != null) {
 				if(device.getDeleteDate()==null) {
 					vehicleInfo = deviceRepository.vehicleInfo(deviceId);
-				    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",vehicleInfo);
+					List<Map> data = new ArrayList<>();
+					if(vehicleInfo.size()>0) {
+//						HashMap<Object, Object> map1 = new HashMap<Object, Object>();			   
+//					    map1.put("key", "id");
+//					    map1.put("value", vehicleInfo.get(0).getId());			
+//						data.add(map1);
+//						
+//						HashMap<Object, Object> map2 = new HashMap<Object, Object>();			   
+//					    map2.put("key", "deviceName");
+//					    map2.put("value", vehicleInfo.get(0).getDeviceName());			
+//						data.add(map2);
+						
+						HashMap<Object, Object> map3 = new HashMap<Object, Object>();			   
+					    map3.put("key", "uniqueId");
+					    map3.put("value", vehicleInfo.get(0).getUniqueId());			
+						data.add(map3);
+						
+						HashMap<Object, Object> map4 = new HashMap<Object, Object>();			   
+					    map4.put("key", "sequenceNumber");
+					    map4.put("value", vehicleInfo.get(0).getSequenceNumber());			
+						data.add(map4);
+
+//						HashMap<Object, Object> map5 = new HashMap<Object, Object>();			   
+//					    map5.put("key", "lastUpdate");
+//					    map5.put("value", vehicleInfo.get(0).getLastUpdate());			
+//						data.add(map5);
+//						
+//						HashMap<Object, Object> map6 = new HashMap<Object, Object>();			   
+//					    map6.put("key", "referenceKey");
+//					    map6.put("value", vehicleInfo.get(0).getReferenceKey());			
+//						data.add(map6);
+			          
+						HashMap<Object, Object> map7 = new HashMap<Object, Object>();			   
+					    map7.put("key", "driverName");
+					    map7.put("value", vehicleInfo.get(0).getDriverName());			
+						data.add(map7);
+//						
+//						HashMap<Object, Object> map8 = new HashMap<Object, Object>();			   
+//					    map8.put("key", "geofenceName");
+//					    map8.put("value", vehicleInfo.get(0).getGeofenceName());			
+//						data.add(map8);
+//						
+//						HashMap<Object, Object> map9 = new HashMap<Object, Object>();			   
+//					    map9.put("key", "driverId");
+//					    map9.put("value", vehicleInfo.get(0).getDriverId());			
+//						data.add(map9);
+
+						HashMap<Object, Object> map10 = new HashMap<Object, Object>();			   
+						map10.put("key", "driverPhoto");
+					    map10.put("value", vehicleInfo.get(0).getDriverPhoto());			
+						data.add(map10);
+
+						HashMap<Object, Object> map11 = new HashMap<Object, Object>();			   
+						map11.put("key", "plateType");
+						map11.put("value", vehicleInfo.get(0).getPlateType());			
+						data.add(map11);
+						
+						HashMap<Object, Object> map12 = new HashMap<Object, Object>();			   
+						map12.put("key", "plateNum");
+						map12.put("value", vehicleInfo.get(0).getPlateNum());			
+						data.add(map12);
+						
+						HashMap<Object, Object> map13 = new HashMap<Object, Object>();			   
+						map13.put("key", "rightLetter");
+						map13.put("value", vehicleInfo.get(0).getRightLetter());			
+						data.add(map13);
+						
+						HashMap<Object, Object> map14 = new HashMap<Object, Object>();			   
+						map14.put("key", "middleLetter");
+						map14.put("value", vehicleInfo.get(0).getMiddleLetter());			
+						data.add(map14);
+						
+						HashMap<Object, Object> map15 = new HashMap<Object, Object>();			   
+						map15.put("key", "leftLetter");
+						map15.put("value", vehicleInfo.get(0).getLeftLetter());			
+						data.add(map15);
+
+						HashMap<Object, Object> map16 = new HashMap<Object, Object>();			   
+						map16.put("key", "ownerName");
+						map16.put("value", vehicleInfo.get(0).getOwnerName());			
+						data.add(map16);
+//
+//						HashMap<Object, Object> map17 = new HashMap<Object, Object>();			   
+//						map17.put("key", "ownerId");
+//						map17.put("value", vehicleInfo.get(0).getOwnerId());			
+//						data.add(map17);
+
+						HashMap<Object, Object> map18 = new HashMap<Object, Object>();			   
+						map18.put("key", "userName");
+						map18.put("value", vehicleInfo.get(0).getUserName());			
+						data.add(map18);
+						
+						HashMap<Object, Object> map19 = new HashMap<Object, Object>();			   
+						map19.put("key", "brand");
+						map19.put("value", vehicleInfo.get(0).getBrand());			
+						data.add(map19);
+						
+						HashMap<Object, Object> map20 = new HashMap<Object, Object>();			   
+						map20.put("key", "model");
+						map20.put("value", vehicleInfo.get(0).getModel());			
+						data.add(map20);
+						
+						HashMap<Object, Object> map21 = new HashMap<Object, Object>();			   
+						map21.put("key", "madeYear");
+						map21.put("value", vehicleInfo.get(0).getMadeYear());			
+						data.add(map21);
+						
+						HashMap<Object, Object> map22 = new HashMap<Object, Object>();			   
+						map22.put("key", "color");
+						map22.put("value", vehicleInfo.get(0).getColor());			
+						data.add(map22);
+						
+						HashMap<Object, Object> map23 = new HashMap<Object, Object>();			   
+						map23.put("key", "licenceExptDate");
+						map23.put("value", vehicleInfo.get(0).getLicenceExptDate());			
+						data.add(map23);
+						
+						HashMap<Object, Object> map24 = new HashMap<Object, Object>();			   
+						map24.put("key", "carWeight");
+						map24.put("value", vehicleInfo.get(0).getCarWeight());			
+						data.add(map24);
+
+							
+						    
+					}
+				    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",data);
 					logger.info("************************ vehicleInfo ENDED ***************************");
 					return ResponseEntity.ok().body(getObjectResponse);
 
@@ -1003,6 +1164,210 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					return ResponseEntity.status(404).body(getObjectResponse);
 			 }
 			List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getDeviceLiveData(deviceId);
+			List<Map> data = new ArrayList<>();
+			if(allDevicesLiveData.size()>0) {
+				
+//			    HashMap<Object, Object> map1 = new HashMap<Object, Object>();			   
+//			    map1.put("key", "id");
+//			    map1.put("value", allDevicesLiveData.get(0).getId());			
+//				data.add(map1);
+//				
+//			    HashMap<Object, Object> map2 = new HashMap<Object, Object>();			   
+//				map2.put("key", "deviceName");
+//			    map2.put("value", allDevicesLiveData.get(0).getDeviceName());			
+//				data.add(map2);
+				
+			    HashMap<Object, Object> map3 = new HashMap<Object, Object>();			   
+				map3.put("key", "lastUpdate");
+			    map3.put("value", allDevicesLiveData.get(0).getLastUpdate());			
+				data.add(map3);
+				
+			    HashMap<Object, Object> map4 = new HashMap<Object, Object>();			   
+				map4.put("key", "weight");
+			    map4.put("value", allDevicesLiveData.get(0).getWeight());			
+				data.add(map4);
+				
+			    HashMap<Object, Object> map5 = new HashMap<Object, Object>();			   
+				map5.put("key", "latitude");
+			    map5.put("value", allDevicesLiveData.get(0).getLatitude());			
+				data.add(map5);
+				
+			    HashMap<Object, Object> map6 = new HashMap<Object, Object>();			   
+				map6.put("key", "longitude");
+			    map6.put("value", allDevicesLiveData.get(0).getLongitude());			
+				data.add(map6);
+				
+//			    HashMap<Object, Object> map7 = new HashMap<Object, Object>();			   
+//				map7.put("key", "address");
+//			    map7.put("value", allDevicesLiveData.get(0).getAddress());			
+//				data.add(map7);
+				
+//			    HashMap<Object, Object> map8 = new HashMap<Object, Object>();			   
+//				map8.put("key", "attributes");
+//			    map8.put("value", allDevicesLiveData.get(0).getAttributes());			
+//				data.add(map8);
+
+			    HashMap<Object, Object> map9 = new HashMap<Object, Object>();			   
+				map9.put("key", "crash");
+			    map9.put("value", allDevicesLiveData.get(0).getCrash());			
+				data.add(map9);
+				
+			    HashMap<Object, Object> map10 = new HashMap<Object, Object>();			   
+				map10.put("key", "batteryUnpluged");
+			    map10.put("value", allDevicesLiveData.get(0).getBatteryUnpluged());			
+				data.add(map10);
+				
+			    HashMap<Object, Object> map11 = new HashMap<Object, Object>();			   
+				map11.put("key", "todayHoursString");
+			    map11.put("value", allDevicesLiveData.get(0).getAddress());			
+				data.add(map11);
+				
+			    HashMap<Object, Object> map12 = new HashMap<Object, Object>();			   
+				map12.put("key", "deviceWorkingHoursPerDay");
+			    map12.put("value", allDevicesLiveData.get(0).getDeviceWorkingHoursPerDay());			
+				data.add(map12);
+				
+			    HashMap<Object, Object> map13 = new HashMap<Object, Object>();			   
+				map13.put("key", "driverWorkingHoursPerDay");
+			    map13.put("value", allDevicesLiveData.get(0).getDriverWorkingHoursPerDay());			
+				data.add(map13);
+				
+			    HashMap<Object, Object> map14 = new HashMap<Object, Object>();			   
+				map14.put("key", "power");
+			    map14.put("value", allDevicesLiveData.get(0).getPower());			
+				data.add(map14);
+//				
+//			    HashMap<Object, Object> map15 = new HashMap<Object, Object>();			   
+//				map15.put("key", "photo");
+//			    map15.put("value", allDevicesLiveData.get(0).getPhoto());			
+//				data.add(map15);
+//				
+			    HashMap<Object, Object> map16 = new HashMap<Object, Object>();			   
+				map16.put("key", "speed");
+			    map16.put("value", allDevicesLiveData.get(0).getSpeed());			
+				data.add(map16);
+				
+			    HashMap<Object, Object> map17 = new HashMap<Object, Object>();			   
+				map17.put("key", "status");
+			    map17.put("value", allDevicesLiveData.get(0).getStatus());			
+				data.add(map17);
+				
+//			    HashMap<Object, Object> map18 = new HashMap<Object, Object>();			   
+//			    map18.put("key", "positionId");
+//				map18.put("value", allDevicesLiveData.get(0).getPositionId());			
+//				data.add(map18);
+//				
+//			    HashMap<Object, Object> map19 = new HashMap<Object, Object>();			   
+//			    map19.put("key", "jsonAttributes");
+//				map19.put("value", allDevicesLiveData.get(0).getJsonAttributes());			
+//				data.add(map19);
+//				
+			    HashMap<Object, Object> map20 = new HashMap<Object, Object>();			   
+			    map20.put("key", "sensor1");
+				map20.put("value", allDevicesLiveData.get(0).getSensor1());			
+				data.add(map20);
+				
+			    HashMap<Object, Object> map21 = new HashMap<Object, Object>();			   
+			    map21.put("key", "sensor2");
+			    map21.put("value", allDevicesLiveData.get(0).getSensor2());			
+				data.add(map21);
+			    
+			    HashMap<Object, Object> map22 = new HashMap<Object, Object>();			   
+			    map22.put("key", "hours");
+				map22.put("value", allDevicesLiveData.get(0).getHours());			
+				data.add(map22);
+				
+			    HashMap<Object, Object> map23 = new HashMap<Object, Object>();			   
+			    map23.put("key", "motion");
+				map23.put("value", allDevicesLiveData.get(0).getMotion());			
+				data.add(map23);
+				
+			    HashMap<Object, Object> map24 = new HashMap<Object, Object>();			   
+			    map24.put("key", "totalDistance");
+				map24.put("value", allDevicesLiveData.get(0).getTotalDistance());			
+				data.add(map24);
+				
+			    HashMap<Object, Object> map25 = new HashMap<Object, Object>();			   
+			    map25.put("key", "ignition");
+			    map25.put("value", allDevicesLiveData.get(0).getIgnition());			
+				data.add(map25);
+				
+			    HashMap<Object, Object> map26 = new HashMap<Object, Object>();			   
+			    map26.put("key", "alarm");
+				map26.put("value", allDevicesLiveData.get(0).getAlarm());			
+				data.add(map26);
+				
+			    HashMap<Object, Object> map27 = new HashMap<Object, Object>();			   
+			    map27.put("key", "battery");
+				map27.put("value", allDevicesLiveData.get(0).getBattery());			
+				data.add(map27);
+				
+//			    HashMap<Object, Object> map28 = new HashMap<Object, Object>();			   
+//			    map28.put("key", "driverName");
+//				map28.put("value", allDevicesLiveData.get(0).getDriverName());			
+//				data.add(map28);
+//				
+//			    HashMap<Object, Object> map29 = new HashMap<Object, Object>();			   
+//			    map29.put("key", "leftLetter");
+//				map29.put("value", allDevicesLiveData.get(0).getLeftLetter());			
+//				data.add(map29);
+//				
+//			    HashMap<Object, Object> map30 = new HashMap<Object, Object>();			   
+//			    map30.put("key", "middleLetter");
+//				map30.put("value", allDevicesLiveData.get(0).getMiddleLetter());			
+//				data.add(map30);
+//				
+//			    HashMap<Object, Object> map31 = new HashMap<Object, Object>();			   
+//			    map31.put("key", "rightLetter");
+//				map31.put("value", allDevicesLiveData.get(0).getRightLetter());			
+//				data.add(map31);
+//				
+			    HashMap<Object, Object> map32 = new HashMap<Object, Object>();			   
+			    map32.put("key", "powerUnpluged");
+			    map32.put("value", allDevicesLiveData.get(0).getPowerUnpluged());			
+				data.add(map32);
+	            
+			}
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",data);
+			
+			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+	
+		}
+	
+	}
+	
+	@Override
+	public ResponseEntity<?> getDeviceLiveDataMap(String TOKEN,Long deviceId) {
+		// TODO Auto-generated method stub
+		if(TOKEN.equals("")) {
+			 List<Device> devices = null;
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(deviceId == 0) {
+			 List<CustomDeviceLiveData> allDevicesLiveData=	null;
+			    getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is required",allDevicesLiveData);
+				
+				logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+				return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		else {
+			 Device device = findById(deviceId);
+			 if(device == null) {
+				 List<CustomDeviceLiveData> allDevicesLiveData=	null;
+				    getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",allDevicesLiveData);
+					
+					logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+					return ResponseEntity.status(404).body(getObjectResponse);
+			 }
+			List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getDeviceLiveData(deviceId);		
 			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevicesLiveData);
 			
 			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");

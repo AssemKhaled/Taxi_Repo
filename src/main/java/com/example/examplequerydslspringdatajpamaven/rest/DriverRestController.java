@@ -93,6 +93,16 @@ public class DriverRestController {
 		
 		return driverServiceImpl.getUnassignedDrivers(TOKEN,userId);
 	}
+	
+	@RequestMapping(value = "/getDriverSelect", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getDeviceSelect(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                               @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		
+	
+    	return  driverServiceImpl.getDriverSelect(TOKEN,userId);
+
+		
+	}
 
 	
 	

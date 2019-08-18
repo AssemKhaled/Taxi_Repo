@@ -6,6 +6,17 @@ public interface ReportService {
 	
 	public ResponseEntity<?> getEventsReport(String TOKEN,Long deviceId,int offset,String start,String end,String search);
 
+	public ResponseEntity<?> getDeviceWorkingHours(String TOKEN,Long deviceId,int offset,String start,String end,String search);
+	
+	public ResponseEntity<?> getDeviceWorkingHoursExport(String TOKEN,Long deviceId,String start,String end);
+
+    public ResponseEntity<?> getDriverWorkingHours(String TOKEN,Long driverId,int offset,String start,String end,String search);
+	
+	public ResponseEntity<?> getDriverWorkingHoursExport(String TOKEN,Long driverId,String start,String end);
+
+	public ResponseEntity<?> getEventsReportToExcel(String TOKEN,Long deviceId,String start,String end);
+
+	
 	public ResponseEntity<?> getStopsReport(String TOKEN,Long deviceId,String type,String from,String to,int page,int start,int limit);
 
 	public ResponseEntity<?> getTripsReport(String TOKEN,Long deviceId,String type,String from,String to,int page,int start,int limit);

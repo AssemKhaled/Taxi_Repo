@@ -49,9 +49,16 @@ public class DashBoardRestController {
 	public ResponseEntity<?> getAllDevicesLastInfo(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 			                                       @RequestParam (value = "userId", defaultValue = "0") Long userId,
 												   @RequestParam (value = "offset", defaultValue = "0")int offset,
-												   @RequestParam (value = "search", defaultValue = "0") String search ){
+												   @RequestParam (value = "search", defaultValue = "") String search ){
 		
 		return deviceService.getAllDeviceLiveData(TOKEN,userId, offset, search);
+	}
+	
+	@GetMapping(path = "/getAllDevicesLastInfoMap")
+	public ResponseEntity<?> getAllDevicesLastInfo(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                       @RequestParam (value = "userId", defaultValue = "0") Long userId
+			                                       ){		
+		return deviceService.getAllDeviceLiveDataMap(TOKEN,userId);
 	}
 
 	@GetMapping(path = "/getDevicesLiveData")
@@ -59,6 +66,13 @@ public class DashBoardRestController {
 			                                    @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId){
 		
 		return deviceService.getDeviceLiveData(TOKEN,deviceId);
+	}
+	
+	@GetMapping(path = "/getDevicesLiveDataMap")
+	public ResponseEntity<?> getDevicesLiveDataMap(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                    @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId){
+		
+		return deviceService.getDeviceLiveDataMap(TOKEN,deviceId);
 	}
 	
 
