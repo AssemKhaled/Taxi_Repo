@@ -84,12 +84,11 @@ public class User {
 	@Column(name = "roleId")
 	private Long roleId;
 	
-	@Column(name = "accountType")
+	@Column(name = "accountType",columnDefinition = "int default 0")
 	private Integer accountType;
 	
-	private Long clientId;
-	
-	private Long vendorId;
+	@Column(name = "parents")
+	private String parents;
 	
 	 @JsonIgnore
 	 @ManyToMany(
@@ -329,18 +328,13 @@ public class User {
 	public void setAccountType(Integer accountType) {
 		this.accountType = accountType;
 	}
-	public Long getClientId() {
-		return clientId;
+	public String getParents() {
+		return parents;
 	}
-	public void setClientId(Long clientId) {
-		this.clientId = clientId;
+	public void setParents(String parents) {
+		this.parents = parents;
 	}
-	public Long getVendorId() {
-		return vendorId;
-	}
-	public void setVendorId(Long vendorId) {
-		this.vendorId = vendorId;
-	}
+	
 	
 
 

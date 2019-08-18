@@ -47,7 +47,11 @@ public interface DeviceService {
 
 	public ResponseEntity<?> vehicleInfo(String TOKEN,Long deviceId);
 	
+
+	public ResponseEntity<?> assignDeviceToUser(Long userId,Long deviceId , Long toUserId);
+
 	public ResponseEntity<?> getAllDeviceLiveDataMap(String TOKEN,Long userId);
+
 
 
 }

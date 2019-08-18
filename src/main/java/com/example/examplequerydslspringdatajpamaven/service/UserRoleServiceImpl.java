@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.CDL;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,9 +37,17 @@ public class UserRoleServiceImpl implements UserRoleService {
 	
 	GetObjectResponse getObjectResponse;
 	@Override
-	public ResponseEntity<?> createRole(UserRole role) {
+	public ResponseEntity<?> createRole(UserRole role,Long userId) {
 		// TODO Auto-generated method stub
-		
+		 if(userId == 0) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "loggedUser Id is required",null);
+			 return  ResponseEntity.badRequest().body(getObjectResponse); 
+		 }
+		 User loggedUser = userService.findById(userId);
+		 if(loggedUser == null) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged User is not found ",null);
+			 return  ResponseEntity.status(404).body(getObjectResponse); 
+		 }
 		if(role.getId()!=null || role.getName() == null || role. getName() == ""
 				||role.getPermissions() == null || role.getPermissions() == "") {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Only name and permissions are required to add Role ",null);
@@ -48,6 +58,7 @@ public class UserRoleServiceImpl implements UserRoleService {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this role name was added before you can edit or delte it only",null);
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
+		role.setUserId(userId);
 		userRoleRepository.save(role);
 		
 		 getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "role added successfully",null);
@@ -175,33 +186,33 @@ public class UserRoleServiceImpl implements UserRoleService {
 		return ResponseEntity.ok().body(getObjectResponse);
 	}
 	
-	@Override
-	public ResponseEntity<?> getRolePageContent(Long userId) {
-		// TODO Auto-generated method stub
-		if(userId == 0) {
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "  userId is required",null);
-			 return  ResponseEntity.badRequest().body(getObjectResponse);
-		}
-		User user = userService.findById(userId);
-		if(user == null) {
-			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this user not found ",null);
-			 return  ResponseEntity.status(404).body(getObjectResponse);
-		}
-		List<Permission> permissions = permissionService.getPermissionsList();
-		if(permissions.isEmpty()) {
-			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "no permissions to add ",null);
-			 return  ResponseEntity.status(404).body(getObjectResponse);
-		}
-		List<UserRole> role = userRoleRepository.getUserRole(userId);
-		Map content = new HashMap();
-		content.put("permissions", permissions);
-		content.put("role" ,role);
-		List<Map> pageContent = new ArrayList<>();
-		pageContent.add(content);
-		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",pageContent);
-		
-		return ResponseEntity.ok().body(getObjectResponse);
-	}
+//	@Override
+//	public ResponseEntity<?> getRolePageContent(Long userId) {
+//		// TODO Auto-generated method stub
+//		if(userId == 0) {
+//			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "  userId is required",null);
+//			 return  ResponseEntity.badRequest().body(getObjectResponse);
+//		}
+//		User user = userService.findById(userId);
+//		if(user == null) {
+//			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this user not found ",null);
+//			 return  ResponseEntity.status(404).body(getObjectResponse);
+//		}
+//		List<Permission> permissions = permissionService.getPermissionsList();
+//		if(permissions.isEmpty()) {
+//			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "no permissions to add ",null);
+//			 return  ResponseEntity.status(404).body(getObjectResponse);
+//		}
+//		List<UserRole> role = userRoleRepository.getUserRole(userId);
+//		Map content = new HashMap();
+//		content.put("permissions", permissions);
+//		content.put("role" ,role);
+//		List<Map> pageContent = new ArrayList<>();
+//		pageContent.add(content);
+//		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",pageContent);
+//		
+//		return ResponseEntity.ok().body(getObjectResponse);
+//	}
 	@Override
 	public Boolean checkUserHasPermission(Long userId, String module, String functionality) {
 		
@@ -221,7 +232,7 @@ public class UserRoleServiceImpl implements UserRoleService {
 		 
 		 if(permissions.has(module)) {
 			
-			 JSONObject serviceFunctionalities = permissions.getJSONObject("device"); 
+			 JSONObject serviceFunctionalities = permissions.getJSONObject(module); 
 			
 			 if(serviceFunctionalities.has(functionality)) {
 				 
@@ -241,6 +252,59 @@ public class UserRoleServiceImpl implements UserRoleService {
 		 }
 		
 	}
+@Override
+public ResponseEntity<?> getRolePageContent(Long userId) {
+	// TODO Auto-generated method stub
+	if(userId == 0) {
+		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "  userId is required",null);
+		 return  ResponseEntity.badRequest().body(getObjectResponse);
+	}else {
+		User loggedUser = userService.findById(userId);
+		if(loggedUser == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this user not found ",null);
+			 return  ResponseEntity.status(404).body(getObjectResponse);	
+		}else {
+			if(loggedUser.getAccountType() == 1) {
+				//getAllPermissions
+				List<Permission> permissions = permissionService.getPermissionsList();
+				if(permissions.isEmpty()) {
+					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "no permissions to add",null);
+					 return  ResponseEntity.status(404).body(getObjectResponse);
+				}else {
+					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",permissions);
+					 return  ResponseEntity.ok().body(getObjectResponse);
+				}
+			}else {
+				UserRole userRole = findById(loggedUser.getRoleId());
+				if(userRole == null) { 
+					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user not has role to createnew one",null);
+					 return  ResponseEntity.badRequest().body(getObjectResponse);
+				}else {
+					
+					JSONObject myjson = new JSONObject(userRole.getPermissions());
+					
+					JSONArray the_json_array = myjson.getJSONArray("permissions");
+					System.out.println("myJson"+the_json_array);
+					List<Permission> list = new ArrayList<Permission>();
+					
+					for(Object object : the_json_array) {	
+						JSONObject permissionObject = new JSONObject(object.toString());
+						Permission permission = new Permission();
+						permission.setId((long) permissionObject.getInt("id"));
+						permission.setName(permissionObject.getString("name"));
+						permission.setFunctionality(permissionObject.getJSONObject("functionality").toString());
+						list.add(permission);
+					}
+					getObjectResponse =  new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "sucecss",list);
+					 return  ResponseEntity.badRequest().body(getObjectResponse);
+					
+				}
+			}
+		}
+		
+	}
+}
 	
 	
 

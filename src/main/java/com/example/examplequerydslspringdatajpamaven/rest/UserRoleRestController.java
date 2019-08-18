@@ -23,9 +23,9 @@ public class UserRoleRestController {
 	UserRoleService userRoleService;
 	
 	@PostMapping("/createRole")
-	public ResponseEntity<?> createRole(@RequestBody(required = false) UserRole role){
+	public ResponseEntity<?> createRole(@RequestParam (value = "userId",defaultValue = "0") Long userId,@RequestBody(required = false) UserRole role){
 		
-		return userRoleService.createRole(role);
+		return userRoleService.createRole(role,userId);
 	}
 	
 	@PostMapping("/editRole")

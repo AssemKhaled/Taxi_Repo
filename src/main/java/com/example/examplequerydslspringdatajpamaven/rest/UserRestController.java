@@ -49,14 +49,18 @@ public class UserRestController {
 	public ResponseEntity<?> usersList(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 									   @RequestParam (value = "userId", defaultValue = "0") Long userId,
 									   @RequestParam(value = "offset", defaultValue = "0") int offset,
-							           @RequestParam(value = "search", defaultValue = "") String search) {
-		return userService.usersOfUser(TOKEN,userId,offset,search);
+							           @RequestParam(value = "search", defaultValue = "") String search,
+							           @RequestParam(value = "active",defaultValue = "1") int active) {
+		return userService.usersOfUser(TOKEN,userId,offset,search,active);
 	}
 	
 	@GetMapping("/getUserById")
 	public ResponseEntity<?> getUserById(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                             @RequestParam (value = "userId", defaultValue = "0") Long userId) {
-		return userService.findUserById(TOKEN,userId);
+			                             @RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,
+			                             @RequestParam (value = "userId", defaultValue = "0") Long userId
+			                             
+			                             ) {
+		return userService.findUserById(TOKEN,userId,loggedUserId);
 	}
 
 	@PostMapping(path ="/createUser")
