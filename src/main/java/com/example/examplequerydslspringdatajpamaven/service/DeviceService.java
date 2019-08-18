@@ -44,6 +44,8 @@ public interface DeviceService {
 	public ResponseEntity<?> getDeviceLiveData(String TOKEN,Long deviceId);
 
 	public ResponseEntity<?> vehicleInfo(String TOKEN,Long deviceId);
+	
+	public ResponseEntity<?> assignDeviceToUser(Long userId,Long deviceId , Long toUserId);
 
 
 }

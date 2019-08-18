@@ -6,7 +6,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.UserRole;
 
 public interface UserRoleService {
 
-	public ResponseEntity<?>createRole(UserRole role);
+	public ResponseEntity<?>createRole(UserRole role,Long userId);
 	
 	public ResponseEntity<?>editRole(UserRole role);
 	

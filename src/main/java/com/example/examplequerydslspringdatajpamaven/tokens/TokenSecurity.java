@@ -61,6 +61,21 @@ public class TokenSecurity {
     	return false;
     }
     
+    public Boolean removeActiveUserById(Long userId) {
+    	List<Token>activeNow = getActiveUsers();
+    	
+    	int i = 0;
+    	for(Token user : activeNow) {
+    		 if(user.getUserId() == userId) {
+    			 activeNow.remove(i);
+     			
+     			return true;
+    		 }
+    		 i++;
+    	}
+    	return false;
+    }
+    
     public Boolean checkToken(String token) {
     	List<Token> activeNow = getActiveUsers();
     	

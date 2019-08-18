@@ -116,7 +116,7 @@ public class DeviceRestController {
 		return deviceService.getDeviceDriver(TOKEN,deviceId);
 	}
 	
-	@	GetMapping(value = "/getDeviceGeofences")
+	@GetMapping(value = "/getDeviceGeofences")
 	public @ResponseBody ResponseEntity<?> getDeviceGeofences(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 			                                                  @RequestParam (value = "deviceId",defaultValue = "0") Long deviceId) {
 		
@@ -133,6 +133,12 @@ public class DeviceRestController {
 
 		
 	}
-
+	
+	@GetMapping(value = "/assignDeviceToUser")
+	public ResponseEntity<?> assignDeviceToUser( @RequestParam (value = "userId", defaultValue = "0") Long userId,
+												 @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+												 @RequestParam (value = "toUserId", defaultValue = "0") Long toUserId){
+		return deviceService.assignDeviceToUser(userId,deviceId,toUserId);
+	}
 
 }

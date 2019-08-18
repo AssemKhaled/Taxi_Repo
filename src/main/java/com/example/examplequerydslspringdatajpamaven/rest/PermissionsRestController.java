@@ -34,10 +34,12 @@ public class PermissionsRestController {
 		return permissionService.editPermission(permission);
 			
 	}
+	
 	@GetMapping(path = "deletePermission")
 	public ResponseEntity<?> deletePermission( @RequestParam (value = "permissionId",defaultValue = "0") Long permissionId){
 		
 		return permissionService.deletePermission(permissionId);
 	}
+	
 	
 }

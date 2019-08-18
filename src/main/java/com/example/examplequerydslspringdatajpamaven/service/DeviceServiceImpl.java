@@ -78,11 +78,29 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			 logger.info("************************ getAllUserDevices ENDED ***************************");
 			return  ResponseEntity.status(404).body(getObjectResponse);
 		}
-		if(!userRoleService.checkUserHasPermission(userId, "device", "list")) {
-			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get devices list",null);
-			 logger.info("************************ getAllUserDevices ENDED ***************************");
-			return  ResponseEntity.badRequest().body(getObjectResponse);
-		}
+//		if(!userRoleService.checkUserHasPermission(userId, "device", "list")) {
+//			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get devices list",null);
+//			 logger.info("************************ getAllUserDevices ENDED ***************************");
+//			return  ResponseEntity.badRequest().body(getObjectResponse);
+//		}
+		 if(loggedUser.getAccountType() == 4) {
+			 Set<User> parentClients = loggedUser.getUsersOfUser();
+			 if(parentClients.isEmpty()) {
+				
+				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get devices of this user",null);
+				 logger.info("************************ getAllUserDevices ENDED ***************************");
+				return  ResponseEntity.status(404).body(getObjectResponse);
+			 }else {
+				 User parentClient = null ;
+				 for(User object : parentClients) {
+					 parentClient = object;
+				 }
+				 List<CustomDeviceList> devices= deviceRepository.getDevicesList(parentClient.getId(),offset,search);
+				 getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
+				 logger.info("************************ getAllUserDevices ENDED ***************************");
+				return  ResponseEntity.ok().body(getObjectResponse);
+			 }
+		 }
 		 List<CustomDeviceList> devices= deviceRepository.getDevicesList(userId,offset,search);
 		 getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
 		 logger.info("************************ getAllUserDevices ENDED ***************************");
@@ -198,17 +216,14 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			return super.checkActive(TOKEN);
 		}
 		if(userId == 0) {
-			List<Device> devices = null;
 			
-			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "User ID is Required",devices);
+			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "User ID is Required",null);
 			logger.info("************************ editDevice ENDED ***************************");
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		User loggedUser = userService.findById(userId);
 		if(loggedUser == null) {
-			List<Device> devices = null;
-			
-			getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "This user is not found",devices);
+			getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "This user is not found",null);
 			logger.info("************************ editDevice ENDED ***************************");
 			return ResponseEntity.status(404).body(getObjectResponse);
 		}
@@ -221,8 +236,8 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			|| device.getRightLetter() == null || device.getRightLetter() == ""
 			|| device.getMiddleLetter() == null || device.getMiddleLetter() == ""	) {
 			
-			List<Device> devices = null;
-			
+			List<Device> devices = new ArrayList<>();
+			devices.add(device);
 			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "atrributes [id ,name, trackerImei , sequence" + 
 					"					Number , plate num , leftLetter , middleLetter,RightLetter ] are required",devices);
 			logger.info("************************ editDevice ENDED ***************************");
@@ -236,6 +251,11 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "This device not found",devices);
 		    	logger.info("************************ createDevice ENDED ***************************");
 		    	return ResponseEntity.status(404).body(getObjectResponse);
+			}
+			if(!checkIfParent(oldDevice , loggedUser)) {
+				getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
+				logger.info("************************ editDevice ENDED ***************************");
+				return ResponseEntity.badRequest().body(getObjectResponse);
 			}
 			Set<User> userCreater=new HashSet<>();
 			userCreater = oldDevice.getUser();
@@ -367,6 +387,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		 }
 		 else
 		 {
+			 
 			 User creater= userService.findById(userId);
 			 if(creater == null) {
 				 List<Device> devices = null;
@@ -374,7 +395,11 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			     logger.info("************************ deleteDevice ENDED ***************************");
 			     return ResponseEntity.status(404).body(getObjectResponse);
 			 }
-			 	
+			 if(!checkIfParent(device , creater)) {
+					getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to delete this user ",null);
+					logger.info("************************ editDevice ENDED ***************************");
+					return ResponseEntity.badRequest().body(getObjectResponse);
+			 }
 			 Calendar cal = Calendar.getInstance();
 			 int day = cal.get(Calendar.DATE);
 		     int month = cal.get(Calendar.MONTH) + 1;
@@ -458,6 +483,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			}
 			else
 			{
+				
 				List<Device> devices = new ArrayList<>();
 				devices.add(device);
 				getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
@@ -497,6 +523,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				return ResponseEntity.status(404).body(getObjectResponse);
 			}
 			else {
+				
 				if(driverId == 0) {
 					Set<Driver> drivers=new HashSet<>() ;
 					drivers= device.getDriver();
@@ -984,7 +1011,145 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		}
 	
 	}
-   
+
+	@Override
+	public ResponseEntity<?> assignDeviceToUser(Long userId, Long deviceId, Long toUserId) {
+		// TODO Auto-generated method stub
+		if(userId == 0 || deviceId == 0 || toUserId == 0) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "userId , deviceId and toUserId  are required",null);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		else {
+			User loggedUser = userService.findById(userId);
+			if(loggedUser == null) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "loggedUser is not found",null);
+				
+				return ResponseEntity.status(404).body(getObjectResponse);
+			}else {
+				if(loggedUser.getAccountType() == 3 || loggedUser.getAccountType() == 4) {
+					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to assign device to any user",null);
+					
+					return ResponseEntity.status(404).body(getObjectResponse);
+				}
+				Device device = findById(deviceId);
+				if(device == null) {
+					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "device is not found",null);
+					
+					return ResponseEntity.status(404).body(getObjectResponse);
+				}else {
+					if(checkIfParent( device ,  loggedUser)) {
+					     User toUser = userService.findById(toUserId);
+					     if(toUser == null) {
+					    	 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "user you want to assign to  is not found",null);
+								
+								return ResponseEntity.status(404).body(getObjectResponse);
+					     }else {
+					    	  if(toUser.getAccountType()== 4) {
+					    		  getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to assign device to this user",null);
+									
+									return ResponseEntity.status(404).body(getObjectResponse);
+					    	  }
+					    	  else if(loggedUser.getAccountType() == toUser.getAccountType()) {
+					    		  if(loggedUser.getId() == toUser.getId()) {
+					    			  Set<User> deviceOldUser = device.getUser();
+						    			 Set<User> temp = deviceOldUser;
+						    			 deviceOldUser.removeAll(temp);
+						    			 device.setUser(deviceOldUser);
+						    		     deviceOldUser.add(toUser);
+						    		     device.setUser(deviceOldUser);
+						    		     deviceRepository.save(device);
+						    		     getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "device assigned successfully",null);
+											
+										return ResponseEntity.ok().body(getObjectResponse);
+					    		  }else {
+					    			  getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to assign device to this user",null);
+										
+										return ResponseEntity.status(404).body(getObjectResponse);
+					    		  }
+					    	  }
+					    	 List<User>toUserParents = userService.getAllParentsOfuser(toUser, toUser.getAccountType());
+					    	 if(toUserParents.isEmpty()) {
+					    		 
+					    		 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to assign device to this user",null);
+									
+									return ResponseEntity.status(404).body(getObjectResponse);
+					    	 }else {
+					    		
+					    		 boolean isParent = false;
+					    		 for(User object : toUserParents) {
+					    			 if(loggedUser.getId() ==  object.getId()) {
+					    				 isParent = true;
+					    				 break;
+					    			 }
+					    		 }
+					    		 if(isParent) {
+					    			 
+					    			// assign user to another user
+					    			 Set<User> deviceOldUser = device.getUser();
+					    			 Set<User> temp = deviceOldUser;
+					    			 deviceOldUser.removeAll(temp);
+					    			 device.setUser(deviceOldUser);
+					    		     deviceOldUser.add(toUser);
+					    		     device.setUser(deviceOldUser);
+					    		     deviceRepository.save(device);
+					    		     getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "device assigned successfully",null);
+										
+									return ResponseEntity.ok().body(getObjectResponse);
+					    		     
+					    		 }else {
+					    			 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to assign device to this user",null);
+										
+									 return ResponseEntity.status(404).body(getObjectResponse);
+					    		 }
+					    	 }
+					     }
+						
+						
+					}else {
+						getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "loggedUser is not allowed  to assign this device",null);
+						
+						return ResponseEntity.status(404).body(getObjectResponse);
+					}
+				}
+			}
+		}
+		
+	}
+	
+   public Boolean checkIfParent(Device device , User loggedUser) {
+	   Set<User> deviceParent = device.getUser();
+	   if(deviceParent.isEmpty()) {
+		  
+		   return false;
+	   }else {
+		   User parent = null;
+		   for (User object : deviceParent) {
+			   parent = object;
+		   }
+		   if(parent.getId() == loggedUser.getId()) {
+			   return true;
+		   }
+		   if(parent.getAccountType() == 1) {
+			   if(parent.getId() == loggedUser.getId()) {
+				   return true;
+			   }
+		   }else {
+			   List<User> parents = userService.getAllParentsOfuser(parent, parent.getAccountType());
+			   if(parents.isEmpty()) {
+				   
+				   return false;
+			   }else {
+				   for(User object :parents) {
+					   if(object.getId() == loggedUser.getId()) {
+						   return true;
+					   }
+				   }
+			   }
+		   }
+		  
+	   }
+	   return false;
+   }
 
 
 }
