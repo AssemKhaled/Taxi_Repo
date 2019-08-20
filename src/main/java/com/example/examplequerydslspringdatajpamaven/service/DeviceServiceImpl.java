@@ -78,6 +78,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			 logger.info("************************ getAllUserDevices ENDED ***************************");
 			return  ResponseEntity.status(404).body(getObjectResponse);
 		}
+
 		if(loggedUser.getAccountType()!= 1) {
 			if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "list")) {
 				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get devices list",null);
@@ -104,6 +105,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				return  ResponseEntity.ok().body(getObjectResponse);
 			 }
 		 }
+
 		 List<CustomDeviceList> devices= deviceRepository.getDevicesList(userId,offset,search);
 		 Integer size=  deviceRepository.getDevicesListSize(userId);
 		 getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",devices,size);
