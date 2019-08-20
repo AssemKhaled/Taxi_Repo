@@ -82,18 +82,20 @@ public class DeviceRestController {
 	
 	@GetMapping(path ="/getDevicebyId")
 	public ResponseEntity<?> getDevicebyId(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                               @RequestParam (value = "deviceId",defaultValue = "0") Long deviceId) {
+			                               @RequestParam (value = "deviceId",defaultValue = "0") Long deviceId,
+			                               @RequestParam(value = "userId",defaultValue = "0") Long userId) {
 
-			 return  deviceService.findDeviceById(TOKEN,deviceId);
+			 return  deviceService.findDeviceById(TOKEN,deviceId,userId);
 	}
 	
 	@GetMapping(path = "/assignDeviceToDriver")
 	public ResponseEntity<?> assignDeviceToDriver(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 												  @RequestParam (value = "driverId", defaultValue = "0") Long driverId,
-												  @RequestParam(value = "deviceId" ,defaultValue = "0") Long deviceId) {
+												  @RequestParam(value = "deviceId" ,defaultValue = "0") Long deviceId,
+												  @RequestParam(value = "userId" , defaultValue = "0")Long userId ) {
 		
 
-		return deviceService.assignDeviceToDriver(TOKEN,deviceId,driverId);	
+		return deviceService.assignDeviceToDriver(TOKEN,deviceId,driverId,userId);	
 		
 	}
 	

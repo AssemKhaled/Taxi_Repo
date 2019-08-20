@@ -27,6 +27,7 @@ import com.example.examplequerydslspringdatajpamaven.Validator.JWKValidator;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceList;
 import com.example.examplequerydslspringdatajpamaven.entity.Token;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
+import com.example.examplequerydslspringdatajpamaven.entity.UserRole;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
@@ -48,6 +49,9 @@ public class LoginServiceImpl extends RestServiceController implements LoginServ
 //	JWKValidator jwkValidator;
 	@Autowired
 	JWKValidator jwkValidator;
+	
+	@Autowired
+	UserRoleService userRoleService;
 	
 	GetObjectResponse getObjectResponse;
 	
@@ -80,6 +84,7 @@ public class LoginServiceImpl extends RestServiceController implements LoginServ
 				else {
 					
 					String loggedEmail= user.getEmail();
+					UserRole userRole = userRoleService.findById(user.getRoleId());
 					String token =  jwkValidator.createJWT(loggedEmail, null);
 					Map userInfo = new HashMap();
 					userInfo.put("userId", user.getId());
@@ -87,6 +92,7 @@ public class LoginServiceImpl extends RestServiceController implements LoginServ
 					userInfo.put("email", user.getEmail());
 					userInfo.put("photo", user.getPhoto());
 					userInfo.put("token",token);
+					userInfo.put("userRole", userRole);
 					List<Map> loggedUser = new ArrayList<>();
 					loggedUser.add(userInfo);
 					SimpleDateFormat FORMATTER = new SimpleDateFormat("yyyy-MM-dd  HH:MM:ss");
