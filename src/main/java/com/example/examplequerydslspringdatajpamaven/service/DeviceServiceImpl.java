@@ -154,6 +154,14 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			logger.info("************************ createDevice ENDED ***************************");
 			return ResponseEntity.status(404).body(getObjectResponse);
 		}
+		logger.info(loggedUser.getAccountType());
+		if(loggedUser.getAccountType()!= 1) {
+			if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "create")) {
+				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to create device",null);
+				 logger.info("************************ createDevice ENDED ***************************");
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+		}
 		
 		if((device.getId() != null && device.getId() != 0) || device.getName()== null ||device.getName() == ""
 				|| device.getUniqueId()== null || device.getUniqueId() == null
