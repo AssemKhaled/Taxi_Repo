@@ -100,7 +100,12 @@ public class DriverRestController {
 		
 	}
 
-	
+	@GetMapping(value = "/assignDriverToUser")
+	public ResponseEntity<?> assignDeviceToUser( @RequestParam (value = "userId", defaultValue = "0") Long userId,
+												 @RequestParam (value = "driverId", defaultValue = "0") Long driverId,
+												 @RequestParam (value = "toUserId", defaultValue = "0") Long toUserId){
+		return driverServiceImpl.assignDriverToUser(userId,driverId,toUserId);
+	}
 	
 
 }

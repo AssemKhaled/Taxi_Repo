@@ -756,6 +756,112 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 		   }
 		   return false;
 	   }
+
+	@Override
+	public ResponseEntity<?> assignDriverToUser(Long userId, Long driverId, Long toUserId) {
+		// TODO Auto-generated method stub
+		if(userId == 0 || driverId == 0 || toUserId == 0) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "userId , driverId and toUserId  are required",null);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		else {
+			User loggedUser = userServiceImpl.findById(userId);
+			if(loggedUser == null) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "loggedUser is not found",null);
+				
+				return ResponseEntity.status(404).body(getObjectResponse);
+			}else {
+				if(loggedUser.getAccountType() == 3 || loggedUser.getAccountType() == 4) {
+					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to assign driver to any user",null);
+					
+					return ResponseEntity.status(404).body(getObjectResponse);
+				}
+				Driver driver = getDriverById(driverId);
+				if(driver == null) {
+					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "driver is not found",null);
+					
+					return ResponseEntity.status(404).body(getObjectResponse);
+				}else {
+					if(checkIfParent( driver ,  loggedUser)) {
+					     User toUser = userServiceImpl.findById(toUserId);
+					     if(toUser == null) {
+					    	 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "user you want to assign to  is not found",null);
+								
+								return ResponseEntity.status(404).body(getObjectResponse);
+					     }else {
+					    	  if(toUser.getAccountType()== 4) {
+					    		  getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to assign driver to this user",null);
+									
+									return ResponseEntity.status(404).body(getObjectResponse);
+					    	  }
+					    	  
+					    	  //to make user assign driver to himself
+					    	  else if(loggedUser.getAccountType() == toUser.getAccountType()) {
+					    		  if(loggedUser.getId() == toUser.getId()) {
+					    			  Set<User> driverOldUser = driver.getUserDriver();
+						    			 Set<User> temp = driverOldUser;
+						    			 driverOldUser.removeAll(temp);
+						    			 driver.setUserDriver(driverOldUser);
+						    			 driverOldUser.add(toUser);
+						    			 driver.setUserDriver(driverOldUser);
+						    		     driverRepository.save(driver);
+						    		     getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "driver assigned successfully",null);
+											
+										return ResponseEntity.ok().body(getObjectResponse);
+					    		  }else {
+					    			  getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to assign driver to this user",null);
+										
+										return ResponseEntity.status(404).body(getObjectResponse);
+					    		  }
+					    	  }
+					    	 List<User>toUserParents = userServiceImpl.getAllParentsOfuser(toUser, toUser.getAccountType());
+					    	 if(toUserParents.isEmpty()) {
+					    		 
+					    		 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to assign device to this user",null);
+									
+									return ResponseEntity.status(404).body(getObjectResponse);
+					    	 }else {
+					    		
+					    		 boolean isParent = false;
+					    		 for(User object : toUserParents) {
+					    			 if(loggedUser.getId() ==  object.getId()) {
+					    				 isParent = true;
+					    				 break;
+					    			 }
+					    		 }
+					    		 if(isParent) {
+					    			 
+					    			// assign user to another user
+					    			 Set<User> driverOldUser = driver.getUserDriver();
+					    			 Set<User> temp = driverOldUser;
+					    			 driverOldUser.removeAll(temp);
+					    			 driver.setUserDriver(driverOldUser);
+					    		     driverOldUser.add(toUser);
+					    		     driver.setUserDriver(driverOldUser);;
+					    		     driverRepository.save(driver);
+					    		     getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "driver assigned successfully",null);
+										
+									return ResponseEntity.ok().body(getObjectResponse);
+					    		     
+					    		 }else {
+					    			 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to assign driver to this user",null);
+										
+									 return ResponseEntity.status(404).body(getObjectResponse);
+					    		 }
+					    	 }
+					     }
+						
+						
+					}else {
+						getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "loggedUser is not allowed  to assign this device",null);
+						
+						return ResponseEntity.status(404).body(getObjectResponse);
+					}
+				}
+			}
+		}
+		
+	}
 	
 
 	
