@@ -20,6 +20,9 @@ public interface DriverService {
 	public ResponseEntity<?> getUnassignedDrivers(String TOKEN,Long userId);
 	
 	public Integer getTotalNumberOfUserDrivers(List<Long> userId);
+	
+	// added by maryam
+	public ResponseEntity<?> assignDriverToUser(Long userId,Long driverId , Long toUserId);
 
 
 
