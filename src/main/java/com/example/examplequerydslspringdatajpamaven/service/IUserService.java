@@ -24,6 +24,7 @@ public interface IUserService {
 	public ResponseEntity<?> saveUser(Long parentId , User user);
 	public List<User> getAllParentsOfuser(User user,Integer accountType);
 	public List<User>getAllChildrenOfUser(Long userId);
+	public ResponseEntity<?> getUserSelect(String TOKEN,Long userId);
 
 
 }

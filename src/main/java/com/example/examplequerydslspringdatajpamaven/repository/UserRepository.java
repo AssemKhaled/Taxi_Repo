@@ -13,7 +13,9 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
+import com.example.examplequerydslspringdatajpamaven.entity.UserSelect;
 
 @Component
 public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredicateExecutor<User> {
@@ -40,6 +42,11 @@ public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredi
 			+ "tc_users.identity_num LIKE %:search%) limit :offset,10", nativeQuery = true)
 	public List<User> getInactiveUsersOfUser(@Param("userId") Long userId,@Param("offset")int offset,@Param("search")String search); 
 	
+	@Query(value = "SELECT count(*) FROM tc_user_user "
+			+ " inner join tc_users on tc_user_user.manageduserid=tc_users.id "
+			+ "where tc_user_user.userid = :userId and delete_date is not  null ", nativeQuery = true)
+	public Integer getInactiveUsersOfUserSize(@Param("userId") Long userId); 
+	
 	@Query(value = "SELECT tc_users.* FROM tc_user_user inner join tc_users on tc_user_user.manageduserid=tc_users.id where tc_user_user.userid = :userId and delete_date is null ", nativeQuery = true)
 	public List<User> getChildrenOfUser(@Param("userId") Long userId);
 
@@ -65,5 +72,8 @@ public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredi
 	public void deleteUserOfUser(@Param("userId")Long deviceId);
 	
 	
-	
+	@Query(value = "SELECT tc_users.id,tc_users.name FROM tc_user_user " + 
+			" inner join tc_users on tc_user_user.manageduserid=tc_users.id" + 
+			" where tc_user_user.userid = :userId and delete_date is null",nativeQuery = true)
+	public List<UserSelect> getUserSelect(@Param("userId")Long userId);
 }
