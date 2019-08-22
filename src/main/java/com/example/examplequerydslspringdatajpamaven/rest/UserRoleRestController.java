@@ -55,6 +55,7 @@ public class UserRoleRestController {
 	@GetMapping("/getAllRolesCreatedByUser")
 	public ResponseEntity<?> getAllRolesCreatedByUser(@RequestParam (value = "userId",defaultValue = "0") Long userId){
 		
+		
 		return userRoleService.getAllRolesCreatedByUser(userId);
 	}
 	

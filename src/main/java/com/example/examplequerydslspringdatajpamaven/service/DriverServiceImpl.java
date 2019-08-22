@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
@@ -66,20 +67,48 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 
 			}
 			else {
-				if(user.getDelete_date() == null) {
-					drivers = driverRepository.getAllDrivers(id,offset,search);
+				   userServiceImpl.resetChildernArray();
+					if(user.getAccountType() == 4 ) {
+						Set<User>parentClients = user.getUsersOfUser();
+						if(parentClients.isEmpty()) {
+							getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get drivers of this user",null);
+							 logger.info("************************ getAllUserDtivers ENDED ***************************");
+							return  ResponseEntity.status(404).body(getObjectResponse);
+						}else {
+							User parent = null;
+							for(User object : parentClients) {
+								parent = object;
+							}
+							List<Long>usersIds= new ArrayList<>();
+						   usersIds.add(parent.getId());
+							drivers = driverRepository.getAllDrivers(usersIds,offset,search);
+							Integer size= driverRepository.getAllDriversSize(parent.getId());
+							
+							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",drivers,size);
+							logger.info("************************ getAllDrivers ENDED ***************************");
+							return ResponseEntity.ok().body(getObjectResponse);
+						}
+					}
+					List<User>childernUsers = userServiceImpl.getActiveAndInactiveChildern(id);
+					 List<Long>usersIds= new ArrayList<>();
+					 if(childernUsers.isEmpty()) {
+						 usersIds.add(id);
+					 }
+					 else {
+						 usersIds.add(id);
+						 for(User object : childernUsers) {
+							 usersIds.add(object.getId());
+						 }
+					 }
+					 System.out.println("Ids"+usersIds.toString());
+					drivers = driverRepository.getAllDrivers(usersIds,offset,search);
 					Integer size= driverRepository.getAllDriversSize(id);
 					
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",drivers,size);
 					logger.info("************************ getAllDrivers ENDED ***************************");
 					return ResponseEntity.ok().body(getObjectResponse);
 
-				}
-				else {
-					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User is not Found",drivers);
-					return ResponseEntity.status(404).body(getObjectResponse);
-
-				}
+				
 				
 			}
 
@@ -124,7 +153,6 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 
 			}
 			else {
-				if(user.getDelete_date()==null) {
 					
 					if(driver.getName()== null || driver.getUniqueid()== null
 							   || driver.getMobile_num() == null || driver.getName()== "" || driver.getUniqueid()== ""
@@ -169,8 +197,21 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 						}
 						else {
 							if(driver.getId() == null || driver.getId() == 0) {
+								User driverParent = new User();
+								if(user.getAccountType() == 4) {
+									Set<User> parentClients = user.getUsersOfUser();
+									if(parentClients.isEmpty()) {
+										 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allowed to add driver",drivers);
+										 return  ResponseEntity.badRequest().body(getObjectResponse);
+									}
+									for(User object : parentClients) {
+										driverParent = object;
+									}
+								}else {
+									driverParent = user;
+								}
 								Set<User> userDriver = new HashSet<>();
-								userDriver.add(user);
+								userDriver.add(driverParent);
 								driver.setUserDriver(userDriver);
 								driverRepository.save(driver);
 								drivers.add(driver);
@@ -190,12 +231,7 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 						}
 						
 					}
-				}
-				else {
-					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",drivers);
-					return ResponseEntity.status(404).body(getObjectResponse);
-
-				}
+				
 			}
 			
 			
@@ -244,14 +280,42 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 
 			}
 			else {
-                if(user.getDelete_date()==null) {
+               
                 	if(driver.getId() != null) {
                 		   	
 						Driver driverCheck = driverRepository.findOne(driver.getId());
 
 						if(driverCheck != null) {
 							if(driverCheck.getDelete_date() == null) {
+								boolean isParent = false;
 								
+								if(user.getAccountType() == 4) {
+									Set<User>parentClient = user.getUsersOfUser();
+									if(parentClient.isEmpty()) {
+										 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allowed to edit driver",drivers);
+										 return  ResponseEntity.badRequest().body(getObjectResponse);
+									}
+									User parent = null;
+									for(User object : parentClient) {
+										parent = object ;
+									}
+									Set<User>driverParent = driverCheck.getUserDriver();
+									if(driverParent.isEmpty()) {
+										 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allowed to edit driver",drivers);
+										 return  ResponseEntity.badRequest().body(getObjectResponse);
+									}
+									for(User parentObject : driverParent) {
+										if(parentObject.getId() == parent.getId()) {
+											isParent = true;
+											break;
+										}
+									}
+								}
+								if(!checkIfParent(driverCheck , user) && ! isParent) {
+									getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this driver ",null);
+									logger.info("************************ editDevice ENDED ***************************");
+									return ResponseEntity.badRequest().body(getObjectResponse);
+								}
 								if(driver.getName()== null || driver.getUniqueid()== null
 										   || driver.getMobile_num() == null || driver.getName()== "" || driver.getUniqueid()== ""
 										   || driver.getMobile_num() == "") {
@@ -295,22 +359,20 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 									}
 									else {
 										
-										Set<User> userDriver = new HashSet<>();
-										userDriver.add(user);
-										driver.setUserDriver(userDriver);
-										if(driverCheck.getUserDriver().equals(driver.getUserDriver())) {
+										   Set<User> userDriver = new HashSet<>();
+										
+									    	userDriver = driverCheck.getUserDriver();
+										
+										   driver.setUserDriver(userDriver);
+										
 											driverRepository.save(driver);
 											drivers.add(driver);
 											getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Updated Successfully",drivers);
 											logger.info("************************ editDriver ENDED ***************************");
 											return ResponseEntity.ok().body(getObjectResponse);
 
-										}
-										else {
-											getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(),"Not allow to edit this driver it belongs to another user",drivers);
-											return ResponseEntity.status(404).body(getObjectResponse);
-
-										}
+										
+										
 										
 										
 									
@@ -338,12 +400,7 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 
                 	}
 					
-				}
-				else {
-					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",drivers);
-					return ResponseEntity.status(404).body(getObjectResponse);
-
-				}
+				
 				
 				
 			}
@@ -363,7 +420,7 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 
 
 	@Override
-	public ResponseEntity<?> findById(String TOKEN,Long driverId) {
+	public ResponseEntity<?> findById(String TOKEN,Long driverId,Long userId) {
 		logger.info("************************ getDriverById STARTED ***************************");
 		List<Driver> drivers = new ArrayList<Driver>();
 		if(TOKEN.equals("")) {
@@ -375,14 +432,51 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 		{
 			return super.checkActive(TOKEN);
 		}
-
+        if(userId == 0) {
+        	 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "loggedUser id is required",null);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+        }
+        User loggedUser = userServiceImpl.findById(userId);
+        if(loggedUser == null) {
+        	getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "loggedUser is not Found",drivers);
+			return  ResponseEntity.status(404).body(getObjectResponse);
+        }
 		if(driverId != 0) {
 			
 			Driver driver= driverRepository.findOne(driverId);
 
 			if(driver != null) {
 				if(driver.getDelete_date() == null) {
-					
+					boolean isParent = false;
+					if(loggedUser.getAccountType() == 4) {
+						Set<User> clientParents = loggedUser.getUsersOfUser();
+						if(clientParents.isEmpty()) {
+							getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this user",null);
+							 return  ResponseEntity.badRequest().body(getObjectResponse);
+						}else {
+							User parent = null;
+							for(User object : clientParents) {
+								parent = object ;
+							}
+							Set<User>driverParents = driver.getUserDriver();
+							if(driverParents.isEmpty()) {
+								getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this driver",null);
+								 return  ResponseEntity.badRequest().body(getObjectResponse);
+							}else {
+								for(User parentObject : driverParents) {
+									if(parentObject.getId() == parent.getId()) {
+										isParent = true;
+										break;
+									}
+								}
+							}
+						}
+					}
+					if(!checkIfParent(driver , loggedUser) && ! isParent) {
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this driver ",null);
+						logger.info("************************ editDevice ENDED ***************************");
+						return ResponseEntity.badRequest().body(getObjectResponse);
+					}
 					drivers.add(driver);
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",drivers);
 					logger.info("************************ getDriverById ENDED ***************************");
@@ -414,7 +508,7 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 	}
 	
 	@Override
-	public ResponseEntity<?> deleteDriver(String TOKEN,Long driverId) {
+	public ResponseEntity<?> deleteDriver(String TOKEN,Long driverId,Long userId) {
 		
 		Date date = new Date();
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd"); 
@@ -423,7 +517,7 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 
 		List<Driver> drivers = new ArrayList<Driver>();
 		if(TOKEN.equals("")) {
-			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",drivers);
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN  is required",drivers);
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		
@@ -431,11 +525,49 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 		{
 			return super.checkActive(TOKEN);
 		}
+		if(userId == 0) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "loggedUser id is required",drivers);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User loggedUser = userServiceImpl.findById(userId);
+		if(loggedUser == null) {
+			getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This loggedUser  is not Found",drivers);
+			return  ResponseEntity.status(404).body(getObjectResponse);
+		}
 		if(driverId != 0) {
 			Driver driver= driverRepository.findOne(driverId);
 			if(driver != null) {
 				if(driver.getDelete_date() == null) {
-				
+				 boolean isParent = false;
+				 if(loggedUser.getAccountType() == 4) {
+					 Set<User> parentClients = loggedUser.getUsersOfUser();
+					 if(parentClients.isEmpty()) {
+						 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to delete this driver",drivers);
+						 return  ResponseEntity.badRequest().body(getObjectResponse);
+					 }else {
+						 User parent = null;
+						 for(User object : parentClients) {
+							 parent = object;
+						 }
+						 Set<User>driverParent = driver.getUserDriver();
+						 if(driverParent.isEmpty()) {
+							 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to delete this driver",drivers);
+							 return  ResponseEntity.badRequest().body(getObjectResponse);
+						 }else {
+							 for(User parentObject : driverParent) {
+								 if(parentObject.getId() == parent.getId()) {
+									 isParent = true;
+									 break;
+								 }
+							 }
+						 }
+					 }
+				 }
+				 if(!checkIfParent(driver , loggedUser) && ! isParent) {
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to delete this driver ",null);
+						logger.info("************************ editDevice ENDED ***************************");
+						return ResponseEntity.badRequest().body(getObjectResponse);
+					}
 					driverRepository.deleteDriver(driverId,currentDate);
 					driverRepository.deleteDriverId(driverId);
 					driverRepository.deleteDriverDeviceId(driverId);
@@ -520,9 +652,9 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 	}
 
 	@Override
-	public Integer getTotalNumberOfUserDrivers(Long userId) {
+	public Integer getTotalNumberOfUserDrivers(List<Long> usersIds) {
 		// TODO Auto-generated method stub
-		 Integer totalNumberOfUserDrivers = driverRepository.getTotalNumberOfUserDrivers(userId);
+		 Integer totalNumberOfUserDrivers = driverRepository.getTotalNumberOfUserDrivers(usersIds);
 		return totalNumberOfUserDrivers;
 	}
 
@@ -590,7 +722,40 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 
 	}
 	
-	
+	 public Boolean checkIfParent(Driver driver , User loggedUser) {
+		   Set<User> driverParent = driver.getUserDriver();
+		   if(driverParent.isEmpty()) {
+			  
+			   return false;
+		   }else {
+			   User parent = null;
+			   for (User object : driverParent) {
+				   parent = object;
+			   }
+			   if(parent.getId() == loggedUser.getId()) {
+				   return true;
+			   }
+			   if(parent.getAccountType() == 1) {
+				   if(parent.getId() == loggedUser.getId()) {
+					   return true;
+				   }
+			   }else {
+				   List<User> parents = userServiceImpl.getAllParentsOfuser(parent, parent.getAccountType());
+				   if(parents.isEmpty()) {
+					   
+					   return false;
+				   }else {
+					   for(User object :parents) {
+						   if(object.getId() == loggedUser.getId()) {
+							   return true;
+						   }
+					   }
+				   }
+			   }
+			  
+		   }
+		   return false;
+	   }
 	
 
 	

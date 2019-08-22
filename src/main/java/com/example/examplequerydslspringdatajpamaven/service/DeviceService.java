@@ -23,11 +23,11 @@ public interface DeviceService {
 	
 	public  ResponseEntity<?> deleteDevice(String TOKEN,Long userId, Long deviceId);
 	
-	public ResponseEntity<?>  findDeviceById(String TOKEN,Long deviceId);
+	public ResponseEntity<?>  findDeviceById(String TOKEN,Long deviceId,Long userId);
 
 	public ResponseEntity<?> getDeviceSelect(String TOKEN,Long userId);
 
-	public ResponseEntity<?> assignDeviceToDriver(String TOKEN,Long deviceId , Long driverId);
+	public ResponseEntity<?> assignDeviceToDriver(String TOKEN,Long deviceId , Long driverId , Long userId);
 	
 	public ResponseEntity<?> assignDeviceToGeofences(String TOKEN,Long deviceId,Long [] geoIds );
 
@@ -41,13 +41,12 @@ public interface DeviceService {
 	
 	public ResponseEntity<?> getAllDeviceLiveData(String TOKEN,Long userId,int offset,String search);
 	
-	public ResponseEntity<?> getDeviceLiveData(String TOKEN,Long deviceId);
+	public ResponseEntity<?> getDeviceLiveData(String TOKEN,Long deviceId,Long userId);
 
-	public ResponseEntity<?> getDeviceLiveDataMap(String TOKEN,Long deviceId);
+	public ResponseEntity<?> getDeviceLiveDataMap(String TOKEN,Long deviceId,Long userId);
 
-	public ResponseEntity<?> vehicleInfo(String TOKEN,Long deviceId);
+	public ResponseEntity<?> vehicleInfo(String TOKEN,Long deviceId,Long userId);
 	
-
 	public ResponseEntity<?> assignDeviceToUser(Long userId,Long deviceId , Long toUserId);
 
 	public ResponseEntity<?> getAllDeviceLiveDataMap(String TOKEN,Long userId);

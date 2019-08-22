@@ -224,32 +224,49 @@ public class UserRoleServiceImpl implements UserRoleService {
 		List<UserRole> roles = userRoleRepository.getUserRole(userId);
 		if(roles.isEmpty()) {
 			return false;
-		}
-		
-		UserRole role = roles.get(0);
-		
-		JSONObject permissions = new JSONObject(role.getPermissions());
-		 
-		 if(permissions.has(module)) {
+		}else {
+			UserRole role = roles.get(0);
 			
-			 JSONObject serviceFunctionalities = permissions.getJSONObject(module); 
-			
-			 if(serviceFunctionalities.has(functionality)) {
-				 
-				 if(serviceFunctionalities.getBoolean(functionality)) {
-					 
-					 return true;
-				 }else {
-					 return false;
-				 }
-			 }
-			 else {
+			JSONObject permissions = new JSONObject(role.getPermissions());
+			 if(permissions.has("permissions")) {
+				 JSONArray the_json_array = permissions.getJSONArray("permissions");
+					System.out.println("myJson"+the_json_array);
+					
+					
+					for(Object object : the_json_array) {	
+						System.out.println("myJson"+object);
+						JSONObject permissionObject = new JSONObject(object.toString());
+						
+
+						
+						if( permissionObject.has("name")) {
+							if(permissionObject.getString("name").equals(module)) {
+								System.out.println("get here");
+								JSONObject serviceFunctionalities= permissionObject.getJSONObject("functionality");
+								
+								
+								 if(serviceFunctionalities.has(functionality)) {
+									 
+									 if(serviceFunctionalities.getBoolean(functionality)) {
+										 
+										 return true;
+									 }
+								 }
+							}
+							
+							 
+						 }
+						 
+					}
+				 return false;
+//				 
+			 }else {
 				 return false;
 			 }
-		 }
-		 else {
-			 return false;
-		 }
+		}
+		
+		
+		
 		
 	}
 @Override

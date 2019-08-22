@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
@@ -22,6 +24,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceList;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
@@ -59,7 +63,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	GetObjectResponse getObjectResponse;
 
 	@Override
-	public ResponseEntity<?> getEventsReport(String TOKEN,Long deviceId,int offset,String start,String end,String search) {
+	public ResponseEntity<?> getEventsReport(String TOKEN,Long deviceId,int offset,String start,String end,String search,Long userId) {
 		logger.info("************************ getEventsReport STARTED ***************************");
 	
 		List<EventReport> eventReport = new ArrayList<EventReport>();
@@ -72,13 +76,21 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		{
 			return super.checkActive(TOKEN);
 		}
-		if(deviceId != 0) {
-			offset=offset-1;
-			if(offset <0) {
-				offset=0;
+		
+		if(deviceId != 0 || userId != 0) {
+			
+			User loggedUser = userServiceImpl.findById(userId);
+			if(loggedUser == null) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",eventReport);
+				return  ResponseEntity.status(404).body(getObjectResponse);
 			}
+			
 			Device device =deviceServiceImpl.findById(deviceId);
+			
+			
+				
 			if(device != null) {
+				
 				if(start.equals("0") || end.equals("0")) {
 					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",eventReport);
 					return  ResponseEntity.badRequest().body(getObjectResponse);
@@ -119,6 +131,36 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 						return  ResponseEntity.badRequest().body(getObjectResponse);
 
 					}
+					boolean isParent = false;
+					if(loggedUser.getAccountType() == 4) {
+						Set<User>parentClients = loggedUser.getUsersOfUser();
+						if(parentClients.isEmpty()) {
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this device ",eventReport);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}else {
+							User parent = null;
+							for(User object : parentClients) {
+								parent = object ;
+							}
+							Set<User>deviceParent = device.getUser();
+							if(deviceParent.isEmpty()) {
+								getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this device ",eventReport);
+								return  ResponseEntity.badRequest().body(getObjectResponse);
+							}else {
+								for(User  parentObject : deviceParent) {
+									if(parent.getId() == parentObject.getId()) {
+										isParent = true;
+										break;
+									}
+								}
+							}
+						}
+					}
+					if(!deviceServiceImpl.checkIfParent(device , loggedUser) && ! isParent) {
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
+						logger.info("************************ editDevice ENDED ***************************");
+						return ResponseEntity.badRequest().body(getObjectResponse);
+					}
 					search = "%"+search+"%";
 					eventReport = eventRepository.getEvents(deviceId, offset, start, end,search);
 					Integer size = null;
@@ -149,14 +191,13 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 		}
 		else {
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",eventReport);
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device Id and loggedUser id are Required",eventReport);
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
-		
-		
-
+			
 	}
+	
 	@Override
 	public ResponseEntity<?> getDeviceWorkingHours(String TOKEN,Long deviceId,int offset,String start,String end,String search) {
 		logger.info("************************ HoursDev STARTED ***************************");
@@ -675,15 +716,59 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		}
 		
 		if(userId != 0) {
-			offset=offset-1;
-			if(offset <0) {
-				offset=0;
-			}
+		
 			User user = userServiceImpl.findById(userId);
 			if(user != null) {
-				if(user.getDelete_date()==null) {
+				userServiceImpl.resetChildernArray();
+				 if(user.getAccountType() == 4) {
+					 Set<User> parentClients = user.getUsersOfUser();
+					 if(parentClients.isEmpty()) {
+						
+						 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get devices of this user",null);
+						 logger.info("************************ getAllUserDevices ENDED ***************************");
+						return  ResponseEntity.status(404).body(getObjectResponse);
+					 }else {
+						 User parentClient = new User() ;
+						 for(User object : parentClients) {
+							 parentClient = object;
+						 }
+						 List<Long>usersIds= new ArrayList<>();
+						 usersIds.add(parentClient.getId());
+						
+						 search = "%"+search+"%";
+							notifications= eventRepository.getNotifications(usersIds, offset,search);
+							Integer size=0;
+							if(notifications.size()>0) {
+								size=eventRepository.getNotificationsSize(userId);
+								for(int i=0;i<notifications.size();i++) {
+									if(notifications.get(i).getEventType().equals("alarm")) {
+										JSONObject obj = new JSONObject(notifications.get(i).getAttributes());
+										notifications.get(i).setEventType(obj.getString("alarm"));
+									}
+								}
+									
+							}
+							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",notifications,size);
+							logger.info("************************ getNotifications ENDED ***************************");
+							return  ResponseEntity.ok().body(getObjectResponse);
+					 }
+				 }
+				 
+				 List<User>childernUsers = userServiceImpl.getActiveAndInactiveChildern(userId);
+				 List<Long>usersIds= new ArrayList<>();
+				 if(childernUsers.isEmpty()) {
+					 usersIds.add(userId);
+				 }
+				 else {
+					 usersIds.add(userId);
+					 for(User object : childernUsers) {
+						 usersIds.add(object.getId());
+					 }
+				 }
+				 System.out.println("Ids"+usersIds.toString());
+				
 					search = "%"+search+"%";
-					notifications= eventRepository.getNotifications(userId, offset,search);
+					notifications= eventRepository.getNotifications(usersIds, offset,search);
 					Integer size=0;
 					if(notifications.size()>0) {
 						size=eventRepository.getNotificationsSize(userId);
@@ -699,12 +784,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 					logger.info("************************ getNotifications ENDED ***************************");
 					return  ResponseEntity.ok().body(getObjectResponse);
 
-				}
-				else {
-					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",notifications);
-					return  ResponseEntity.status(404).body(getObjectResponse);
-
-				}
+				
 			}
 			else {
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",notifications);

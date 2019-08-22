@@ -35,7 +35,7 @@ public interface EventRepository  extends JpaRepository<Event, Long>, QueryDslPr
 			@Param("end")String end);
 	
 	@Query(nativeQuery = true, name = "getNotifications")
-	public List<EventReport> getNotifications(@Param("userId")Long userId,@Param("offset")int offset,@Param("search")String search);
+	public List<EventReport> getNotifications(@Param("userId") List<Long> userId,@Param("offset")int offset,@Param("search")String search);
 
 	@Query (value = "SELECT count(tc_events.id)"+
 			" FROM tc_user_device" + 

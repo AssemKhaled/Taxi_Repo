@@ -61,18 +61,20 @@ public class DashBoardRestController {
 		return deviceService.getAllDeviceLiveDataMap(TOKEN,userId);
 	}
 
-	@GetMapping(path = "/getDevicesLiveData")
+	@GetMapping(path = "/getDeviceLiveData")
 	public ResponseEntity<?> getDevicesLiveData(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                    @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId){
+			                                    @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+			                                    @RequestParam(value = "userId",defaultValue = "0") Long userId){
 		
-		return deviceService.getDeviceLiveData(TOKEN,deviceId);
+		return deviceService.getDeviceLiveData(TOKEN,deviceId,userId);
 	}
 	
-	@GetMapping(path = "/getDevicesLiveDataMap")
+	@GetMapping(path = "/getDeviceLiveDataMap")
 	public ResponseEntity<?> getDevicesLiveDataMap(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                    @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId){
+			                                    @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+			                                    @RequestParam(value = "userId",defaultValue = "0")Long userId){
 		
-		return deviceService.getDeviceLiveDataMap(TOKEN,deviceId);
+		return deviceService.getDeviceLiveDataMap(TOKEN,deviceId,userId);
 	}
 	
 
@@ -87,11 +89,12 @@ public class DashBoardRestController {
 	}
 	@RequestMapping(value = "/vehicleInfo", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> vehicleInfo(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                           @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId){
+			                                           @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+			                                           @RequestParam(value = "userId",defaultValue = "0")Long userId){
 		
 
 		
-    	return  deviceService.vehicleInfo(TOKEN,deviceId);
+    	return  deviceService.vehicleInfo(TOKEN,deviceId,userId);
 
 	}
 

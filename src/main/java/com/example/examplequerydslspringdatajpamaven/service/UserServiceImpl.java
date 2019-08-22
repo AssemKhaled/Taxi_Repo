@@ -37,6 +37,7 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	@Autowired
 	private UserRoleRepository roleRepository;
 	
+	private List<User> childernUsers = new ArrayList<>();
 	private static final Log logger = LogFactory.getLog(DeviceServiceImpl.class);
 	
 	GetObjectResponse getObjectResponse;
@@ -1259,7 +1260,7 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	   				 }else {
 	   				  TokenSecurity.getInstance().removeActiveUserById(deleteUserId);
 	   					 //get all children
-	   				  List<User>children = getAllChildrenOfUser(deleteUserId);
+	   				  List<User>children = getAllChildernOfUser(deleteUserId);
 	   				  if(!children.isEmpty()) {
 	   					  for(User object : children ) {
 	   						TokenSecurity.getInstance().removeActiveUserById(object.getId());
@@ -1285,10 +1286,45 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	}
 
 	@Override
-	public List<User> getAllChildrenOfUser(Long userId) {
+	public List<User> getAllChildernOfUser(Long userId) {
 		// TODO Auto-generated method stub
+		System.out.println("parentId"+userId);
+
+		List<User>childrenReturned = userRepository.getChildrenOfUser(userId);
+		if(!childrenReturned.isEmpty()) {
+			for(User object : childrenReturned) {
+				childernUsers.add(object);
+				if(object.getAccountType() != 4) {
+					getAllChildernOfUser(object.getId());
+				}
+			}
+		}
+		return childernUsers;
+	}
+
+	@Override
+	public void resetChildernArray() {
+		// TODO Auto-generated method stub
+		childernUsers = new ArrayList<>();
 		
-		return userRepository.getChildrenOfUser(userId);
+	}
+
+	@Override
+	public List<User> getActiveAndInactiveChildern(Long userId) {
+		// TODO Auto-generated method stub
+		// TODO Auto-generated method stub
+				System.out.println("parentId"+userId);
+
+				List<User>childrenReturned = userRepository.getActiveAndInactiveChildrenOfUser(userId);
+				if(!childrenReturned.isEmpty()) {
+					for(User object : childrenReturned) {
+						childernUsers.add(object);
+						if(object.getAccountType() != 4) {
+							getActiveAndInactiveChildern(object.getId());
+						}
+					}
+				}
+				return childernUsers;
 	}
 	
 	public  ResponseEntity<?> getUserSelect(String TOKEN,Long userId) {
@@ -1338,4 +1374,6 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 		
 
 	}
+
+	
 }
