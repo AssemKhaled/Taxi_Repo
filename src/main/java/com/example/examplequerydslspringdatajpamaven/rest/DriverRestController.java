@@ -34,33 +34,29 @@ public class DriverRestController {
 													  @RequestParam (value = "offset", defaultValue = "0") int offset,
 													  @RequestParam (value = "search", defaultValue = "") String search) {
 		
-		offset=offset-1;
-		if(offset <0) {
-			offset=0;
-		}
-
-		
     	return  driverServiceImpl.getAllDrivers(TOKEN,id,offset,search);
 
 	}
 	
 	@RequestMapping(value = "/getDriverById", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getDriverById(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                             @RequestParam (value = "driverId", defaultValue = "0") Long driverId) {
+			                                             @RequestParam (value = "driverId", defaultValue = "0") Long driverId,
+			                                             @RequestParam(value = "userId",defaultValue = "0")Long userId) {
 		
 		
-		return driverServiceImpl.findById(TOKEN,driverId);
+		return driverServiceImpl.findById(TOKEN,driverId,userId);
 
 	}
 	
 	
 	@RequestMapping(value = "/deleteDriver", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> deleteDriver(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                            @RequestParam (value = "driverId", defaultValue = "0") Long driverId) {
+			                                            @RequestParam (value = "driverId", defaultValue = "0") Long driverId,
+			                                            @RequestParam(value = "userId",defaultValue = "0") Long userId) {
 		
 		
 		
-		return driverServiceImpl.deleteDriver(TOKEN,driverId);
+		return driverServiceImpl.deleteDriver(TOKEN,driverId,userId);
 
 	}
 	

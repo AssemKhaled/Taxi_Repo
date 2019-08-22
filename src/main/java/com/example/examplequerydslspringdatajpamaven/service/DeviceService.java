@@ -41,11 +41,11 @@ public interface DeviceService {
 	
 	public ResponseEntity<?> getAllDeviceLiveData(String TOKEN,Long userId,int offset,String search);
 	
-	public ResponseEntity<?> getDeviceLiveData(String TOKEN,Long deviceId);
+	public ResponseEntity<?> getDeviceLiveData(String TOKEN,Long deviceId,Long userId);
 
-	public ResponseEntity<?> getDeviceLiveDataMap(String TOKEN,Long deviceId);
+	public ResponseEntity<?> getDeviceLiveDataMap(String TOKEN,Long deviceId,Long userId);
 
-	public ResponseEntity<?> vehicleInfo(String TOKEN,Long deviceId);
+	public ResponseEntity<?> vehicleInfo(String TOKEN,Long deviceId,Long userId);
 	
 	public ResponseEntity<?> assignDeviceToUser(Long userId,Long deviceId , Long toUserId);
 

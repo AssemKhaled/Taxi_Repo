@@ -42,10 +42,10 @@ public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslP
 	public List<Driver> checkDublicateDriverInEdit(@Param("driverId") Long driverId,@Param("userId") Long userId,@Param("name") String name,@Param("uniqueId") String uniqueId,@Param("mobileNum") String mobileNum);
 	
 	@Query(value = "SELECT tc_drivers.* FROM tc_drivers INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id"
-			+ " WHERE tc_user_driver.userid=:userId and tc_drivers.delete_date is null"
+			+ " WHERE tc_user_driver.userid IN(:userIds) and tc_drivers.delete_date is null"
 			+ " and ((tc_drivers.name Like %:search%) OR (tc_drivers.uniqueid Like %:search%) OR (tc_drivers.mobile_num Like %:search%) OR (tc_drivers.birth_date Like %:search%))"
 			+ " LIMIT :offset,10", nativeQuery = true)
-	public List<Driver> getAllDrivers(@Param("userId") Long userId,@Param("offset") int offset,@Param("search") String search);
+	public List<Driver> getAllDrivers(@Param("userIds") List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
 	
 	//added by maryam
 	@Query(value = "SELECT  * FROM tc_drivers A " + 
@@ -60,9 +60,9 @@ public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslP
 	
 	@Query(value = "SELECT count(tc_drivers.id) FROM tc_drivers INNER JOIN tc_user_driver "
 			+ "ON tc_user_driver.driverid = tc_drivers.id AND "
-			+ "tc_user_driver.userid = :userId WHERE tc_drivers.delete_date is null",nativeQuery = true)
+			+ "tc_user_driver.userid IN (:userIds) WHERE tc_drivers.delete_date is null",nativeQuery = true)
 	
-	public Integer getTotalNumberOfUserDrivers(@Param("userId") Long userId);
+	public Integer getTotalNumberOfUserDrivers(@Param("userIds") List<Long> userIds);
 	
 	@Query(value = "SELECT count(*) FROM tc_drivers INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id"
 			+ " WHERE tc_user_driver.userid=:userId and tc_drivers.delete_date is null", nativeQuery = true)

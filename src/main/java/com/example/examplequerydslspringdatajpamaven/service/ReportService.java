@@ -4,7 +4,7 @@ import org.springframework.http.ResponseEntity;
 
 public interface ReportService {
 	
-	public ResponseEntity<?> getEventsReport(String TOKEN,Long deviceId,int offset,String start,String end,String search);
+	public ResponseEntity<?> getEventsReport(String TOKEN,Long deviceId,int offset,String start,String end,String search,Long userId);
 
 	public ResponseEntity<?> getDeviceWorkingHours(String TOKEN,Long deviceId,int offset,String start,String end,String search);
 	

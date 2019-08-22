@@ -167,7 +167,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
      		+ " LEFT JOIN  tc_device_geofence ON tc_devices.id=tc_device_geofence.deviceid" 
      		+ " LEFT JOIN  tc_geofences ON tc_geofences.id=tc_device_geofence.geofenceid and tc_geofences.delete_date"
      		+ " is null INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id "
-     		+ " where tc_user_device.userid =:userId and tc_devices.delete_date is null"
+     		+ " where tc_user_device.userid IN(:userIds) and tc_devices.delete_date is null"
      		+ " AND (tc_devices.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.uniqueid LIKE LOWER(CONCAT('%',:search, '%'))"
      		+ " OR tc_devices.sequence_number LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))"
      		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%')) ) "
@@ -180,7 +180,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 			+ " tc_positions.speed,tc_devices.photo , tc_positions.id as positionId  FROM tc_devices "
 			+ " INNER JOIN  tc_user_device ON tc_devices.id=tc_user_device.deviceid " 
 			+ " LEFT JOIN tc_positions ON tc_positions.id=tc_devices.positionid"
-			+ "  where tc_user_device.userid= :userId and tc_devices.delete_date is null "
+			+ "  where tc_user_device.userid IN (:userIds) and tc_devices.delete_date is null "
 			+ "  AND ((tc_devices.name LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))) "
 			+ " OR (tc_positions.address LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_positions.latitude LIKE LOWER(CONCAT('%',:search, '%'))) "
 			+ " OR (tc_positions.longitude LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_positions.speed LIKE LOWER(CONCAT('%',:search, '%'))))"
@@ -197,7 +197,7 @@ query="SELECT tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.la
 		" LEFT JOIN tc_positions ON tc_positions.id=tc_devices.positionid " + 
 		" LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_devices.id " + 
 		" LEFT JOIN tc_drivers ON tc_drivers.id=tc_device_driver.driverid " + 
-		" where tc_user_device.userid=:userId and tc_devices.delete_date is null  GROUP BY tc_devices.id"),
+		" where tc_user_device.userid IN(:userIds) and tc_devices.delete_date is null  GROUP BY tc_devices.id,tc_drivers.id"),
 
 
 @NamedNativeQuery(name="getDeviceLiveData", 

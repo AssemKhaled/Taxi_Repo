@@ -42,6 +42,9 @@ public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredi
 	
 	@Query(value = "SELECT tc_users.* FROM tc_user_user inner join tc_users on tc_user_user.manageduserid=tc_users.id where tc_user_user.userid = :userId and delete_date is null ", nativeQuery = true)
 	public List<User> getChildrenOfUser(@Param("userId") Long userId);
+	
+	@Query(value = "SELECT tc_users.* FROM tc_user_user inner join tc_users on tc_user_user.manageduserid=tc_users.id where tc_user_user.userid = :userId ", nativeQuery = true)
+	public List<User> getActiveAndInactiveChildrenOfUser(@Param("userId") Long userId);
 
 	@Query(value = "SELECT count(*) FROM tc_user_user "
 			+ " inner join tc_users on tc_user_user.manageduserid=tc_users.id "

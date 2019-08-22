@@ -31,11 +31,12 @@ public class ReportRestController {
 													 @RequestParam (value = "offset", defaultValue = "0") int offset,
 													 @RequestParam (value = "start", defaultValue = "0") String start,
 													 @RequestParam (value = "end", defaultValue = "0") String end,
-													 @RequestParam (value = "search", defaultValue = "") String search) {
+													 @RequestParam (value = "search", defaultValue = "") String search,
+													 @RequestParam (value = "userId",defaultValue = "0")Long userId) {
 		
 		
 		
-    	return  reportServiceImpl.getEventsReport(TOKEN,deviceId, offset, start, end,search);
+    	return  reportServiceImpl.getEventsReport(TOKEN,deviceId, offset, start, end,search,userId);
 
 	}
 	@RequestMapping(value = "/getDeviceWorkingHours", method = RequestMethod.GET)
