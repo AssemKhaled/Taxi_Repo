@@ -23,9 +23,14 @@ public interface IUserService {
 	public Boolean checkIfParentOrNot(Long parentId,Long childId,Integer parentType ,Integer childTye);
 	public ResponseEntity<?> saveUser(Long parentId , User user);
 	public List<User> getAllParentsOfuser(User user,Integer accountType);
+
+	
+	public ResponseEntity<?> getUserSelect(String TOKEN,Long userId);
+
 	public List<User>getAllChildernOfUser(Long userId);
 	public List<User>getActiveAndInactiveChildern(Long userId);
-	public  void resetChildernArray();
+	public void resetChildernArray();
+
 
 
 }

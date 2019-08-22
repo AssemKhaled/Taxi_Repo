@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
@@ -98,5 +100,13 @@ public class UserRestController {
 		return userService.getUserRole(userId);
 	}
 
+	@RequestMapping(value = "/getUserSelect", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getUserSelect(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                               @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		
+	
+    	return userService.getUserSelect(TOKEN,userId);
 
+		
+	}
 }

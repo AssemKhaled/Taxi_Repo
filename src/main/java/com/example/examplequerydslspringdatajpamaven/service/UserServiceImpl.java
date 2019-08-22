@@ -18,8 +18,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
+import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.entity.UserRole;
+import com.example.examplequerydslspringdatajpamaven.entity.UserSelect;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRoleRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
@@ -234,7 +236,8 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 
 				if(active == 0) {
 					List<User> users = userRepository.getInactiveUsersOfUser(userId,offset,search);
-					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users);
+					Integer size=userRepository.getInactiveUsersOfUserSize(userId);
+					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users,size);
 					logger.info("************************ getAllUsersOfUser ENDED ***************************");
 					return  ResponseEntity.ok().body(getObjectResponse);
 				}
@@ -1323,4 +1326,54 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 				}
 				return childernUsers;
 	}
+	
+	public  ResponseEntity<?> getUserSelect(String TOKEN,Long userId) {
+
+		logger.info("************************ getDeviceSelect STARTED ***************************");
+		List<UserSelect> users = new ArrayList<UserSelect>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",users);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+	    if(userId != 0) {
+	    	User user = findById(userId);
+	    	if(user != null) {
+	    		if(user.getDelete_date() == null) {
+	    			users = userRepository.getUserSelect(userId);
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",users);
+					logger.info("************************ getDeviceSelect ENDED ***************************");
+					return ResponseEntity.ok().body(getObjectResponse);
+
+	    		}
+	    		else {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",users);
+					return ResponseEntity.status(404).body(getObjectResponse);
+
+	    		}
+	    	
+	    	}
+	    	else {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",users);
+				return ResponseEntity.status(404).body(getObjectResponse);
+
+	    	}
+			
+		}
+		else {
+			
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",users);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
+	
+		
+
+	}
+
+	
 }
