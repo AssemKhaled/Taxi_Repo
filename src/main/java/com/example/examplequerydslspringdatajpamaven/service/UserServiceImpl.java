@@ -36,6 +36,9 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	
 	@Autowired
 	private UserRoleRepository roleRepository;
+
+	@Autowired
+	private UserRoleService userRoleService;
 	
 	private List<User> childernUsers = new ArrayList<>();
 	private static final Log logger = LogFactory.getLog(DeviceServiceImpl.class);
@@ -233,7 +236,13 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 				return  ResponseEntity.status(404).body(getObjectResponse);
 			}
 			else {
-
+				if(user.getAccountType()!= 1) {
+					if(!userRoleService.checkUserHasPermission(userId, "USER", "list")) {
+						 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get user list",null);
+						 logger.info("************************ getAllUses ENDED ***************************");
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+					}
+				}
 				if(active == 0) {
 					List<User> users = userRepository.getInactiveUsersOfUser(userId,offset,search);
 					Integer size=userRepository.getInactiveUsersOfUserSize(userId);
@@ -282,6 +291,13 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 
 			    	return ResponseEntity.status(404).body(getObjectResponse);
 				}else {
+					if(creater.getAccountType()!= 1) {
+						if(!userRoleService.checkUserHasPermission(userId, "USER", "create")) {
+							 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to create user",null);
+							 logger.info("************************ getAllUses ENDED ***************************");
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}
+					}
 					if(user.getId() != null && user.getId() != 0) {
 						List<User> users = null;
 						String message= "create doesn't accept id";
@@ -455,6 +471,13 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 			    	logger.info("************************editUser ENDED ***************************");
 			    	return ResponseEntity.status(404).body(getObjectResponse); 
 			  }
+			  if(loggedUser.getAccountType()!= 1) {
+					if(!userRoleService.checkUserHasPermission(userId, "USER", "edit")) {
+						 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to edit user",null);
+						 logger.info("************************ editUSER ENDED ***************************");
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+					}
+				}
 			//to set the users of updateduser
 			if( user.getId() == null || user.getId() == 0|| user.getEmail() == null || user.getEmail() == "" ||
 					 user.getName() == null || user.getName() == "" 
@@ -1216,6 +1239,13 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 		if(loggedUser == null) {
 			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This user is not found",null);
 		    return ResponseEntity.status(404).body(getObjectResponse);
+		}
+		if(loggedUser.getAccountType()!= 1) {
+			if(!userRoleService.checkUserHasPermission(userId, "USER", "delete")) {
+				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to delete user",null);
+				 logger.info("************************ editUSER ENDED ***************************");
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
 		}
 		
 		//check if has permission to delete user

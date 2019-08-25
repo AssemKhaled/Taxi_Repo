@@ -51,9 +51,10 @@ public class GeofenceRestController {
 	
 	@RequestMapping(value = "/deleteGeofence", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> deleteDriver(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                            @RequestParam (value = "geofenceId", defaultValue = "0") Long geofenceId) {
+			                                            @RequestParam (value = "geofenceId", defaultValue = "0") Long geofenceId,
+			                                            @RequestParam (value = "userId", defaultValue = "0") Long userId) {
 
-    	return  geofenceServiceImpl.deleteGeofence(TOKEN,geofenceId);
+    	return  geofenceServiceImpl.deleteGeofence(TOKEN,geofenceId,userId);
 
 
 	}

@@ -45,6 +45,9 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	
 	@Autowired
 	DeviceRepository deviceRepository;
+
+	@Autowired
+	private UserRoleService userRoleService;
 	
 	@Autowired
 	DriverRepository driverRepository;
@@ -83,6 +86,13 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			if(loggedUser == null) {
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",eventReport);
 				return  ResponseEntity.status(404).body(getObjectResponse);
+			}
+			if(loggedUser.getAccountType()!= 1) {
+				if(!userRoleService.checkUserHasPermission(userId, "EVENTREPORT", "list")) {
+					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get EVENTREPORT list",null);
+					 logger.info("************************ EVENTREPORT ENDED ***************************");
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
 			}
 			
 			Device device =deviceServiceImpl.findById(deviceId);
@@ -199,7 +209,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	}
 	
 	@Override
-	public ResponseEntity<?> getDeviceWorkingHours(String TOKEN,Long deviceId,int offset,String start,String end,String search) {
+	public ResponseEntity<?> getDeviceWorkingHours(String TOKEN,Long deviceId,int offset,String start,String end,String search,Long userId) {
 		logger.info("************************ HoursDev STARTED ***************************");
 	
 		List<DeviceWorkingHours> deviceHours = new ArrayList<DeviceWorkingHours>();
@@ -212,10 +222,22 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		{
 			return super.checkActive(TOKEN);
 		}
-		if(deviceId != 0) {
+		if(deviceId != 0 || userId != 0) {
 			offset=offset-1;
 			if(offset <0) {
 				offset=0;
+			}
+			User loggedUser = userServiceImpl.findById(userId);
+			if(loggedUser == null) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",deviceHours);
+				return  ResponseEntity.status(404).body(getObjectResponse);
+			}
+			if(loggedUser.getAccountType()!= 1) {
+				if(!userRoleService.checkUserHasPermission(userId, "DEVICEWORKINGHOURSREPORT", "list")) {
+					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get DEVICEWORKINGHOURSREPORT list",null);
+					 logger.info("************************ DEVICEWORKINGHOURSREPORT ENDED ***************************");
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
 			}
 			Device device =deviceServiceImpl.findById(deviceId);
 			if(device != null) {
@@ -258,6 +280,36 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",deviceHours);
 						return  ResponseEntity.badRequest().body(getObjectResponse);
 
+					}
+					boolean isParent = false;
+					if(loggedUser.getAccountType() == 4) {
+						Set<User>parentClients = loggedUser.getUsersOfUser();
+						if(parentClients.isEmpty()) {
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this device ",deviceHours);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}else {
+							User parent = null;
+							for(User object : parentClients) {
+								parent = object ;
+							}
+							Set<User>deviceParent = device.getUser();
+							if(deviceParent.isEmpty()) {
+								getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this device ",deviceHours);
+								return  ResponseEntity.badRequest().body(getObjectResponse);
+							}else {
+								for(User  parentObject : deviceParent) {
+									if(parent.getId() == parentObject.getId()) {
+										isParent = true;
+										break;
+									}
+								}
+							}
+						}
+					}
+					if(!deviceServiceImpl.checkIfParent(device , loggedUser) && ! isParent) {
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
+						logger.info("************************ getDeviceWorkingHours ENDED ***************************");
+						return ResponseEntity.badRequest().body(getObjectResponse);
 					}
 					search = "%"+search+"%";
 					deviceHours = deviceRepository.getDeviceWorkingHours(deviceId,start, end,offset,search);
@@ -294,7 +346,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 		}
 		else {
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",deviceHours);
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID and User Id is Required",deviceHours);
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
@@ -303,7 +355,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 	}
 	@Override
-	public ResponseEntity<?> getDeviceWorkingHoursExport(String TOKEN,Long deviceId,String start,String end) {
+	public ResponseEntity<?> getDeviceWorkingHoursExport(String TOKEN,Long deviceId,String start,String end,Long userId) {
 		logger.info("************************ exportHoursDev STARTED ***************************");
 	
 		List<DeviceWorkingHours> deviceHours = new ArrayList<DeviceWorkingHours>();
@@ -316,8 +368,19 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		{
 			return super.checkActive(TOKEN);
 		}
-		if(deviceId != 0) {
-			
+		if(deviceId != 0 || userId != 0) {
+			User loggedUser = userServiceImpl.findById(userId);
+			if(loggedUser == null) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",deviceHours);
+				return  ResponseEntity.status(404).body(getObjectResponse);
+			}
+			if(loggedUser.getAccountType()!= 1) {
+				if(!userRoleService.checkUserHasPermission(userId, "DEVICEWORKINGHOURSREPORT", "export")) {
+					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get DEVICEWORKINGHOURSREPORT export",null);
+					 logger.info("************************ DEVICEWORKINGHOURSREPORTExport ENDED ***************************");
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+			}
 			Device device =deviceServiceImpl.findById(deviceId);
 			if(device != null) {
 				if(start.equals("0") || end.equals("0")) {
@@ -360,6 +423,36 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 						return  ResponseEntity.badRequest().body(getObjectResponse);
 
 					}
+					boolean isParent = false;
+					if(loggedUser.getAccountType() == 4) {
+						Set<User>parentClients = loggedUser.getUsersOfUser();
+						if(parentClients.isEmpty()) {
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this device ",deviceHours);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}else {
+							User parent = null;
+							for(User object : parentClients) {
+								parent = object ;
+							}
+							Set<User>deviceParent = device.getUser();
+							if(deviceParent.isEmpty()) {
+								getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this device ",deviceHours);
+								return  ResponseEntity.badRequest().body(getObjectResponse);
+							}else {
+								for(User  parentObject : deviceParent) {
+									if(parent.getId() == parentObject.getId()) {
+										isParent = true;
+										break;
+									}
+								}
+							}
+						}
+					}
+					if(!deviceServiceImpl.checkIfParent(device , loggedUser) && ! isParent) {
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
+						logger.info("************************ getDeviceWorkingHours ENDED ***************************");
+						return ResponseEntity.badRequest().body(getObjectResponse);
+					}
 					deviceHours = deviceRepository.getDeviceWorkingHoursExport(deviceId,start, end);
 					Integer size = null;
 					if(deviceHours.size()>0) {
@@ -394,7 +487,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 		}
 		else {
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",deviceHours);
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID and User ID is Required",deviceHours);
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
@@ -403,7 +496,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 	}
 	@Override
-	public ResponseEntity<?> getDriverWorkingHours(String TOKEN,Long driverId,int offset,String start,String end,String search) {
+	public ResponseEntity<?> getDriverWorkingHours(String TOKEN,Long driverId,int offset,String start,String end,String search,Long userId) {
 		logger.info("************************ HoursDev STARTED ***************************");
 	
 		List<DriverWorkingHours> driverHours = new ArrayList<DriverWorkingHours>();
@@ -416,10 +509,22 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		{
 			return super.checkActive(TOKEN);
 		}
-		if(driverId != 0) {
+		if(driverId != 0 || userId != 0) {
 			offset=offset-1;
 			if(offset <0) {
 				offset=0;
+			}
+			User loggedUser = userServiceImpl.findById(userId);
+			if(loggedUser == null) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",driverHours);
+				return  ResponseEntity.status(404).body(getObjectResponse);
+			}
+			if(loggedUser.getAccountType()!= 1) {
+				if(!userRoleService.checkUserHasPermission(userId, "DRIVERWORKINGHOURSREPORT", "list")) {
+					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get DRIVERWORKINGHOURSREPORT list",null);
+					 logger.info("************************ DRIVERWORKINGHOURSREPORT ENDED ***************************");
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
 			}
 			Driver driver =driverServiceImpl.getDriverById(driverId);
 			if(driver != null) {
@@ -462,6 +567,36 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",driverHours);
 						return  ResponseEntity.badRequest().body(getObjectResponse);
 
+					}
+					boolean isParent = false;
+					if(loggedUser.getAccountType() == 4) {
+						Set<User>parentClients = loggedUser.getUsersOfUser();
+						if(parentClients.isEmpty()) {
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this driver ",driverHours);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}else {
+							User parent = null;
+							for(User object : parentClients) {
+								parent = object ;
+							}
+							Set<User>driverParent = driver.getUserDriver();
+							if(driverParent.isEmpty()) {
+								getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this driver ",driverHours);
+								return  ResponseEntity.badRequest().body(getObjectResponse);
+							}else {
+								for(User  parentObject : driverParent) {
+									if(parent.getId() == parentObject.getId()) {
+										isParent = true;
+										break;
+									}
+								}
+							}
+						}
+					}
+					if(!driverServiceImpl.checkIfParent(driver , loggedUser) && ! isParent) {
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
+						logger.info("************************ getDeviceWorkingHours ENDED ***************************");
+						return ResponseEntity.badRequest().body(getObjectResponse);
 					}
 					search = "%"+search+"%";
 					driverHours = driverRepository.getDriverWorkingHours(driverId,start, end,offset,search);
@@ -489,7 +624,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				
 			}
 			else {
-				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Device ID is not found",driverHours);
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Driver ID is not found",driverHours);
 				return  ResponseEntity.status(404).body(getObjectResponse);
 
 			}
@@ -498,7 +633,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 		}
 		else {
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",driverHours);
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID and userId is Required",driverHours);
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
@@ -507,7 +642,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 	}
 	@Override
-	public ResponseEntity<?> getDriverWorkingHoursExport(String TOKEN,Long driverId,String start,String end) {
+	public ResponseEntity<?> getDriverWorkingHoursExport(String TOKEN,Long driverId,String start,String end,Long userId) {
 		logger.info("************************ exportHoursDev STARTED ***************************");
 	
 		List<DriverWorkingHours> driverHours = new ArrayList<DriverWorkingHours>();
@@ -520,8 +655,19 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		{
 			return super.checkActive(TOKEN);
 		}
-		if(driverId != 0) {
-			
+		if(driverId != 0 || userId != 0) {
+			User loggedUser = userServiceImpl.findById(userId);
+			if(loggedUser == null) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",driverHours);
+				return  ResponseEntity.status(404).body(getObjectResponse);
+			}
+			if(loggedUser.getAccountType()!= 1) {
+				if(!userRoleService.checkUserHasPermission(userId, "DRIVERWORKINGHOURSREPORT", "export")) {
+					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get DRIVERWORKINGHOURSREPORT export",null);
+					 logger.info("************************ DRIVERWORKINGHOURSREPORT ENDED ***************************");
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+			}
 			Driver driver =driverServiceImpl.getDriverById(driverId);
 			if(driver != null) {
 				if(start.equals("0") || end.equals("0")) {
@@ -563,6 +709,36 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",driverHours);
 						return  ResponseEntity.badRequest().body(getObjectResponse);
 
+					}
+					boolean isParent = false;
+					if(loggedUser.getAccountType() == 4) {
+						Set<User>parentClients = loggedUser.getUsersOfUser();
+						if(parentClients.isEmpty()) {
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this driver ",driverHours);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}else {
+							User parent = null;
+							for(User object : parentClients) {
+								parent = object ;
+							}
+							Set<User>driverParent = driver.getUserDriver();
+							if(driverParent.isEmpty()) {
+								getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this driver ",driverHours);
+								return  ResponseEntity.badRequest().body(getObjectResponse);
+							}else {
+								for(User  parentObject : driverParent) {
+									if(parent.getId() == parentObject.getId()) {
+										isParent = true;
+										break;
+									}
+								}
+							}
+						}
+					}
+					if(!driverServiceImpl.checkIfParent(driver , loggedUser) && ! isParent) {
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
+						logger.info("************************ getDriverWorkingHours ENDED ***************************");
+						return ResponseEntity.badRequest().body(getObjectResponse);
 					}
 					driverHours = driverRepository.getDriverWorkingHoursExport(driverId,start, end);
 					Integer size = null;
@@ -598,7 +774,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 		}
 		else {
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Driver ID is Required",driverHours);
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Driver ID and userId is Required",driverHours);
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
@@ -607,7 +783,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 	}
 	@Override
-	public ResponseEntity<?> getEventsReportToExcel(String TOKEN,Long deviceId,String start,String end) {
+	public ResponseEntity<?> getEventsReportToExcel(String TOKEN,Long deviceId,String start,String end,Long userId) {
 		logger.info("************************ getEventsReport STARTED ***************************");
 	
 		List<EventReport> eventReport = new ArrayList<EventReport>();
@@ -620,8 +796,19 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		{
 			return super.checkActive(TOKEN);
 		}
-		if(deviceId != 0) {
-			
+		if(deviceId != 0 || userId !=0) {
+			User loggedUser = userServiceImpl.findById(userId);
+			if(loggedUser == null) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",eventReport);
+				return  ResponseEntity.status(404).body(getObjectResponse);
+			}
+			if(loggedUser.getAccountType()!= 1) {
+				if(!userRoleService.checkUserHasPermission(userId, "EVENTREPORT", "export")) {
+					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get EVENTREPORT export",null);
+					 logger.info("************************ EVENTREPORT ENDED ***************************");
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+			}
 			Device device =deviceServiceImpl.findById(deviceId);
 			if(device != null) {
 				if(start.equals("0") || end.equals("0")) {
@@ -663,6 +850,36 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",eventReport);
 						return  ResponseEntity.badRequest().body(getObjectResponse);
 
+					}
+					boolean isParent = false;
+					if(loggedUser.getAccountType() == 4) {
+						Set<User>parentClients = loggedUser.getUsersOfUser();
+						if(parentClients.isEmpty()) {
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this device ",eventReport);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}else {
+							User parent = null;
+							for(User object : parentClients) {
+								parent = object ;
+							}
+							Set<User>deviceParent = device.getUser();
+							if(deviceParent.isEmpty()) {
+								getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this device ",eventReport);
+								return  ResponseEntity.badRequest().body(getObjectResponse);
+							}else {
+								for(User  parentObject : deviceParent) {
+									if(parent.getId() == parentObject.getId()) {
+										isParent = true;
+										break;
+									}
+								}
+							}
+						}
+					}
+					if(!deviceServiceImpl.checkIfParent(device , loggedUser) && ! isParent) {
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
+						logger.info("************************ getDeviceWorkingHours ENDED ***************************");
+						return ResponseEntity.badRequest().body(getObjectResponse);
 					}
 					eventReport = eventRepository.getEventsToExcel(deviceId,start,end);
 					if(eventReport.size()>0) {
@@ -807,7 +1024,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 	@Override
 	public ResponseEntity<?> getStopsReport(String TOKEN,Long deviceId, String type, String from, String to, int page, int start,
-			int limit) {
+			int limit,Long userId) {
 
 		logger.info("************************ getStopsReport STARTED ***************************");
 
@@ -821,8 +1038,19 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		{
 			return super.checkActive(TOKEN);
 		}
-		if(deviceId != 0) {
-			
+		if(deviceId != 0 || userId !=0) {
+			User loggedUser = userServiceImpl.findById(userId);
+			if(loggedUser == null) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",stopReport);
+				return  ResponseEntity.status(404).body(getObjectResponse);
+			}
+			if(loggedUser.getAccountType()!= 1) {
+				if(!userRoleService.checkUserHasPermission(userId, "STOPREPORT", "list")) {
+					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get STOPREPORT list",null);
+					 logger.info("************************ STOPREPORT ENDED ***************************");
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+			}
 			Device device = deviceServiceImpl.findById(deviceId);
 			
 			if(device != null) {
@@ -866,7 +1094,36 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 
 					}
-
+					boolean isParent = false;
+					if(loggedUser.getAccountType() == 4) {
+						Set<User>parentClients = loggedUser.getUsersOfUser();
+						if(parentClients.isEmpty()) {
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this device ",stopReport);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}else {
+							User parent = null;
+							for(User object : parentClients) {
+								parent = object ;
+							}
+							Set<User>deviceParent = device.getUser();
+							if(deviceParent.isEmpty()) {
+								getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this device ",stopReport);
+								return  ResponseEntity.badRequest().body(getObjectResponse);
+							}else {
+								for(User  parentObject : deviceParent) {
+									if(parent.getId() == parentObject.getId()) {
+										isParent = true;
+										break;
+									}
+								}
+							}
+						}
+					}
+					if(!deviceServiceImpl.checkIfParent(device , loggedUser) && ! isParent) {
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
+						logger.info("************************ getDeviceWorkingHours ENDED ***************************");
+						return ResponseEntity.badRequest().body(getObjectResponse);
+					}
 					String plainCreds = "admin@fuinco.com:admin";
 					byte[] plainCredsBytes = plainCreds.getBytes();
 					
@@ -920,7 +1177,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 	@Override
 	public ResponseEntity<?> getTripsReport(String TOKEN,Long deviceId, String type, String from, String to, int page, int start,
-			int limit) {
+			int limit,Long userId) {
 
 		logger.info("************************ getTripsReport STARTED ***************************");
 
@@ -934,8 +1191,19 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		{
 			return super.checkActive(TOKEN);
 		}
-		if(deviceId != 0) {
-			
+		if(deviceId != 0 || userId != 0) {
+			User loggedUser = userServiceImpl.findById(userId);
+			if(loggedUser == null) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",tripReport);
+				return  ResponseEntity.status(404).body(getObjectResponse);
+			}
+			if(loggedUser.getAccountType()!= 1) {
+				if(!userRoleService.checkUserHasPermission(userId, "TRIPREPORT", "list")) {
+					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get TRIPREPORT list",null);
+					 logger.info("************************ TRIPREPORT ENDED ***************************");
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+			}
             Device device = deviceServiceImpl.findById(deviceId);
 			
 			if(device != null) {
@@ -975,7 +1243,36 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 						return  ResponseEntity.badRequest().body(getObjectResponse);
 
 					}
-
+					boolean isParent = false;
+					if(loggedUser.getAccountType() == 4) {
+						Set<User>parentClients = loggedUser.getUsersOfUser();
+						if(parentClients.isEmpty()) {
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this device ",tripReport);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}else {
+							User parent = null;
+							for(User object : parentClients) {
+								parent = object ;
+							}
+							Set<User>deviceParent = device.getUser();
+							if(deviceParent.isEmpty()) {
+								getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this device ",tripReport);
+								return  ResponseEntity.badRequest().body(getObjectResponse);
+							}else {
+								for(User  parentObject : deviceParent) {
+									if(parent.getId() == parentObject.getId()) {
+										isParent = true;
+										break;
+									}
+								}
+							}
+						}
+					}
+					if(!deviceServiceImpl.checkIfParent(device , loggedUser) && ! isParent) {
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
+						logger.info("************************ getDeviceWorkingHours ENDED ***************************");
+						return ResponseEntity.badRequest().body(getObjectResponse);
+					}
 					String plainCreds = "admin@fuinco.com:admin";
 					byte[] plainCredsBytes = plainCreds.getBytes();
 					

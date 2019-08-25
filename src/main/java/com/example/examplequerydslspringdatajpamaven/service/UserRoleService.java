@@ -6,21 +6,21 @@ import com.example.examplequerydslspringdatajpamaven.entity.UserRole;
 
 public interface UserRoleService {
 
-	public ResponseEntity<?>createRole(UserRole role,Long userId);
+	public ResponseEntity<?>createRole(String TOKEN,UserRole role,Long userId);
 	
-	public ResponseEntity<?>editRole(UserRole role);
+	public ResponseEntity<?>editRole(String TOKEN,UserRole role,Long userId);
 	
 	public UserRole findById(Long Id);
 	
-	public ResponseEntity<?>deleteRole(Long roleId);
+	public ResponseEntity<?>deleteRole(String TOKEN,Long roleId,Long userId);
 	
-	public ResponseEntity<?>getRoleById(Long roleId);
+	public ResponseEntity<?>getRoleById(String TOKEN,Long roleId);
 	
-	public ResponseEntity<?>assignRoleToUser(Long roleId,Long userId);
+	public ResponseEntity<?>assignRoleToUser(String TOKEN,Long roleId,Long userId,Long loggedId);
 	
-	public ResponseEntity<?>getAllRolesCreatedByUser(Long userId);
+	public ResponseEntity<?>getAllRolesCreatedByUser(String TOKEN,Long userId);
 	
-	public ResponseEntity<?> getRolePageContent(Long userId);
+	public ResponseEntity<?> getRolePageContent(String TOKEN,Long userId);
 	
 	public Boolean checkUserHasPermission(Long userId,String module,String functionality); 
 	

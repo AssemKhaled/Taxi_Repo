@@ -32,6 +32,9 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 	GeofenceRepository geofenceRepository;
 	
 	@Autowired
+	private UserRoleService userRoleService;
+	
+	@Autowired
 	UserRepository userRepository;
 
 	@Autowired
@@ -64,6 +67,13 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 
 			}
 			else {
+				if(user.getAccountType()!= 1) {
+					if(!userRoleService.checkUserHasPermission(id, "GEOFENCE", "list")) {
+						 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get geofences list",null);
+						 logger.info("************************ getAllUserDevices ENDED ***************************");
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+					}
+				}
 				if(user.getDelete_date() == null) {
 					geofences = geofenceRepository.getAllGeofences(id,offset,search);
 					Integer size=geofenceRepository.getAllGeofencesSize(id);
@@ -144,7 +154,7 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 	}
 
 	@Override
-	public ResponseEntity<?> deleteGeofence(String TOKEN,Long geofenceId) {
+	public ResponseEntity<?> deleteGeofence(String TOKEN,Long geofenceId,Long userId) {
 
 		logger.info("************************ deleteGeofence STARTED ***************************");
 
@@ -154,6 +164,20 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 
 		
 		List<Geofence> geofences = new ArrayList<Geofence>();
+		User user = userServiceImpl.findById(userId);
+		if(user == null ) {
+			getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User is not Found",geofences);
+			return  ResponseEntity.status(404).body(getObjectResponse);
+
+		}
+		
+		if(user.getAccountType()!= 1) {
+			if(!userRoleService.checkUserHasPermission(userId, "GEOFENCE", "delete")) {
+				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to delete",null);
+				 logger.info("************************ deleteGeo ENDED ***************************");
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+		}
 		if(TOKEN.equals("")) {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",geofences);
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
@@ -234,6 +258,13 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 
 			}
 			else {
+				if(user.getAccountType()!= 1) {
+					if(!userRoleService.checkUserHasPermission(id, "GEOFENCE", "create")) {
+						 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to create",null);
+						 logger.info("************************ deleteGeo ENDED ***************************");
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+					}
+				}
 				if(user.getDelete_date()==null) {
 					if(geofence.getName()== null || geofence.getType()== null
 							   || geofence.getArea() == null || geofence.getName()== "" || geofence.getType()== ""
@@ -328,6 +359,13 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 
 			}
 			else {
+				if(user.getAccountType()!= 1) {
+					if(!userRoleService.checkUserHasPermission(id, "GEOFENCE", "edit")) {
+						 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to edit",null);
+						 logger.info("************************ deleteGeo ENDED ***************************");
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+					}
+				}
 				 if(user.getDelete_date()==null) {
 					 if(geofence.getId() != null) {
 						 Geofence geofneceCheck = getById(geofence.getId());
@@ -470,6 +508,13 @@ logger.info("************************ getAllUserGeofences STARTED **************
 
 			}
 			else {
+				if(user.getAccountType()!= 1) {
+					if(!userRoleService.checkUserHasPermission(id, "GEOFENCE", "list")) {
+						 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to list",null);
+						 logger.info("************************ deleteGeo ENDED ***************************");
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+					}
+				}
 				if(user.getDelete_date() == null) {
 					geofences = geofenceRepository.getAllGeos(id);
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",geofences);

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -23,45 +24,45 @@ public class UserRoleRestController {
 	UserRoleService userRoleService;
 	
 	@PostMapping("/createRole")
-	public ResponseEntity<?> createRole(@RequestParam (value = "userId",defaultValue = "0") Long userId,@RequestBody(required = false) UserRole role){
+	public ResponseEntity<?> createRole(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,@RequestParam (value = "userId",defaultValue = "0") Long userId,@RequestBody(required = false) UserRole role){
 		
-		return userRoleService.createRole(role,userId);
+		return userRoleService.createRole(TOKEN,role,userId);
 	}
 	
 	@PostMapping("/editRole")
-	public ResponseEntity<?> editRole(@RequestBody(required = false) UserRole role){
-		return userRoleService.editRole(role);
+	public ResponseEntity<?> editRole(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,@RequestBody(required = false) UserRole role,@RequestParam (value = "userId",defaultValue = "0") Long userId){
+		return userRoleService.editRole(TOKEN,role,userId);
 	}
 	
 	@GetMapping("/deleteRole")
-	public ResponseEntity<?>deleteRole(@RequestParam (value = "roleId",defaultValue = "0") Long roleId){
+	public ResponseEntity<?>deleteRole(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,@RequestParam (value = "roleId",defaultValue = "0") Long roleId,@RequestParam (value = "userId",defaultValue = "0") Long userId){
 		
 		
-		return userRoleService.deleteRole(roleId);
+		return userRoleService.deleteRole(TOKEN,roleId,userId);
 	}
 	
 	@GetMapping("/getRoleById")
-	public ResponseEntity<?>getRoleByTd(@RequestParam (value = "roleId",defaultValue = "0") Long roleId){
+	public ResponseEntity<?>getRoleByTd(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,@RequestParam (value = "roleId",defaultValue = "0") Long roleId){
 		
-		return userRoleService.getRoleById(roleId);
+		return userRoleService.getRoleById(TOKEN,roleId);
 	}
 	
 	@GetMapping("/assignRoleToUser")
-	public ResponseEntity<?>assignRoleToUser(@RequestParam (value = "roleId",defaultValue = "0") Long roleId,@RequestParam (value = "userId",defaultValue = "0") Long userId){
+	public ResponseEntity<?>assignRoleToUser(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,@RequestParam (value = "roleId",defaultValue = "0") Long roleId,@RequestParam (value = "userId",defaultValue = "0") Long userId,@RequestParam (value = "loggedId",defaultValue = "0") Long loggedId){
 	
-		return userRoleService.assignRoleToUser(roleId,userId);
+		return userRoleService.assignRoleToUser(TOKEN,roleId,userId,loggedId);
 	}
 	
 	@GetMapping("/getAllRolesCreatedByUser")
-	public ResponseEntity<?> getAllRolesCreatedByUser(@RequestParam (value = "userId",defaultValue = "0") Long userId){
+	public ResponseEntity<?> getAllRolesCreatedByUser(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,@RequestParam (value = "userId",defaultValue = "0") Long userId){
 		
 		
-		return userRoleService.getAllRolesCreatedByUser(userId);
+		return userRoleService.getAllRolesCreatedByUser(TOKEN,userId);
 	}
 	
 	@GetMapping("/getRolePageContent")
-	public ResponseEntity<?> getRolePageContent(@RequestParam (value = "userId",defaultValue = "0") Long userId){
-		return userRoleService.getRolePageContent(userId);
+	public ResponseEntity<?> getRolePageContent(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,@RequestParam (value = "userId",defaultValue = "0") Long userId){
+		return userRoleService.getRolePageContent(TOKEN,userId);
 	}
 	
 	

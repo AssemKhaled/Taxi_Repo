@@ -35,6 +35,9 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 	DriverRepository driverRepository;
 	
 	@Autowired
+	private UserRoleService userRoleService;
+	
+	@Autowired
 	UserServiceImpl userServiceImpl;
 	
 	@Autowired
@@ -67,12 +70,19 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 
 			}
 			else {
+				if(user.getAccountType()!= 1) {
+					if(!userRoleService.checkUserHasPermission(id, "DRIVER", "list")) {
+						 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get driver list",null);
+						 logger.info("************************ getAllUserDrivers ENDED ***************************");
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+					}
+				}
 				   userServiceImpl.resetChildernArray();
 					if(user.getAccountType() == 4 ) {
 						Set<User>parentClients = user.getUsersOfUser();
 						if(parentClients.isEmpty()) {
 							getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get drivers of this user",null);
-							 logger.info("************************ getAllUserDtivers ENDED ***************************");
+							 logger.info("************************ getAllUserDrivers ENDED ***************************");
 							return  ResponseEntity.status(404).body(getObjectResponse);
 						}else {
 							User parent = null;
@@ -153,6 +163,13 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 
 			}
 			else {
+				if(user.getAccountType()!= 1) {
+					if(!userRoleService.checkUserHasPermission(id, "DRIVER", "create")) {
+						 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to create driver",null);
+						 logger.info("************************ createDriver ENDED ***************************");
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+					}
+				}
 					
 					if(driver.getName()== null || driver.getUniqueid()== null
 							   || driver.getMobile_num() == null || driver.getName()== "" || driver.getUniqueid()== ""
@@ -280,6 +297,13 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 
 			}
 			else {
+				if(user.getAccountType()!= 1) {
+					if(!userRoleService.checkUserHasPermission(id, "DRIVER", "edit")) {
+						 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to edit driver",null);
+						 logger.info("************************ editDriver ENDED ***************************");
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+					}
+				}
                
                 	if(driver.getId() != null) {
                 		   	
@@ -534,6 +558,13 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 			getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This loggedUser  is not Found",drivers);
 			return  ResponseEntity.status(404).body(getObjectResponse);
 		}
+		if(loggedUser.getAccountType()!= 1) {
+			if(!userRoleService.checkUserHasPermission(userId, "DRIVER", "delete")) {
+				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to delete driver",null);
+				 logger.info("************************ deleteDriver ENDED ***************************");
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+		}
 		if(driverId != 0) {
 			Driver driver= driverRepository.findOne(driverId);
 			if(driver != null) {
@@ -771,6 +802,13 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 				
 				return ResponseEntity.status(404).body(getObjectResponse);
 			}else {
+				if(loggedUser.getAccountType()!= 1) {
+					if(!userRoleService.checkUserHasPermission(userId, "DRIVER", "assignToUser")) {
+						 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to assignToUser",null);
+						 logger.info("************************ assignToUser ENDED ***************************");
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+					}
+				}
 				if(loggedUser.getAccountType() == 3 || loggedUser.getAccountType() == 4) {
 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to assign driver to any user",null);
 					

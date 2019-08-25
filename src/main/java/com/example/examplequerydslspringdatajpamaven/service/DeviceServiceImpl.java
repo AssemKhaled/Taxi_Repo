@@ -49,6 +49,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	
 	@Autowired
 	private UserRoleService userRoleService;
+	
 	@Override
 	public ResponseEntity<?> getAllUserDevices(String TOKEN,Long userId , int offset, String search) {
 		// TODO Auto-generated method stub
@@ -154,7 +155,6 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			logger.info("************************ createDevice ENDED ***************************");
 			return ResponseEntity.status(404).body(getObjectResponse);
 		}
-		logger.info(loggedUser.getAccountType());
 		if(loggedUser.getAccountType()!= 1) {
 			if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "create")) {
 				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to create device",null);
@@ -268,6 +268,13 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "This user is not found",null);
 			logger.info("************************ editDevice ENDED ***************************");
 			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+		if(loggedUser.getAccountType()!= 1) {
+			if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "edit")) {
+				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to edit device",null);
+				 logger.info("************************ editDevice ENDED ***************************");
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
 		}
 	
 		if(device.getId() == null || device.getName()== null ||device.getName() == "" 
@@ -448,6 +455,14 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		     logger.info("************************ deleteDevice ENDED ***************************");
 		     return ResponseEntity.badRequest().body(getObjectResponse); 
 		 }
+		User loggedUser = userService.findById(userId);
+		if(loggedUser.getAccountType()!= 1) {
+			if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "delete")) {
+				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to delete device",null);
+				 logger.info("************************ deleteDevice ENDED ***************************");
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+		}
 		 System.out.println(deviceId);
 		 Device device = findById(deviceId);
 		 if(device == null)
@@ -661,6 +676,13 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			logger.info("************************ assignDeviceToDriver ENDED ***************************");
 			return ResponseEntity.status(404).body(getObjectResponse);
 		}
+		if(loggedUser.getAccountType()!= 1) {
+			if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "assignDeviceToDriver")) {
+				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to assignDeviceToDriver",null);
+				 logger.info("************************ deleteDevice ENDED ***************************");
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+		}
 		if(deviceId == 0 ) {
 			
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",null);
@@ -790,7 +812,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	}
 
 	@Override
-	public ResponseEntity<?> assignDeviceToGeofences(String TOKEN,Long deviceId , Long [] geoIds) {
+	public ResponseEntity<?> assignDeviceToGeofences(String TOKEN,Long deviceId , Long [] geoIds,Long userId) {
 		logger.info("************************ assignDeviceToGeofences STARTED ***************************");
 		if(TOKEN.equals("")) {
 			 List<Device> devices = null;
@@ -801,6 +823,19 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		if(super.checkActive(TOKEN)!= null)
 		{
 			return super.checkActive(TOKEN);
+		}
+		User loggedUser = userService.findById(userId);
+		if(loggedUser == null) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This loggedUser is not found",null);
+			logger.info("************************ assignGeofenceToDevice ENDED ***************************");
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+		if(loggedUser.getAccountType()!= 1) {
+			if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "assignGeofenceToDevice")) {
+				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to assignGeofenceToDevice",null);
+				 logger.info("************************ assignGeofenceToDevice ENDED ***************************");
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
 		}
 		if(deviceId == 0){
 			List<Device> devices = null;
@@ -1810,11 +1845,19 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		}
 		else {
 			User loggedUser = userService.findById(userId);
+			
 			if(loggedUser == null) {
 				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "loggedUser is not found",null);
 				
 				return ResponseEntity.status(404).body(getObjectResponse);
 			}else {
+				if(loggedUser.getAccountType()!= 1) {
+					if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "assignToUser")) {
+						 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to assignToUser",null);
+						 logger.info("************************ assignToUser ENDED ***************************");
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+					}
+				}
 				if(loggedUser.getAccountType() == 3 || loggedUser.getAccountType() == 4) {
 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to assign device to any user",null);
 					
