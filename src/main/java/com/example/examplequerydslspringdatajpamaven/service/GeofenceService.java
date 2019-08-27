@@ -11,7 +11,7 @@ public interface GeofenceService {
 
 	public ResponseEntity<?> getAllGeofences(String TOKEN,Long id,int offset,String search);
 	public ResponseEntity<?> getAllGeo(String TOKEN,Long id);
-	public ResponseEntity<?> getGeofenceById(String TOKEN,Long geofenceId);
+	public ResponseEntity<?> getGeofenceById(String TOKEN,Long geofenceId,Long userId);
 	public Geofence getById(Long geofenceId);
 	public ResponseEntity<?> deleteGeofence(String TOKEN,Long geofenceId,Long userId);
 	public List<Geofence> checkDublicateGeofenceInAdd(Long userId,String name);

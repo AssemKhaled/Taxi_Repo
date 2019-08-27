@@ -42,14 +42,14 @@ public interface GeofenceRepository extends JpaRepository<Geofence, Long>, Query
 	public List<Geofence> getMultipleGeofencesById(@Param("ids")Long [] ids);
 	
 	@Query(value = "SELECT tc_geofences.* FROM tc_geofences INNER JOIN tc_user_geofence ON tc_user_geofence.geofenceid = tc_geofences.id"
-			+ " WHERE tc_user_geofence.userid=:userId and tc_geofences.delete_date is null"
+			+ " WHERE tc_user_geofence.userid IN(:userIds)and tc_geofences.delete_date is null"
 			+ " and ((tc_geofences.name Like %:search%) OR (tc_geofences.type Like %:search%))"
 			+ " LIMIT :offset,10", nativeQuery = true)
-	public List<Geofence> getAllGeofences(@Param("userId") Long userId,@Param("offset") int offset,@Param("search") String search);
+	public List<Geofence> getAllGeofences(@Param("userIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
 	
 	@Query(value = "SELECT count(*) FROM tc_geofences INNER JOIN tc_user_geofence ON tc_user_geofence.geofenceid = tc_geofences.id"
-			+ " WHERE tc_user_geofence.userid=:userId and tc_geofences.delete_date is null", nativeQuery = true)
-	public Integer getAllGeofencesSize(@Param("userId") Long userId);
+			+ " WHERE tc_user_geofence.userid IN(:userIds)and tc_geofences.delete_date is null", nativeQuery = true)
+	public Integer getAllGeofencesSize(@Param("userIds")List<Long> userIds);
 	
 	@Query(value = "SELECT tc_geofences.* FROM tc_geofences INNER JOIN tc_user_geofence ON tc_user_geofence.geofenceid = tc_geofences.id"
 			+ " WHERE tc_user_geofence.userid=:userId and tc_geofences.delete_date is null", nativeQuery = true)

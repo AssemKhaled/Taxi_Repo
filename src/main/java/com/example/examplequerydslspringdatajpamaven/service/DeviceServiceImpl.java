@@ -87,7 +87,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
 		}
-		userService.resetChildernArray();
+		 userService.resetChildernArray();
 		 if(loggedUser.getAccountType() == 4) {
 			 Set<User> parentClients = loggedUser.getUsersOfUser();
 			 if(parentClients.isEmpty()) {
@@ -103,7 +103,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				 List<Long>usersIds= new ArrayList<>();
 				 usersIds.add(parentClient.getId());
 				 List<CustomDeviceList> devices= deviceRepository.getDevicesList(usersIds,offset,search);
-				 getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
+				 getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",usersIds);
 				 logger.info("************************ getAllUserDevices ENDED ***************************");
 				return  ResponseEntity.ok().body(getObjectResponse);
 			 }
