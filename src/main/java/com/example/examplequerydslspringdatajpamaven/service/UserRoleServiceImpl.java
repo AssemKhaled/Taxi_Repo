@@ -289,7 +289,16 @@ public ResponseEntity<?> getRolePageContent(Long userId) {
 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "no permissions to add",null);
 					 return  ResponseEntity.status(404).body(getObjectResponse);
 				}else {
-					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",permissions);
+					Map permissionsList   = new HashMap<>();
+					permissionsList.put("permissions", permissions);
+					Map responseData = new HashMap<>();
+					responseData.put("id",null);
+					responseData.put("name",null);
+					responseData.put("permissions", permissionsList);
+					List<Map> response = new ArrayList<Map>();
+					response.add(responseData);
+					
+					getObjectResponse =  new GetObjectResponse(HttpStatus.OK.value(), "sucecss",response);
 					 return  ResponseEntity.ok().body(getObjectResponse);
 				}
 			}else {
@@ -311,10 +320,20 @@ public ResponseEntity<?> getRolePageContent(Long userId) {
 						permission.setId((long) permissionObject.getInt("id"));
 						permission.setName(permissionObject.getString("name"));
 						permission.setFunctionality(permissionObject.getJSONObject("functionality").toString());
+						
 						list.add(permission);
 					}
-					getObjectResponse =  new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "sucecss",list);
-					 return  ResponseEntity.badRequest().body(getObjectResponse);
+					Map permissions   = new HashMap<>();
+					permissions.put("permissions", list);
+					Map responseData = new HashMap<>();
+					responseData.put("id",null);
+					responseData.put("name",null);
+					responseData.put("permissions", permissions);
+					List<Map> response = new ArrayList<Map>();
+					response.add(responseData);
+					
+					getObjectResponse =  new GetObjectResponse(HttpStatus.OK.value(), "sucecss",response);
+					 return  ResponseEntity.ok().body(getObjectResponse);
 					
 				}
 			}

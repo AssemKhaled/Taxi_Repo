@@ -24,7 +24,8 @@ public class Permission {
 	
 	@Column(name = "delete_date")
 	private String delete_date;
-
+	
+	
 	
 	public Long getId() {
 		return id;
@@ -57,4 +58,7 @@ public class Permission {
 	public void setDelete_date(String delete_date) {
 		this.delete_date = delete_date;
 	}
+
+	
+	
 }
