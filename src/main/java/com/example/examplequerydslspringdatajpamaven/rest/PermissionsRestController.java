@@ -22,13 +22,13 @@ public class PermissionsRestController {
 	@Autowired
 	PermissionService permissionService;
 	@PostMapping(path = "/addPermission")
-	public ResponseEntity<?> addPermission(@RequestBody(required = false) Permission permission){
+	public ResponseEntity<?> addPermission(@RequestBody(required = true) Permission permission){
 		
 		return permissionService.addPermission(permission);
 	}
 	
 	@PostMapping(path ="/editPermission")
-	public ResponseEntity<?> editPermission(@RequestBody(required = false) Permission permission){
+	public ResponseEntity<?> editPermission(@RequestBody(required = true) Permission permission){
 		
 
 		return permissionService.editPermission(permission);
@@ -36,7 +36,7 @@ public class PermissionsRestController {
 	}
 	
 	@GetMapping(path = "deletePermission")
-	public ResponseEntity<?> deletePermission( @RequestParam (value = "permissionId",defaultValue = "0") Long permissionId){
+	public ResponseEntity<?> deletePermission(@RequestParam (value = "permissionId",defaultValue = "0") Long permissionId){
 		
 		return permissionService.deletePermission(permissionId);
 	}

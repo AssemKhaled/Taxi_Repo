@@ -36,6 +36,9 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	
 	@Autowired
 	private UserRoleRepository roleRepository;
+
+	@Autowired
+	private UserRoleService userRoleService;
 	
 	private List<User> childernUsers = new ArrayList<>();
 	private static final Log logger = LogFactory.getLog(DeviceServiceImpl.class);
@@ -233,7 +236,13 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 				return  ResponseEntity.status(404).body(getObjectResponse);
 			}
 			else {
-
+				if(user.getAccountType()!= 1) {
+					if(!userRoleService.checkUserHasPermission(userId, "USER", "list")) {
+						 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get user list",null);
+						 logger.info("************************ getAllUses ENDED ***************************");
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+					}
+				}
 				if(active == 0) {
 					List<User> users = userRepository.getInactiveUsersOfUser(userId,offset,search);
 					Integer size=userRepository.getInactiveUsersOfUserSize(userId);
@@ -282,6 +291,13 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 
 			    	return ResponseEntity.status(404).body(getObjectResponse);
 				}else {
+					if(creater.getAccountType()!= 1) {
+						if(!userRoleService.checkUserHasPermission(userId, "USER", "create")) {
+							 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to create user",null);
+							 logger.info("************************ getAllUses ENDED ***************************");
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}
+					}
 					if(user.getId() != null && user.getId() != 0) {
 						List<User> users = null;
 						String message= "create doesn't accept id";
@@ -455,6 +471,13 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 			    	logger.info("************************editUser ENDED ***************************");
 			    	return ResponseEntity.status(404).body(getObjectResponse); 
 			  }
+			  if(loggedUser.getAccountType()!= 1) {
+					if(!userRoleService.checkUserHasPermission(userId, "USER", "edit")) {
+						 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to edit user",null);
+						 logger.info("************************ editUSER ENDED ***************************");
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+					}
+				}
 			//to set the users of updateduser
 			if( user.getId() == null || user.getId() == 0|| user.getEmail() == null || user.getEmail() == "" ||
 					 user.getName() == null || user.getName() == "" 
@@ -1217,6 +1240,13 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This user is not found",null);
 		    return ResponseEntity.status(404).body(getObjectResponse);
 		}
+		if(loggedUser.getAccountType()!= 1) {
+			if(!userRoleService.checkUserHasPermission(userId, "USER", "delete")) {
+				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to delete user",null);
+				 logger.info("************************ editUSER ENDED ***************************");
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+		}
 		
 		//check if has permission to delete user
 		
@@ -1367,6 +1397,115 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 		else {
 			
 			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",users);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
+	
+		
+
+	}
+	
+	public  ResponseEntity<?> getVendorSelect(String TOKEN,Long userId) {
+
+		logger.info("************************ getVendorSelect STARTED ***************************");
+		List<UserSelect> users = new ArrayList<UserSelect>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",users);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+	    if(userId != 0) {
+	    	User user = findById(userId);
+	    	if(user != null) {
+	    		if(user.getDelete_date() == null) {
+	    			if(user.getAccountType() == 1) {
+	    				users = userRepository.getVendorSelect(userId);
+						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",users);
+						logger.info("************************ getDeviceSelect ENDED ***************************");
+						return ResponseEntity.ok().body(getObjectResponse);
+	    			}
+	    			else {
+	    				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is not Account type 1 to get his own vendors",users);
+	    				 return  ResponseEntity.badRequest().body(getObjectResponse);
+	    			}
+	    			
+
+	    		}
+	    		else {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",users);
+					return ResponseEntity.status(404).body(getObjectResponse);
+
+	    		}
+	    	
+	    	}
+	    	else {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",users);
+				return ResponseEntity.status(404).body(getObjectResponse);
+
+	    	}
+			
+		}
+		else {
+			
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",users);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
+	
+		
+
+	}
+	
+	public  ResponseEntity<?> getClientSelect(String TOKEN,Long vendorId) {
+
+		logger.info("************************ getClientSelect STARTED ***************************");
+		List<UserSelect> users = new ArrayList<UserSelect>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",users);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+	    if(vendorId != 0) {
+	    	User user = findById(vendorId);
+	    	if(user != null) {
+	    		if(user.getDelete_date() == null) {
+	    			if(user.getAccountType()==2) {
+	    				users = userRepository.getClientSelect(vendorId);
+						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",users);
+						logger.info("************************ getClientSelect ENDED ***************************");
+						return ResponseEntity.ok().body(getObjectResponse);
+	    			}
+	    			else {
+	    				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Vendor ID is not Account type 2 to get his own clients",users);
+	    				return  ResponseEntity.badRequest().body(getObjectResponse);
+	    			}
+
+	    		}
+	    		else {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Vendor ID is not found",users);
+					return ResponseEntity.status(404).body(getObjectResponse);
+
+	    		}
+	    	
+	    	}
+	    	else {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Vendor ID is not found",users);
+				return ResponseEntity.status(404).body(getObjectResponse);
+
+	    	}
+			
+		}
+		else {
+			
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Vendor ID is Required",users);
 			return ResponseEntity.badRequest().body(getObjectResponse);
 
 		}

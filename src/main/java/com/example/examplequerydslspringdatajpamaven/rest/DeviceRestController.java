@@ -102,9 +102,10 @@ public class DeviceRestController {
 	@GetMapping(path = "/assignGeofencesToDevice")
 	public ResponseEntity<?> assignGeofencesToDevice(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 			                                         @RequestParam(value = "deviceId" ,defaultValue = "0") Long deviceId,
+			                                         @RequestParam(value = "userId" , defaultValue = "0")Long userId,
 			                                         @RequestParam (value = "geoIds", defaultValue = "")Long [] geoIds) {
 	
-				return deviceService.assignDeviceToGeofences(TOKEN,deviceId,geoIds);	
+				return deviceService.assignDeviceToGeofences(TOKEN,deviceId,geoIds,userId);	
 				
 	}
 	@GetMapping(path = "/testResponse")

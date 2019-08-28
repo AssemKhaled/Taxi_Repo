@@ -29,7 +29,7 @@ public interface DeviceService {
 
 	public ResponseEntity<?> assignDeviceToDriver(String TOKEN,Long deviceId , Long driverId , Long userId);
 	
-	public ResponseEntity<?> assignDeviceToGeofences(String TOKEN,Long deviceId,Long [] geoIds );
+	public ResponseEntity<?> assignDeviceToGeofences(String TOKEN,Long deviceId,Long [] geoIds,Long userId );
 
 	public ResponseEntity<?> testgetDeviceById();
 

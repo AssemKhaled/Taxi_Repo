@@ -84,15 +84,23 @@ public class LoginServiceImpl extends RestServiceController implements LoginServ
 				else {
 					
 					String loggedEmail= user.getEmail();
-					UserRole userRole = userRoleService.findById(user.getRoleId());
+					
+					
 					String token =  jwkValidator.createJWT(loggedEmail, null);
 					Map userInfo = new HashMap();
 					userInfo.put("userId", user.getId());
 					userInfo.put("name" ,user.getName());
 					userInfo.put("email", user.getEmail());
 					userInfo.put("photo", user.getPhoto());
+					userInfo.put("accountType", user.getAccountType());
 					userInfo.put("token",token);
-					userInfo.put("userRole", userRole);
+					if(user.getRoleId() == null) {
+						userInfo.put("userRole", null);
+					}else {
+						UserRole userRole = userRoleService.findById(user.getRoleId());
+						userInfo.put("userRole", userRole);
+					}
+					
 					List<Map> loggedUser = new ArrayList<>();
 					loggedUser.add(userInfo);
 					SimpleDateFormat FORMATTER = new SimpleDateFormat("yyyy-MM-dd  HH:MM:ss");
