@@ -319,6 +319,7 @@ public ResponseEntity<?> getRolePageContent(Long userId) {
 						Permission permission = new Permission();
 						permission.setId((long) permissionObject.getInt("id"));
 						permission.setName(permissionObject.getString("name"));
+						
 						permission.setFunctionality(permissionObject.getJSONObject("functionality").toString());
 						
 						list.add(permission);

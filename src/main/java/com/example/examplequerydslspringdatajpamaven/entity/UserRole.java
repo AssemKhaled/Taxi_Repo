@@ -25,7 +25,7 @@ public class UserRole {
 	@Column(name = "name")
 	private String name;
 	
-	@Column(name = "permissions")
+	@Column(name = "permissions" , length = 100000)
 	private String permissions ;
 	
 	@Column(name = "delete_date")
