@@ -1404,6 +1404,115 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 		
 
 	}
+	
+	public  ResponseEntity<?> getVendorSelect(String TOKEN,Long userId) {
+
+		logger.info("************************ getVendorSelect STARTED ***************************");
+		List<UserSelect> users = new ArrayList<UserSelect>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",users);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+	    if(userId != 0) {
+	    	User user = findById(userId);
+	    	if(user != null) {
+	    		if(user.getDelete_date() == null) {
+	    			if(user.getAccountType() == 1) {
+	    				users = userRepository.getVendorSelect(userId);
+						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",users);
+						logger.info("************************ getDeviceSelect ENDED ***************************");
+						return ResponseEntity.ok().body(getObjectResponse);
+	    			}
+	    			else {
+	    				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is not Account type 1 to get his own vendors",users);
+	    				 return  ResponseEntity.badRequest().body(getObjectResponse);
+	    			}
+	    			
+
+	    		}
+	    		else {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",users);
+					return ResponseEntity.status(404).body(getObjectResponse);
+
+	    		}
+	    	
+	    	}
+	    	else {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",users);
+				return ResponseEntity.status(404).body(getObjectResponse);
+
+	    	}
+			
+		}
+		else {
+			
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",users);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
+	
+		
+
+	}
+	
+	public  ResponseEntity<?> getClientSelect(String TOKEN,Long vendorId) {
+
+		logger.info("************************ getClientSelect STARTED ***************************");
+		List<UserSelect> users = new ArrayList<UserSelect>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",users);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+	    if(vendorId != 0) {
+	    	User user = findById(vendorId);
+	    	if(user != null) {
+	    		if(user.getDelete_date() == null) {
+	    			if(user.getAccountType()==2) {
+	    				users = userRepository.getClientSelect(vendorId);
+						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",users);
+						logger.info("************************ getClientSelect ENDED ***************************");
+						return ResponseEntity.ok().body(getObjectResponse);
+	    			}
+	    			else {
+	    				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Vendor ID is not Account type 2 to get his own clients",users);
+	    				return  ResponseEntity.badRequest().body(getObjectResponse);
+	    			}
+
+	    		}
+	    		else {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Vendor ID is not found",users);
+					return ResponseEntity.status(404).body(getObjectResponse);
+
+	    		}
+	    	
+	    	}
+	    	else {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Vendor ID is not found",users);
+				return ResponseEntity.status(404).body(getObjectResponse);
+
+	    	}
+			
+		}
+		else {
+			
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Vendor ID is Required",users);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
+	
+		
+
+	}
 
 	
 }

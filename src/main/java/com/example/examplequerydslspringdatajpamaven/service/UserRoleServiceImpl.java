@@ -119,7 +119,8 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 			
 		}
 		
-		Long createdByUserId=role.getUserId();
+		UserRole userRole = userRoleRepository.findOne(role.getId());
+		Long createdByUserId=userRole.getUserId();
 		if(createdByUserId == 4) {
 			 if(loggedUser.getAccountType()==4) {
 				 if(createdByUserId!=userId) {
@@ -262,6 +263,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 				 return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
 		}
+		role.setUserId(createdByUserId);
 		userRoleRepository.save(role);
 		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "role updated successfully",null);
 		 return  ResponseEntity.ok().body(getObjectResponse);

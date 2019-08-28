@@ -104,9 +104,23 @@ public class UserRestController {
 	public @ResponseBody ResponseEntity<?> getUserSelect(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 			                                               @RequestParam (value = "userId", defaultValue = "0") Long userId) {
 		
-	
     	return userService.getUserSelect(TOKEN,userId);
-
+		
+	}
+	
+	@RequestMapping(value = "/getVendorSelect", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getVendorSelect(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                               @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		
+    	return userService.getVendorSelect(TOKEN,userId);
+		
+	}
+	
+	@RequestMapping(value = "/getClientSelect", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getClientSelect(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                               @RequestParam (value = "vendorId", defaultValue = "0") Long vendorId) {
+		
+    	return userService.getClientSelect(TOKEN,vendorId);
 		
 	}
 }

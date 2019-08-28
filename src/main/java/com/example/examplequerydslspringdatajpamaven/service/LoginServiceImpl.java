@@ -92,6 +92,7 @@ public class LoginServiceImpl extends RestServiceController implements LoginServ
 					userInfo.put("name" ,user.getName());
 					userInfo.put("email", user.getEmail());
 					userInfo.put("photo", user.getPhoto());
+					userInfo.put("accountType", user.getAccountType());
 					userInfo.put("token",token);
 					if(user.getRoleId() == null) {
 						userInfo.put("userRole", null);
