@@ -1290,6 +1290,7 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	   				 }else {
 	   				  TokenSecurity.getInstance().removeActiveUserById(deleteUserId);
 	   					 //get all children
+	   				 resetChildernArray();
 	   				  List<User>children = getAllChildernOfUser(deleteUserId);
 	   				  if(!children.isEmpty()) {
 	   					  for(User object : children ) {
