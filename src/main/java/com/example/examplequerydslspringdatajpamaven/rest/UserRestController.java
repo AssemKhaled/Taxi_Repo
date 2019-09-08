@@ -49,11 +49,12 @@ public class UserRestController {
 	
 	@GetMapping("/usersList")
 	public ResponseEntity<?> usersList(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                           @RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,
 									   @RequestParam (value = "userId", defaultValue = "0") Long userId,
 									   @RequestParam(value = "offset", defaultValue = "0") int offset,
 							           @RequestParam(value = "search", defaultValue = "") String search,
 							           @RequestParam(value = "active",defaultValue = "1") int active) {
-		return userService.usersOfUser(TOKEN,userId,offset,search,active);
+		return userService.usersOfUser(TOKEN,userId,loggedUserId,offset,search,active);
 	}
 	
 	@GetMapping("/getUserById")
@@ -123,4 +124,13 @@ public class UserRestController {
     	return userService.getClientSelect(TOKEN,vendorId);
 		
 	}
+	
+	@RequestMapping(value = "/getUserSelectWithChild", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getUserSelectWithChild(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                               @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		
+    	return userService.getUserSelectWithChild(TOKEN,userId);
+		
+	}
+	
 }

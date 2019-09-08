@@ -14,7 +14,7 @@ public interface IUserService {
 //	public ResponseEntity<?> UserDevice(Long userId,int offset, String search);
 	public User findById(Long userId);
 	public ResponseEntity<?> findUserById(String TOKEN,Long userId,Long loggedUserId);
-	public ResponseEntity<?> usersOfUser(String TOKEN,Long userId,int offset,String search,int active);
+	public ResponseEntity<?> usersOfUser(String TOKEN,Long userId,Long loggedUserId,int offset,String search,int active);
 	public ResponseEntity<?> createUser(String TOKEN,User user,Long userId);
 	public ResponseEntity<?> editUser(String TOKEN,User user,Long userId);
 	public List<Integer> checkUserDuplication(User user);
@@ -33,6 +33,9 @@ public interface IUserService {
 	public List<User>getAllChildernOfUser(Long userId);
 	public List<User>getActiveAndInactiveChildern(Long userId);
 	public void resetChildernArray();
+	
+	public ResponseEntity<?> getUserSelectWithChild(String TOKEN,Long userId);
+
 
 
 

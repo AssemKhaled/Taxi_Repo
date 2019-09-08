@@ -35,7 +35,13 @@ public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredi
 			+ "tc_users.identity_num LIKE %:search%) limit :offset,10", nativeQuery = true)
 	public List<User> getUsersOfUser(@Param("userId") Long userId,@Param("offset")int offset,@Param("search")String search); 
 	
-
+	@Query(value = "SELECT tc_users.* FROM tc_user_user inner join tc_users on tc_user_user.manageduserid=tc_users.id where tc_user_user.userid = :userId AND  "
+			+ "(tc_users.name LIKE %:search% OR "
+			+ "tc_users.email LIKE %:search% OR tc_users.commercial_num LIKE %:search% OR "
+			+ "tc_users.identity_num LIKE %:search%) limit :offset,10", nativeQuery = true)
+	public List<User> getAllUsersOfUser(@Param("userId") Long userId,@Param("offset")int offset,@Param("search")String search); 
+	
+	
 	@Query(value = "SELECT tc_users.* FROM tc_user_user inner join tc_users on tc_user_user.manageduserid=tc_users.id where tc_user_user.userid = :userId and delete_date is not  null AND  "
 			+ "(tc_users.name LIKE %:search% OR "
 			+ "tc_users.email LIKE %:search% OR tc_users.commercial_num LIKE %:search% OR "
@@ -58,6 +64,11 @@ public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredi
 			+ "where tc_user_user.userid = :userId and delete_date is null", nativeQuery = true)
 	public Integer getUsersOfUserSize(@Param("userId") Long userId);
 	
+	@Query(value = "SELECT count(*) FROM tc_user_user "
+			+ " inner join tc_users on tc_user_user.manageduserid=tc_users.id "
+			+ "where tc_user_user.userid = :userId", nativeQuery = true)
+	public Integer getAllUsersOfUserSize(@Param("userId") Long userId);
+	
 	
 
 	
@@ -79,6 +90,11 @@ public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredi
 			" inner join tc_users on tc_user_user.manageduserid=tc_users.id" + 
 			" where tc_user_user.userid = :userId and delete_date is null",nativeQuery = true)
 	public List<UserSelect> getUserSelect(@Param("userId")Long userId);
+	
+	@Query(value = "SELECT tc_users.id,tc_users.name FROM tc_user_user " + 
+			" inner join tc_users on tc_user_user.manageduserid=tc_users.id" + 
+			" where tc_user_user.userid IN(:userIds) and delete_date is null",nativeQuery = true)
+	public List<UserSelect> getUserSelectWithChild(@Param("userIds")List<Long> userIds);
 	
 	@Query(value = "SELECT tc_users.id,tc_users.name FROM tc_user_user " + 
 			" inner join tc_users on tc_user_user.manageduserid=tc_users.id" + 

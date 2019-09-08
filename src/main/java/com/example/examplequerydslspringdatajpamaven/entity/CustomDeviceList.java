@@ -257,6 +257,18 @@ public class CustomDeviceList{
 	public void setCarWeight(String carWeight) {
 		this.carWeight = carWeight;
 	}
+
+	public String getVehiclePlate() {
+		return vehiclePlate;
+	}
+
+	public void setVehiclePlate(String vehiclePlate) {
+		this.vehiclePlate = vehiclePlate;
+	}
+
+	public void setOwnerId(String ownerId) {
+		this.ownerId = ownerId;
+	}
 	
 
 }

@@ -11,9 +11,14 @@ public interface DriverService {
 	public ResponseEntity<?> getDriverSelect(String TOKEN,Long userId);
 	public ResponseEntity<?> findById(String TOKEN,Long driverId,Long userId);
 	public ResponseEntity<?> deleteDriver(String Token,Long driverId, Long userId);
-	public List<Driver> checkDublicateDriverInAdd(Long userId,String name,String uniqueId,String mobileNum);
+	public List<Driver> checkDublicateDriverInAddName(Long userId,String name);
+	public List<Driver> checkDublicateDriverInAddUniqueMobile(String uniqueId,String mobileNum);
+
 	public ResponseEntity<?> addDriver(String TOKEN,Driver driver,Long id);
-	public List<Driver> checkDublicateDriverInEdit(Long driverId,Long userId,String name,String uniqueId,String mobileNum);
+	public List<Driver> checkDublicateDriverInEditName(Long driverId,Long userId,String name);
+	public List<Driver> checkDublicateDriverInEditMobileUnique(Long driverId,String uniqueId,String mobileNum);
+
+	
 	public ResponseEntity<?> editDriver(String TOKEN,Driver driver,Long id);
 	
 	// added by maryam 

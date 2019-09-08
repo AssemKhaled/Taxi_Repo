@@ -155,7 +155,7 @@ public class ProfileServiceImpl extends RestServiceController implements Profile
 	}
 
 	@Override
-	public ResponseEntity<?> updateProfilePassword(String TOKEN,Map<String, String> data,Long userId) {
+	public ResponseEntity<?> updateProfilePassword(String TOKEN,Map<String, String> data,String check,Long userId) {
 		
 		logger.info("************************ updateProfilePassword STARTED ***************************");
 
@@ -178,19 +178,45 @@ public class ProfileServiceImpl extends RestServiceController implements Profile
 			}
 			else {
 				if(user.getDelete_date() == null) {
-					
-					if(data.get("oldPassword") == null || data.get("newPassword") == null ||
-							data.get("oldPassword") == "" || data.get("newPassword") == "") {
-						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "newPassword and oldPassword is Required",users);
-						return ResponseEntity.badRequest().body(getObjectResponse);
+					if(check=="") {
+						if(data.get("oldPassword") == null || data.get("newPassword") == null ||
+								data.get("oldPassword") == "" || data.get("newPassword") == "") {
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "newPassword and oldPassword is Required",users);
+							return ResponseEntity.badRequest().body(getObjectResponse);
 
+						}
+						else {
+							String hashedPassword = userServiceImpl.getMd5(data.get("oldPassword").toString());
+							String newPassword= userServiceImpl.getMd5(data.get("newPassword").toString());
+							String oldPassword= user.getPassword();
+							
+							if(hashedPassword.equals(oldPassword)){
+								user.setPassword(newPassword);
+								profileRepository.save(user);
+								users.add(user);
+								getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success" ,users);
+								logger.info("************************ updateProfilePassword ENDED ***************************");
+								return ResponseEntity.ok().body(getObjectResponse);
+
+							}
+							else {
+								getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Wrong oldPassword",users);
+								return ResponseEntity.status(404).body(getObjectResponse);
+
+							}
+							
+
+						}
 					}
 					else {
-						String hashedPassword = userServiceImpl.getMd5(data.get("oldPassword").toString());
-						String newPassword= userServiceImpl.getMd5(data.get("newPassword").toString());
-						String oldPassword= user.getPassword();
-						
-						if(hashedPassword.equals(oldPassword)){
+						if(data.get("newPassword") == null || data.get("newPassword") == "") {
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "newPassword is Required",users);
+							return ResponseEntity.badRequest().body(getObjectResponse);
+
+						}
+						else {
+							String newPassword= userServiceImpl.getMd5(data.get("newPassword").toString());
+							
 							user.setPassword(newPassword);
 							profileRepository.save(user);
 							users.add(user);
@@ -198,17 +224,12 @@ public class ProfileServiceImpl extends RestServiceController implements Profile
 							logger.info("************************ updateProfilePassword ENDED ***************************");
 							return ResponseEntity.ok().body(getObjectResponse);
 
-						}
-						else {
-							getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Wrong oldPassword",users);
-							return ResponseEntity.status(404).body(getObjectResponse);
+							
+							
 
 						}
-						
-
 					}
 					
-
 				}
 				else {
 					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",users);

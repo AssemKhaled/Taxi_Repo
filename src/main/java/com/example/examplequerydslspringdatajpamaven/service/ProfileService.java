@@ -14,7 +14,7 @@ public interface ProfileService {
 
 	public ResponseEntity<?>  updateProfileInfo(String TOKEN,User user,Long userId);
 	
-	public ResponseEntity<?> updateProfilePassword(String TOKEN,Map<String, String> data,Long userId);
+	public ResponseEntity<?> updateProfilePassword(String TOKEN,Map<String, String> data,String check,Long userId);
 
 	public ResponseEntity<?> updateProfilePhoto(String TOKEN,Map<String, String> data,Long userId);
 

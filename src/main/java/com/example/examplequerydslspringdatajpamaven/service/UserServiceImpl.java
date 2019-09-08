@@ -208,7 +208,7 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	}
 
 	@Override
-	public ResponseEntity<?> usersOfUser(String TOKEN,Long userId,int offset,String search,int active) {
+	public ResponseEntity<?> usersOfUser(String TOKEN,Long userId,Long loggedUserId,int offset,String search,int active) {
 		logger.info("************************ getAllUsersOfUser STARTED ***************************");
 		if(TOKEN.equals("")) {
 			 List<User> users = null;
@@ -228,7 +228,14 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		else {
-			User user = findById(userId);
+			User Loggeduser = findById(loggedUserId);
+			if(Loggeduser == null) {
+				 List<User> users = null;
+				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value() ,"This logged user ID is not found",users);
+				 logger.info("************************ getAllUsersOfUser ENDED ***************************");
+				return  ResponseEntity.status(404).body(getObjectResponse);
+			}
+			User user=userRepository.findOne(userId);
 			if(user == null) {
 				 List<User> users = null;
 				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value() ,"This user is not found",users);
@@ -236,8 +243,8 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 				return  ResponseEntity.status(404).body(getObjectResponse);
 			}
 			else {
-				if(user.getAccountType()!= 1) {
-					if(!userRoleService.checkUserHasPermission(userId, "USER", "list")) {
+				if(Loggeduser.getAccountType()!= 1) {
+					if(!userRoleService.checkUserHasPermission(loggedUserId, "USER", "list")) {
 						 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get user list",null);
 						 logger.info("************************ getAllUses ENDED ***************************");
 						return  ResponseEntity.badRequest().body(getObjectResponse);
@@ -246,6 +253,13 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 				if(active == 0) {
 					List<User> users = userRepository.getInactiveUsersOfUser(userId,offset,search);
 					Integer size=userRepository.getInactiveUsersOfUserSize(userId);
+					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users,size);
+					logger.info("************************ getAllUsersOfUser ENDED ***************************");
+					return  ResponseEntity.ok().body(getObjectResponse);
+				}
+				if(active == 2) {
+					List<User> users = userRepository.getAllUsersOfUser(userId,offset,search);
+					Integer size=userRepository.getAllUsersOfUserSize(userId);
 					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users,size);
 					logger.info("************************ getAllUsersOfUser ENDED ***************************");
 					return  ResponseEntity.ok().body(getObjectResponse);
@@ -324,7 +338,13 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 				    	return ResponseEntity.badRequest().body(getObjectResponse);
 					}
 					//create vendor
-					if(user.getAccountType() == 2) {
+					if(user.getAccountType() == 1) {
+						getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Can't Create account type 1",null);
+				    	logger.info("************************createUser ENDED ***************************");
+				    	return ResponseEntity.badRequest().body(getObjectResponse);
+					}
+					
+					else if(user.getAccountType() == 2) {
 						if(creater.getAccountType() != 1) {
 			    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot create vendor",null);
 					    	logger.info("************************createUser ENDED ***************************");
@@ -335,6 +355,9 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 			    		}
 					}
 					//check if the user is client
+					
+			    	
+					
 					else if(user.getAccountType() == 3) {
 					    	JSONObject parentUsers = new JSONObject(user.getParents());
 					    	if( !parentUsers.has("vendorId")) {
@@ -343,17 +366,67 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 						    	logger.info("************************createUser ENDED ***************************");
 						    	return ResponseEntity.badRequest().body(getObjectResponse);
 					    	}else {
+					    		if(parentUsers.get("vendorId").equals(null)) {
+					    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Vendor ID is Required",null);
+							    	logger.info("************************createUser ENDED ***************************");
+							    	return ResponseEntity.badRequest().body(getObjectResponse);
+					    		}
+					    		if(creater.getAccountType()==2) {
+					    			if(parentUsers.getLong("vendorId") != userId) {
+						    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "not allow to create and assign to another vendor",null);
+								    	logger.info("************************createUser ENDED ***************************");
+								    	return ResponseEntity.badRequest().body(getObjectResponse);
+						    		}
+					    		}
+					    		
+					    		
 					    		if(!checkIfParentOrNot(userId,parentUsers.getLong("vendorId"),creater.getAccountType(),2)) {
 					    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign client to this vendor",null);
 							    	logger.info("************************createUser ENDED ***************************");
 							    	return ResponseEntity.badRequest().body(getObjectResponse);
 					    		}
 					    		else {
+					    			if(parentUsers.has("clientId")) {
+					    				if(!parentUsers.get("clientId").equals(null)) {
+							    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not allow to assign Client ID",null);
+									    	logger.info("************************createUser ENDED ***************************");
+									    	return ResponseEntity.badRequest().body(getObjectResponse);
+							    		}
+					    				
+					    			}
 					    			return saveUser(parentUsers.getLong("vendorId"),user);
 					    		}
 					    	}
 					    }else if(user.getAccountType() == 4) {
 					    	if(creater.getAccountType() == 4) {
+					    	JSONObject parentUsers = new JSONObject(user.getParents());
+					    	
+                           if(!parentUsers.has("clientId")) {
+					    		
+					    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "clientId not found",null);
+						    	logger.info("************************createUser ENDED ***************************");
+						    	return ResponseEntity.badRequest().body(getObjectResponse);
+					    	}else {
+					    		if(parentUsers.get("clientId").equals(null)) {
+					    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Client ID is Required",null);
+							    	logger.info("************************createUser ENDED ***************************");
+							    	return ResponseEntity.badRequest().body(getObjectResponse);
+					    		}
+					    	}
+                           
+                           if(!parentUsers.has("vendorId")) {
+					    		
+					    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "vendorId not found",null);
+						    	logger.info("************************createUser ENDED ***************************");
+						    	return ResponseEntity.badRequest().body(getObjectResponse);
+					    	}else {
+					    		if(parentUsers.get("vendorId").equals(null)) {
+					    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Vendor ID is Required",null);
+							    	logger.info("************************createUser ENDED ***************************");
+							    	return ResponseEntity.badRequest().body(getObjectResponse);
+					    		}
+					    	}
+					    	
 				    		Set<User> userParents = creater.getUsersOfUser();
 				    		if(userParents.isEmpty()) {
 				    			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this  creater user not assigned to any client please assign first to client",null);
@@ -361,15 +434,65 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 						    	return ResponseEntity.status(404).body(getObjectResponse);
 				    		}
 				    		else {
+				    			
 				    			User parent = null;
+				    			boolean isParentClient=false;
+				    			boolean isParentVendor=false;
 				    			for(User parentClient : userParents) {
 					    			 parent = parentClient;
-					    			break;
+					    			 if(parent.getId().equals(parentUsers.getLong("clientId"))) {
+					    				 isParentClient=true;
+					    				 break;
+					    			 }
 					    		}
-				    			return saveUser(parent.getId(),user);
+				    			if(isParentClient == true) {
+						    		User clientUser= findById(parentUsers.getLong("clientId"));
+						    		Set<User> ClientParents = clientUser.getUsersOfUser();
+
+				    				for(User parentClient : ClientParents) {
+						    			 parent = parentClient;
+						    			 if(parent.getId().equals(parentUsers.getLong("vendorId"))) {
+						    				 isParentVendor=true;
+						    				 break;
+						    			 }
+						    		}
+				    				if(isParentVendor == true) {
+						    			return saveUser(parent.getId(),user);
+				    				}
+				    				else {
+				    					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "vendorId not the parent of client",null);
+								    	logger.info("************************createUser ENDED ***************************");
+								    	return ResponseEntity.badRequest().body(getObjectResponse);
+				    				}
+				    				
+				    			}
+				    			else {
+				    				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "clientId not the parent of creater",null);
+							    	logger.info("************************createUser ENDED ***************************");
+							    	return ResponseEntity.badRequest().body(getObjectResponse);
+				    			}
 				    		}
 				    		
 				    	}else if(creater.getAccountType() == 3) {
+					    	JSONObject parentUsers = new JSONObject(user.getParents());
+                            if(!parentUsers.has("clientId")) {
+					    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "clientId not found",null);
+						    	logger.info("************************createUser ENDED ***************************");
+						    	return ResponseEntity.badRequest().body(getObjectResponse);
+					    	}else {
+					    		if(parentUsers.get("clientId").equals(null)) {
+					    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "client ID is Required",null);
+							    	logger.info("************************createUser ENDED ***************************");
+							    	return ResponseEntity.badRequest().body(getObjectResponse);
+					    		}
+					    		if(parentUsers.getLong("clientId") != userId) {
+					    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "not allow to create and assign to another clientId",null);
+							    	logger.info("************************createUser ENDED ***************************");
+							    	return ResponseEntity.badRequest().body(getObjectResponse);
+					    		}
+					    	}
+			    			
+				    		
 				    		return saveUser(creater.getId(),user);
 				    	}
 				    	else if(creater.getAccountType()== 2) {
@@ -380,6 +503,11 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 						    	logger.info("************************createUser ENDED ***************************");
 						    	return ResponseEntity.badRequest().body(getObjectResponse);
 					    	}else {
+					    		if(parentUsers.get("clientId").equals(null)) {
+					    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Client ID is Required",null);
+							    	logger.info("************************createUser ENDED ***************************");
+							    	return ResponseEntity.badRequest().body(getObjectResponse);
+					    		}
 					    		if(!checkIfParentOrNot(userId,parentUsers.getLong("clientId"),creater.getAccountType(),3)) {
 					    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign user to this client",null);
 							    	logger.info("************************createUser ENDED ***************************");
@@ -398,6 +526,11 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 					    	logger.info("************************createUser ENDED ***************************");
 					    	return ResponseEntity.badRequest().body(getObjectResponse);
 				    	}else {
+				    		if(parentUsers.get("vendorId").equals(null)) {
+				    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Vendor ID is Required",null);
+						    	logger.info("************************createUser ENDED ***************************");
+						    	return ResponseEntity.badRequest().body(getObjectResponse);
+				    		}
 				    		if(!checkIfParentOrNot(userId,parentUsers.getLong("vendorId"),creater.getAccountType(),2)) {
 				    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign user to this vendor",null);
 						    	logger.info("************************createUser ENDED ***************************");
@@ -410,6 +543,11 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 							    	logger.info("************************createUser ENDED ***************************");
 							    	return ResponseEntity.badRequest().body(getObjectResponse);
 						    	}else {
+						    		if(parentUsers.get("clientId").equals(null)) {
+						    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Client ID is Required",null);
+								    	logger.info("************************createUser ENDED ***************************");
+								    	return ResponseEntity.badRequest().body(getObjectResponse);
+						    		}
 						    		if(!checkIfParentOrNot(parentUsers.getLong("vendorId"),parentUsers.getLong("clientId"),2,3)) {
 						    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign user to this client ",null);
 								    	logger.info("************************createUser ENDED ***************************");
@@ -497,7 +635,6 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 			    	return ResponseEntity.badRequest().body(getObjectResponse);
 				}else {
 					
-					
 					if(user.getPassword()!= null) {
 						List<User> users = null;
 						String message= "you are not allowed to edit password";
@@ -506,6 +643,34 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 				    	logger.info("************************createUser ENDED ***************************");
 				    	return ResponseEntity.badRequest().body(getObjectResponse);
 					}
+					
+					JSONObject parentUsersCH = new JSONObject(user.getParents());
+                    if(parentUsersCH.has("clientId")) {
+                    	if(!parentUsersCH.get("clientId").equals(null)) {
+							User chClient = userRepository.findOne(parentUsersCH.getLong("clientId"));
+			    			if(chClient.getAccountType()!=3) {
+
+				    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "not allow to put another type in clientId parents",null);
+						    	logger.info("************************createUser ENDED ***************************");
+						    	return ResponseEntity.badRequest().body(getObjectResponse);
+				    		}
+			    		}
+			    	}
+                    if(parentUsersCH.has("vendorId")) {
+                    	if(!parentUsersCH.get("vendorId").equals(null)) {
+							User chClient = userRepository.findOne(parentUsersCH.getLong("vendorId"));
+			    			if(chClient.getAccountType()!=2) {
+
+				    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "not allow to put another type in vendorId parents",null);
+						    	logger.info("************************createUser ENDED ***************************");
+						    	return ResponseEntity.badRequest().body(getObjectResponse);
+				    		}
+			    		}
+			    	}
+					
+					
+					
+					
 					User oldOne = findById(user.getId());
 					if(oldOne == null) {
 						List<User> users = null;
@@ -520,7 +685,31 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 					    	return ResponseEntity.badRequest().body(getObjectResponse);
 						}else {
 							// to edit vendor
-							if(user.getAccountType() == 2) {
+							if(user.getAccountType() == 1) {
+								Set<User> parentUsers = oldOne.getUsersOfUser();
+							    Boolean isParent = false;
+							    for( User parent : parentUsers) {
+							    	if(parent.getId() == userId) {
+							    		isParent = true;
+							    		break;
+							    	}
+							    }
+							    if(!isParent) {
+							    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowe to edit this user",null);
+							    	logger.info("************************createUser ENDED ***************************");
+							    	return ResponseEntity.badRequest().body(getObjectResponse);
+							    }else {
+							    	String password = oldOne.getPassword();
+									user.setPassword(password);
+							    	return saveUser(userId,user);
+								    			
+								}
+								
+							 
+							}
+							
+							
+							else if(user.getAccountType() == 2) {
 								Set<User> parentUsers = oldOne.getUsersOfUser();
 							    Boolean isParent = false;
 							    for( User parent : parentUsers) {
@@ -581,6 +770,11 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 											    	logger.info("************************createUser ENDED ***************************");
 											    	return ResponseEntity.badRequest().body(getObjectResponse);
 										    	}else {
+										    		if(parentUsersToAssign.get("vendorId").equals(null)) {
+										    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Vednor ID is Required",null);
+												    	logger.info("************************createUser ENDED ***************************");
+												    	return ResponseEntity.badRequest().body(getObjectResponse);
+										    		}
 										    		if(!checkIfParentOrNot(userId,parentUsersToAssign.getLong("vendorId"),loggedUser.getAccountType(),2)) {
 										    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign client to this vendor",null);
 												    	logger.info("************************createUser ENDED ***************************");
@@ -632,6 +826,11 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 							}
 						     // edit user
 							else if(user.getAccountType() == 4) {
+								if(userId == user.getId()) {
+									getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowe to edit this user",null);
+							    	logger.info("************************createUser ENDED ***************************");
+							    	return ResponseEntity.badRequest().body(getObjectResponse);
+								}
 								if(loggedUser.getAccountType() == 1) {
 									Set <User> userParentClients = oldOne.getUsersOfUser();
 									if(userParentClients.isEmpty()) {
@@ -675,18 +874,33 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 												    	logger.info("************************createUser ENDED ***************************");
 												    	return ResponseEntity.badRequest().body(getObjectResponse);
 											    	}else {
+											    		if(parentUsers.get("vendorId").equals(null)) {
+											    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Vednor ID is Required",null);
+													    	logger.info("************************createUser ENDED ***************************");
+													    	return ResponseEntity.badRequest().body(getObjectResponse);
+											    		}
 											    		if(!checkIfParentOrNot(userId,parentUsers.getLong("vendorId"),loggedUser.getAccountType(),2)) {
 											    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign user to this vendor",null);
 													    	logger.info("************************createUser ENDED ***************************");
 													    	return ResponseEntity.badRequest().body(getObjectResponse);
 											    		}
 											    		else {
+											    			if(parentUsers.get("vendorId").equals(null)) {
+												    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Vednor ID is Required",null);
+														    	logger.info("************************createUser ENDED ***************************");
+														    	return ResponseEntity.badRequest().body(getObjectResponse);
+												    		}
 											    			if( !parentUsers.has("clientId")) {
 													    		
 													    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you must select client to be parent of this user",null);
 														    	logger.info("************************createUser ENDED ***************************");
 														    	return ResponseEntity.badRequest().body(getObjectResponse);
 													    	}else {
+													    		if(parentUsers.get("clientId").equals(null)) {
+													    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Client ID is Required",null);
+															    	logger.info("************************createUser ENDED ***************************");
+															    	return ResponseEntity.badRequest().body(getObjectResponse);
+													    		}
 													    		if(!checkIfParentOrNot(parentUsers.getLong("vendorId"),parentUsers.getLong("clientId"),2,3)) {
 													    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign user to this client ",null);
 															    	logger.info("************************createUser ENDED ***************************");
@@ -744,6 +958,11 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 											    	logger.info("************************createUser ENDED ***************************");
 											    	return ResponseEntity.badRequest().body(getObjectResponse);
 										    	}else {
+										    		if(parentUsers.get("clientId").equals(null)) {
+										    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Client ID is Required",null);
+												    	logger.info("************************createUser ENDED ***************************");
+												    	return ResponseEntity.badRequest().body(getObjectResponse);
+										    		}
 										    		if(!checkIfParentOrNot(userId,parentUsers.getLong("clientId"),loggedUser.getAccountType(),3)) {
 										    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign user to this client",null);
 												    	logger.info("************************createUser ENDED ***************************");
@@ -1358,7 +1577,8 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 				return childernUsers;
 	}
 	
-	public  ResponseEntity<?> getUserSelect(String TOKEN,Long userId) {
+	@Override
+	public  ResponseEntity<?> getUserSelectWithChild(String TOKEN,Long userId) {
 
 		logger.info("************************ getDeviceSelect STARTED ***************************");
 		List<UserSelect> users = new ArrayList<UserSelect>();
@@ -1375,7 +1595,20 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	    	User user = findById(userId);
 	    	if(user != null) {
 	    		if(user.getDelete_date() == null) {
-	    			users = userRepository.getUserSelect(userId);
+	    			List<User>childernUsers = getActiveAndInactiveChildern(userId);
+	    			 List<Long>usersIds= new ArrayList<>();
+	    			 if(childernUsers.isEmpty()) {
+	    				 usersIds.add(userId);
+	    			 }
+	    			 else {
+	    				 usersIds.add(userId);
+	    				 for(User object : childernUsers) {
+	    					 usersIds.add(object.getId());
+	    				 }
+	    			 }
+	    			
+	    			
+	    			users = userRepository.getUserSelectWithChild(usersIds);
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",users);
 					logger.info("************************ getDeviceSelect ENDED ***************************");
 					return ResponseEntity.ok().body(getObjectResponse);
@@ -1515,5 +1748,52 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 
 	}
 
+	public  ResponseEntity<?> getUserSelect(String TOKEN,Long userId) {
+
+		logger.info("************************ getDeviceSelect STARTED ***************************");
+		List<UserSelect> users = new ArrayList<UserSelect>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",users);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+	    if(userId != 0) {
+	    	User user = findById(userId);
+	    	if(user != null) {
+	    		if(user.getDelete_date() == null) {
+	    			users = userRepository.getUserSelect(userId);
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",users);
+					logger.info("************************ getDeviceSelect ENDED ***************************");
+					return ResponseEntity.ok().body(getObjectResponse);
+
+	    		}
+	    		else {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",users);
+					return ResponseEntity.status(404).body(getObjectResponse);
+
+	    		}
+	    	
+	    	}
+	    	else {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",users);
+				return ResponseEntity.status(404).body(getObjectResponse);
+
+	    	}
+			
+		}
+		else {
+			
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",users);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
+	
+		
+
+	}
 	
 }

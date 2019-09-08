@@ -34,7 +34,7 @@ public class PermissionServiceImpl  implements PermissionService{
 		 List<Permission> duplicatePermission= permissionRepositoty.findByName(permission.getName());
 		 if(!duplicatePermission.isEmpty()) {
 			
-			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this permission  was added before you can edit or delte it only",duplicatePermission);
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "This Permission Name was added before you can Edit or Delete it only",duplicatePermission);
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
 		 }
 		 permissionRepositoty.save(permission);
@@ -77,7 +77,7 @@ public class PermissionServiceImpl  implements PermissionService{
 		List<Permission> duplicatePermission= permissionRepositoty.findByName(permission.getName());
 		 if(!duplicatePermission.isEmpty()) {
 			  if(duplicatePermission.get(0).getId() != permission.getId()) {
-				  getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this permission  was added in another permission ",null);
+				  getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "This Permission Name was added before you can Edit or Delete it only",null);
 					 return  ResponseEntity.badRequest().body(getObjectResponse);
 			  }
 			

@@ -78,8 +78,8 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	
 	@Query(value = "SELECT count(*) FROM tc_devices "
 			+ " INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id "
-			+ " WHERE tc_user_device.userid=:userId and tc_devices.delete_date is null",nativeQuery = true )
-	public Integer getDevicesListSize(@Param("userId")Long userId);
+			+ " WHERE tc_user_device.userid IN(:userIds) and tc_devices.delete_date is null",nativeQuery = true )
+	public Integer getDevicesListSize(@Param("userIds")List<Long> userIds);
 	
 	@Query(nativeQuery = true, name = "getDriverWorkingHoursExport")
 	public List<DeviceWorkingHours> getDeviceWorkingHoursExport(@Param("deviceId")Long deviceId,@Param("start")String start,@Param("end")String end);

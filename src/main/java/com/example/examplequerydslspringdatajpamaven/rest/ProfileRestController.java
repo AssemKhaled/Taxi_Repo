@@ -38,10 +38,11 @@ public class ProfileRestController {
 	@RequestMapping(value = "/changePassowrd", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<?> changePassowrd(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 			                                              @RequestBody Map<String, String> data ,
+			                                              @RequestParam (value = "check", defaultValue = "") String check,
 			                                              @RequestParam (value = "userId", defaultValue = "0") Long userId) {
 
 		
-    	return profileServiceImpl.updateProfilePassword(TOKEN,data,userId);
+    	return profileServiceImpl.updateProfilePassword(TOKEN,data,check,userId);
 
 	}
 	

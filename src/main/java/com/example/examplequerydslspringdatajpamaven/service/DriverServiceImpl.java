@@ -90,9 +90,9 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 								parent = object;
 							}
 							List<Long>usersIds= new ArrayList<>();
-						   usersIds.add(parent.getId());
+						    usersIds.add(parent.getId());
 							drivers = driverRepository.getAllDrivers(usersIds,offset,search);
-							Integer size= driverRepository.getAllDriversSize(parent.getId());
+							Integer size= driverRepository.getAllDriversSize(usersIds);
 							
 							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",drivers,size);
 							logger.info("************************ getAllDrivers ENDED ***************************");
@@ -112,7 +112,7 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 					 }
 					 System.out.println("Ids"+usersIds.toString());
 					drivers = driverRepository.getAllDrivers(usersIds,offset,search);
-					Integer size= driverRepository.getAllDriversSize(id);
+					Integer size= driverRepository.getAllDriversSize(usersIds);
 					
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",drivers,size);
 					logger.info("************************ getAllDrivers ENDED ***************************");
@@ -134,9 +134,15 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 	}
 
 	@Override
-	public List<Driver> checkDublicateDriverInAdd(Long id, String name, String uniqueId, String mobileNum) {
+	public List<Driver> checkDublicateDriverInAddName(Long id, String name) {
 		
-		return driverRepository.checkDublicateDriverInAdd(id,name,uniqueId,mobileNum);
+		return driverRepository.checkDublicateDriverInAddName(id,name);
+
+	}
+	@Override
+	public List<Driver> checkDublicateDriverInAddUniqueMobile(String uniqueId, String mobileNum) {
+		
+		return driverRepository.checkDublicateDriverInAddUniqueMobile(uniqueId,mobileNum);
 
 	}
 	
@@ -191,27 +197,43 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 							driver.setPhoto("Not-available.png");
 						}
 						
-						List<Driver> res=checkDublicateDriverInAdd(id,driver.getName(),driver.getUniqueid(),driver.getMobile_num());
+						List<Driver> res1=checkDublicateDriverInAddName(id,driver.getName());					    
+					    List<Driver> res2=checkDublicateDriverInAddUniqueMobile(driver.getUniqueid(),driver.getMobile_num());
 					    List<Integer> duplictionList =new ArrayList<Integer>();
-						if(!res.isEmpty()) {
-							for(int i=0;i<res.size();i++) {
-								if(res.get(i).getName().equalsIgnoreCase(driver.getName())) {
+
+						if(!res1.isEmpty()) {
+							for(int i=0;i<res1.size();i++) {
+								if(res1.get(i).getName().equalsIgnoreCase(driver.getName())) {
 									duplictionList.add(1);				
 								}
-								if(res.get(i).getUniqueid().equalsIgnoreCase(driver.getUniqueid())) {
+					
+							}
+					    	
+
+						}
+						
+						if(!res2.isEmpty()) {
+							for(int i=0;i<res2.size();i++) {
+								
+								if(res2.get(i).getUniqueid().equalsIgnoreCase(driver.getUniqueid())) {
 									duplictionList.add(2);				
 				
 								}
-								if(res.get(i).getMobile_num().equalsIgnoreCase(driver.getMobile_num())) {
+								if(res2.get(i).getMobile_num().equalsIgnoreCase(driver.getMobile_num())) {
 									duplictionList.add(3);				
 
 								}
 								
 							}
-					    	getObjectResponse = new GetObjectResponse( 301, "This Driver was found before",duplictionList);
-							return ResponseEntity.ok().body(getObjectResponse);
+					    	
 
 						}
+						
+						if(!res1.isEmpty() || !res2.isEmpty()) {
+							getObjectResponse = new GetObjectResponse( 301, "This Driver was found before",duplictionList);
+							return ResponseEntity.ok().body(getObjectResponse);	
+						}
+						
 						else {
 							if(driver.getId() == null || driver.getId() == 0) {
 								User driverParent = new User();
@@ -268,10 +290,15 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 	}
 	
 	@Override
-	public List<Driver> checkDublicateDriverInEdit(Long driverId, Long userId, String name, String uniqueId,
-			String mobileNum) {
+	public List<Driver> checkDublicateDriverInEditName(Long driverId, Long userId, String name) {
 
-		return driverRepository.checkDublicateDriverInEdit(driverId, userId, name, uniqueId, mobileNum);
+		return driverRepository.checkDublicateDriverInEditName(driverId, userId, name);
+
+	}
+	@Override
+	public List<Driver> checkDublicateDriverInEditMobileUnique(Long driverId, String uniqueId, String mobileNum) {
+
+		return driverRepository.checkDublicateDriverInEditUniqueMobile(driverId, uniqueId, mobileNum);
 
 	}
 	
@@ -360,27 +387,46 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 										driver.setPhoto(driverCheck.getPhoto());
 									}
 									
-									List<Driver> res=checkDublicateDriverInEdit(driver.getId(),id,driver.getName(),driver.getUniqueid(),driver.getMobile_num());
-								    List<Integer> duplictionList =new ArrayList<Integer>();
-									if(!res.isEmpty()) {
-										for(int i=0;i<res.size();i++) {
-											if(res.get(i).getName().equalsIgnoreCase(driver.getName())) {
+									List<Driver> res1=checkDublicateDriverInEditName(driver.getId(),id,driver.getName());
+									List<Driver> res2=checkDublicateDriverInEditMobileUnique(driver.getId(),driver.getUniqueid(),driver.getMobile_num());
+
+									List<Integer> duplictionList =new ArrayList<Integer>();
+									
+									if(!res1.isEmpty()) {
+										for(int i=0;i<res1.size();i++) {
+											if(res1.get(i).getName().equalsIgnoreCase(driver.getName())) {
 												duplictionList.add(1);				
 											}
-											if(res.get(i).getUniqueid().equalsIgnoreCase(driver.getUniqueid())) {
+											
+											
+										}
+								    	
+
+									}
+									
+									
+									if(!res2.isEmpty()) {
+										for(int i=0;i<res2.size();i++) {
+											
+											if(res2.get(i).getUniqueid().equalsIgnoreCase(driver.getUniqueid())) {
 												duplictionList.add(2);				
 							
 											}
-											if(res.get(i).getMobile_num().equalsIgnoreCase(driver.getMobile_num())) {
+											if(res2.get(i).getMobile_num().equalsIgnoreCase(driver.getMobile_num())) {
 												duplictionList.add(3);				
 			
 											}
 											
 										}
-								    	getObjectResponse = new GetObjectResponse( 301, "This Driver was found before",duplictionList);
-										return ResponseEntity.ok().body(getObjectResponse);
+								    	
 
 									}
+									if(!res1.isEmpty() || !res2.isEmpty()) {
+										
+										getObjectResponse = new GetObjectResponse( 301, "This Driver was found before",duplictionList);
+										return ResponseEntity.ok().body(getObjectResponse);
+									}
+									
 									else {
 										
 										   Set<User> userDriver = new HashSet<>();
