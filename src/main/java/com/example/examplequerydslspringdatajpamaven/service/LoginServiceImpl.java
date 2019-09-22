@@ -94,15 +94,18 @@ public class LoginServiceImpl extends RestServiceController implements LoginServ
 					userInfo.put("photo", user.getPhoto());
 					userInfo.put("accountType", user.getAccountType());
 					userInfo.put("token",token);
-					if(user.getRoleId() == null) {
-						//userInfo.put("userRole", null);
-						getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "No roles assigned to this user yet",null);
-						logger.info("************************ Login ENDED ***************************");
-						return  ResponseEntity.status(404).body(getObjectResponse);
-					}else {
-						UserRole userRole = userRoleService.findById(user.getRoleId());
-						userInfo.put("userRole", userRole);
+					if(user.getAccountType() != 1) {
+						if(user.getRoleId() == null ) {
+							//userInfo.put("userRole", null);
+							getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "No roles assigned to this user yet",null);
+							logger.info("************************ Login ENDED ***************************");
+							return  ResponseEntity.status(404).body(getObjectResponse);
+						}else {
+							UserRole userRole = userRoleService.findById(user.getRoleId());
+							userInfo.put("userRole", userRole);
+						}
 					}
+					
 					
 					List<Map> loggedUser = new ArrayList<>();
 					loggedUser.add(userInfo);
