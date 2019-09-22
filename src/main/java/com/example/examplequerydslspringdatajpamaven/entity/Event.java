@@ -128,7 +128,7 @@ import javax.persistence.Table;
 
 
 @Entity
-@Table(name = "tc_events" , schema = "sareb_blue")
+@Table(name = "tc_events" , schema = "sareb_new")
 public class Event {
 	
 
