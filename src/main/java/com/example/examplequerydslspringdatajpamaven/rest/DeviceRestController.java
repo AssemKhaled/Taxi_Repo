@@ -138,10 +138,19 @@ public class DeviceRestController {
 	}
 	
 	@GetMapping(value = "/assignDeviceToUser")
-	public ResponseEntity<?> assignDeviceToUser( @RequestParam (value = "userId", defaultValue = "0") Long userId,
+	public ResponseEntity<?> assignDeviceToUser(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                     @RequestParam (value = "userId", defaultValue = "0") Long userId,
 												 @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
 												 @RequestParam (value = "toUserId", defaultValue = "0") Long toUserId){
-		return deviceService.assignDeviceToUser(userId,deviceId,toUserId);
+		return deviceService.assignDeviceToUser(TOKEN,userId,deviceId,toUserId);
 	}
 
+	@GetMapping(value = "/getCalibrationData")
+	public ResponseEntity<?> getCalibrationData( @RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN, 
+			                                     @RequestParam (value = "userId", defaultValue = "0") Long userId,
+												 @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId){
+		return deviceService.getCalibrationData(TOKEN,userId,deviceId);
+	}
+
+	
 }

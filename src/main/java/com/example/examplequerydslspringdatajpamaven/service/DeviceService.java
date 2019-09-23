@@ -47,10 +47,11 @@ public interface DeviceService {
 
 	public ResponseEntity<?> vehicleInfo(String TOKEN,Long deviceId,Long userId);
 	
-	public ResponseEntity<?> assignDeviceToUser(Long userId,Long deviceId , Long toUserId);
+	public ResponseEntity<?> assignDeviceToUser(String TOKEN,Long userId,Long deviceId , Long toUserId);
 
 	public ResponseEntity<?> getAllDeviceLiveDataMap(String TOKEN,Long userId);
 
+	public ResponseEntity<?> getCalibrationData(String TOKEN,Long userId,Long deviceId);
 
 
 }

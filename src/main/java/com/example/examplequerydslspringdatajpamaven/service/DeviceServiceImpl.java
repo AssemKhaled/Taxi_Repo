@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceList;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceLiveData;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
+import com.example.examplequerydslspringdatajpamaven.entity.DeviceCalibrationData;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
@@ -1866,8 +1868,18 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	}
 
 	@Override
-	public ResponseEntity<?> assignDeviceToUser(Long userId, Long deviceId, Long toUserId) {
+	public ResponseEntity<?> assignDeviceToUser(String TOKEN,Long userId, Long deviceId, Long toUserId) {
 		// TODO Auto-generated method stub
+		if(TOKEN.equals("")) {
+			 List<Device> devices = null;
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
 		if(userId == 0 || deviceId == 0 || toUserId == 0) {
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "userId , deviceId and toUserId  are required",null);
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
@@ -2012,5 +2024,70 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	   return false;
    }
 
+   @Override
+	public ResponseEntity<?> getCalibrationData(String TOKEN,Long userId, Long deviceId) {
+	// TODO Auto-generated method stub
+			if(TOKEN.equals("")) {
+				 List<Device> devices = null;
+				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
+				 return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			
+			if(super.checkActive(TOKEN)!= null)
+			{
+				return super.checkActive(TOKEN);
+			}
+			if(userId == 0 || deviceId == 0) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "userId and deviceId are required",null);
+				 return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			else {
+				User loggedUser = userService.findById(userId);
+				
+				if(loggedUser == null) {
+					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "loggedUser is not found",null);
+					
+					return ResponseEntity.status(404).body(getObjectResponse);
+				}
+				else {
+					Device device = findById(deviceId);
+					if(device == null) {
+						getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "device is not found",null);
+						return ResponseEntity.status(404).body(getObjectResponse);
+					}
+					else {
+						if(checkIfParent( device ,  loggedUser)) {
+							List<DeviceCalibrationData> calibrationData=deviceRepository.getCalibrationData(deviceId);
+							System.out.println("calibrationData: "+calibrationData);
 
+							ArrayList<Object> data=new ArrayList<>();
+							data =null;
+							if(!calibrationData.isEmpty()) {
+						         System.out.println("ind: "+calibrationData.get(0)); 
+
+							         System.out.println("ind: "+calibrationData.get(0)); 
+   									// String str = calibrationData.get(0).toString(); 
+//								     String arrOfStr[] = str.split(" "); 
+//								     for (String a : arrOfStr) {
+//								         System.out.println("a: "+a); 
+//								    	 JSONObject obj =new JSONObject(a);
+//								         System.out.println("DATA: "+obj); 
+//								         data.add(obj);
+//								     }
+								
+								 
+							}
+							System.out.println("calibrationData: "+data);
+							getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Success",null);
+							return ResponseEntity.ok().body(getObjectResponse);
+						}
+						else {
+							getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "userId not from parents of this device",null);
+							return  ResponseEntity.badRequest().body(getObjectResponse);	
+						}
+					}
+					
+				}
+			}
+   }
 }

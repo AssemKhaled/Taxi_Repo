@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceList;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceLiveData;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
+import com.example.examplequerydslspringdatajpamaven.entity.DeviceCalibrationData;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.EventReport;
@@ -95,5 +96,8 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 			" WHERE deviceid=:deviceId AND devicetime<=:end AND  devicetime>=:start group by CAST(devicetime AS DATE) )as t1) order by devicetime DESC",nativeQuery = true )
 	public Integer getDeviceWorkingHoursSize(@Param("deviceId")Long deviceId,@Param("start")String start,@Param("end")String end);
 
+	
+	@Query(value = "SELECT calibrationData FROM tc_devices WHERE tc_devices.id=:deviceId AND tc_devices.delete_date IS NULL",nativeQuery = true)
+	public List<DeviceCalibrationData> getCalibrationData(@Param("deviceId")Long deviceId);
 }
 
