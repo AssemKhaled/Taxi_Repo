@@ -50,7 +50,12 @@ public class UserRoleRestController {
 	@GetMapping("/assignRoleToUser")
 	public ResponseEntity<?>assignRoleToUser(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,@RequestParam (value = "roleId",defaultValue = "0") Long roleId,@RequestParam (value = "userId",defaultValue = "0") Long userId,@RequestParam (value = "loggedId",defaultValue = "0") Long loggedId){
 	
-		return userRoleService.assignRoleToUser(TOKEN,roleId,userId,loggedId);
+		if(roleId == 0) {
+			return userRoleService.removeRoleFromUser(TOKEN,roleId,userId,loggedId);
+		}else {
+			return userRoleService.assignRoleToUser(TOKEN,roleId,userId,loggedId);
+		}
+		
 	}
 	
 	@GetMapping("/getAllRolesCreatedByUser")
@@ -65,5 +70,10 @@ public class UserRoleRestController {
 		return userRoleService.getRolePageContent(TOKEN,userId);
 	}
 	
+	@GetMapping("/getUserParentRoles")
+	public ResponseEntity<?>getUserParentRoles(@RequestHeader(value = "TOKEN",defaultValue = "")String TOKEN,
+			                                   @RequestParam(value ="selectedUserId",defaultValue= "0")Long userId){
+		return userRoleService.getUserParentRoles(TOKEN,userId);
+	}
 	
 }

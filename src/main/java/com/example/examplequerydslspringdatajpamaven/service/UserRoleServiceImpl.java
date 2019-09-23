@@ -34,6 +34,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 	UserServiceImpl userService;
 	
 	
+	
 	@Autowired
 	private UserRoleService userRoleService;
 	
@@ -686,8 +687,8 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "as this user not child of creater userId its'nt allow to assign",null);
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 		 }
-		
-				
+
+			
 //		Set<User> userParents = user.getUsersOfUser();
 //		if(!userParents.isEmpty()) {
 //			User parent = null;
@@ -765,7 +766,6 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 //			
 //		
 
-		
 		
 		user.setRoleId(roleId);
 		userRepository.save(user);
@@ -985,6 +985,155 @@ public ResponseEntity<?> getRolePageContent(String TOKEN,Long userId) {
 		}
 		
 	}
+}
+@Override
+public ResponseEntity<?> getUserParentRoles(String TOKEN, Long userId) {
+	// TODO Auto-generated method stub
+	if(TOKEN.equals("")) {
+		 List<UserRole> roles = null;
+		 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",roles);
+		 return  ResponseEntity.badRequest().body(getObjectResponse);
+	}
+	
+	if(super.checkActive(TOKEN)!= null)
+	{
+		return super.checkActive(TOKEN);
+	}
+	if(userId == 0) {
+		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "  userId is required",null);
+		 return  ResponseEntity.badRequest().body(getObjectResponse);
+	}else {
+		User user = userService.findById(userId);
+		if(user == null) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this user not found ",null);
+			return  ResponseEntity.status(404).body(getObjectResponse);
+		}
+		else {
+			Set<User> userParents = user.getUsersOfUser();
+			User parent = null;
+			for(User parentClient : userParents) {
+				 parent = parentClient;
+			}
+			
+			List<Long>usersIds= new ArrayList<>();
+			
+			usersIds.add(parent.getId());
+			
+			List<UserRole> roles = userRoleRepository.getAllRolesCreatedByUser(usersIds);
+			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",roles);
+			
+			return ResponseEntity.ok().body(getObjectResponse);
+		}
+	}
+	
+}
+@Override
+public ResponseEntity<?> removeRoleFromUser(String TOKEN, Long roleId, Long userId, Long loggedId) {
+	// TODO Auto-generated method stub
+	if(TOKEN.equals("")) {
+		 List<UserRole> roles = null;
+		 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",roles);
+		 return  ResponseEntity.badRequest().body(getObjectResponse);
+	}
+	
+	if(super.checkActive(TOKEN)!= null)
+	{
+		return super.checkActive(TOKEN);
+	}
+	if(userId == loggedId) {
+		 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not allow to assign to your self",null);
+		 return  ResponseEntity.badRequest().body(getObjectResponse);
+	}
+	User loggedUser = userService.findById(loggedId);
+	 if(loggedUser == null) {
+		 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged User is not found ",null);
+		 return  ResponseEntity.status(404).body(getObjectResponse); 
+	 }
+	 if(loggedUser.getAccountType()!= 1) {
+		if(!userRoleService.checkUserHasPermission(loggedId, "ROLE", "assignToUser")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to assignToUser role",null);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+	}
+	 if(userId == 0 ) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), " userId is required",null);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+	}
+	 User assignedToUser  = userService.findById(userId);
+	 if(assignedToUser == null) {
+		 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "assigned to user is not found ",null);
+		 return  ResponseEntity.status(404).body(getObjectResponse);  
+	 }
+	 Boolean isParent = false;
+	 if(loggedUser.getAccountType() == 4) {
+		 Set<User> loggedParent = loggedUser.getUsersOfUser();
+		 if(loggedParent.isEmpty()) {
+			 getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to remove role from this user ",null);
+//				logger.info("************************ editDevice ENDED ***************************");
+				return ResponseEntity.badRequest().body(getObjectResponse);
+		 }else {
+			if(assignedToUser.getAccountType() != 4) {
+				getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to remove role from this user ",null);
+//				logger.info("************************ editDevice ENDED ***************************");
+				return ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			 User parent =null;
+				for(User object : loggedParent) {
+					parent = object;
+				}
+			Set<User> assignedToParents = assignedToUser.getUsersOfUser();
+			if(assignedToParents.isEmpty()) {
+				getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to remove role from this user ",null);
+//				logger.info("************************ editDevice ENDED ***************************");
+				return ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			for(User object :assignedToParents ) {
+				if(object.getId() == parent.getId() ) {
+					isParent = true;
+					
+					break;
+				}
+			}			
+		 }
+	 }else {
+		 List<User> parents = userService.getAllParentsOfuser(assignedToUser, assignedToUser.getAccountType());
+		   if(parents.isEmpty()) {
+			   isParent =  false;
+		   }else {
+			   for(User object :parents) {
+				   if(object.getId() == loggedUser.getId()) {
+					   isParent = true;
+					   break;
+				   }
+			   }
+		   }
+	 }
+	 if(isParent) {
+		 
+		 Long role = assignedToUser.getRoleId();
+		 if(role == null) {
+			 getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "this user does not have role to remove  ",null);
+//				logger.info("************************ editDevice ENDED ***************************");
+				return ResponseEntity.badRequest().body(getObjectResponse);
+		 }
+		 else {
+			 
+			 	userRepository.removeRoleFromUser(userId);
+				getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "removed successfully",null);
+				return  ResponseEntity.ok().body(getObjectResponse);
+		 }
+	 }else {
+		 getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to remove role from this user ",null);
+//			logger.info("************************ editDevice ENDED ***************************");
+			return ResponseEntity.badRequest().body(getObjectResponse);
+	 }
+	 
+				 
+	 
+	 
+	 
+	 
+	 
 }
 	
 	
