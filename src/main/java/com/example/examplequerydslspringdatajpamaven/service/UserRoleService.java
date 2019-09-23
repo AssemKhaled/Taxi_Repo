@@ -26,5 +26,7 @@ public interface UserRoleService {
 	
 	public ResponseEntity<?>getUserParentRoles( String TOKEN, Long userId);
 	
+	public ResponseEntity<?>removeRoleFromUser(String TOKEN,Long roleId,Long userId,Long loggedId);
+	
 	
 }

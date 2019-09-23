@@ -86,6 +86,11 @@ public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredi
 	public void deleteUserOfUser(@Param("userId")Long deviceId);
 	
 	
+	@Modifying
+    @Transactional
+	@Query(value = "update  tc_users set roleId = null where id = :userId", nativeQuery = true )
+	public void removeRoleFromUser(@Param("userId")Long deviceId);
+	
 	@Query(value = "SELECT tc_users.id,tc_users.name FROM tc_user_user " + 
 			" inner join tc_users on tc_user_user.manageduserid=tc_users.id" + 
 			" where tc_user_user.userid = :userId and delete_date is null",nativeQuery = true)

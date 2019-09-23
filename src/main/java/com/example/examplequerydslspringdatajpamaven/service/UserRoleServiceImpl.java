@@ -34,6 +34,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 	UserServiceImpl userService;
 	
 	
+	
 	@Autowired
 	private UserRoleService userRoleService;
 	
@@ -686,75 +687,85 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "as this user not child of creater userId its'nt allow to assign",null);
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 		 }
-		
-		
-		
-		
-		Set<User> userParents = user.getUsersOfUser();
-		User parent = null;
-		for(User parentClient : userParents) {
-			 parent = parentClient;
-		}
-		UserRole parentRole=findById(parent.getRoleId());	
-		
-		if(parentRole== null) {
-			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "As no Role assigned to your direct parent yet not allow to assign to this user else",null);
-			return  ResponseEntity.status(404).body(getObjectResponse);
-		}
-    	JSONObject ParentRolePerm = new JSONObject(parentRole.getPermissions());
-    	JSONObject ChildRolePerm = new JSONObject(role.getPermissions());
-    	if(ChildRolePerm.getJSONArray("permissions").length() > ParentRolePerm.getJSONArray("permissions").length()) {
-    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not allow to assign functionality to user not assigned to direct parent",null);
-			return  ResponseEntity.badRequest().body(getObjectResponse);
-    	}
-    	Boolean check=true;
-    	for(int i=0;i<ChildRolePerm.getJSONArray("permissions").length();i++) {
-    		for(int j=0;j<ParentRolePerm.getJSONArray("permissions").length();j++) {
-    			if(ChildRolePerm.getJSONArray("permissions").getJSONObject(i).get("name").equals(ParentRolePerm.getJSONArray("permissions").getJSONObject(j).get("name"))
-    					&&
-    					ChildRolePerm.getJSONArray("permissions").getJSONObject(i).get("id").equals(ParentRolePerm.getJSONArray("permissions").getJSONObject(j).get("id"))) {
-    				check=true;
-    				if(ChildRolePerm.getJSONArray("permissions").getJSONObject(i).getJSONObject("functionality").length() > ParentRolePerm.getJSONArray("permissions").getJSONObject(j).getJSONObject("functionality").length()) {
-    		    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not allow to assign functionality to user not assigned to direct parent",null);
-    					return  ResponseEntity.badRequest().body(getObjectResponse);
-    		    	}
-    				else {
-    					Iterator iterChild = ChildRolePerm.getJSONArray("permissions").getJSONObject(i).getJSONObject("functionality").keys();
-    					Iterator iterParent = ParentRolePerm.getJSONArray("permissions").getJSONObject(j).getJSONObject("functionality").keys();
-    					 while(iterChild.hasNext()){
-    					   String keyChild = (String)iterChild.next();
-    					   Boolean valueChild = ChildRolePerm.getJSONArray("permissions").getJSONObject(i).getJSONObject("functionality").getBoolean(keyChild);
-    					   if(ParentRolePerm.getJSONArray("permissions").getJSONObject(j).getJSONObject("functionality").has(keyChild)) { 
-    						   if(ParentRolePerm.getJSONArray("permissions").getJSONObject(j).getJSONObject("functionality").getBoolean(keyChild) == false) {
-    							   if(valueChild != false ) {
-    								   getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not allow to assign functionality to user not assigned to direct parent",null);
-    								   return  ResponseEntity.badRequest().body(getObjectResponse);
-    							   }    							  
-    						   }
-    						   
-    					   }    							       						
-    					   else {
-    						   getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not allow to assign functionality to user not assigned to direct parent",null);
-							   return  ResponseEntity.badRequest().body(getObjectResponse);
-						   }
 
-    					 }
-    				}
-    				break;
-    			}
-    			else {
-					check=false;
-    				
-    			}
-    			
-    		}
-    		if(check == false) {
-    			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not allow to assign functionality to user not assigned to direct parent",null);
-				 return  ResponseEntity.badRequest().body(getObjectResponse);
-    		}
-    	}
+			
+//		Set<User> userParents = user.getUsersOfUser();
+//		if(!userParents.isEmpty()) {
+//			User parent = null;
+//			for(User parentClient : userParents) {
+//				 parent = parentClient;
+//			}
+//			if(parent != null) {
+//				if(parent.getAccountType() != 1) {
+//					if(parent.getRoleId() == null ) {
+//						getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "As no Role assigned to your direct parent yet not allow to assign to this user else",null);
+//						return  ResponseEntity.status(404).body(getObjectResponse);
+//					}
+//					UserRole parentRole=findById(parent.getRoleId());	
+//					
+//					if(parentRole== null) {
+//						getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "As no Role assigned to your direct parent yet not allow to assign to this user else",null);
+//						return  ResponseEntity.status(404).body(getObjectResponse);
+//					}
+//			    	JSONObject ParentRolePerm = new JSONObject(parentRole.getPermissions());
+//			    	JSONObject ChildRolePerm = new JSONObject(role.getPermissions());
+//			    	if(ChildRolePerm.getJSONArray("permissions").length() > ParentRolePerm.getJSONArray("permissions").length()) {
+//			    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not allow to assign functionality to user not assigned to direct parent",null);
+//						return  ResponseEntity.badRequest().body(getObjectResponse);
+//			    	}
+//			    	Boolean check=true;
+//			    	for(int i=0;i<ChildRolePerm.getJSONArray("permissions").length();i++) {
+//			    		for(int j=0;j<ParentRolePerm.getJSONArray("permissions").length();j++) {
+//			    			if(ChildRolePerm.getJSONArray("permissions").getJSONObject(i).get("name").equals(ParentRolePerm.getJSONArray("permissions").getJSONObject(j).get("name"))
+//			    					&&
+//			    					ChildRolePerm.getJSONArray("permissions").getJSONObject(i).get("id").equals(ParentRolePerm.getJSONArray("permissions").getJSONObject(j).get("id"))) {
+//			    				check=true;
+//			    				if(ChildRolePerm.getJSONArray("permissions").getJSONObject(i).getJSONObject("functionality").length() > ParentRolePerm.getJSONArray("permissions").getJSONObject(j).getJSONObject("functionality").length()) {
+//			    		    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not allow to assign functionality to user not assigned to direct parent",null);
+//			    					return  ResponseEntity.badRequest().body(getObjectResponse);
+//			    		    	}
+//			    				else {
+//			    					Iterator iterChild = ChildRolePerm.getJSONArray("permissions").getJSONObject(i).getJSONObject("functionality").keys();
+//			    					Iterator iterParent = ParentRolePerm.getJSONArray("permissions").getJSONObject(j).getJSONObject("functionality").keys();
+//			    					 while(iterChild.hasNext()){
+//			    					   String keyChild = (String)iterChild.next();
+//			    					   Boolean valueChild = ChildRolePerm.getJSONArray("permissions").getJSONObject(i).getJSONObject("functionality").getBoolean(keyChild);
+//			    					   if(ParentRolePerm.getJSONArray("permissions").getJSONObject(j).getJSONObject("functionality").has(keyChild)) { 
+//			    						   if(ParentRolePerm.getJSONArray("permissions").getJSONObject(j).getJSONObject("functionality").getBoolean(keyChild) == false) {
+//			    							   if(valueChild != false ) {
+//			    								   getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not allow to assign functionality to user not assigned to direct parent",null);
+//			    								   return  ResponseEntity.badRequest().body(getObjectResponse);
+//			    							   }    							  
+//			    						   }
+//			    						   
+//			    					   }    							       						
+//			    					   else {
+//			    						   getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not allow to assign functionality to user not assigned to direct parent",null);
+//										   return  ResponseEntity.badRequest().body(getObjectResponse);
+//									   }
+//
+//			    					 }
+//			    				}
+//			    				break;
+//			    			}
+//			    			else {
+//								check=false;
+//			    				
+//			    			}
+//			    			
+//			    		}
+//			    		if(check == false) {
+//			    			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not allow to assign functionality to user not assigned to direct parent",null);
+//							 return  ResponseEntity.badRequest().body(getObjectResponse);
+//			    		}
+//			    	}
+//				}
+//				
+//			}
+//		}
+//			
+//		
 
-		
 		
 		user.setRoleId(roleId);
 		userRepository.save(user);
@@ -1015,6 +1026,114 @@ public ResponseEntity<?> getUserParentRoles(String TOKEN, Long userId) {
 		}
 	}
 	
+}
+@Override
+public ResponseEntity<?> removeRoleFromUser(String TOKEN, Long roleId, Long userId, Long loggedId) {
+	// TODO Auto-generated method stub
+	if(TOKEN.equals("")) {
+		 List<UserRole> roles = null;
+		 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",roles);
+		 return  ResponseEntity.badRequest().body(getObjectResponse);
+	}
+	
+	if(super.checkActive(TOKEN)!= null)
+	{
+		return super.checkActive(TOKEN);
+	}
+	if(userId == loggedId) {
+		 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not allow to assign to your self",null);
+		 return  ResponseEntity.badRequest().body(getObjectResponse);
+	}
+	User loggedUser = userService.findById(loggedId);
+	 if(loggedUser == null) {
+		 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged User is not found ",null);
+		 return  ResponseEntity.status(404).body(getObjectResponse); 
+	 }
+	 if(loggedUser.getAccountType()!= 1) {
+		if(!userRoleService.checkUserHasPermission(loggedId, "ROLE", "assignToUser")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to assignToUser role",null);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+	}
+	 if(userId == 0 ) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), " userId is required",null);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+	}
+	 User assignedToUser  = userService.findById(userId);
+	 if(assignedToUser == null) {
+		 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "assigned to user is not found ",null);
+		 return  ResponseEntity.status(404).body(getObjectResponse);  
+	 }
+	 Boolean isParent = false;
+	 if(loggedUser.getAccountType() == 4) {
+		 Set<User> loggedParent = loggedUser.getUsersOfUser();
+		 if(loggedParent.isEmpty()) {
+			 getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to remove role from this user ",null);
+//				logger.info("************************ editDevice ENDED ***************************");
+				return ResponseEntity.badRequest().body(getObjectResponse);
+		 }else {
+			if(assignedToUser.getAccountType() != 4) {
+				getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to remove role from this user ",null);
+//				logger.info("************************ editDevice ENDED ***************************");
+				return ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			 User parent =null;
+				for(User object : loggedParent) {
+					parent = object;
+				}
+			Set<User> assignedToParents = assignedToUser.getUsersOfUser();
+			if(assignedToParents.isEmpty()) {
+				getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to remove role from this user ",null);
+//				logger.info("************************ editDevice ENDED ***************************");
+				return ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			for(User object :assignedToParents ) {
+				if(object.getId() == parent.getId() ) {
+					isParent = true;
+					
+					break;
+				}
+			}			
+		 }
+	 }else {
+		 List<User> parents = userService.getAllParentsOfuser(assignedToUser, assignedToUser.getAccountType());
+		   if(parents.isEmpty()) {
+			   isParent =  false;
+		   }else {
+			   for(User object :parents) {
+				   if(object.getId() == loggedUser.getId()) {
+					   isParent = true;
+					   break;
+				   }
+			   }
+		   }
+	 }
+	 if(isParent) {
+		 
+		 Long role = assignedToUser.getRoleId();
+		 if(role == null) {
+			 getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "this user does not have role to remove  ",null);
+//				logger.info("************************ editDevice ENDED ***************************");
+				return ResponseEntity.badRequest().body(getObjectResponse);
+		 }
+		 else {
+			 
+			 	userRepository.removeRoleFromUser(userId);
+				getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "removed successfully",null);
+				return  ResponseEntity.ok().body(getObjectResponse);
+		 }
+	 }else {
+		 getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to remove role from this user ",null);
+//			logger.info("************************ editDevice ENDED ***************************");
+			return ResponseEntity.badRequest().body(getObjectResponse);
+	 }
+	 
+				 
+	 
+	 
+	 
+	 
+	 
 }
 	
 	
