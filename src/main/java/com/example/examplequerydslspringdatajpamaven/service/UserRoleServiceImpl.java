@@ -975,6 +975,47 @@ public ResponseEntity<?> getRolePageContent(String TOKEN,Long userId) {
 		
 	}
 }
+@Override
+public ResponseEntity<?> getUserParentRoles(String TOKEN, Long userId) {
+	// TODO Auto-generated method stub
+	if(TOKEN.equals("")) {
+		 List<UserRole> roles = null;
+		 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",roles);
+		 return  ResponseEntity.badRequest().body(getObjectResponse);
+	}
+	
+	if(super.checkActive(TOKEN)!= null)
+	{
+		return super.checkActive(TOKEN);
+	}
+	if(userId == 0) {
+		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "  userId is required",null);
+		 return  ResponseEntity.badRequest().body(getObjectResponse);
+	}else {
+		User user = userService.findById(userId);
+		if(user == null) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this user not found ",null);
+			return  ResponseEntity.status(404).body(getObjectResponse);
+		}
+		else {
+			Set<User> userParents = user.getUsersOfUser();
+			User parent = null;
+			for(User parentClient : userParents) {
+				 parent = parentClient;
+			}
+			
+			List<Long>usersIds= new ArrayList<>();
+			
+			usersIds.add(parent.getId());
+			
+			List<UserRole> roles = userRoleRepository.getAllRolesCreatedByUser(usersIds);
+			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",roles);
+			
+			return ResponseEntity.ok().body(getObjectResponse);
+		}
+	}
+	
+}
 	
 	
 

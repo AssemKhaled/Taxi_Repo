@@ -24,5 +24,7 @@ public interface UserRoleService {
 	
 	public Boolean checkUserHasPermission(Long userId,String module,String functionality); 
 	
+	public ResponseEntity<?>getUserParentRoles( String TOKEN, Long userId);
+	
 	
 }

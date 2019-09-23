@@ -65,5 +65,10 @@ public class UserRoleRestController {
 		return userRoleService.getRolePageContent(TOKEN,userId);
 	}
 	
+	@GetMapping("/getUserParentRoles")
+	public ResponseEntity<?>getUserParentRoles(@RequestHeader(value = "TOKEN",defaultValue = "")String TOKEN,
+			                                   @RequestParam(value ="selectedUserId",defaultValue= "0")Long userId){
+		return userRoleService.getUserParentRoles(TOKEN,userId);
+	}
 	
 }
