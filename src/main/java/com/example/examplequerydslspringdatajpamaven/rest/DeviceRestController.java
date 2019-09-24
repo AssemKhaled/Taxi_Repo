@@ -2,6 +2,7 @@ package com.example.examplequerydslspringdatajpamaven.rest;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -150,6 +151,13 @@ public class DeviceRestController {
 			                                     @RequestParam (value = "userId", defaultValue = "0") Long userId,
 												 @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId){
 		return deviceService.getCalibrationData(TOKEN,userId,deviceId);
+	}
+	@PostMapping(value = "/addDataToCaliberation")
+	public ResponseEntity<?> addDataToCaliberation( @RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN, 
+			                                        @RequestParam (value = "userId", defaultValue = "0") Long userId,
+												    @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+												    @RequestBody Map<String, List> data){
+		return deviceService.addDataToCaliberation(TOKEN,userId,deviceId,data);
 	}
 
 	

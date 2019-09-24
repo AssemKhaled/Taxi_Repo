@@ -97,7 +97,7 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	public Integer getDeviceWorkingHoursSize(@Param("deviceId")Long deviceId,@Param("start")String start,@Param("end")String end);
 
 	
-	@Query(value = "SELECT calibrationData FROM tc_devices WHERE tc_devices.id=:deviceId AND tc_devices.delete_date IS NULL",nativeQuery = true)
-	public List<DeviceCalibrationData> getCalibrationData(@Param("deviceId")Long deviceId);
+	@Query(value = "SELECT tc_devices.calibrationData FROM tc_devices WHERE tc_devices.id=:deviceId AND tc_devices.delete_date IS NULL ",nativeQuery = true)
+	public List<DeviceCalibrationData> getCalibrationDataCCC(@Param("deviceId")Long deviceId);
 }
 

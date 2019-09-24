@@ -1,6 +1,7 @@
 package com.example.examplequerydslspringdatajpamaven.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.http.ResponseEntity;
@@ -52,6 +53,8 @@ public interface DeviceService {
 	public ResponseEntity<?> getAllDeviceLiveDataMap(String TOKEN,Long userId);
 
 	public ResponseEntity<?> getCalibrationData(String TOKEN,Long userId,Long deviceId);
+	
+	public ResponseEntity<?> addDataToCaliberation(String TOKEN,Long userId,Long deviceId,Map<String, List> data);
 
 
 }
