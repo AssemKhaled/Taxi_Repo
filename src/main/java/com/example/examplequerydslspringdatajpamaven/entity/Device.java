@@ -21,6 +21,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.SqlResultSetMapping;
 import javax.persistence.SqlResultSetMappings;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Type;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -336,7 +339,7 @@ public class Device {
 	@Column(name = "is_valid")
 	private Integer is_valid;
 	
-	@Column(name = "calibrationData")
+	@Column(name = "calibrationData",length=1024)
 	private String calibrationData;
 	
 	@Column(name = "lineData")

@@ -2058,6 +2058,15 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					}
 					else {
 						if(checkIfParent( device ,  loggedUser)) {
+							if(loggedUser.getAccountType()!= 1) {
+								if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "calibration")) {
+									 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to edit calibration",null);
+									 logger.info("************************ calibration ENDED ***************************");
+									return  ResponseEntity.badRequest().body(getObjectResponse);
+								}
+							}
+							
+							
 							List<DeviceCalibrationData> calibrationData = new ArrayList<DeviceCalibrationData>();
                             calibrationData=deviceRepository.getCalibrationDataCCC(deviceId);
 							List<Map> data=new ArrayList<Map>();
@@ -2121,6 +2130,15 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					}
 					else {
 						if(checkIfParent( device ,  loggedUser)) {
+							if(loggedUser.getAccountType()!= 1) {
+								if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "calibration")) {
+									 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to edit calibration",null);
+									 logger.info("************************ calibration ENDED ***************************");
+									return  ResponseEntity.badRequest().body(getObjectResponse);
+								}
+							}
+							
+							
 							if(data.get("calibrationData") == null || data.get("calibrationData").size()==0) {
 								getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Caliberation data shouldn't be null",null);
 								return  ResponseEntity.badRequest().body(getObjectResponse);
@@ -2137,6 +2155,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 									req+=" "+pushed.toString();
 								}
 							}
+							System.out.println("len : "+req.length());
 							device.setCalibrationData(req);
 							deviceRepository.save(device);
 
