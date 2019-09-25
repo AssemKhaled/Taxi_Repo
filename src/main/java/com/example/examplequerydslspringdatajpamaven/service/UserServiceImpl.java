@@ -1315,7 +1315,7 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 					}
 					Set<User>parentsOfChild = child.getUsersOfUser();
 					for( User parentOfChild : parentsOfChild) {
-						if(parentOfChild.getId() == parentId) {
+						if(parentOfChild.getId().equals(parentId)) {
 							return true;
 						}
 					}
