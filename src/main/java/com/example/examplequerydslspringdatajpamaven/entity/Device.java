@@ -138,6 +138,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 	                     @ColumnResult(name="driverName",type=String.class),
 	                     @ColumnResult(name="driverId",type=Long.class),
 	                     @ColumnResult(name="driverPhoto",type=String.class),
+	                     @ColumnResult(name="driverUniqueId",type=String.class),
 	                     @ColumnResult(name="plateType",type=String.class),
 	                     @ColumnResult(name="vehiclePlate",type=String.class),
 	                     @ColumnResult(name="ownerName",type=String.class),
@@ -236,7 +237,7 @@ query="SELECT CAST(devicetime AS DATE) as deviceTime ,tc_positions.id as positio
 
 @NamedNativeQuery(name="vehicleInfo", 
 resultSetMapping="vehicleInfoData", 
-query=" SELECT tc_drivers.id as driverId,tc_drivers.name as driverName,tc_drivers.photo as driverPhoto,"
+query=" SELECT tc_drivers.id as driverId,tc_drivers.uniqueid as driverUniqueId,tc_drivers.name as driverName,tc_drivers.photo as driverPhoto,"
 		+ " tc_devices.id as id,tc_devices.uniqueid as uniqueId,tc_devices.sequence_number as sequenceNumber,"
 		+ " tc_devices.owner_name as ownerName,tc_devices.owner_id as ownerId, "
 		+ " tc_devices.username as userName,tc_devices.model as model ,"

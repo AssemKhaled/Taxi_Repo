@@ -1373,7 +1373,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 //						data.add(map2);
 						
 						HashMap<Object, Object> map3 = new HashMap<Object, Object>();			   
-					    map3.put("key", "uniqueId");
+					    map3.put("key", "Tracker IMEI");
 					    map3.put("value", vehicleInfo.get(0).getUniqueId());			
 						data.add(map3);
 						
@@ -1397,6 +1397,11 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					    map7.put("value", vehicleInfo.get(0).getDriverName());			
 						data.add(map7);
 //						
+						
+						HashMap<Object, Object> map00 = new HashMap<Object, Object>();			   
+					    map00.put("key", "Driver Identity Number");
+					    map00.put("value", vehicleInfo.get(0).getDriverUniqueId());			
+						data.add(map00);
 //						HashMap<Object, Object> map8 = new HashMap<Object, Object>();			   
 //					    map8.put("key", "geofenceName");
 //					    map8.put("value", vehicleInfo.get(0).getGeofenceName());			
@@ -1407,10 +1412,10 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 //					    map9.put("value", vehicleInfo.get(0).getDriverId());			
 //						data.add(map9);
 
-						HashMap<Object, Object> map10 = new HashMap<Object, Object>();			   
-						map10.put("key", "Driver Photo");
-					    map10.put("value", vehicleInfo.get(0).getDriverPhoto());			
-						data.add(map10);
+//						HashMap<Object, Object> map10 = new HashMap<Object, Object>();			   
+//						map10.put("key", "Driver Photo");
+//					    map10.put("value", vehicleInfo.get(0).getDriverPhoto());			
+//						data.add(map10);
 
 						HashMap<Object, Object> map11 = new HashMap<Object, Object>();			   
 						map11.put("key", "Plate Type");
@@ -1654,17 +1659,17 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 //				map8.put("key", "attributes");
 //			    map8.put("value", allDevicesLiveData.get(0).getAttributes());			
 //				data.add(map8);
-
-			    HashMap<Object, Object> map9 = new HashMap<Object, Object>();			   
-				map9.put("key", "Crash");
-			    map9.put("value", allDevicesLiveData.get(0).getCrash());			
-				data.add(map9);
-				
-			    HashMap<Object, Object> map10 = new HashMap<Object, Object>();			   
-				map10.put("key", "Battery Unpluged");
-			    map10.put("value", allDevicesLiveData.get(0).getBatteryUnpluged());			
-				data.add(map10);
-				
+//
+//			    HashMap<Object, Object> map9 = new HashMap<Object, Object>();			   
+//				map9.put("key", "Crash");
+//			    map9.put("value", allDevicesLiveData.get(0).getCrash());			
+//				data.add(map9);
+//				
+//			    HashMap<Object, Object> map10 = new HashMap<Object, Object>();			   
+//				map10.put("key", "Battery Unpluged");
+//			    map10.put("value", allDevicesLiveData.get(0).getBatteryUnpluged());			
+//				data.add(map10);
+//				
 			    HashMap<Object, Object> map11 = new HashMap<Object, Object>();			   
 				map11.put("key", "Address");
 			    map11.put("value", allDevicesLiveData.get(0).getAddress());			
@@ -1694,11 +1699,11 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				map16.put("key", "Speed");
 			    map16.put("value", allDevicesLiveData.get(0).getSpeed());			
 				data.add(map16);
-				
-			    HashMap<Object, Object> map17 = new HashMap<Object, Object>();			   
-				map17.put("key", "Status");
-			    map17.put("value", allDevicesLiveData.get(0).getStatus());			
-				data.add(map17);
+//				
+//			    HashMap<Object, Object> map17 = new HashMap<Object, Object>();			   
+//				map17.put("key", "Status");
+//			    map17.put("value", allDevicesLiveData.get(0).getStatus());			
+//				data.add(map17);
 				
 //			    HashMap<Object, Object> map18 = new HashMap<Object, Object>();			   
 //			    map18.put("key", "positionId");
@@ -1770,11 +1775,11 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 //				map31.put("value", allDevicesLiveData.get(0).getRightLetter());			
 //				data.add(map31);
 //				
-			    HashMap<Object, Object> map32 = new HashMap<Object, Object>();			   
-			    map32.put("key", "Power Unpluged");
-			    map32.put("value", allDevicesLiveData.get(0).getPowerUnpluged());			
-				data.add(map32);
-	            
+//			    HashMap<Object, Object> map32 = new HashMap<Object, Object>();			   
+//			    map32.put("key", "Power Unpluged");
+//			    map32.put("value", allDevicesLiveData.get(0).getPowerUnpluged());			
+//				data.add(map32);
+//	            
 			}
 			
 			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",data);

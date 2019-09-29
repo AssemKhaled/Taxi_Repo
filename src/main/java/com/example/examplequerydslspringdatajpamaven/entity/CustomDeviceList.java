@@ -14,6 +14,7 @@ public class CustomDeviceList{
 	private String geofenceName;
 	private Long driverId;
 	private String driverPhoto;
+	private String driverUniqueId;
 	private String plateType;
 	private String plateNum;
 	private String rightLetter;
@@ -44,7 +45,7 @@ public class CustomDeviceList{
 	}
 
 	public CustomDeviceList(int id,String uniqueId, String sequenceNumber, String driverName, Long driverId,
-			String driverPhoto, String plateType, String vehiclePlate, String ownerName, String ownerId, String userName, String brand, String model,
+			String driverPhoto,String driverUniqueId ,String plateType, String vehiclePlate, String ownerName, String ownerId, String userName, String brand, String model,
 			String madeYear, String color, String licenceExptDate, String carWeight) {
 		super();
 		this.id=id;
@@ -53,6 +54,7 @@ public class CustomDeviceList{
 		this.driverName = driverName;
 		this.driverId = driverId;
 		this.driverPhoto = driverPhoto;
+		this.driverUniqueId = driverUniqueId;
 		this.plateType = plateType;
 		this.vehiclePlate=vehiclePlate;
 		this.ownerName = ownerName;
@@ -268,6 +270,12 @@ public class CustomDeviceList{
 
 	public void setOwnerId(String ownerId) {
 		this.ownerId = ownerId;
+	}
+	public String getDriverUniqueId() {
+		return driverUniqueId;
+	}
+	public void setDriverUniqueId(String driverUniqueId) {
+		this.driverUniqueId = driverUniqueId;
 	}
 	
 
