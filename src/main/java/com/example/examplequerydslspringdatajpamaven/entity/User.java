@@ -98,7 +98,7 @@ public class User {
 	    )
 //	    @OnDelete(action = OnDeleteAction.CASCADE)
 	    private Set<Device> devices = new HashSet<>();
-	    @JsonIgnore
+	    
 		@ManyToMany(
 	            fetch = FetchType.LAZY,
 	            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
