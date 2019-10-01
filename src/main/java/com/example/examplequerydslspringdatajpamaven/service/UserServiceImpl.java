@@ -253,7 +253,7 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 				if(active == 0) {
 					List<User> users = userRepository.getInactiveUsersOfUser(userId,offset,search);
 					Integer size=userRepository.getInactiveUsersOfUserSize(userId);
-					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users,size);
+					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "succxess",users,size);
 					logger.info("************************ getAllUsersOfUser ENDED ***************************");
 					return  ResponseEntity.ok().body(getObjectResponse);
 				}
@@ -276,309 +276,509 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 		 
 	}
 
+//	@Override
+//	public ResponseEntity<?> createUser(String TOKEN,User user,Long userId) {
+//		
+//		logger.info("************************createUser STARTED ***************************");
+//		
+//		if(TOKEN.equals("")) {
+//			 List<User> users = null;
+//			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",users);
+//			 return  ResponseEntity.badRequest().body(getObjectResponse);
+//		}else {
+//			if(super.checkActive(TOKEN)!= null)
+//			{
+//				return super.checkActive(TOKEN);
+//			}
+//			//userId is the user parent of the account user
+//			if(userId == 0) {
+//				List<User> users = null;
+//		    	//throw duplication exception with duplication list
+//		    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",users);
+//		    	logger.info("************************createUser ENDED ***************************");
+//		    	return ResponseEntity.badRequest().body(getObjectResponse);
+//			}else {
+//				User creater = findById(userId);
+//				if(creater == null) {
+//					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This  creater user is not Found",null);
+//		    	logger.info("************************createUser ENDED ***************************");
+//
+//			    	return ResponseEntity.status(404).body(getObjectResponse);
+//				}else {
+//					if(creater.getAccountType()!= 1) {
+//						if(!userRoleService.checkUserHasPermission(userId, "USER", "create")) {
+//							 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to create user",null);
+//							 logger.info("************************ getAllUses ENDED ***************************");
+//							return  ResponseEntity.badRequest().body(getObjectResponse);
+//						}
+//					}
+//					if(user.getId() != null && user.getId() != 0) {
+//						List<User> users = null;
+//						String message= "create doesn't accept id";
+//				    	//throw duplication exception with duplication list
+//				    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), message,users);
+//				    	logger.info("************************createUser ENDED ***************************");
+//				    	return ResponseEntity.ok().body(getObjectResponse);
+//					}
+//					if(user.getEmail() == null || user.getEmail() == "" || user.getPassword() == null
+//						|| user.getPassword() == "" || user.getName() == null || user.getName() == "" 
+//						|| user.getIdentity_num() == null || user.getIdentity_num() == ""
+//						|| user.getCommercial_num() == null ||user.getCommercial_num() == ""
+//						|| user.getCompany_phone() == null || user.getCompany_phone() == ""
+//						|| user.getManager_phone() == null || user.getManager_phone() == ""
+//						|| user.getManager_mobile() == null || user.getManager_mobile() == "" 
+//						|| user.getPhone() == null || user.getPhone() == "" || user.getAccountType() == null || user.getAccountType() == 0 
+//						|| user.getParents() == null || user.getParents() == "") {
+//						List<User> users = null;
+//						String message= "attributes [email , password, name, identityNumber ,commercialNumber,"
+//								+ "companyPhone ,Managerphone, ManagerMobile ,accountType,userParents] are required";
+//				    	//throw duplication exception with duplication list
+//				    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), message,users);
+//				    	logger.info("************************createUser ENDED ***************************");
+//				    	return ResponseEntity.badRequest().body(getObjectResponse);
+//					}
+//					
+//					if(user.getAccountType() == 1) {
+//						getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Can't Create account type 1",null);
+//				    	logger.info("************************createUser ENDED ***************************");
+//				    	return ResponseEntity.badRequest().body(getObjectResponse);
+//					}
+//					//create vendor
+//					else if(user.getAccountType() == 2) {
+//						if(creater.getAccountType() != 1) {
+//			    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot create vendor",null);
+//					    	logger.info("************************createUser ENDED ***************************");
+//					    	return ResponseEntity.badRequest().body(getObjectResponse);
+//			    		}
+//			    		else {
+//			    			return saveUser(userId,user);
+//			    		}
+//					}
+//					//check if the user is client
+//					else if(user.getAccountType() == 3) {
+//						if(creater.getAccountType() != 2 && creater.getAccountType() != 1) {
+//							getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot create client",null);
+//					    	logger.info("************************createUser ENDED ***************************");
+//					    	return ResponseEntity.badRequest().body(getObjectResponse);
+//						}
+//					    	JSONObject parentUsers = new JSONObject(user.getParents());
+//					    	if( !parentUsers.has("vendorId")) {
+//					    		
+//					    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "the parent user of this user must be of type vendor",null);
+//						    	logger.info("************************createUser ENDED ***************************");
+//						    	return ResponseEntity.badRequest().body(getObjectResponse);
+//					    	}else {
+//					    		if(parentUsers.get("vendorId").equals(null)) {
+//					    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Vendor ID is Required",null);
+//							    	logger.info("************************createUser ENDED ***************************");
+//							    	return ResponseEntity.badRequest().body(getObjectResponse);
+//					    		}
+//					    		if(creater.getAccountType()==2) {
+//					    			if(parentUsers.getLong("vendorId") != userId) {
+//						    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "not allow to create and assign to another vendor",null);
+//								    	logger.info("************************createUser ENDED ***************************");
+//								    	return ResponseEntity.badRequest().body(getObjectResponse);
+//						    		}
+//					    		}
+//					    		if(!checkIfParentOrNot(userId,parentUsers.getLong("vendorId"),creater.getAccountType(),2)) {
+//					    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign client to this vendor",null);
+//							    	logger.info("************************createUser ENDED ***************************");
+//							    	return ResponseEntity.badRequest().body(getObjectResponse);
+//					    		}
+//					    		else {
+//					    			if(parentUsers.has("clientId")) {
+//					    				if(!parentUsers.get("clientId").equals(null)) {
+//							    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not allow to assign Client ID",null);
+//									    	logger.info("************************createUser ENDED ***************************");
+//									    	return ResponseEntity.badRequest().body(getObjectResponse);
+//							    		}
+//					    				
+//					    			}
+//					    			return saveUser(parentUsers.getLong("vendorId"),user);
+//					    		}
+//					    	}
+//					    }else if(user.getAccountType() == 4) {
+//					    	if(creater.getAccountType() == 4) {
+//					    	JSONObject parentUsers = new JSONObject(user.getParents());
+//					    	
+//                           if(!parentUsers.has("clientId")) {
+//					    		
+//					    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "clientId not found",null);
+//						    	logger.info("************************createUser ENDED ***************************");
+//						    	return ResponseEntity.badRequest().body(getObjectResponse);
+//					    	}else {
+//					    		if(parentUsers.get("clientId").equals(null)) {
+//					    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Client ID is Required",null);
+//							    	logger.info("************************createUser ENDED ***************************");
+//							    	return ResponseEntity.badRequest().body(getObjectResponse);
+//					    		}
+//					    	}
+//                           
+//                           if(!parentUsers.has("vendorId")) {
+//					    		
+//					    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "vendorId not found",null);
+//						    	logger.info("************************createUser ENDED ***************************");
+//						    	return ResponseEntity.badRequest().body(getObjectResponse);
+//					    	}else {
+//					    		if(parentUsers.get("vendorId").equals(null)) {
+//					    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Vendor ID is Required",null);
+//							    	logger.info("************************createUser ENDED ***************************");
+//							    	return ResponseEntity.badRequest().body(getObjectResponse);
+//					    		}
+//					    	}
+//					    	
+//				    		Set<User> userParents = creater.getUsersOfUser();
+//				    		if(userParents.isEmpty()) {
+//				    			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this  creater user not assigned to any client please assign first to client",null);
+//						    	logger.info("************************createUser ENDED ***************************");
+//						    	return ResponseEntity.status(404).body(getObjectResponse);
+//				    		}
+//				    		else {
+//				    			
+//				    			User parent = null;
+//				    			boolean isParentClient=false;
+//				    			boolean isParentVendor=false;
+//				    			for(User parentClient : userParents) {
+//					    			 parent = parentClient;
+//					    			 if(parent.getId().equals(parentUsers.getLong("clientId"))) {
+//					    				 isParentClient=true;
+//					    				 break;
+//					    			 }
+//					    		}
+//				    			if(isParentClient == true) {
+//						    		User clientUser= findById(parentUsers.getLong("clientId"));
+//						    		Set<User> ClientParents = clientUser.getUsersOfUser();
+//
+//				    				for(User parentClient : ClientParents) {
+//						    			 parent = parentClient;
+//						    			 if(parent.getId().equals(parentUsers.getLong("vendorId"))) {
+//						    				 isParentVendor=true;
+//						    				 break;
+//						    			 }
+//						    		}
+//				    				if(isParentVendor == true) {
+//						    			return saveUser(parent.getId(),user);
+//				    				}
+//				    				else {
+//				    					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "vendorId not the parent of client",null);
+//								    	logger.info("************************createUser ENDED ***************************");
+//								    	return ResponseEntity.badRequest().body(getObjectResponse);
+//				    				}
+//				    				
+//				    			}
+//				    			else {
+//				    				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "clientId not the parent of creater",null);
+//							    	logger.info("************************createUser ENDED ***************************");
+//							    	return ResponseEntity.badRequest().body(getObjectResponse);
+//				    			}
+//				    		}
+//				    		
+//				    	}else if(creater.getAccountType() == 3) {
+//					    	JSONObject parentUsers = new JSONObject(user.getParents());
+//                            if(!parentUsers.has("clientId")) {
+//					    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "clientId not found",null);
+//						    	logger.info("************************createUser ENDED ***************************");
+//						    	return ResponseEntity.badRequest().body(getObjectResponse);
+//					    	}else {
+//					    		if(parentUsers.get("clientId").equals(null)) {
+//					    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "client ID is Required",null);
+//							    	logger.info("************************createUser ENDED ***************************");
+//							    	return ResponseEntity.badRequest().body(getObjectResponse);
+//					    		}
+//					    		if(parentUsers.getLong("clientId") != userId) {
+//					    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "not allow to create and assign to another clientId",null);
+//							    	logger.info("************************createUser ENDED ***************************");
+//							    	return ResponseEntity.badRequest().body(getObjectResponse);
+//					    		}
+//					    	}
+//			    			
+//				    		
+//				    		return saveUser(creater.getId(),user);
+//				    	}
+//				    	else if(creater.getAccountType()== 2) {
+//				    		JSONObject parentUsers = new JSONObject(user.getParents());
+//					    	if( !parentUsers.has("clientId")) {
+//					    		
+//					    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "the parent user of this user must be of type client",null);
+//						    	logger.info("************************createUser ENDED ***************************");
+//						    	return ResponseEntity.badRequest().body(getObjectResponse);
+//					    	}else {
+//					    		if(parentUsers.get("clientId").equals(null)) {
+//					    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Client ID is Required",null);
+//							    	logger.info("************************createUser ENDED ***************************");
+//							    	return ResponseEntity.badRequest().body(getObjectResponse);
+//					    		}
+//					    		if(!checkIfParentOrNot(userId,parentUsers.getLong("clientId"),creater.getAccountType(),3)) {
+//					    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign user to this client",null);
+//							    	logger.info("************************createUser ENDED ***************************");
+//							    	return ResponseEntity.badRequest().body(getObjectResponse);
+//					    		}
+//					    		else {
+//					    			return saveUser(parentUsers.getLong("clientId"),user);
+//					    		}
+//				    	}
+//				    	
+//				    }else if(creater.getAccountType() ==1) {
+//				    	JSONObject parentUsers = new JSONObject(user.getParents());
+//				    	if( !parentUsers.has("vendorId")) {
+//				    		
+//				    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you must select vendor to be parent of this user",null);
+//					    	logger.info("************************createUser ENDED ***************************");
+//					    	return ResponseEntity.badRequest().body(getObjectResponse);
+//				    	}else {
+//				    		if(parentUsers.get("vendorId").equals(null)) {
+//				    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Vendor ID is Required",null);
+//						    	logger.info("************************createUser ENDED ***************************");
+//						    	return ResponseEntity.badRequest().body(getObjectResponse);
+//				    		}
+//				    		if(!checkIfParentOrNot(userId,parentUsers.getLong("vendorId"),creater.getAccountType(),2)) {
+//				    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign user to this vendor",null);
+//						    	logger.info("************************createUser ENDED ***************************");
+//						    	return ResponseEntity.badRequest().body(getObjectResponse);
+//				    		}
+//				    		else {
+//				    			if( !parentUsers.has("clientId")) {
+//						    		
+//						    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you must select client to be parent of this user",null);
+//							    	logger.info("************************createUser ENDED ***************************");
+//							    	return ResponseEntity.badRequest().body(getObjectResponse);
+//						    	}else {
+//						    		if(parentUsers.get("clientId").equals(null)) {
+//						    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Client ID is Required",null);
+//								    	logger.info("************************createUser ENDED ***************************");
+//								    	return ResponseEntity.badRequest().body(getObjectResponse);
+//						    		}
+//						    		if(!checkIfParentOrNot(parentUsers.getLong("vendorId"),parentUsers.getLong("clientId"),2,3)) {
+//						    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign user to this client ",null);
+//								    	logger.info("************************createUser ENDED ***************************");
+//								    	return ResponseEntity.badRequest().body(getObjectResponse);
+//						    		}
+//						    		else {
+//						    			return saveUser(parentUsers.getLong("clientId"),user);
+//						    		}
+//				    		}
+//			    	}
+//				   }
+//				   }
+//				    else {
+//				    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "creater must has account type",null);
+//				    	logger.info("************************createUser ENDED ***************************");
+//				    	return ResponseEntity.badRequest().body(getObjectResponse);
+//				    }
+//					
+//					
+//				}else {
+//					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "user must has account type",null);
+//			    	logger.info("************************createUser ENDED ***************************");
+//			    	return ResponseEntity.badRequest().body(getObjectResponse);
+//				}
+//					
+//				}
+//			}
+//		}
+//	
+//
+//		
+//	}
 	@Override
 	public ResponseEntity<?> createUser(String TOKEN,User user,Long userId) {
-		
 		logger.info("************************createUser STARTED ***************************");
 		
 		if(TOKEN.equals("")) {
 			 List<User> users = null;
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",users);
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
-		}else {
-			if(super.checkActive(TOKEN)!= null)
-			{
+		}
+		if(super.checkActive(TOKEN)!= null)
+		{
 				return super.checkActive(TOKEN);
+		}
+		if(userId == 0) {
+			
+	    	//throw duplication exception with duplication list
+	    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",null);
+	    	logger.info("************************createUser ENDED ***************************");
+	    	return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User creater = findById(userId);
+		if(creater == null) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This  creater user is not Found",null);
+    	logger.info("************************createUser ENDED ***************************");
+
+	    	return ResponseEntity.status(404).body(getObjectResponse);
+		}
+		if(creater.getAccountType()!= 1) {
+			if(!userRoleService.checkUserHasPermission(userId, "USER", "create")) {
+				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to create user",null);
+				 logger.info("************************ getAllUses ENDED ***************************");
+				return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
-			//userId is the user parent of the account user
-			if(userId == 0) {
-				List<User> users = null;
-		    	//throw duplication exception with duplication list
-		    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",users);
+		}
+		if(user.getId() != null && user.getId() != 0) {
+			
+			String message= "create doesn't accept id";
+	    	//throw duplication exception with duplication list
+	    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), message,null);
+	    	logger.info("************************createUser ENDED ***************************");
+	    	return ResponseEntity.ok().body(getObjectResponse);
+		}
+		if(user.getEmail() == null || user.getEmail() == "" || user.getPassword() == null
+		|| user.getPassword() == "" || user.getName() == null || user.getName() == "" 
+		|| user.getIdentity_num() == null || user.getIdentity_num() == ""
+		|| user.getCommercial_num() == null ||user.getCommercial_num() == ""
+		|| user.getCompany_phone() == null || user.getCompany_phone() == ""
+		|| user.getManager_phone() == null || user.getManager_phone() == ""
+		|| user.getManager_mobile() == null || user.getManager_mobile() == "" 
+		|| user.getPhone() == null || user.getPhone() == "" || user.getAccountType() == null || user.getAccountType() == 0 ) {
+		List<User> users = null;
+		String message= "attributes [email , password, name, identityNumber ,commercialNumber,"
+				+ "companyPhone ,Managerphone, ManagerMobile ,accountType] are required";
+    	//throw duplication exception with duplication list
+    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), message,users);
+    	logger.info("************************createUser ENDED ***************************");
+    	return ResponseEntity.badRequest().body(getObjectResponse);
+	  }
+		if(user.getAccountType() == 1) {
+		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Can't Create account type 1",null);
+    	logger.info("************************createUser ENDED ***************************");
+    	return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		if(creater.getAccountType() == 4 && user.getAccountType() != 4) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this account can't create account of type admin , vendor or client",null);
+	    	logger.info("************************createUser ENDED ***************************");
+	    	return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		if(creater.getAccountType() == 3 && user.getAccountType() != 4) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this account can't create account of type admin , vendor or client",null);
+	    	logger.info("************************createUser ENDED ***************************");
+	    	return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		if(creater.getAccountType() ==2 && (user.getAccountType() ==2 || user.getAccountType() == 1)) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this account can't create account of type admin or vendor",null);
+	    	logger.info("************************createUser ENDED ***************************");
+	    	return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		//if creater is  user assign the direct parent of this  user to this user
+		if(creater.getAccountType() == 4) {
+			Set<User> parentClients = creater.getUsersOfUser();
+			if(parentClients.isEmpty()) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user account cannot create user as it has no parent",null);
 		    	logger.info("************************createUser ENDED ***************************");
 		    	return ResponseEntity.badRequest().body(getObjectResponse);
-			}else {
-				User creater = findById(userId);
-				if(creater == null) {
-					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This  creater user is not Found",null);
-		    	logger.info("************************createUser ENDED ***************************");
-
-			    	return ResponseEntity.status(404).body(getObjectResponse);
-				}else {
-					if(creater.getAccountType()!= 1) {
-						if(!userRoleService.checkUserHasPermission(userId, "USER", "create")) {
-							 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to create user",null);
-							 logger.info("************************ getAllUses ENDED ***************************");
-							return  ResponseEntity.badRequest().body(getObjectResponse);
-						}
-					}
-					if(user.getId() != null && user.getId() != 0) {
-						List<User> users = null;
-						String message= "create doesn't accept id";
-				    	//throw duplication exception with duplication list
-				    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), message,users);
-				    	logger.info("************************createUser ENDED ***************************");
-				    	return ResponseEntity.ok().body(getObjectResponse);
-					}
-					if(user.getEmail() == null || user.getEmail() == "" || user.getPassword() == null
-						|| user.getPassword() == "" || user.getName() == null || user.getName() == "" 
-						|| user.getIdentity_num() == null || user.getIdentity_num() == ""
-						|| user.getCommercial_num() == null ||user.getCommercial_num() == ""
-						|| user.getCompany_phone() == null || user.getCompany_phone() == ""
-						|| user.getManager_phone() == null || user.getManager_phone() == ""
-						|| user.getManager_mobile() == null || user.getManager_mobile() == "" 
-						|| user.getPhone() == null || user.getPhone() == "" || user.getAccountType() == null || user.getAccountType() == 0 
-						|| user.getParents() == null || user.getParents() == "") {
-						List<User> users = null;
-						String message= "attributes [email , password, name, identityNumber ,commercialNumber,"
-								+ "companyPhone ,Managerphone, ManagerMobile ,accountType,userParents] are required";
-				    	//throw duplication exception with duplication list
-				    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), message,users);
-				    	logger.info("************************createUser ENDED ***************************");
-				    	return ResponseEntity.badRequest().body(getObjectResponse);
-					}
-					//create vendor
-					if(user.getAccountType() == 1) {
-						getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Can't Create account type 1",null);
-				    	logger.info("************************createUser ENDED ***************************");
-				    	return ResponseEntity.badRequest().body(getObjectResponse);
-					}
-					
-					else if(user.getAccountType() == 2) {
-						if(creater.getAccountType() != 1) {
-			    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot create vendor",null);
-					    	logger.info("************************createUser ENDED ***************************");
-					    	return ResponseEntity.badRequest().body(getObjectResponse);
-			    		}
-			    		else {
-			    			return saveUser(userId,user);
-			    		}
-					}
-					//check if the user is client
-					
-			    	
-					
-					else if(user.getAccountType() == 3) {
-					    	JSONObject parentUsers = new JSONObject(user.getParents());
-					    	if( !parentUsers.has("vendorId")) {
-					    		
-					    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "the parent user of this user must be of type vendor",null);
-						    	logger.info("************************createUser ENDED ***************************");
-						    	return ResponseEntity.badRequest().body(getObjectResponse);
-					    	}else {
-					    		if(parentUsers.get("vendorId").equals(null)) {
-					    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Vendor ID is Required",null);
-							    	logger.info("************************createUser ENDED ***************************");
-							    	return ResponseEntity.badRequest().body(getObjectResponse);
-					    		}
-					    		if(creater.getAccountType()==2) {
-					    			if(parentUsers.getLong("vendorId") != userId) {
-						    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "not allow to create and assign to another vendor",null);
-								    	logger.info("************************createUser ENDED ***************************");
-								    	return ResponseEntity.badRequest().body(getObjectResponse);
-						    		}
-					    		}
-					    		
-					    		
-					    		if(!checkIfParentOrNot(userId,parentUsers.getLong("vendorId"),creater.getAccountType(),2)) {
-					    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign client to this vendor",null);
-							    	logger.info("************************createUser ENDED ***************************");
-							    	return ResponseEntity.badRequest().body(getObjectResponse);
-					    		}
-					    		else {
-					    			if(parentUsers.has("clientId")) {
-					    				if(!parentUsers.get("clientId").equals(null)) {
-							    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not allow to assign Client ID",null);
-									    	logger.info("************************createUser ENDED ***************************");
-									    	return ResponseEntity.badRequest().body(getObjectResponse);
-							    		}
-					    				
-					    			}
-					    			return saveUser(parentUsers.getLong("vendorId"),user);
-					    		}
-					    	}
-					    }else if(user.getAccountType() == 4) {
-					    	if(creater.getAccountType() == 4) {
-					    	JSONObject parentUsers = new JSONObject(user.getParents());
-					    	
-                           if(!parentUsers.has("clientId")) {
-					    		
-					    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "clientId not found",null);
-						    	logger.info("************************createUser ENDED ***************************");
-						    	return ResponseEntity.badRequest().body(getObjectResponse);
-					    	}else {
-					    		if(parentUsers.get("clientId").equals(null)) {
-					    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Client ID is Required",null);
-							    	logger.info("************************createUser ENDED ***************************");
-							    	return ResponseEntity.badRequest().body(getObjectResponse);
-					    		}
-					    	}
-                           
-                           if(!parentUsers.has("vendorId")) {
-					    		
-					    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "vendorId not found",null);
-						    	logger.info("************************createUser ENDED ***************************");
-						    	return ResponseEntity.badRequest().body(getObjectResponse);
-					    	}else {
-					    		if(parentUsers.get("vendorId").equals(null)) {
-					    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Vendor ID is Required",null);
-							    	logger.info("************************createUser ENDED ***************************");
-							    	return ResponseEntity.badRequest().body(getObjectResponse);
-					    		}
-					    	}
-					    	
-				    		Set<User> userParents = creater.getUsersOfUser();
-				    		if(userParents.isEmpty()) {
-				    			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this  creater user not assigned to any client please assign first to client",null);
-						    	logger.info("************************createUser ENDED ***************************");
-						    	return ResponseEntity.status(404).body(getObjectResponse);
-				    		}
-				    		else {
-				    			
-				    			User parent = null;
-				    			boolean isParentClient=false;
-				    			boolean isParentVendor=false;
-				    			for(User parentClient : userParents) {
-					    			 parent = parentClient;
-					    			 if(parent.getId().equals(parentUsers.getLong("clientId"))) {
-					    				 isParentClient=true;
-					    				 break;
-					    			 }
-					    		}
-				    			if(isParentClient == true) {
-						    		User clientUser= findById(parentUsers.getLong("clientId"));
-						    		Set<User> ClientParents = clientUser.getUsersOfUser();
-
-				    				for(User parentClient : ClientParents) {
-						    			 parent = parentClient;
-						    			 if(parent.getId().equals(parentUsers.getLong("vendorId"))) {
-						    				 isParentVendor=true;
-						    				 break;
-						    			 }
-						    		}
-				    				if(isParentVendor == true) {
-						    			return saveUser(parent.getId(),user);
-				    				}
-				    				else {
-				    					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "vendorId not the parent of client",null);
-								    	logger.info("************************createUser ENDED ***************************");
-								    	return ResponseEntity.badRequest().body(getObjectResponse);
-				    				}
-				    				
-				    			}
-				    			else {
-				    				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "clientId not the parent of creater",null);
-							    	logger.info("************************createUser ENDED ***************************");
-							    	return ResponseEntity.badRequest().body(getObjectResponse);
-				    			}
-				    		}
-				    		
-				    	}else if(creater.getAccountType() == 3) {
-					    	JSONObject parentUsers = new JSONObject(user.getParents());
-                            if(!parentUsers.has("clientId")) {
-					    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "clientId not found",null);
-						    	logger.info("************************createUser ENDED ***************************");
-						    	return ResponseEntity.badRequest().body(getObjectResponse);
-					    	}else {
-					    		if(parentUsers.get("clientId").equals(null)) {
-					    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "client ID is Required",null);
-							    	logger.info("************************createUser ENDED ***************************");
-							    	return ResponseEntity.badRequest().body(getObjectResponse);
-					    		}
-					    		if(parentUsers.getLong("clientId") != userId) {
-					    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "not allow to create and assign to another clientId",null);
-							    	logger.info("************************createUser ENDED ***************************");
-							    	return ResponseEntity.badRequest().body(getObjectResponse);
-					    		}
-					    	}
-			    			
-				    		
-				    		return saveUser(creater.getId(),user);
-				    	}
-				    	else if(creater.getAccountType()== 2) {
-				    		JSONObject parentUsers = new JSONObject(user.getParents());
-					    	if( !parentUsers.has("clientId")) {
-					    		
-					    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "the parent user of this user must be of type client",null);
-						    	logger.info("************************createUser ENDED ***************************");
-						    	return ResponseEntity.badRequest().body(getObjectResponse);
-					    	}else {
-					    		if(parentUsers.get("clientId").equals(null)) {
-					    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Client ID is Required",null);
-							    	logger.info("************************createUser ENDED ***************************");
-							    	return ResponseEntity.badRequest().body(getObjectResponse);
-					    		}
-					    		if(!checkIfParentOrNot(userId,parentUsers.getLong("clientId"),creater.getAccountType(),3)) {
-					    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign user to this client",null);
-							    	logger.info("************************createUser ENDED ***************************");
-							    	return ResponseEntity.badRequest().body(getObjectResponse);
-					    		}
-					    		else {
-					    			return saveUser(parentUsers.getLong("clientId"),user);
-					    		}
-				    	}
-				    	
-				    }else if(creater.getAccountType() ==1) {
-				    	JSONObject parentUsers = new JSONObject(user.getParents());
-				    	if( !parentUsers.has("vendorId")) {
-				    		
-				    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you must select vendor to be parent of this user",null);
-					    	logger.info("************************createUser ENDED ***************************");
-					    	return ResponseEntity.badRequest().body(getObjectResponse);
-				    	}else {
-				    		if(parentUsers.get("vendorId").equals(null)) {
-				    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Vendor ID is Required",null);
-						    	logger.info("************************createUser ENDED ***************************");
-						    	return ResponseEntity.badRequest().body(getObjectResponse);
-				    		}
-				    		if(!checkIfParentOrNot(userId,parentUsers.getLong("vendorId"),creater.getAccountType(),2)) {
-				    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign user to this vendor",null);
-						    	logger.info("************************createUser ENDED ***************************");
-						    	return ResponseEntity.badRequest().body(getObjectResponse);
-				    		}
-				    		else {
-				    			if( !parentUsers.has("clientId")) {
-						    		
-						    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you must select client to be parent of this user",null);
-							    	logger.info("************************createUser ENDED ***************************");
-							    	return ResponseEntity.badRequest().body(getObjectResponse);
-						    	}else {
-						    		if(parentUsers.get("clientId").equals(null)) {
-						    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Client ID is Required",null);
-								    	logger.info("************************createUser ENDED ***************************");
-								    	return ResponseEntity.badRequest().body(getObjectResponse);
-						    		}
-						    		if(!checkIfParentOrNot(parentUsers.getLong("vendorId"),parentUsers.getLong("clientId"),2,3)) {
-						    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign user to this client ",null);
-								    	logger.info("************************createUser ENDED ***************************");
-								    	return ResponseEntity.badRequest().body(getObjectResponse);
-						    		}
-						    		else {
-						    			return saveUser(parentUsers.getLong("clientId"),user);
-						    		}
-				    		}
-			    	}
-				   }
-				   }
-				    else {
-				    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "creater must has account type",null);
-				    	logger.info("************************createUser ENDED ***************************");
-				    	return ResponseEntity.badRequest().body(getObjectResponse);
-				    }
-					
-					
-				}else {
-					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "user must has account type",null);
+			}
+			User parentClient = null;
+			
+			for(User object : parentClients) {
+				parentClient = object;
+			}
+			return saveUser(parentClient.getId(),user);
+			
+		}
+		if(creater.getAccountType() == 3) {
+		
+			return saveUser(creater.getId(), user);
+		 
+		}
+		if(creater.getAccountType() == 2) {
+			
+			if(user.getAccountType() == 3) {
+				return saveUser(creater.getId(), user);
+			}
+			if(user.getAccountType() == 4){
+				if(user.getParents() == null || user.getParents() == "") {
+					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "parents is required in this case",null);
 			    	logger.info("************************createUser ENDED ***************************");
 			    	return ResponseEntity.badRequest().body(getObjectResponse);
 				}
-					
-				}
+				JSONObject parentUsers = new JSONObject(user.getParents());
+				
+		    	if( !parentUsers.has("clientId")) {
+		    		
+		    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you must select client to be parent of this user",null);
+			    	logger.info("************************createUser ENDED ***************************");
+			    	return ResponseEntity.badRequest().body(getObjectResponse);
+			    	
+		    	}
+		    	if(parentUsers.get("clientId").equals(null)) {
+		    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "client ID is Required",null);
+				    logger.info("************************createUser ENDED ***************************");
+				    return ResponseEntity.badRequest().body(getObjectResponse);
+		    	}
+		    	if(!checkIfParentOrNot(userId,parentUsers.getLong("clientId"),creater.getAccountType(),3)) {
+		    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign user to this client",null);
+			    	logger.info("************************createUser ENDED ***************************");
+			    	return ResponseEntity.badRequest().body(getObjectResponse);
+	    		}
+		    	return saveUser(parentUsers.getLong("clientId"), user);
 			}
 		}
-	
-
+		if(creater.getAccountType() == 1) {
+			if(user.getAccountType() == 2) {
+				return saveUser(creater.getId(), user);
+			}
+			if(user.getAccountType() == 3) {
+				if(user.getParents() == null || user.getParents() == "") {
+					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "parents is required in this case",null);
+			    	logger.info("************************createUser ENDED ***************************");
+			    	return ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				JSONObject parentUsers = new JSONObject(user.getParents());
+				
+		    	if( !parentUsers.has("vendorId")) {
+		    		
+		    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you must select vendor to be parent of this user",null);
+			    	logger.info("************************createUser ENDED ***************************");
+			    	return ResponseEntity.badRequest().body(getObjectResponse);
+			    	
+		    	}
+		    	if(parentUsers.get("vendorId").equals(null)) {
+		    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "vendor ID is Required",null);
+				    logger.info("************************createUser ENDED ***************************");
+				    return ResponseEntity.badRequest().body(getObjectResponse);
+		    	}
+		    	if(!checkIfParentOrNot(userId,parentUsers.getLong("vendorId"),creater.getAccountType(),2)) {
+		    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this client cannot assign user to this vendor",null);
+			    	logger.info("************************createUser ENDED ***************************");
+			    	return ResponseEntity.badRequest().body(getObjectResponse);
+	    		}
+		    	return saveUser(parentUsers.getLong("vendorId"), user);
+			}
+			if(user.getAccountType() == 4) {
+				
+				if(user.getParents() == null || user.getParents() == "") {
+					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "parents is required in this case",null);
+			    	logger.info("************************createUser ENDED ***************************");
+			    	return ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
+				JSONObject parentUsers = new JSONObject(user.getParents());
+				if( !parentUsers.has("vendorId") || !parentUsers.has("clientId")) {
+		    		
+		    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you must select vendor  and client to be parent of this user",null);
+			    	logger.info("************************createUser ENDED ***************************");
+			    	return ResponseEntity.badRequest().body(getObjectResponse);
+			    	
+		    	}
+				if(parentUsers.get("vendorId").equals(null) || parentUsers.get("clientId").equals(null)) {
+		    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "vendor ID and client ID are Required",null);
+				    logger.info("************************createUser ENDED ***************************");
+				    return ResponseEntity.badRequest().body(getObjectResponse);
+		    	}
+				if(!checkIfParentOrNot(userId,parentUsers.getLong("vendorId"),creater.getAccountType(),2)) {
+		    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this admin cannot assign user to this vendor",null);
+			    	logger.info("************************createUser ENDED ***************************");
+			    	return ResponseEntity.badRequest().body(getObjectResponse);
+	    		}
+				if(!checkIfParentOrNot(parentUsers.getLong("vendorId"),parentUsers.getLong("clientId"),2,3)) {
+		    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this vendor cannot assign user to this client",null);
+			    	logger.info("************************createUser ENDED ***************************");
+			    	return ResponseEntity.badRequest().body(getObjectResponse);
+	    		}
+				return saveUser(parentUsers.getLong("clientId"), user);
+			}
+		}
 		
+		return null;
 	}
 	@Override
 	public ResponseEntity<?> editUser(String TOKEN,User user,Long userId) {
@@ -589,474 +789,787 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",users);
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
-		
 		if(super.checkActive(TOKEN)!= null)
 		{
 			return super.checkActive(TOKEN);
 		}
+	
 		if(userId == 0) {
-			List<User> users = null;
-	    	//throw duplication exception with duplication list
-	    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",users);
-	    	logger.info("************************editUser ENDED ***************************");
-	    	return ResponseEntity.badRequest().body(getObjectResponse);
-		}else {
-			  User loggedUser =  findById(userId);
-			  if(loggedUser == null) {
-				  List<User> users = null;
-			    	//throw duplication exception with duplication list
-			    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This user ID is not Found",users);
-			    	logger.info("************************editUser ENDED ***************************");
-			    	return ResponseEntity.status(404).body(getObjectResponse); 
-			  }
-			  if(loggedUser.getAccountType()!= 1) {
-					if(!userRoleService.checkUserHasPermission(userId, "USER", "edit")) {
-						 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to edit user",null);
-						 logger.info("************************ editUSER ENDED ***************************");
-						return  ResponseEntity.badRequest().body(getObjectResponse);
-					}
+    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",null);
+    		logger.info("************************editUser ENDED ***************************");
+    		return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User loggedUser =  findById(userId);
+		if(loggedUser == null) {
+			 
+		   	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This user ID is not Found",null);
+		   	logger.info("************************editUser ENDED ***************************");
+		   	return ResponseEntity.status(404).body(getObjectResponse); 
+		 }
+		 if(loggedUser.getAccountType()!= 1) {
+				if(!userRoleService.checkUserHasPermission(userId, "USER", "edit")) {
+					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to edit user",null);
+					 logger.info("************************ editUSER ENDED ***************************");
+					return  ResponseEntity.badRequest().body(getObjectResponse);
 				}
-			//to set the users of updateduser
-			if( user.getId() == null || user.getId() == 0|| user.getEmail() == null || user.getEmail() == "" ||
-					 user.getName() == null || user.getName() == "" 
-					|| user.getIdentity_num() == null || user.getIdentity_num() == ""
-					|| user.getCommercial_num() == null ||user.getCommercial_num() == ""
-					|| user.getCompany_phone() == null || user.getCompany_phone() == ""
-					|| user.getManager_phone() == null || user.getManager_phone() == ""
-					|| user.getManager_mobile() == null || user.getManager_mobile() == ""
-					|| user.getPhone() == null || user.getPhone() == "" || user.getAccountType() ==  0 
-					|| user.getAccountType() == null) {
-					List<User> users = null;
-					String message= "attributes [id,email , name, identityNumber ,commercialNumber,"
-							+ "companyPhone ,Managerphone, ManagerMobile, accountType ] are required";
-			    	//throw duplication exception with duplication list
-			    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), message,users);
+		}
+		if( user.getId() == null || user.getId() == 0|| user.getEmail() == null || user.getEmail() == "" ||
+		 user.getName() == null || user.getName() == "" 
+		|| user.getIdentity_num() == null || user.getIdentity_num() == ""
+		|| user.getCommercial_num() == null ||user.getCommercial_num() == ""
+		|| user.getCompany_phone() == null || user.getCompany_phone() == ""
+		|| user.getManager_phone() == null || user.getManager_phone() == ""
+		|| user.getManager_mobile() == null || user.getManager_mobile() == ""
+		|| user.getPhone() == null || user.getPhone() == "" || user.getAccountType() ==  0 
+		|| user.getAccountType() == null) {
+		
+			String message= "attributes [id,email , name, identityNumber ,commercialNumber,"
+				+ "companyPhone ,Managerphone, ManagerMobile, accountType ] are required";
+			//throw duplication exception with duplication list
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), message,null);
+			logger.info("************************createUser ENDED ***************************");
+		}
+		if(user.getPassword()!= null) {
+		
+			String message= "you are not allowed to edit password";
+			//throw duplication exception with duplication list
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), message,null);
+			logger.info("************************createUser ENDED ***************************");
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User oldUser = findById(user.getId());
+		if(oldUser == null) {
+			
+	    	//throw duplication exception with duplication list
+	    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not found",null);
+	    	logger.info("************************editUser ENDED ***************************");
+	    	return ResponseEntity.status(404).body(getObjectResponse);
+		}
+		if(oldUser.getAccountType() ==1 ) {
+			//throw duplication exception with duplication list
+	    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "admin acouunt is not editable",null);
+	    	logger.info("************************editUser ENDED ***************************");
+	    	return ResponseEntity.status(404).body(getObjectResponse);
+		}
+		if(loggedUser.getAccountType() == 4 && oldUser.getAccountType() !=4) {
+			//throw duplication exception with duplication list
+	    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User can't edit admin,vendor or client users",null);
+	    	logger.info("************************editUser ENDED ***************************");
+	    	return ResponseEntity.status(404).body(getObjectResponse);
+			
+		}
+		if(loggedUser.getAccountType() == 3 && oldUser.getAccountType() !=4) {
+			//throw duplication exception with duplication list
+	    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User can't edit admin,vendor or client users",null);
+	    	logger.info("************************editUser ENDED ***************************");
+	    	return ResponseEntity.status(404).body(getObjectResponse);
+		}
+		if(loggedUser.getAccountType() == 2 && (oldUser.getAccountType() !=4 && oldUser.getAccountType() !=3)) {
+			
+			//throw duplication exception with duplication list
+	    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User can't edit admin or vendor users",null);
+	    	logger.info("************************editUser ENDED ***************************");
+	    	return ResponseEntity.status(404).body(getObjectResponse);
+		}
+		if(!user.getAccountType().equals(oldUser.getAccountType())) {
+			//throw duplication exception with duplication list
+	    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "You cannot edit user account type ",null);
+	    	logger.info("************************editUser ENDED ***************************");
+	    	return ResponseEntity.status(404).body(getObjectResponse);
+		}
+		if(loggedUser.getAccountType() == 4) {
+			
+			Set<User> loggedParents = loggedUser.getUsersOfUser();
+			if(loggedParents.isEmpty()) {
+				//throw duplication exception with duplication list
+		    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you and this user not belong to the same client ",null);
+		    	return ResponseEntity.status(404).body(getObjectResponse);
+			}
+			User loggedParent = null;
+			
+			for(User object:loggedParents) {
+				loggedParent = object;
+			}
+			if(!checkIfParentOrNot(loggedParent.getId(),user.getId(),3,4)){
+				//throw duplication exception with duplication list
+		    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you and this user donot belong to the same client ",null);
+		    	return ResponseEntity.status(404).body(getObjectResponse);
+			}
+			String password = oldUser.getPassword();
+			user.setPassword(password);
+	    	return saveUser(loggedParent.getId(),user);
+			
+		}
+		if(loggedUser.getAccountType() == 3) {
+			if(!checkIfParentOrNot(loggedUser.getId(),user.getId(),3,4)){
+				//throw duplication exception with duplication list
+		    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent client of this user ",null);
+		    	return ResponseEntity.status(404).body(getObjectResponse);
+			}
+			String password = oldUser.getPassword();
+			user.setPassword(password);
+	    	return saveUser(loggedUser.getId(),user);
+			
+		}
+		if(loggedUser.getAccountType() == 2) {
+			if(oldUser.getAccountType() == 3) {
+				if(!checkIfParentOrNot(loggedUser.getId(),user.getId(),2,3)){
+					//throw duplication exception with duplication list
+			    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent vendor of this client ",null);
+			    	return ResponseEntity.status(404).body(getObjectResponse);
+				}
+				String password = oldUser.getPassword();
+				user.setPassword(password);
+		    	return saveUser(loggedUser.getId(),user);
+			}
+			if(oldUser.getAccountType() == 4) {
+				if(user.getParents() == null || user.getParents() == "") {
+					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "parents is required in this case",null);
 			    	logger.info("************************createUser ENDED ***************************");
 			    	return ResponseEntity.badRequest().body(getObjectResponse);
-				}else {
-					
-					if(user.getPassword()!= null) {
-						List<User> users = null;
-						String message= "you are not allowed to edit password";
-				    	//throw duplication exception with duplication list
-				    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), message,users);
-				    	logger.info("************************createUser ENDED ***************************");
-				    	return ResponseEntity.badRequest().body(getObjectResponse);
-					}
-					
-					JSONObject parentUsersCH = new JSONObject(user.getParents());
-                    if(parentUsersCH.has("clientId")) {
-                    	if(!parentUsersCH.get("clientId").equals(null)) {
-							User chClient = userRepository.findOne(parentUsersCH.getLong("clientId"));
-			    			if(chClient.getAccountType()!=3) {
-
-				    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "not allow to put another type in clientId parents",null);
-						    	logger.info("************************createUser ENDED ***************************");
-						    	return ResponseEntity.badRequest().body(getObjectResponse);
-				    		}
-			    		}
-			    	}
-                    if(parentUsersCH.has("vendorId")) {
-                    	if(!parentUsersCH.get("vendorId").equals(null)) {
-							User chClient = userRepository.findOne(parentUsersCH.getLong("vendorId"));
-			    			if(chClient.getAccountType()!=2) {
-
-				    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "not allow to put another type in vendorId parents",null);
-						    	logger.info("************************createUser ENDED ***************************");
-						    	return ResponseEntity.badRequest().body(getObjectResponse);
-				    		}
-			    		}
-			    	}
-					
-					
-					
-					
-					User oldOne = findById(user.getId());
-					if(oldOne == null) {
-						List<User> users = null;
-				    	//throw duplication exception with duplication list
-				    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not found",users);
-				    	logger.info("************************editUser ENDED ***************************");
-				    	return ResponseEntity.status(404).body(getObjectResponse);
-					}else {
-						if(oldOne.getAccountType() != user.getAccountType()) {
-							getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you cann't edit account Type",null);
-					    	logger.info("************************createUser ENDED ***************************");
-					    	return ResponseEntity.badRequest().body(getObjectResponse);
-						}else {
-							// to edit vendor
-							if(user.getAccountType() == 1) {
-								Set<User> parentUsers = oldOne.getUsersOfUser();
-							    Boolean isParent = false;
-							    for( User parent : parentUsers) {
-							    	if(parent.getId() == userId) {
-							    		isParent = true;
-							    		break;
-							    	}
-							    }
-							    if(!isParent) {
-							    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowe to edit this user",null);
-							    	logger.info("************************createUser ENDED ***************************");
-							    	return ResponseEntity.badRequest().body(getObjectResponse);
-							    }else {
-							    	String password = oldOne.getPassword();
-									user.setPassword(password);
-							    	return saveUser(userId,user);
-								    			
-								}
-								
-							 
-							}
-							
-							
-							else if(user.getAccountType() == 2) {
-								Set<User> parentUsers = oldOne.getUsersOfUser();
-							    Boolean isParent = false;
-							    for( User parent : parentUsers) {
-							    	if(parent.getId() == userId) {
-							    		isParent = true;
-							    		break;
-							    	}
-							    }
-							    if(!isParent) {
-							    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowe to edit this user",null);
-							    	logger.info("************************createUser ENDED ***************************");
-							    	return ResponseEntity.badRequest().body(getObjectResponse);
-							    }else {
-							    	String password = oldOne.getPassword();
-									user.setPassword(password);
-							    	return saveUser(userId,user);
-							    			
-							}
-							
-						 
-						}
-						//to edit client
-							else if(user.getAccountType() == 3) {
-								if(loggedUser.getAccountType() == 1) {
-									Set<User> parentUsers = oldOne.getUsersOfUser();
-									
-									
-									if(parentUsers.isEmpty()) {
-										System.out.println("no parent vendor");
-										getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this user is not assigned to any of your vendors you cannot edit it",null);
-								    	logger.info("************************createUser ENDED ***************************");
-								    	return ResponseEntity.status(404).body(getObjectResponse);
-									}else {
-										User directParent = null;
-										for(User userParent : parentUsers) {
-											directParent = userParent;
-											break;
-										}
-										Set<User> vendorParents = directParent.getUsersOfUser();
-										if(vendorParents.isEmpty()) {
-											getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this user is not assigned to any of your vendors you cannot edit it",null);
-									    	logger.info("************************createUser ENDED ***************************");
-									    	return ResponseEntity.status(404).body(getObjectResponse);
-										}else {
-											User vendorParent = null;
-											for(User userParent : vendorParents) {
-												vendorParent = userParent;
-												break;
-											}
-											if(vendorParent.getId() == userId) {
-												String password = oldOne.getPassword();
-												user.setPassword(password);
-												//check assign
-												JSONObject parentUsersToAssign = new JSONObject(user.getParents());
-										    	if( !parentUsersToAssign.has("vendorId")) {
-										    		
-										    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "the parent user of this user must be of type vendor",null);
-											    	logger.info("************************createUser ENDED ***************************");
-											    	return ResponseEntity.badRequest().body(getObjectResponse);
-										    	}else {
-										    		if(parentUsersToAssign.get("vendorId").equals(null)) {
-										    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Vednor ID is Required",null);
-												    	logger.info("************************createUser ENDED ***************************");
-												    	return ResponseEntity.badRequest().body(getObjectResponse);
-										    		}
-										    		if(!checkIfParentOrNot(userId,parentUsersToAssign.getLong("vendorId"),loggedUser.getAccountType(),2)) {
-										    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign client to this vendor",null);
-												    	logger.info("************************createUser ENDED ***************************");
-												    	return ResponseEntity.badRequest().body(getObjectResponse);
-										    		}
-										    		else {
-										    			return saveUser(parentUsersToAssign.getLong("vendorId"),user);
-										    		}
-										    	}
-										    	
-											}else {
-												getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this user vendor you cannot edit it",null);
-										    	logger.info("************************createUser ENDED ***************************");
-										    	return ResponseEntity.status(404).body(getObjectResponse);
-											}
-										}
-									}
-								}else if(loggedUser.getAccountType() == 2){
-									Set<User> vendorParents = oldOne.getUsersOfUser();
-									if(vendorParents.isEmpty()) {
-										getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
-								    	logger.info("************************createUser ENDED ***************************");
-								    	return ResponseEntity.status(404).body(getObjectResponse);
-									}else {
-										User vendor = null;
-										for(User userVendor :vendorParents ) {
-											vendor = userVendor;
-											break;
-										}
-										if(vendor.getId() == userId) {
-											
-											String password = oldOne.getPassword();
-											user.setPassword(password);
-											//check assign
-											
-									    	return saveUser(userId,user);
-										}else {
-											getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
-									    	logger.info("************************createUser ENDED ***************************");
-									    	return ResponseEntity.status(404).body(getObjectResponse);
-										}
-									}
-									
-								}else {
-									getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
-							    	logger.info("************************createUser ENDED ***************************");
-							    	return ResponseEntity.status(404).body(getObjectResponse);
-								}
-							}
-						     // edit user
-							else if(user.getAccountType() == 4) {
-								if(userId == user.getId()) {
-									getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowe to edit this user",null);
-							    	logger.info("************************createUser ENDED ***************************");
-							    	return ResponseEntity.badRequest().body(getObjectResponse);
-								}
-								if(loggedUser.getAccountType() == 1) {
-									Set <User> userParentClients = oldOne.getUsersOfUser();
-									if(userParentClients.isEmpty()) {
-										getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
-								    	logger.info("************************createUser ENDED ***************************");
-								    	return ResponseEntity.status(404).body(getObjectResponse);
-									}else {
-										User parentClient = null;
-										for(User client : userParentClients ) {
-											parentClient = client;
-											break;
-										}
-										Set<User> userParentVendors = parentClient.getUsersOfUser();
-										if(userParentVendors.isEmpty()) {
-											getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
-									    	logger.info("************************createUser ENDED ***************************");
-									    	return ResponseEntity.status(404).body(getObjectResponse);
-										}else {
-											User vendor = null;
-											for(User vendorObject : userParentVendors) {
-												 vendor = vendorObject;
-												 break;
-											}
-											Set<User>Admins = vendor.getUsersOfUser();
-											if(Admins.isEmpty()) {
-												getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
-										    	logger.info("************************createUser ENDED ***************************");
-										    	return ResponseEntity.status(404).body(getObjectResponse);
-											}else {
-												User admin = null;
-												for(User adminParent :Admins) {
-													admin = adminParent;
-													break;
-												}
-												if(admin.getId() == userId) {
-													//check assign
-													JSONObject parentUsers = new JSONObject(user.getParents());
-											    	if( !parentUsers.has("vendorId")) {
-											    		
-											    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you must select vendor to be parent of this user",null);
-												    	logger.info("************************createUser ENDED ***************************");
-												    	return ResponseEntity.badRequest().body(getObjectResponse);
-											    	}else {
-											    		if(parentUsers.get("vendorId").equals(null)) {
-											    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Vednor ID is Required",null);
-													    	logger.info("************************createUser ENDED ***************************");
-													    	return ResponseEntity.badRequest().body(getObjectResponse);
-											    		}
-											    		if(!checkIfParentOrNot(userId,parentUsers.getLong("vendorId"),loggedUser.getAccountType(),2)) {
-											    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign user to this vendor",null);
-													    	logger.info("************************createUser ENDED ***************************");
-													    	return ResponseEntity.badRequest().body(getObjectResponse);
-											    		}
-											    		else {
-											    			if(parentUsers.get("vendorId").equals(null)) {
-												    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Vednor ID is Required",null);
-														    	logger.info("************************createUser ENDED ***************************");
-														    	return ResponseEntity.badRequest().body(getObjectResponse);
-												    		}
-											    			if( !parentUsers.has("clientId")) {
-													    		
-													    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you must select client to be parent of this user",null);
-														    	logger.info("************************createUser ENDED ***************************");
-														    	return ResponseEntity.badRequest().body(getObjectResponse);
-													    	}else {
-													    		if(parentUsers.get("clientId").equals(null)) {
-													    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Client ID is Required",null);
-															    	logger.info("************************createUser ENDED ***************************");
-															    	return ResponseEntity.badRequest().body(getObjectResponse);
-													    		}
-													    		if(!checkIfParentOrNot(parentUsers.getLong("vendorId"),parentUsers.getLong("clientId"),2,3)) {
-													    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign user to this client ",null);
-															    	logger.info("************************createUser ENDED ***************************");
-															    	return ResponseEntity.badRequest().body(getObjectResponse);
-													    		}
-													    		else {
-													    			String password = oldOne.getPassword();
-																	user.setPassword(password);
-													    			return saveUser(parentUsers.getLong("clientId"),user);
-													    		}
-											    		}
-										    	}
-											   }
-													
-											    	
-												}else {
-													getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
-											    	logger.info("************************createUser ENDED ***************************");
-											    	return ResponseEntity.status(404).body(getObjectResponse);
-												}
-											}
-										}
-									}
-								}else if(loggedUser.getAccountType() == 2) {
-									Set<User> clientParents = oldOne.getUsersOfUser();
-									if(clientParents.isEmpty()) {
-										getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
-								    	logger.info("************************createUser ENDED ***************************");
-								    	return ResponseEntity.status(404).body(getObjectResponse);
-									}else {
-										User client = null;
-										for(User clientObject : clientParents) {
-											 client = clientObject;
-											 break;
-										}
-										Set<User> vendorParents = client.getUsersOfUser();
-										if(vendorParents.isEmpty()) {
-											getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
-									    	logger.info("************************createUser ENDED ***************************");
-									    	return ResponseEntity.status(404).body(getObjectResponse);
-										}else {
-											User vendor = null;
-											for(User vendorObject : vendorParents) {
-												vendor = vendorObject;
-												break;
-											}
-											if(vendor.getId() == userId) {
-												String password = oldOne.getPassword();
-												user.setPassword(password);
-												//check assign
-												JSONObject parentUsers = new JSONObject(user.getParents());
-										    	if( !parentUsers.has("clientId")) {
-										    		
-										    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "the parent user of this user must be of type client",null);
-											    	logger.info("************************createUser ENDED ***************************");
-											    	return ResponseEntity.badRequest().body(getObjectResponse);
-										    	}else {
-										    		if(parentUsers.get("clientId").equals(null)) {
-										    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Client ID is Required",null);
-												    	logger.info("************************createUser ENDED ***************************");
-												    	return ResponseEntity.badRequest().body(getObjectResponse);
-										    		}
-										    		if(!checkIfParentOrNot(userId,parentUsers.getLong("clientId"),loggedUser.getAccountType(),3)) {
-										    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign user to this client",null);
-												    	logger.info("************************createUser ENDED ***************************");
-												    	return ResponseEntity.badRequest().body(getObjectResponse);
-										    		}
-										    		else {
-										    			return saveUser(parentUsers.getLong("clientId"),user);
-										    		}
-									    	}
-										    	
-												
-											}else {
-												getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
-										    	logger.info("************************createUser ENDED ***************************");
-										    	return ResponseEntity.status(404).body(getObjectResponse);
-											}
-										}
-									}
-								}else if( loggedUser.getAccountType() == 3) {
-									Set<User> parentClients = oldOne.getUsersOfUser();
-									if(parentClients.isEmpty()) {
-										getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
-								    	logger.info("************************createUser ENDED ***************************");
-								    	return ResponseEntity.status(404).body(getObjectResponse);
-									}else {
-										User client = null ;
-										for(User clientObject : parentClients) {
-											client = clientObject ;
-											break;
-										}
-										if(client.getId() == userId) {
-											String password = oldOne.getPassword();
-											user.setPassword(password);
-											//check assign
-									    	return saveUser(userId,user);
-										}else {
-											getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
-									    	logger.info("************************createUser ENDED ***************************");
-									    	return ResponseEntity.status(404).body(getObjectResponse);
-										}
-									}
-								}else if(loggedUser.getAccountType() == 4) {
-									Set<User> loggedUserParents = loggedUser.getUsersOfUser();
-									if(loggedUserParents.isEmpty()) {
-										
-										getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
-								    	logger.info("************************createUser ENDED ***************************");
-								    	return ResponseEntity.status(404).body(getObjectResponse);
-									}else {
-										Set<User>userParents = oldOne.getUsersOfUser();
-										if(userParents.isEmpty()) {
-											getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
-									    	logger.info("************************createUser ENDED ***************************");
-									    	return ResponseEntity.status(404).body(getObjectResponse);
-										}else {
-											User loggedParent = null;
-											for(User loggedParentObject : loggedUserParents ) {
-												loggedParent = loggedParentObject;
-												break;
-											}
-											User userParent = null ;
-										    for(User parentObject : userParents) {
-										    	userParent = parentObject; 
-										    	break;
-										    }
-										    if(userParent.getId() == loggedParent.getId()) {
-										    	String password = oldOne.getPassword();
-												user.setPassword(password);
-												//check assign
-										    	return saveUser(userParent.getId(),user);
-										    }else {
-										    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
-										    	logger.info("************************createUser ENDED ***************************");
-										    	return ResponseEntity.status(404).body(getObjectResponse);
-										    }
-										}
-									}
-								}
-							}
-							else {
-								return null;
-							}
-						
-					    
-					   return null;
+				}
+				
+				JSONObject parentUsers = new JSONObject(user.getParents());
+                if( !parentUsers.has("clientId")) {
+		    		
+		    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you must select  client to be parent of this user",null);
+			    	logger.info("************************createUser ENDED ***************************");
+			    	return ResponseEntity.badRequest().body(getObjectResponse);
+			    	
+		    	}
+				if( parentUsers.get("clientId").equals(null)) {
+		    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), " client ID is Required",null);
+				    logger.info("************************createUser ENDED ***************************");
+				    return ResponseEntity.badRequest().body(getObjectResponse);
+		    	}
+				if(!checkIfParentOrNot(loggedUser.getId(),parentUsers.getLong("clientId"),2,3)) {
+		    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this vendor cannot assign user to this client",null);
+			    	logger.info("************************createUser ENDED ***************************");
+			    	return ResponseEntity.badRequest().body(getObjectResponse);
+	    		}
+//				if(!checkIfParentOrNot(loggedUser.getId(),user.getId(),2,4)){
+//					//throw duplication exception with duplication list
+//			    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent vendor of this user ",null);
+//			    	return ResponseEntity.status(404).body(getObjectResponse);
+//				}
+				List<User>  parents = getAllParentsOfuser(oldUser,4);
+				if(parents.isEmpty()) {
+					//throw duplication exception with duplication list
+			    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent admin of this user ",null);
+			    	return ResponseEntity.status(404).body(getObjectResponse);
+				}
+				boolean isParent = false;
+				for(User object: parents) {
+					if(loggedUser.getId().equals(object.getId())) {
+						isParent = true;
 					}
 				}
-			
-			
-				}	
+				if(isParent) {
+					String password = oldUser.getPassword();
+					user.setPassword(password);
+			    	return saveUser(parentUsers.getLong("clientId"),user);
+				}else {
+					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent admin of this user ",null);
+			    	return ResponseEntity.status(404).body(getObjectResponse);
+				}
+							
+			}
 		}
-		
-		
+		if(loggedUser.getAccountType() == 1) {
+			if(oldUser.getAccountType() == 2) {
+				if(!checkIfParentOrNot(loggedUser.getId(),user.getId(),1,2)){
+					//throw duplication exception with duplication list
+			    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent admin of this vendor ",null);
+			    	return ResponseEntity.status(404).body(getObjectResponse);
+				}
+				String password = oldUser.getPassword();
+				user.setPassword(password);
+		    	return saveUser(loggedUser.getId(),user);
+				
+			}
+			if(oldUser.getAccountType() == 3) {
+				
+				if(user.getParents() == null || user.getParents() == "") {
+					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "parents is required in this case",null);
+			    	logger.info("************************createUser ENDED ***************************");
+			    	return ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
+				JSONObject parentUsers = new JSONObject(user.getParents());
+                if( !parentUsers.has("vendorId")) {
+		    		
+		    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you must select  vendor to be parent of this client",null);
+			    	logger.info("************************createUser ENDED ***************************");
+			    	return ResponseEntity.badRequest().body(getObjectResponse);
+			    	
+		    	}
+				if( parentUsers.get("vendorId").equals(null)) {
+		    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), " vendor ID is Required",null);
+				    logger.info("************************createUser ENDED ***************************");
+				    return ResponseEntity.badRequest().body(getObjectResponse);
+		    	}
+				if(!checkIfParentOrNot(loggedUser.getId(),parentUsers.getLong("vendorId"),1,2)) {
+		    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not the parent of this vendor ",null);
+			    	logger.info("************************createUser ENDED ***************************");
+			    	return ResponseEntity.badRequest().body(getObjectResponse);
+	    		}
+				List<User>  parents = getAllParentsOfuser(oldUser,3);
+				if(parents.isEmpty()) {
+					//throw duplication exception with duplication list
+			    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent admin of this user ",null);
+			    	return ResponseEntity.status(404).body(getObjectResponse);
+				}
+				boolean isParent = false;
+				for(User object: parents) {
+					if(loggedUser.getId().equals(object.getId())) {
+						isParent = true;
+					}
+				}
+
+				if(isParent) {
+					String password = oldUser.getPassword();
+					user.setPassword(password);
+			    	return saveUser(parentUsers.getLong("vendorId"),user);
+				}else {
+					//throw duplication exception with duplication list
+			    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent admin of this user ",null);
+			    	return ResponseEntity.status(404).body(getObjectResponse);
+				}
+				
+			}
+			if(oldUser.getAccountType() == 4) {
+				if(user.getParents() == null || user.getParents() == "") {
+					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "parents is required in this case",null);
+			    	logger.info("************************createUser ENDED ***************************");
+			    	return ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
+				JSONObject parentUsers = new JSONObject(user.getParents());
+				if( !parentUsers.has("vendorId") || !parentUsers.has("clientId")) {
+		    		
+		    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you must select vendor  and client to be parent of this user",null);
+			    	logger.info("************************createUser ENDED ***************************");
+			    	return ResponseEntity.badRequest().body(getObjectResponse);
+			    	
+		    	}
+				if(parentUsers.get("vendorId").equals(null) || parentUsers.get("clientId").equals(null)) {
+		    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "vendor ID and client ID are Required",null);
+				    logger.info("************************createUser ENDED ***************************");
+				    return ResponseEntity.badRequest().body(getObjectResponse);
+		    	}
+				if(!checkIfParentOrNot(loggedUser.getId(),parentUsers.getLong("vendorId"),1,2)) {
+		    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this admin cannot assign user to this vendor",null);
+			    	logger.info("************************createUser ENDED ***************************");
+			    	return ResponseEntity.badRequest().body(getObjectResponse);
+	    		}
+				if(!checkIfParentOrNot(parentUsers.getLong("vendorId"),parentUsers.getLong("clientId"),2,3)) {
+		    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this vendor cannot assign user to this client",null);
+			    	logger.info("************************createUser ENDED ***************************");
+			    	return ResponseEntity.badRequest().body(getObjectResponse);
+	    		}
+
+				List<User>  parents = getAllParentsOfuser(oldUser,4);
+				if(parents.isEmpty()) {
+					//throw duplication exception with duplication list
+			    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent admin of this user ",null);
+			    	return ResponseEntity.status(404).body(getObjectResponse);
+				}
+				boolean isParent = false;
+				for(User object: parents) {
+					if(loggedUser.getId().equals(object.getId())) {
+						isParent = true;
+					}
+				}
+				if(isParent) {
+					String password = oldUser.getPassword();
+					user.setPassword(password);
+			    	return saveUser(parentUsers.getLong("clientId"),user);
+				}else {
+					//throw duplication exception with duplication list
+			    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent admin of this user ",null);
+			    	return ResponseEntity.status(404).body(getObjectResponse);
+				}
+			}
+		}
+		return null;
 	}
+//	@Override
+//	public ResponseEntity<?> editUser(String TOKEN,User user,Long userId) {
+//		
+//		logger.info("************************editUser STARTED ***************************");
+//		if(TOKEN.equals("")) {
+//			 List<User> users = null;
+//			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",users);
+//			 return  ResponseEntity.badRequest().body(getObjectResponse);
+//		}
+//		
+//		if(super.checkActive(TOKEN)!= null)
+//		{
+//			return super.checkActive(TOKEN);
+//		}
+//		if(userId == 0) {
+//			List<User> users = null;
+//	    	//throw duplication exception with duplication list
+//	    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",users);
+//	    	logger.info("************************editUser ENDED ***************************");
+//	    	return ResponseEntity.badRequest().body(getObjectResponse);
+//		}else {
+//			  User loggedUser =  findById(userId);
+//			  if(loggedUser == null) {
+//				  List<User> users = null;
+//			    	//throw duplication exception with duplication list
+//			    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This user ID is not Found",users);
+//			    	logger.info("************************editUser ENDED ***************************");
+//			    	return ResponseEntity.status(404).body(getObjectResponse); 
+//			  }
+//			  if(loggedUser.getAccountType()!= 1) {
+//					if(!userRoleService.checkUserHasPermission(userId, "USER", "edit")) {
+//						 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to edit user",null);
+//						 logger.info("************************ editUSER ENDED ***************************");
+//						return  ResponseEntity.badRequest().body(getObjectResponse);
+//					}
+//				}
+//			//to set the users of updateduser
+//			if( user.getId() == null || user.getId() == 0|| user.getEmail() == null || user.getEmail() == "" ||
+//					 user.getName() == null || user.getName() == "" 
+//					|| user.getIdentity_num() == null || user.getIdentity_num() == ""
+//					|| user.getCommercial_num() == null ||user.getCommercial_num() == ""
+//					|| user.getCompany_phone() == null || user.getCompany_phone() == ""
+//					|| user.getManager_phone() == null || user.getManager_phone() == ""
+//					|| user.getManager_mobile() == null || user.getManager_mobile() == ""
+//					|| user.getPhone() == null || user.getPhone() == "" || user.getAccountType() ==  0 
+//					|| user.getAccountType() == null) {
+//					List<User> users = null;
+//					String message= "attributes [id,email , name, identityNumber ,commercialNumber,"
+//							+ "companyPhone ,Managerphone, ManagerMobile, accountType ] are required";
+//			    	//throw duplication exception with duplication list
+//			    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), message,users);
+//			    	logger.info("************************createUser ENDED ***************************");
+//			    	return ResponseEntity.badRequest().body(getObjectResponse);
+//				}else {
+//					
+//					if(user.getPassword()!= null) {
+//						List<User> users = null;
+//						String message= "you are not allowed to edit password";
+//				    	//throw duplication exception with duplication list
+//				    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), message,users);
+//				    	logger.info("************************createUser ENDED ***************************");
+//				    	return ResponseEntity.badRequest().body(getObjectResponse);
+//					}
+//					
+//					JSONObject parentUsersCH = new JSONObject(user.getParents());
+//                    if(parentUsersCH.has("clientId")) {
+//                    	if(!parentUsersCH.get("clientId").equals(null)) {
+//							User chClient = userRepository.findOne(parentUsersCH.getLong("clientId"));
+//			    			if(chClient.getAccountType()!=3) {
+//
+//				    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "not allow to put another type in clientId parents",null);
+//						    	logger.info("************************createUser ENDED ***************************");
+//						    	return ResponseEntity.badRequest().body(getObjectResponse);
+//				    		}
+//			    		}
+//			    	}
+//                    if(parentUsersCH.has("vendorId")) {
+//                    	if(!parentUsersCH.get("vendorId").equals(null)) {
+//							User chClient = userRepository.findOne(parentUsersCH.getLong("vendorId"));
+//			    			if(chClient.getAccountType()!=2) {
+//
+//				    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "not allow to put another type in vendorId parents",null);
+//						    	logger.info("************************createUser ENDED ***************************");
+//						    	return ResponseEntity.badRequest().body(getObjectResponse);
+//				    		}
+//			    		}
+//			    	}
+//					
+//					
+//					
+//					
+//					User oldOne = findById(user.getId());
+//					if(oldOne == null) {
+//						List<User> users = null;
+//				    	//throw duplication exception with duplication list
+//				    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not found",users);
+//				    	logger.info("************************editUser ENDED ***************************");
+//				    	return ResponseEntity.status(404).body(getObjectResponse);
+//					}else {
+//						if(oldOne.getAccountType() != user.getAccountType()) {
+//							getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you cann't edit account Type",null);
+//					    	logger.info("************************createUser ENDED ***************************");
+//					    	return ResponseEntity.badRequest().body(getObjectResponse);
+//						}else {
+//							// to edit vendor
+//							if(user.getAccountType() == 1) {
+//								Set<User> parentUsers = oldOne.getUsersOfUser();
+//							    Boolean isParent = false;
+//							    for( User parent : parentUsers) {
+//							    	if(parent.getId() == userId) {
+//							    		isParent = true;
+//							    		break;
+//							    	}
+//							    }
+//							    if(!isParent) {
+//							    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowe to edit this user",null);
+//							    	logger.info("************************createUser ENDED ***************************");
+//							    	return ResponseEntity.badRequest().body(getObjectResponse);
+//							    }else {
+//							    	String password = oldOne.getPassword();
+//									user.setPassword(password);
+//							    	return saveUser(userId,user);
+//								    			
+//								}
+//								
+//							 
+//							}
+//							
+//							
+//							else if(user.getAccountType() == 2) {
+//								Set<User> parentUsers = oldOne.getUsersOfUser();
+//							    Boolean isParent = false;
+//							    for( User parent : parentUsers) {
+//							    	if(parent.getId() == userId) {
+//							    		isParent = true;
+//							    		break;
+//							    	}
+//							    }
+//							    if(!isParent) {
+//							    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowe to edit this user",null);
+//							    	logger.info("************************createUser ENDED ***************************");
+//							    	return ResponseEntity.badRequest().body(getObjectResponse);
+//							    }else {
+//							    	String password = oldOne.getPassword();
+//									user.setPassword(password);
+//							    	return saveUser(userId,user);
+//							    			
+//							}
+//							
+//						 
+//						}
+//						//to edit client
+//							else if(user.getAccountType() == 3) {
+//								if(loggedUser.getAccountType() == 1) {
+//									Set<User> parentUsers = oldOne.getUsersOfUser();
+//									
+//									
+//									if(parentUsers.isEmpty()) {
+//										System.out.println("no parent vendor");
+//										getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this user is not assigned to any of your vendors you cannot edit it",null);
+//								    	logger.info("************************createUser ENDED ***************************");
+//								    	return ResponseEntity.status(404).body(getObjectResponse);
+//									}else {
+//										User directParent = null;
+//										for(User userParent : parentUsers) {
+//											directParent = userParent;
+//											break;
+//										}
+//										Set<User> vendorParents = directParent.getUsersOfUser();
+//										if(vendorParents.isEmpty()) {
+//											getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this user is not assigned to any of your vendors you cannot edit it",null);
+//									    	logger.info("************************createUser ENDED ***************************");
+//									    	return ResponseEntity.status(404).body(getObjectResponse);
+//										}else {
+//											User vendorParent = null;
+//											for(User userParent : vendorParents) {
+//												vendorParent = userParent;
+//												break;
+//											}
+//											if(vendorParent.getId() == userId) {
+//												String password = oldOne.getPassword();
+//												user.setPassword(password);
+//												//check assign
+//												JSONObject parentUsersToAssign = new JSONObject(user.getParents());
+//										    	if( !parentUsersToAssign.has("vendorId")) {
+//										    		
+//										    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "the parent user of this user must be of type vendor",null);
+//											    	logger.info("************************createUser ENDED ***************************");
+//											    	return ResponseEntity.badRequest().body(getObjectResponse);
+//										    	}else {
+//										    		if(parentUsersToAssign.get("vendorId").equals(null)) {
+//										    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Vednor ID is Required",null);
+//												    	logger.info("************************createUser ENDED ***************************");
+//												    	return ResponseEntity.badRequest().body(getObjectResponse);
+//										    		}
+//										    		if(!checkIfParentOrNot(userId,parentUsersToAssign.getLong("vendorId"),loggedUser.getAccountType(),2)) {
+//										    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign client to this vendor",null);
+//												    	logger.info("************************createUser ENDED ***************************");
+//												    	return ResponseEntity.badRequest().body(getObjectResponse);
+//										    		}
+//										    		else {
+//										    			return saveUser(parentUsersToAssign.getLong("vendorId"),user);
+//										    		}
+//										    	}
+//										    	
+//											}else {
+//												getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this user vendor you cannot edit it",null);
+//										    	logger.info("************************createUser ENDED ***************************");
+//										    	return ResponseEntity.status(404).body(getObjectResponse);
+//											}
+//										}
+//									}
+//								}else if(loggedUser.getAccountType() == 2){
+//									Set<User> vendorParents = oldOne.getUsersOfUser();
+//									if(vendorParents.isEmpty()) {
+//										getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
+//								    	logger.info("************************createUser ENDED ***************************");
+//								    	return ResponseEntity.status(404).body(getObjectResponse);
+//									}else {
+//										User vendor = null;
+//										for(User userVendor :vendorParents ) {
+//											vendor = userVendor;
+//											break;
+//										}
+//										if(vendor.getId() == userId) {
+//											
+//											String password = oldOne.getPassword();
+//											user.setPassword(password);
+//											//check assign
+//											
+//									    	return saveUser(userId,user);
+//										}else {
+//											getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
+//									    	logger.info("************************createUser ENDED ***************************");
+//									    	return ResponseEntity.status(404).body(getObjectResponse);
+//										}
+//									}
+//									
+//								}else {
+//									getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
+//							    	logger.info("************************createUser ENDED ***************************");
+//							    	return ResponseEntity.status(404).body(getObjectResponse);
+//								}
+//							}
+//						     // edit user
+//							else if(user.getAccountType() == 4) {
+//								if(userId == user.getId()) {
+//									getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowe to edit this user",null);
+//							    	logger.info("************************createUser ENDED ***************************");
+//							    	return ResponseEntity.badRequest().body(getObjectResponse);
+//								}
+//								if(loggedUser.getAccountType() == 1) {
+//									Set <User> userParentClients = oldOne.getUsersOfUser();
+//									if(userParentClients.isEmpty()) {
+//										getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
+//								    	logger.info("************************createUser ENDED ***************************");
+//								    	return ResponseEntity.status(404).body(getObjectResponse);
+//									}else {
+//										User parentClient = null;
+//										for(User client : userParentClients ) {
+//											parentClient = client;
+//											break;
+//										}
+//										Set<User> userParentVendors = parentClient.getUsersOfUser();
+//										if(userParentVendors.isEmpty()) {
+//											getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
+//									    	logger.info("************************createUser ENDED ***************************");
+//									    	return ResponseEntity.status(404).body(getObjectResponse);
+//										}else {
+//											User vendor = null;
+//											for(User vendorObject : userParentVendors) {
+//												 vendor = vendorObject;
+//												 break;
+//											}
+//											Set<User>Admins = vendor.getUsersOfUser();
+//											if(Admins.isEmpty()) {
+//												getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
+//										    	logger.info("************************createUser ENDED ***************************");
+//										    	return ResponseEntity.status(404).body(getObjectResponse);
+//											}else {
+//												User admin = null;
+//												for(User adminParent :Admins) {
+//													admin = adminParent;
+//													break;
+//												}
+//												if(admin.getId() == userId) {
+//													//check assign
+//													JSONObject parentUsers = new JSONObject(user.getParents());
+//											    	if( !parentUsers.has("vendorId")) {
+//											    		
+//											    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you must select vendor to be parent of this user",null);
+//												    	logger.info("************************createUser ENDED ***************************");
+//												    	return ResponseEntity.badRequest().body(getObjectResponse);
+//											    	}else {
+//											    		if(parentUsers.get("vendorId").equals(null)) {
+//											    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Vednor ID is Required",null);
+//													    	logger.info("************************createUser ENDED ***************************");
+//													    	return ResponseEntity.badRequest().body(getObjectResponse);
+//											    		}
+//											    		if(!checkIfParentOrNot(userId,parentUsers.getLong("vendorId"),loggedUser.getAccountType(),2)) {
+//											    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign user to this vendor",null);
+//													    	logger.info("************************createUser ENDED ***************************");
+//													    	return ResponseEntity.badRequest().body(getObjectResponse);
+//											    		}
+//											    		else {
+//											    			if(parentUsers.get("vendorId").equals(null)) {
+//												    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Vednor ID is Required",null);
+//														    	logger.info("************************createUser ENDED ***************************");
+//														    	return ResponseEntity.badRequest().body(getObjectResponse);
+//												    		}
+//											    			if( !parentUsers.has("clientId")) {
+//													    		
+//													    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you must select client to be parent of this user",null);
+//														    	logger.info("************************createUser ENDED ***************************");
+//														    	return ResponseEntity.badRequest().body(getObjectResponse);
+//													    	}else {
+//													    		if(parentUsers.get("clientId").equals(null)) {
+//													    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Client ID is Required",null);
+//															    	logger.info("************************createUser ENDED ***************************");
+//															    	return ResponseEntity.badRequest().body(getObjectResponse);
+//													    		}
+//													    		if(!checkIfParentOrNot(parentUsers.getLong("vendorId"),parentUsers.getLong("clientId"),2,3)) {
+//													    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign user to this client ",null);
+//															    	logger.info("************************createUser ENDED ***************************");
+//															    	return ResponseEntity.badRequest().body(getObjectResponse);
+//													    		}
+//													    		else {
+//													    			String password = oldOne.getPassword();
+//																	user.setPassword(password);
+//													    			return saveUser(parentUsers.getLong("clientId"),user);
+//													    		}
+//											    		}
+//										    	}
+//											   }
+//													
+//											    	
+//												}else {
+//													getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
+//											    	logger.info("************************createUser ENDED ***************************");
+//											    	return ResponseEntity.status(404).body(getObjectResponse);
+//												}
+//											}
+//										}
+//									}
+//								}else if(loggedUser.getAccountType() == 2) {
+//									Set<User> clientParents = oldOne.getUsersOfUser();
+//									if(clientParents.isEmpty()) {
+//										getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
+//								    	logger.info("************************createUser ENDED ***************************");
+//								    	return ResponseEntity.status(404).body(getObjectResponse);
+//									}else {
+//										User client = null;
+//										for(User clientObject : clientParents) {
+//											 client = clientObject;
+//											 break;
+//										}
+//										Set<User> vendorParents = client.getUsersOfUser();
+//										if(vendorParents.isEmpty()) {
+//											getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
+//									    	logger.info("************************createUser ENDED ***************************");
+//									    	return ResponseEntity.status(404).body(getObjectResponse);
+//										}else {
+//											User vendor = null;
+//											for(User vendorObject : vendorParents) {
+//												vendor = vendorObject;
+//												break;
+//											}
+//											if(vendor.getId() == userId) {
+//												String password = oldOne.getPassword();
+//												user.setPassword(password);
+//												//check assign
+//												JSONObject parentUsers = new JSONObject(user.getParents());
+//										    	if( !parentUsers.has("clientId")) {
+//										    		
+//										    		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "the parent user of this user must be of type client",null);
+//											    	logger.info("************************createUser ENDED ***************************");
+//											    	return ResponseEntity.badRequest().body(getObjectResponse);
+//										    	}else {
+//										    		if(parentUsers.get("clientId").equals(null)) {
+//										    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Client ID is Required",null);
+//												    	logger.info("************************createUser ENDED ***************************");
+//												    	return ResponseEntity.badRequest().body(getObjectResponse);
+//										    		}
+//										    		if(!checkIfParentOrNot(userId,parentUsers.getLong("clientId"),loggedUser.getAccountType(),3)) {
+//										    			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user cannot assign user to this client",null);
+//												    	logger.info("************************createUser ENDED ***************************");
+//												    	return ResponseEntity.badRequest().body(getObjectResponse);
+//										    		}
+//										    		else {
+//										    			return saveUser(parentUsers.getLong("clientId"),user);
+//										    		}
+//									    	}
+//										    	
+//												
+//											}else {
+//												getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
+//										    	logger.info("************************createUser ENDED ***************************");
+//										    	return ResponseEntity.status(404).body(getObjectResponse);
+//											}
+//										}
+//									}
+//								}else if( loggedUser.getAccountType() == 3) {
+//									Set<User> parentClients = oldOne.getUsersOfUser();
+//									if(parentClients.isEmpty()) {
+//										getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
+//								    	logger.info("************************createUser ENDED ***************************");
+//								    	return ResponseEntity.status(404).body(getObjectResponse);
+//									}else {
+//										User client = null ;
+//										for(User clientObject : parentClients) {
+//											client = clientObject ;
+//											break;
+//										}
+//										if(client.getId() == userId) {
+//											String password = oldOne.getPassword();
+//											user.setPassword(password);
+//											//check assign
+//									    	return saveUser(userId,user);
+//										}else {
+//											getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
+//									    	logger.info("************************createUser ENDED ***************************");
+//									    	return ResponseEntity.status(404).body(getObjectResponse);
+//										}
+//									}
+//								}else if(loggedUser.getAccountType() == 4) {
+//									Set<User> loggedUserParents = loggedUser.getUsersOfUser();
+//									if(loggedUserParents.isEmpty()) {
+//										
+//										getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
+//								    	logger.info("************************createUser ENDED ***************************");
+//								    	return ResponseEntity.status(404).body(getObjectResponse);
+//									}else {
+//										Set<User>userParents = oldOne.getUsersOfUser();
+//										if(userParents.isEmpty()) {
+//											getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
+//									    	logger.info("************************createUser ENDED ***************************");
+//									    	return ResponseEntity.status(404).body(getObjectResponse);
+//										}else {
+//											User loggedParent = null;
+//											for(User loggedParentObject : loggedUserParents ) {
+//												loggedParent = loggedParentObject;
+//												break;
+//											}
+//											User userParent = null ;
+//										    for(User parentObject : userParents) {
+//										    	userParent = parentObject; 
+//										    	break;
+//										    }
+//										    if(userParent.getId() == loggedParent.getId()) {
+//										    	String password = oldOne.getPassword();
+//												user.setPassword(password);
+//												//check assign
+//										    	return saveUser(userParent.getId(),user);
+//										    }else {
+//										    	getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not the parent of this you cannot edit it",null);
+//										    	logger.info("************************createUser ENDED ***************************");
+//										    	return ResponseEntity.status(404).body(getObjectResponse);
+//										    }
+//										}
+//									}
+//								}
+//							}
+//							else {
+//								return null;
+//							}
+//						
+//					    
+//					   return null;
+//					}
+//				}
+//			
+//			
+//				}	
+//		}
+//		
+//		
+//	}
 	
 	
 	 public static String getMd5(String input) 
@@ -1270,6 +1783,7 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 //		}
 //		
 //	}
+	
 
 	@Override
 	public ResponseEntity<?> getUserRole(Long userId) {
@@ -1294,20 +1808,25 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	public Boolean checkIfParentOrNot(Long parentId, Long childId,Integer parentType , Integer childType) {
 		// TODO Auto-generated method stub
 		if(parentId == 0 || parentId == null ||  childId == 0 || childId == null) {
+			
 			return false;
 		}else {			
 			User parent = findById(parentId);
 			if(parent == null) {
+				
 				return false;
 			}else {
 				if(parent.getAccountType() != parentType ) {
+					
 					return false;
 				}
 				User child = findById(childId);
 				if(child == null) {
+					
 					return false;
 				}else {
 					if(child.getAccountType() != childType) {
+						System.out.println("check here");
 						return false;
 					}
 					if(parentType ==childType) {
