@@ -30,9 +30,10 @@ public class CustomDeviceList{
 	private String licenceExptDate;
 	private String carWeight;
 	private String vehiclePlate;
+	private String companyName;
 
 	
-	public CustomDeviceList(int id ,String deviceName,String uniqueId , String sequenceNumber, String referenceKey , String driverName ,String geofenceName ,Date lastUpdate ) {
+	public CustomDeviceList(int id ,String deviceName,String uniqueId , String sequenceNumber, String referenceKey , String companyName, String driverName ,String geofenceName ,Date lastUpdate ) {
 		this.id = id;
 		this.deviceName = deviceName;
 		this.uniqueId = uniqueId;
@@ -41,6 +42,8 @@ public class CustomDeviceList{
 		this.referenceKey = referenceKey;
 		this.driverName = driverName;
 	    this.lastUpdate = lastUpdate;
+	    this.companyName = companyName;
+
 		
 	}
 
@@ -276,6 +279,14 @@ public class CustomDeviceList{
 	}
 	public void setDriverUniqueId(String driverUniqueId) {
 		this.driverUniqueId = driverUniqueId;
+	}
+
+	public String getCompanyName() {
+		return companyName;
+	}
+
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
 	}
 	
 

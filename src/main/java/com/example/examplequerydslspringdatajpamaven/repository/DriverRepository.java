@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.examplequerydslspringdatajpamaven.entity.CustomDriverList;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
@@ -55,6 +56,11 @@ public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslP
 			+ " and ((tc_drivers.name Like %:search%) OR (tc_drivers.uniqueid Like %:search%) OR (tc_drivers.mobile_num Like %:search%) OR (tc_drivers.birth_date Like %:search%))"
 			+ " LIMIT :offset,10", nativeQuery = true)
 	public List<Driver> getAllDrivers(@Param("userIds") List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
+	
+	
+	@Query(nativeQuery = true, name = "getDriverList")
+	public List<CustomDriverList> getAllDriversCustom(@Param("userIds") List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
+	
 	
 	//added by maryam
 	@Query(value = "SELECT  * FROM tc_drivers A " + 

@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import com.example.examplequerydslspringdatajpamaven.entity.CustomDriverList;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
@@ -53,6 +54,7 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 		
 		logger.info("************************ getAllDrivers STARTED ***************************");
 		List<Driver> drivers = new ArrayList<Driver>();
+	    List<CustomDriverList> customDrivers = new ArrayList<CustomDriverList>();
 		if(TOKEN.equals("")) {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",drivers);
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
@@ -91,10 +93,12 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 							}
 							List<Long>usersIds= new ArrayList<>();
 						    usersIds.add(parent.getId());
-							drivers = driverRepository.getAllDrivers(usersIds,offset,search);
-							Integer size= driverRepository.getAllDriversSize(usersIds);
+						     
+							//drivers = driverRepository.getAllDrivers(usersIds,offset,search);
+						    customDrivers= driverRepository.getAllDriversCustom(usersIds,offset,search);
+						    Integer size= driverRepository.getAllDriversSize(usersIds);
 							
-							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",drivers,size);
+							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",customDrivers,size);
 							logger.info("************************ getAllDrivers ENDED ***************************");
 							return ResponseEntity.ok().body(getObjectResponse);
 						}
@@ -111,10 +115,12 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 						 }
 					 }
 					 System.out.println("Ids"+usersIds.toString());
-					drivers = driverRepository.getAllDrivers(usersIds,offset,search);
+					//drivers = driverRepository.getAllDrivers(usersIds,offset,search);
+				    customDrivers= driverRepository.getAllDriversCustom(usersIds,offset,search);
+
 					Integer size= driverRepository.getAllDriversSize(usersIds);
 					
-					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",drivers,size);
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",customDrivers,size);
 					logger.info("************************ getAllDrivers ENDED ***************************");
 					return ResponseEntity.ok().body(getObjectResponse);
 
