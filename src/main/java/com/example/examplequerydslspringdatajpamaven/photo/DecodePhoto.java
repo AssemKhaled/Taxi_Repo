@@ -28,7 +28,7 @@ public String Base64_Image(String photo) {
 		int n = rand.nextInt(999999);
 		
 		String fileName=n + type;
-		String path="E:/"+fileName;
+		String path="/assets/"+fileName;
 		
 
 		int pos=photo.indexOf(",");

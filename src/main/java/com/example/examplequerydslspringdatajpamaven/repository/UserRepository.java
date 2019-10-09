@@ -110,4 +110,9 @@ public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredi
 			" inner join tc_users on tc_user_user.manageduserid=tc_users.id" + 
 			" where tc_user_user.userid = :vendorId and tc_users.accountType=3 and delete_date is null",nativeQuery = true)
 	public List<UserSelect> getClientSelect(@Param("vendorId")Long vendorId);
+	
+	
+	@Query(value = "SELECT * FROM tc_users where tc_users.id=:userId and tc_users.delete_date is not null", nativeQuery = true)
+	public User getDeletedUser(@Param("userId")Long userId);
+	
 }

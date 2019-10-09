@@ -94,6 +94,14 @@ public class UserRestController {
 		return userService.deleteUser(TOKEN,userId,deleteUserId);
 				
 	}
+	@GetMapping(path ="/activeUser")
+	public ResponseEntity<?> activeUser(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                              @RequestParam (value = "userId", defaultValue = "0") Long userId,
+			                              @RequestParam (value = "activeUserId", defaultValue = "0") Long deleteUserId) {
+		
+		return userService.activeUser(TOKEN,userId,deleteUserId);
+				
+	}
 	
 	@GetMapping(path="/getUserRole")
 	public ResponseEntity<?> getUserRole(@RequestParam (value = "userId", defaultValue = "0") Long userId){

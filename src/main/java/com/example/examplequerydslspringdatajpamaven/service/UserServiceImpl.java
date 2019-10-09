@@ -2055,6 +2055,79 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	}
 
 	@Override
+	public ResponseEntity<?> activeUser(String TOKEN, Long userId, Long activeUserId) {
+		// TODO Auto-generated method stub
+		
+		logger.info("************************activeUser STARTED ***************************");
+		if(TOKEN.equals("")) {
+			 List<User> users = null;
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",users);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(userId == 0 || activeUserId == 0) {
+			
+		    getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",null);
+		    logger.info("************************activeUser ENDED ***************************");
+		    return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+
+		User loggedUser = findById(userId);
+		if(loggedUser == null) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This user is not found",null);
+		    return ResponseEntity.status(404).body(getObjectResponse);
+		}
+		if(loggedUser.getAccountType()!= 1) {
+			if(!userRoleService.checkUserHasPermission(userId, "USER", "delete")) {
+				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to delete user",null);
+				 logger.info("************************ activeUser ENDED ***************************");
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+		}
+		User checkdDeleted = findById(activeUserId);
+		if(checkdDeleted != null) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "user you want to active is already activated",null);
+		    return ResponseEntity.status(404).body(getObjectResponse);
+		}else {
+			User deletedUser = userRepository.getDeletedUser(activeUserId);
+			System.out.println("S: "+deletedUser);
+			System.out.println("S1: "+deletedUser.getAccountType());
+			List<User>parents = getAllParentsOfuser(deletedUser,deletedUser.getAccountType());
+			System.out.println("S2: "+parents);
+			if(parents.isEmpty()) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to active this user",null);
+			    logger.info("************************activeUser ENDED ***************************");
+			    return ResponseEntity.badRequest().body(getObjectResponse);
+			}else {
+				boolean isParent = false;
+				 for(User parent : parents ) {
+					 if(parent.getId() == userId) {
+						 isParent = true;
+						 break;
+					 }
+				 }
+				 if(!isParent) {
+					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to active this user",null);
+					    logger.info("************************activeUser ENDED ***************************");
+					    return ResponseEntity.badRequest().body(getObjectResponse);
+				 }else {
+					
+	   				deletedUser.setDelete_date(null);
+	   				userRepository.save(deletedUser);	   				
+	    			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(),"success",null);
+	    			logger.info("************************activeUser ENDED ***************************");
+	    			return ResponseEntity.ok().body(getObjectResponse);
+				 }
+				 
+			} 
+		}
+		
+	}
+	@Override
 	public List<User> getAllChildernOfUser(Long userId) {
 		// TODO Auto-generated method stub
 		System.out.println("parentId"+userId);

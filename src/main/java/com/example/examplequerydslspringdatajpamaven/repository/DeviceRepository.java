@@ -82,10 +82,10 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 			+ " WHERE tc_user_device.userid IN(:userIds) and tc_devices.delete_date is null",nativeQuery = true )
 	public Integer getDevicesListSize(@Param("userIds")List<Long> userIds);
 	
-	@Query(nativeQuery = true, name = "getDriverWorkingHoursExport")
+	@Query(nativeQuery = true, name = "getDeviceWorkingHoursExport")
 	public List<DeviceWorkingHours> getDeviceWorkingHoursExport(@Param("deviceId")Long deviceId,@Param("start")String start,@Param("end")String end);
 	
-	@Query(nativeQuery = true, name = "getDriverWorkingHours")
+	@Query(nativeQuery = true, name = "getDeviceWorkingHours")
 	public List<DeviceWorkingHours> getDeviceWorkingHours(@Param("deviceId")Long deviceId,@Param("start")String start,@Param("end")String end,@Param("offset")int offset,@Param("search")String search);
 
 	@Query(value = "SELECT count(CAST(devicetime AS DATE)) FROM tc_positions " + 
