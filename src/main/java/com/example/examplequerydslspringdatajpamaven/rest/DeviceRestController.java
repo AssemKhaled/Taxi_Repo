@@ -30,6 +30,7 @@ import com.example.examplequerydslspringdatajpamaven.service.GeofenceServiceImpl
 import com.example.examplequerydslspringdatajpamaven.service.UserServiceImpl;
 
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
+import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 
 
 @CrossOrigin
@@ -91,12 +92,22 @@ public class DeviceRestController {
 	
 	@GetMapping(path = "/assignDeviceToDriver")
 	public ResponseEntity<?> assignDeviceToDriver(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-												  @RequestParam (value = "driverId", defaultValue = "0") Long driverId,
+												  @RequestParam (value = "driverId", defaultValue = "0") String driverId,
 												  @RequestParam(value = "deviceId" ,defaultValue = "0") Long deviceId,
 												  @RequestParam(value = "userId" , defaultValue = "0")Long userId ) {
-		
+		try
+	    {
+			Long.parseLong(driverId);
+	    }
+	    catch(NumberFormatException ex)
+	    {
+	    	GetObjectResponse getObjectResponse;
 
-		return deviceService.assignDeviceToDriver(TOKEN,deviceId,driverId,userId);	
+	    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), " Input is not Number or Can't Assign more than 2  Drivers to the Device",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+	    }
+
+		return deviceService.assignDeviceToDriver(TOKEN,deviceId,Long.parseLong(driverId),userId);	
 		
 	}
 	

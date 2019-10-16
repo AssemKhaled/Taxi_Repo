@@ -101,6 +101,13 @@ public class ProfileServiceImpl extends RestServiceController implements Profile
 			}
 			else {
 				if(Data.getDelete_date() == null) {
+					if( (user.getId() != null && user.getId() != 0) ) {
+						
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "Id not allow in request body of profile",users);
+						logger.info("************************ createDevice ENDED ***************************");
+						return ResponseEntity.badRequest().body(getObjectResponse);
+					}
+					
 					if(user.getEmail() == null || user.getIdentity_num() == null || user.getCommercial_num() == null 
 							|| user.getCompany_phone() == null || user.getManager_phone() == null
 							|| user.getManager_mobile() ==null ||user.getPhone() == null
@@ -178,7 +185,8 @@ public class ProfileServiceImpl extends RestServiceController implements Profile
 			}
 			else {
 				if(user.getDelete_date() == null) {
-					if(check=="") {
+					if(check.equals("")) {
+						System.out.println("dskjdsjkbvkjbvdjs");
 						if(data.get("oldPassword") == null || data.get("newPassword") == null ||
 								data.get("oldPassword") == "" || data.get("newPassword") == "") {
 							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "newPassword and oldPassword is Required",users);
@@ -209,6 +217,8 @@ public class ProfileServiceImpl extends RestServiceController implements Profile
 						}
 					}
 					else {
+						System.out.println("user");
+
 						if(data.get("newPassword") == null || data.get("newPassword") == "") {
 							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "newPassword is Required",users);
 							return ResponseEntity.badRequest().body(getObjectResponse);

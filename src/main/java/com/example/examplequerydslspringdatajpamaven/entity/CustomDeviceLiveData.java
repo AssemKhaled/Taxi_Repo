@@ -22,8 +22,8 @@ public class CustomDeviceLiveData {
 	private String batteryUnpluged;
 	private String PowerUnpluged;
 	private String todayHoursString;
-	private Double deviceWorkingHoursPerDay;
-	private Double driverWorkingHoursPerDay;
+	private String deviceWorkingHoursPerDay;
+	private String driverWorkingHoursPerDay;
 	private Double power;
 	private String photo;
 	private Float speed ;
@@ -130,12 +130,12 @@ public class CustomDeviceLiveData {
 				this.weight =0.0;
 			}
 			if(jsonObject.has("todayHoursString")) {
-				this.deviceWorkingHoursPerDay = jsonObject.getDouble("todayHoursString");
-				this.driverWorkingHoursPerDay = jsonObject.getDouble("todayHoursString");
+				this.deviceWorkingHoursPerDay = jsonObject.getString("todayHoursString");
+				this.driverWorkingHoursPerDay = jsonObject.getString("todayHoursString");
 			}else
 			{
-				this.deviceWorkingHoursPerDay = 0.0;
-				this.driverWorkingHoursPerDay = 0.0;
+				this.deviceWorkingHoursPerDay = "00:00";
+				this.driverWorkingHoursPerDay = "00:00";
 			}
 			if(jsonObject.has("hours")){
 				DecimalFormat df = new DecimalFormat("###.###");
@@ -165,8 +165,8 @@ public class CustomDeviceLiveData {
 			
 		}else {
 			this.weight =0.0;
-			this.deviceWorkingHoursPerDay = 0.0;
-			this.driverWorkingHoursPerDay = 0.0;
+			this.deviceWorkingHoursPerDay = "00:00";
+			this.driverWorkingHoursPerDay = "00:00";
 			
 		}
 
@@ -262,12 +262,12 @@ public class CustomDeviceLiveData {
 				this.weight =0.0;
 			}
 			if(jsonObject.has("todayHoursString")) {
-				this.deviceWorkingHoursPerDay = jsonObject.getDouble("todayHoursString");
-				this.driverWorkingHoursPerDay = jsonObject.getDouble("todayHoursString");
+				this.deviceWorkingHoursPerDay = jsonObject.getString("todayHoursString");
+				this.driverWorkingHoursPerDay = jsonObject.getString("todayHoursString");
 			}else
 			{
-				this.deviceWorkingHoursPerDay = 0.0;
-				this.driverWorkingHoursPerDay = 0.0;
+				this.deviceWorkingHoursPerDay = "00:00";
+				this.driverWorkingHoursPerDay = "00:00";
 			}
 			if(jsonObject.has("hours")){
 				DecimalFormat df = new DecimalFormat("###.###");
@@ -297,8 +297,8 @@ public class CustomDeviceLiveData {
 			
 		}else {
 			this.weight =0.0;
-			this.deviceWorkingHoursPerDay = 0.0;
-			this.driverWorkingHoursPerDay = 0.0;
+			this.deviceWorkingHoursPerDay = "00:00";
+			this.driverWorkingHoursPerDay = "00:00";
 			
 		}
 
@@ -403,23 +403,18 @@ public class CustomDeviceLiveData {
 	public void setTodayHoursString(String todayHoursString) {
 		this.todayHoursString = todayHoursString;
 	}
-
-	public Double getDeviceWorkingHoursPerDay() {
+	public String getDeviceWorkingHoursPerDay() {
 		return deviceWorkingHoursPerDay;
 	}
-
-	public void setDeviceWorkingHoursPerDay(Double deviceWorkingHoursPerDay) {
+	public void setDeviceWorkingHoursPerDay(String deviceWorkingHoursPerDay) {
 		this.deviceWorkingHoursPerDay = deviceWorkingHoursPerDay;
 	}
-
-	public Double getDriverWorkingHoursPerDay() {
+	public String getDriverWorkingHoursPerDay() {
 		return driverWorkingHoursPerDay;
 	}
-
-	public void setDriverWorkingHoursPerDay(Double driverWorkingHoursPerDay) {
+	public void setDriverWorkingHoursPerDay(String driverWorkingHoursPerDay) {
 		this.driverWorkingHoursPerDay = driverWorkingHoursPerDay;
 	}
-
 	public Double getPower() {
 		return power;
 	}

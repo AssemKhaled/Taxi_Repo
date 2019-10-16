@@ -19,7 +19,7 @@ import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvDate;
 
 @Entity
-@Table(name = "tc_positions" , schema = "sareb_blue")
+@Table(name = "tc_positions" , schema = "sareb_gold")
 //@JsonIgnoreProperties(value = { "hibernateLazyInitializer", "handler" })
 public class Position {
 

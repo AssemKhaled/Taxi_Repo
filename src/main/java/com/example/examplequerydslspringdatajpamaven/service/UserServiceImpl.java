@@ -250,10 +250,29 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 						return  ResponseEntity.badRequest().body(getObjectResponse);
 					}
 				}
+				
+				 List<User> parents=getAllParentsOfuser(user,user.getAccountType());
+				 boolean isParent = false; 
+				 User parentClient = new User() ;
+				 for(User object : parents) {
+					 parentClient = object;
+					 if(userId == parentClient.getId()) {
+						isParent =true;
+						break;
+					 }
+				 }
+				 if(userId == loggedUserId) {
+					 isParent =true;
+				 }
+				 if(isParent == false) {
+					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "as you are not the parent of this creater user you cannot allow to edit this role.",null);
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				 }
+
 				if(active == 0) {
 					List<User> users = userRepository.getInactiveUsersOfUser(userId,offset,search);
 					Integer size=userRepository.getInactiveUsersOfUserSize(userId);
-					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "succxess",users,size);
+					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users,size);
 					logger.info("************************ getAllUsersOfUser ENDED ***************************");
 					return  ResponseEntity.ok().body(getObjectResponse);
 				}

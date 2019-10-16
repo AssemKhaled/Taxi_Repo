@@ -80,7 +80,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			return super.checkActive(TOKEN);
 		}
 		
-		if(deviceId != 0 || userId != 0) {
+		if(deviceId != 0 && userId != 0) {
 			
 			User loggedUser = userServiceImpl.findById(userId);
 			if(loggedUser == null) {
@@ -307,7 +307,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 						}
 					}
 					if(!deviceServiceImpl.checkIfParent(device , loggedUser) && ! isParent) {
-						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this device",null);
 						logger.info("************************ getDeviceWorkingHours ENDED ***************************");
 						return ResponseEntity.badRequest().body(getObjectResponse);
 					}
@@ -594,7 +594,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 						}
 					}
 					if(!driverServiceImpl.checkIfParent(driver , loggedUser) && ! isParent) {
-						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this driver",null);
 						logger.info("************************ getDeviceWorkingHours ENDED ***************************");
 						return ResponseEntity.badRequest().body(getObjectResponse);
 					}
@@ -1120,7 +1120,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 						}
 					}
 					if(!deviceServiceImpl.checkIfParent(device , loggedUser) && ! isParent) {
-						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allow to get data as not from parents ",null);
 						logger.info("************************ getDeviceWorkingHours ENDED ***************************");
 						return ResponseEntity.badRequest().body(getObjectResponse);
 					}
@@ -1269,7 +1269,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 						}
 					}
 					if(!deviceServiceImpl.checkIfParent(device , loggedUser) && ! isParent) {
-						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allow to get data as not from parents ",null);
 						logger.info("************************ getDeviceWorkingHours ENDED ***************************");
 						return ResponseEntity.badRequest().body(getObjectResponse);
 					}

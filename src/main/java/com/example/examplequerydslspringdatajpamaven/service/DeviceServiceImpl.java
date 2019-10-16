@@ -168,7 +168,15 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			}
 		}
 		
-		if((device.getId() != null && device.getId() != 0) || device.getName()== null ||device.getName() == ""
+		if( (device.getId() != null && device.getId() != 0) ) {
+            List<Device> devices = null;
+			
+			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "Device Id not allowed in create new device",devices);
+			logger.info("************************ createDevice ENDED ***************************");
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(device.getName()== null ||device.getName() == ""
 				|| device.getUniqueId()== null || device.getUniqueId() == null
 				|| device.getSequenceNumber() == null || device.getSequenceNumber()==""
 				|| device.getPlateNum() == null || device.getPlateNum() == ""
@@ -461,6 +469,12 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		     return ResponseEntity.badRequest().body(getObjectResponse); 
 		 }
 		User loggedUser = userService.findById(userId);
+		if(loggedUser ==null) {
+			List<Device> devices = null;
+			getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "User ID is not found",devices);
+		    logger.info("************************ deleteDevice ENDED ***************************");
+		    return ResponseEntity.status(404).body(getObjectResponse);
+		}
 		if(loggedUser.getAccountType()!= 1) {
 			if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "delete")) {
 				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to delete device",null);
@@ -468,7 +482,6 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
 		}
-		 System.out.println(deviceId);
 		 Device device = findById(deviceId);
 		 if(device == null)
 		 {
@@ -688,6 +701,10 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
 		}
+		
+		
+		
+
 		if(deviceId == 0 ) {
 			
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",null);
@@ -829,6 +846,12 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		{
 			return super.checkActive(TOKEN);
 		}
+		if(userId == 0) {
+			 List<Device> devices = null;
+			 getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "User ID is Required",devices);
+		     logger.info("************************ deleteDevice ENDED ***************************");
+		     return ResponseEntity.badRequest().body(getObjectResponse); 
+		 }
 		User loggedUser = userService.findById(userId);
 		if(loggedUser == null) {
 			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This loggedUser is not found",null);
@@ -880,15 +903,21 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
                 }
 			   
 			}else {
+				    List<Device> devices = null;
+				    Set<Geofence> newGeofences = geofenceService.getMultipleGeofencesById(geoIds);
+					if(newGeofences.isEmpty()) {
+						getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This Geofence ID is not Found",devices);
+						logger.info("************************ assignDeviceToGeofences ENDED ***************************");
+						return ResponseEntity.status(404).body(getObjectResponse);
+					}
 					Set<Geofence> geofences = device.getGeofence();
 					Set<Geofence> oldGeoffences = geofences;
 					geofences.removeAll(oldGeoffences);
 					device.setGeofence(geofences);
 					deviceRepository.save(device);
-					Set<Geofence> newGeofences = geofenceService.getMultipleGeofencesById(geoIds);
+					
 					device.setGeofence(newGeofences);
 					deviceRepository.save(device);
-					List<Device> devices = null;
 					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
 					logger.info("************************ assignDeviceToGeofences ENDED ***************************");
 					return ResponseEntity.ok().body(getObjectResponse);
@@ -1569,7 +1598,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		else {
 			 User loggedUser = userService.findById(userId);
 			 if(loggedUser == null) {
-				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",null);
+				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This user is not found",null);
 					
 					logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
 					return ResponseEntity.status(404).body(getObjectResponse);

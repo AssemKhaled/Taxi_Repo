@@ -74,7 +74,6 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 				return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
 		}
-		 System.out.println("fdvdfvfdvfdv: "+role.getName());
 		if(role.getId()!=null || role.getName() == null || role.getName() == ""
 				||role.getPermissions() == null || role.getPermissions() == "") {
 			
@@ -86,11 +85,32 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "This Role Name was added before you can Edit or Delete it only",null);
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
-		role.setUserId(userId);
+		if(loggedUser.getAccountType()==4) {
+			 Long uId=(long) 0;
+			 List<User> parents=userService.getAllParentsOfuser(loggedUser,loggedUser.getAccountType());
+			 if(parents.isEmpty()) {
+					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "as you are not have parent you cannot allow to edit this role.",null);
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+			 }
+			 else {
+				 User parentClient = new User() ;
+				 for(User object : parents) {
+					 parentClient = object;
+					 uId=parentClient.getId();
+					 break;
+				 }
+				 
+			 }
+			role.setUserId(uId);
+
+		}
+		else {
+			role.setUserId(userId);
+		}
 		userRoleRepository.save(role);
 		
-		 getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "role added successfully",null);
-		 return  ResponseEntity.ok().body(getObjectResponse);
+	 getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "role added successfully",null);
+	 return  ResponseEntity.ok().body(getObjectResponse);
 	}
 	@Override
 	public ResponseEntity<?> editRole(String TOKEN,UserRole role,Long userId) {
@@ -128,10 +148,94 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 		}
 		
 		UserRole userRole = userRoleRepository.findOne(role.getId());
+		if(userRole == null) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "role is not found ",null);
+		    return  ResponseEntity.status(404).body(getObjectResponse); 
+		}
+		else {
+			if(userRole.getDelete_date() != null) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "role is not found ",null);
+			    return  ResponseEntity.status(404).body(getObjectResponse); 
+			}
+		}
 		Long createdByUserId=userRole.getUserId();
 		User createdByUser = userService.findById(createdByUserId);
-		 
-		if(createdByUser.getAccountType() == 4) {
+		if(loggedUser.getAccountType()==4) {
+			 List<User> parents=userService.getAllParentsOfuser(loggedUser,loggedUser.getAccountType());
+			 if(parents.isEmpty()) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "as you are not have parent you cannot allow to edit this role.",null);
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			 }
+			 else {
+				 User parentClient = new User() ;
+				 boolean isParent = false;
+
+				 for(User object : parents) {
+					 parentClient = object;
+					 break;
+					 
+				 }
+				 if(createdByUserId == parentClient.getId()) {
+				 		isParent =true;
+				 }
+				if(isParent == false) {
+					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "As you are account type 4 and this role not created by direct parent not allow to edit.",null);
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				 
+			 }
+			 
+		}
+		if(loggedUser.getAccountType()==3) {
+			if(userId != createdByUserId) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "As you are account type 3 and this role not created by yourself not allow to edit.",null);
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			
+			 
+		}
+		if(loggedUser.getAccountType()==2) {
+			User parentChilds = new User() ;
+	 		boolean isParent =false;
+	 		if(userId==createdByUserId) {
+				isParent=true;
+	 		}
+			Set<User>childs = loggedUser.getUsersOfUser();
+			if(!childs.isEmpty()) {
+				for(User object : childs) {
+					parentChilds = object;
+					if(parentChilds.getId()==createdByUserId) {
+						isParent=true;
+					}
+				}
+			}
+			if(isParent == false) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "As you are type 2 and not the creater or no created by childs you are not allow to edit",null);
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+		}
+		if(loggedUser.getAccountType()==1) {
+			User parentChilds = new User() ;
+	 		boolean isParent =false;
+	 		if(userId==createdByUserId) {
+				isParent=true;
+	 		}
+			Set<User>childs = loggedUser.getUsersOfUser();
+			if(!childs.isEmpty()) {
+				for(User object : childs) {
+					parentChilds = object;
+					if(parentChilds.getId()==createdByUserId) {
+						isParent=true;
+					}
+				}
+			}
+			if(isParent == false) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "As you are type 1 and not the creater or no created by childs you are not allow to edit",null);
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+		}
+		
+		/*if(createdByUser.getAccountType() == 4) {
 			 if(loggedUser.getAccountType()==4) {
 				 if(createdByUserId!=userId) {
 					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "as you are not the creater of the role you cannot allow to edit this role.",null);
@@ -155,6 +259,9 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 						break;
 					 }
 				 }
+				 if(userId == createdByUserId) {
+					 isParent =true;
+				 }
 				 if(isParent == false) {
 					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "as you are not the parent of this creater user you cannot allow to edit this role.",null);
 					return  ResponseEntity.badRequest().body(getObjectResponse);
@@ -163,7 +270,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 			 }
 			 
 		}
-		if(createdByUser.getAccountType()  == 3) {
+		if(createdByUser.getAccountType() == 3) {
 			 if(loggedUser.getAccountType()==4) {
 				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "your not the creater or parent to edit this role",null);
 				return  ResponseEntity.badRequest().body(getObjectResponse);
@@ -185,10 +292,14 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 				 User parentClient = new User() ;
 				 for(User object : parents) {
 					 parentClient = object;
+					 System.out.println("idS: "+parentClient.getId());
 					 if(userId == parentClient.getId()) {
 						isParent =true;
 						break;
 					 }
+				 }
+				 if(userId == createdByUserId) {
+					 isParent =true;
 				 }
 				 if(isParent == false) {
 					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "as you are not the parent of this creater user you cannot allow to edit this role.",null);
@@ -228,6 +339,9 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 						break;
 					 }
 				 }
+				 if(userId == createdByUserId) {
+					 isParent =true;
+				 }
 				 if(isParent == false) {
 					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "as you are not the parent of this creater user you cannot allow to edit this role.",null);
 					return  ResponseEntity.badRequest().body(getObjectResponse);
@@ -256,7 +370,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 					return  ResponseEntity.badRequest().body(getObjectResponse);
 				 }
 			 }
-		}
+		}*/
 		 
 		 
 		
@@ -684,12 +798,11 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 		 for(User object : parentsOfUser) {
 			
 			 parentClientOfUser = object;
-			 if(createdByUserId.equals(parentClientOfUser.getId()) ) {
+			 if(createdByUserId.equals(parentClientOfUser.getId())) {
 				 isParentOfUser =true;
-				break;
+				 break;
 			 }
 		 }
-		 System.out.println("isparent"+isParentOfUser);
 		 if(!isParentOfUser) {
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "as this user not child of creater userId its'nt allow to assign",null);
 			return  ResponseEntity.badRequest().body(getObjectResponse);

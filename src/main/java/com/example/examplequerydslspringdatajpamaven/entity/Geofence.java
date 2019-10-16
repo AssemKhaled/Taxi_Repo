@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
-@Table(name = "tc_geofences" , schema = "sareb_blue")
+@Table(name = "tc_geofences" , schema = "sareb_gold")
 @JsonIgnoreProperties(value = { "device" })
 //@JsonIgnoreProperties(value = { "hibernateLazyInitializer", "handler" })
 

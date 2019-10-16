@@ -9,7 +9,7 @@ import javax.persistence.Table;
 import org.json.JSONObject;
 
 @Entity
-@Table(name = "tc_permissions" , schema = "sareb_blue")
+@Table(name = "tc_permissions" , schema = "sareb_gold")
 public class Permission {
 	@Id
 	@GeneratedValue

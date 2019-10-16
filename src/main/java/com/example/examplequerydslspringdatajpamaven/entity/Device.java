@@ -257,7 +257,7 @@ query=" SELECT tc_drivers.id as driverId,tc_drivers.uniqueid as driverUniqueId,t
 })
 
 @Entity
-@Table(name = "tc_devices" , schema = "sareb_blue")
+@Table(name = "tc_devices" , schema = "sareb_gold")
 @JsonIgnoreProperties(value = { "events","hibernateLazyInitializer", "handler" })
 public class Device {
 
