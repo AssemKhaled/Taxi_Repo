@@ -14,11 +14,11 @@ public interface UserRoleService {
 	
 	public ResponseEntity<?>deleteRole(String TOKEN,Long roleId,Long userId);
 	
-	public ResponseEntity<?>getRoleById(String TOKEN,Long roleId);
+	public ResponseEntity<?>getRoleById(String TOKEN,Long roleId,Long loggedId);
 	
 	public ResponseEntity<?>assignRoleToUser(String TOKEN,Long roleId,Long userId,Long loggedId);
 	
-	public ResponseEntity<?>getAllRolesCreatedByUser(String TOKEN,Long userId);
+	public ResponseEntity<?>getAllRolesCreatedByUser(String TOKEN,Long userId,Long loggedId);
 	
 	public ResponseEntity<?> getRolePageContent(String TOKEN,Long userId);
 	

@@ -42,9 +42,10 @@ public class UserRoleRestController {
 	}
 	
 	@GetMapping("/getRoleById")
-	public ResponseEntity<?>getRoleByTd(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,@RequestParam (value = "roleId",defaultValue = "0") Long roleId){
+	public ResponseEntity<?>getRoleByTd(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,@RequestParam (value = "roleId",defaultValue = "0") Long roleId
+			,@RequestParam (value = "loggedId",defaultValue = "0") Long loggedId){
 		
-		return userRoleService.getRoleById(TOKEN,roleId);
+		return userRoleService.getRoleById(TOKEN,roleId,loggedId);
 	}
 	
 	@GetMapping("/assignRoleToUser")
@@ -59,10 +60,11 @@ public class UserRoleRestController {
 	}
 	
 	@GetMapping("/getAllRolesCreatedByUser")
-	public ResponseEntity<?> getAllRolesCreatedByUser(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,@RequestParam (value = "userId",defaultValue = "0") Long userId){
+	public ResponseEntity<?> getAllRolesCreatedByUser(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,@RequestParam (value = "userId",defaultValue = "0") Long userId
+			,@RequestParam (value = "loggedId",defaultValue = "0") Long loggedId){
 		
 		
-		return userRoleService.getAllRolesCreatedByUser(TOKEN,userId);
+		return userRoleService.getAllRolesCreatedByUser(TOKEN,userId,loggedId);
 	}
 	
 	@GetMapping("/getRolePageContent")

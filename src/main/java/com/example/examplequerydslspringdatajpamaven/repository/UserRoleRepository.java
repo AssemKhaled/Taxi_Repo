@@ -24,4 +24,7 @@ public interface UserRoleRepository extends  JpaRepository<UserRole, Long>, Quer
 	@Query(value = "SELECT * from tc_user_roles where tc_user_roles.userId IN(:userIds) AND delete_date IS NULL",nativeQuery = true)
 	public List<UserRole>getAllRolesCreatedByUser(@Param("userIds")List<Long> userIds);
 	
+	@Query(value = "SELECT * from tc_user_roles where tc_user_roles.userId=:userId AND delete_date IS NULL",nativeQuery = true)
+	public List<UserRole>getAllRolesCreatedByUserToCompare(@Param("userId")Long userId);
+	
 }

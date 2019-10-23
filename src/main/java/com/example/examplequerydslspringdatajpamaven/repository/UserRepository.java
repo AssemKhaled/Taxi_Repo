@@ -115,4 +115,7 @@ public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredi
 	@Query(value = "SELECT * FROM tc_users where tc_users.id=:userId and tc_users.delete_date is not null", nativeQuery = true)
 	public User getDeletedUser(@Param("userId")Long userId);
 	
+	@Query(value = "SELECT * FROM tc_users where roleId=:roleId and delete_date is null", nativeQuery = true)
+	public List<User> getUsersAssignedByRoleId(@Param("roleId") Long roleId);
+	
 }
