@@ -25,24 +25,47 @@ import javax.persistence.Table;
 	                targetClass=EventReport.class,
 	                  columns={
 	                		  
-	                     @ColumnResult(name="eventId",type=Long.class),
-	                     @ColumnResult(name="eventType",type=String.class),
-	                     @ColumnResult(name="serverTime",type=String.class),
-	                     @ColumnResult(name="attributes",type=String.class),
-	                     @ColumnResult(name="deviceId",type=Long.class),
-	                     @ColumnResult(name="deviceName",type=String.class),
-	                     @ColumnResult(name="driverId",type=Long.class),
-	                     @ColumnResult(name="driverName",type=String.class),
-	                     @ColumnResult(name="geofenceId",type=Long.class),
-	                     @ColumnResult(name="geofenceName",type=String.class),
-	                     @ColumnResult(name="positionId",type=Long.class),
-	                     @ColumnResult(name="latitude",type=String.class),
-	                     @ColumnResult(name="longitude",type=String.class)
-	                     
-	                     }
+	                		 @ColumnResult(name="eventId",type=Long.class),
+	  	                     @ColumnResult(name="eventType",type=String.class),
+  	                         @ColumnResult(name="serverTime",type=String.class),
+	  	                     @ColumnResult(name="attributes",type=String.class),
+	  	                     @ColumnResult(name="deviceId",type=Long.class),
+	  	                     @ColumnResult(name="deviceName",type=String.class),
+	  	                     @ColumnResult(name="driverId",type=Long.class),
+	  	                     @ColumnResult(name="driverName",type=String.class),
+	  	                     @ColumnResult(name="geofenceId",type=Long.class),
+	  	                     @ColumnResult(name="geofenceName",type=String.class),
+	  	                     @ColumnResult(name="positionId",type=String.class)
+
+	                     	                     }
 	           )
 	        }
 	),
+//	@SqlResultSetMapping(
+//	        name="eventReport",
+//	        classes={
+//	           @ConstructorResult(
+//	                targetClass=EventReport.class,
+//	                  columns={
+//	                		  
+//	                     @ColumnResult(name="eventId",type=Long.class),
+//	                     @ColumnResult(name="eventType",type=String.class),
+//	                     @ColumnResult(name="serverTime",type=String.class),
+//	                     @ColumnResult(name="attributes",type=String.class),
+//	                     @ColumnResult(name="deviceId",type=Long.class),
+//	                     @ColumnResult(name="deviceName",type=String.class),
+//	                     @ColumnResult(name="driverId",type=Long.class),
+//	                     @ColumnResult(name="driverName",type=String.class),
+//	                     @ColumnResult(name="geofenceId",type=Long.class),
+//	                     @ColumnResult(name="geofenceName",type=String.class),
+//	                     @ColumnResult(name="positionId",type=Long.class),
+//	                     @ColumnResult(name="latitude",type=String.class),
+//	                     @ColumnResult(name="longitude",type=String.class)
+//	                     
+//	                     }
+//	           )
+//	        }
+//	),
 	@SqlResultSetMapping(
 	        name="notification",
 	        classes={
@@ -67,46 +90,81 @@ import javax.persistence.Table;
 
 	
 })
-
+//here
 @NamedNativeQueries({
 	@NamedNativeQuery(name="getEvents", 
 		     resultSetMapping="eventReport", 
 		     query="SELECT tc_events.id as eventId,"
 		     		+ " tc_events.type as eventType"
-		     		+ " , tc_events.servertime as serverTime,tc_events.attributes as attributes,"
+		     		+ " , tc_events.servertime as serverTime,tc_events.attributes as attributes,tc_events.positionid as positionId,"
 		     		+ " tc_devices.id as deviceId,tc_devices.name as deviceName,"
 		     		+ " tc_drivers.id as driverId,tc_drivers.name as driverName ,"
-		     		+ " tc_geofences.id as geofenceId,tc_geofences.name as geofenceName,"
-		     		+ " tc_positions.id as positionId,tc_positions.latitude as latitude ,tc_positions.longitude as longitude"
+		     		+ " tc_geofences.id as geofenceId,tc_geofences.name as geofenceName"
 		     		+ " FROM tc_events INNER JOIN tc_devices ON tc_devices.id=tc_events.deviceid"
-		     		+ " LEFT JOIN tc_positions ON tc_positions.id=tc_events.positionid "
 		     		+ " LEFT JOIN tc_geofences ON tc_geofences.id=tc_events.geofenceid"
 		     		+ " LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_events.deviceid"
 		     		+ " LEFT JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id"
-		     		+ " WHERE tc_events.servertime BETWEEN :start AND :end "
+		     		+ " WHERE tc_events.servertime>=:start AND tc_events.servertime>=:end "
 		     		+ " and tc_events.deviceid =:deviceId AND tc_devices.delete_date IS NULL AND"
 		     		+ " tc_drivers.delete_date IS NULL AND tc_geofences.delete_date IS NULL"
 					+ " and ( (tc_events.type Like :search) OR (tc_events.attributes Like :search) OR (tc_events.servertime Like :search) OR (tc_geofences.name Like :search) OR (tc_drivers.name Like :search)  OR (tc_devices.name Like :search) )"
-		     		+ " ORDER BY tc_events.servertime DESC LIMIT :offset, 10")
-	,
+		     		+ " ORDER BY tc_events.servertime DESC LIMIT :offset, 10"),
+//@NamedNativeQueries({
+//	@NamedNativeQuery(name="getEvents", 
+//		     resultSetMapping="eventReport", 
+//		     query="SELECT tc_events.id as eventId,"
+//		     		+ " tc_events.type as eventType"
+//		     		+ " , tc_events.servertime as serverTime,tc_events.attributes as attributes,"
+//		     		+ " tc_devices.id as deviceId,tc_devices.name as deviceName,"
+//		     		+ " tc_drivers.id as driverId,tc_drivers.name as driverName ,"
+//		     		+ " tc_geofences.id as geofenceId,tc_geofences.name as geofenceName,"
+//		     		+ " tc_positions.id as positionId,tc_positions.latitude as latitude ,tc_positions.longitude as longitude"
+//		     		+ " FROM tc_events INNER JOIN tc_devices ON tc_devices.id=tc_events.deviceid"
+//		     		+ " LEFT JOIN tc_positions ON tc_positions.id=tc_events.positionid "
+//		     		+ " LEFT JOIN tc_geofences ON tc_geofences.id=tc_events.geofenceid"
+//		     		+ " LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_events.deviceid"
+//		     		+ " LEFT JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id"
+//		     		+ " WHERE tc_events.servertime BETWEEN :start AND :end "
+//		     		+ " and tc_events.deviceid =:deviceId AND tc_devices.delete_date IS NULL AND"
+//		     		+ " tc_drivers.delete_date IS NULL AND tc_geofences.delete_date IS NULL"
+//					+ " and ( (tc_events.type Like :search) OR (tc_events.attributes Like :search) OR (tc_events.servertime Like :search) OR (tc_geofences.name Like :search) OR (tc_drivers.name Like :search)  OR (tc_devices.name Like :search) )"
+//		     		+ " ORDER BY tc_events.servertime DESC LIMIT :offset, 10")
+
+//here
 	@NamedNativeQuery(name="getEventsToExcel", 
     resultSetMapping="eventReport", 
     query="SELECT tc_events.id as eventId,"
     		+ " tc_events.type as eventType"
-    		+ " , tc_events.servertime as serverTime,tc_events.attributes as attributes,"
+    		+ " , tc_events.servertime as serverTime,tc_events.attributes as attributes"
+    		+ ",tc_events.positionid as positionId,"
     		+ " tc_devices.id as deviceId,tc_devices.name as deviceName,"
     		+ " tc_drivers.id as driverId,tc_drivers.name as driverName ,"
-    		+ " tc_geofences.id as geofenceId,tc_geofences.name as geofenceName,"
-    		+ " tc_positions.id as positionId,tc_positions.latitude as latitude ,tc_positions.longitude as longitude"
+    		+ " tc_geofences.id as geofenceId,tc_geofences.name as geofenceName"
     		+ " FROM tc_events INNER JOIN tc_devices ON tc_devices.id=tc_events.deviceid"
     		+ " LEFT JOIN tc_positions ON tc_positions.id=tc_events.positionid "
     		+ " LEFT JOIN tc_geofences ON tc_geofences.id=tc_events.geofenceid"
     		+ " LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_events.deviceid"
     		+ " LEFT JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id"
-    		+ " WHERE tc_events.servertime BETWEEN :start AND :end "
+    		+ " WHERE tc_events.servertime>= :start AND tc_events.servertime>= :end "
     		+ " and tc_events.deviceid =:deviceId AND tc_devices.delete_date IS NULL AND"
-    		+ " tc_drivers.delete_date IS NULL AND tc_geofences.delete_date IS NULL")
-    ,
+    		+ " tc_drivers.delete_date IS NULL AND tc_geofences.delete_date IS NULL"),
+//	@NamedNativeQuery(name="getEventsToExcel", 
+//    resultSetMapping="eventReport", 
+//    query="SELECT tc_events.id as eventId,"
+//    		+ " tc_events.type as eventType"
+//    		+ " , tc_events.servertime as serverTime,tc_events.attributes as attributes,"
+//    		+ " tc_devices.id as deviceId,tc_devices.name as deviceName,"
+//    		+ " tc_drivers.id as driverId,tc_drivers.name as driverName ,"
+//    		+ " tc_geofences.id as geofenceId,tc_geofences.name as geofenceName,"
+//    		+ " tc_positions.id as positionId,tc_positions.latitude as latitude ,tc_positions.longitude as longitude"
+//    		+ " FROM tc_events INNER JOIN tc_devices ON tc_devices.id=tc_events.deviceid"
+//    		+ " LEFT JOIN tc_positions ON tc_positions.id=tc_events.positionid "
+//    		+ " LEFT JOIN tc_geofences ON tc_geofences.id=tc_events.geofenceid"
+//    		+ " LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_events.deviceid"
+//    		+ " LEFT JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id"
+//    		+ " WHERE tc_events.servertime BETWEEN :start AND :end "
+//    		+ " and tc_events.deviceid =:deviceId AND tc_devices.delete_date IS NULL AND"
+//    		+ " tc_drivers.delete_date IS NULL AND tc_geofences.delete_date IS NULL"),
 	@NamedNativeQuery(name="getNotifications", 
     resultSetMapping="notification", 
     query="SELECT tc_events.id as eventId,tc_events.type as eventType,tc_events.servertime as serverTime,"
@@ -146,7 +204,7 @@ public class Event {
 	//private Integer deviceid;
 	
 	@Column(name = "positionid")
-	private Integer positionid;
+	private String positionid;
 	
 	@Column(name = "geofenceid")
 	private Integer geofenceid;
@@ -161,7 +219,7 @@ public class Event {
 	private String reason;
 	
 	@Column(name = "maintenanceid")
-	private Integer maintenanceid;
+	private Long maintenanceid;
 
 	public int getId() {
 		return id;
@@ -195,11 +253,11 @@ public class Event {
 		this.deviceid = deviceid;
 	}*/
 
-	public Integer getPositionid() {
+	public String getPositionid() {
 		return positionid;
 	}
 
-	public void setPositionid(Integer positionid) {
+	public void setPositionid(String positionid) {
 		this.positionid = positionid;
 	}
 
@@ -235,11 +293,11 @@ public class Event {
 		this.reason = reason;
 	}
 
-	public Integer getMaintenanceid() {
+	public Long getMaintenanceid() {
 		return maintenanceid;
 	}
 
-	public void setMaintenanceid(Integer maintenanceid) {
+	public void setMaintenanceid(Long maintenanceid) {
 		this.maintenanceid = maintenanceid;
 	}
 	

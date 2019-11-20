@@ -6,13 +6,13 @@ public interface ReportService {
 	
 	public ResponseEntity<?> getEventsReport(String TOKEN,Long deviceId,int offset,String start,String end,String search,Long userId);
 
-	public ResponseEntity<?> getDeviceWorkingHours(String TOKEN,Long deviceId,int offset,String start,String end,String search,Long userId);
+	public ResponseEntity<?> getDeviceWorkingHours(String TOKEN,Long deviceId,int offset,String search,Long userId);
 	
-	public ResponseEntity<?> getDeviceWorkingHoursExport(String TOKEN,Long deviceId,String start,String end,Long userId);
+	public ResponseEntity<?> getDeviceWorkingHoursExport(String TOKEN,Long deviceId,Long userId);
 
-    public ResponseEntity<?> getDriverWorkingHours(String TOKEN,Long driverId,int offset,String start,String end,String search,Long userId);
+    public ResponseEntity<?> getDriverWorkingHours(String TOKEN,Long driverId,int offset,String search,Long userId);
 	
-	public ResponseEntity<?> getDriverWorkingHoursExport(String TOKEN,Long driverId,String start,String end,Long userId);
+	public ResponseEntity<?> getDriverWorkingHoursExport(String TOKEN,Long driverId,Long userId);
 
 	public ResponseEntity<?> getEventsReportToExcel(String TOKEN,Long deviceId,String start,String end,Long userId);
 

@@ -1,20 +1,30 @@
 package com.example.examplequerydslspringdatajpamaven.service;
 
+//import static org.mockito.Matchers.eq;
+
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceList;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceLiveData;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
@@ -22,22 +32,29 @@ import com.example.examplequerydslspringdatajpamaven.entity.DeviceCalibrationDat
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
+import com.example.examplequerydslspringdatajpamaven.entity.NewPosition;
+import com.example.examplequerydslspringdatajpamaven.entity.NewcustomerDivice;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.PositionRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
+import com.mongodb.client.model.geojson.Position;
+import com.mongodb.connection.Stream;
 
 
 
 @Component
+@Service
 public class DeviceServiceImpl extends RestServiceController implements DeviceService {
 
 	private static final Log logger = LogFactory.getLog(DeviceServiceImpl.class);
 	
 	@Autowired 
 	DeviceRepository deviceRepository;
-	
+	@Autowired
+	PositionRepository positionRepository;
 	
 	GetObjectResponse getObjectResponse;
 	
@@ -1191,7 +1208,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	}
 
 	@Override
-	public ResponseEntity<?> getAllDeviceLiveData(String TOKEN,Long userId, int offset, String search) {
+	public ResponseEntity<?> getAllDeviceLiveData(String TOKEN,Long userId,int offset,String search) {
 		// TODO Auto-generated method stub
 		if(TOKEN.equals("")) {
 			 List<Device> devices = null;
@@ -1233,7 +1250,25 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				 }
 				 List<Long>usersIds= new ArrayList<>();
 				 usersIds.add(parentClient.getId());
-				 List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getAllDevicesLiveData(usersIds, offset, search);
+				 List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getAllDevicesLiveData(usersIds,offset,search);
+				  List<Integer> deviceIds = new ArrayList<>();
+				    for (CustomDeviceLiveData customDeviceLiveData: allDevicesLiveData) {
+				    	deviceIds.add(customDeviceLiveData.getId());
+				   }
+					 List<com.example.examplequerydslspringdatajpamaven.entity.Position>allPositionsLiveData=positionRepository.findAllBydeviceidIn(deviceIds);		 
+					 		for(com.example.examplequerydslspringdatajpamaven.entity.Position allpositions: allPositionsLiveData) {
+							 for (CustomDeviceLiveData customDeviceLiveData: allDevicesLiveData) {			
+							 if(allpositions.getDeviceid().equals(customDeviceLiveData.getId())) {				 
+							 customDeviceLiveData.setAddress(allpositions.getAddress());
+							 customDeviceLiveData.setWeight(allpositions.getWeight());
+							 customDeviceLiveData.setLongitude(allpositions.getLongitude());
+							 customDeviceLiveData.setSpeed(allpositions.getSpeed());
+							 customDeviceLiveData.setAttributes(allpositions.getAttributes());
+							 customDeviceLiveData.setLatitude(allpositions.getLatitude());
+							 customDeviceLiveData.setPower(allpositions.getPower());
+							 }
+						 }
+					 }
 				 Integer size=deviceRepository.getAllDevicesLiveDataSize(userId);
 				  getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevicesLiveData,size);
 				 logger.info("************************ getAllUserDevices ENDED ***************************");
@@ -1251,7 +1286,25 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				 usersIds.add(object.getId());
 			 }
 		 }
-	    List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getAllDevicesLiveData(usersIds, offset, search);
+	    List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getAllDevicesLiveData(usersIds,offset,search);
+	    List<Integer> deviceIds = new ArrayList<>();
+	    for (CustomDeviceLiveData customDeviceLiveData: allDevicesLiveData) {
+	    	deviceIds.add(customDeviceLiveData.getId());
+	   }
+		 List<com.example.examplequerydslspringdatajpamaven.entity.Position>allPositionsLiveData=positionRepository.findAllBydeviceidIn(deviceIds);		 
+		 		for(com.example.examplequerydslspringdatajpamaven.entity.Position allpositions: allPositionsLiveData) {
+				 for (CustomDeviceLiveData customDeviceLiveData: allDevicesLiveData) {			
+				 if(allpositions.getDeviceid().equals(customDeviceLiveData.getId())) {				 
+				 customDeviceLiveData.setAddress(allpositions.getAddress());
+				 customDeviceLiveData.setWeight(allpositions.getWeight());
+				 customDeviceLiveData.setLongitude(allpositions.getLongitude());
+				 customDeviceLiveData.setSpeed(allpositions.getSpeed());
+				 customDeviceLiveData.setAttributes(allpositions.getAttributes());
+				 customDeviceLiveData.setLatitude(allpositions.getLatitude());
+				 customDeviceLiveData.setPower(allpositions.getPower());
+				 }
+			 }
+		 }
 	    Integer size=deviceRepository.getAllDevicesLiveDataSize(userId);
 	    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevicesLiveData,size);
 		
@@ -1298,14 +1351,34 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				return  ResponseEntity.status(404).body(getObjectResponse);
 			 }else {
 				 User parentClient = new User() ;
+				 List<Long>usersIds= new ArrayList<>();
+
 				 for(User object : parentClients) {
 					 parentClient = object;
+					 usersIds.add(parentClient.getId());
+
 				 }
-				 List<Long>usersIds= new ArrayList<>();
-				 usersIds.add(parentClient.getId());
 				 List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getAllDevicesLiveDataMap(usersIds);
+				   List<Integer> deviceIds = new ArrayList<>();
+				    for (CustomDeviceLiveData customDeviceLiveData: allDevicesLiveData) {
+				    	deviceIds.add(customDeviceLiveData.getId());
+				   }
+					 List<com.example.examplequerydslspringdatajpamaven.entity.Position>allPositionsLiveData=positionRepository.findAllBydeviceidIn(deviceIds);		 
+					 		for(com.example.examplequerydslspringdatajpamaven.entity.Position allpositions: allPositionsLiveData) {
+							 for (CustomDeviceLiveData customDeviceLiveData: allDevicesLiveData) {			
+							 if(allpositions.getDeviceid().equals(customDeviceLiveData.getId())) {				 
+							 customDeviceLiveData.setAddress(allpositions.getAddress());
+							 customDeviceLiveData.setWeight(allpositions.getWeight());
+							 customDeviceLiveData.setLongitude(allpositions.getLongitude());
+							 customDeviceLiveData.setSpeed(allpositions.getSpeed());
+							 customDeviceLiveData.setAttributes(allpositions.getAttributes());
+							 customDeviceLiveData.setLatitude(allpositions.getLatitude());
+							 customDeviceLiveData.setPower(allpositions.getPower());
+							 }
+						 }
+					 }
 				    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevicesLiveData);
-					
+					logger.info("result"+allDevicesLiveData);
 					logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
 				return  ResponseEntity.ok().body(getObjectResponse);
 			 }
@@ -1321,9 +1394,32 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				 usersIds.add(object.getId());
 			 }
 		 }
-	    List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getAllDevicesLiveDataMap(usersIds);
-	    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevicesLiveData);
+	   List<CustomDeviceLiveData> allDevicesLiveData=deviceRepository.getAllDevicesLiveDataMap(usersIds);
+	   List<Integer> deviceIds = new ArrayList<>();
+	    for (CustomDeviceLiveData customDeviceLiveData: allDevicesLiveData) {
+	    	deviceIds.add(customDeviceLiveData.getId());
+	   }
+		 List<com.example.examplequerydslspringdatajpamaven.entity.Position>allPositionsLiveData=positionRepository.findAllBydeviceidIn(deviceIds);		 
+		 		for(com.example.examplequerydslspringdatajpamaven.entity.Position allpositions: allPositionsLiveData) {
+				 for (CustomDeviceLiveData customDeviceLiveData: allDevicesLiveData) {			
+				 if(allpositions.getDeviceid().equals(customDeviceLiveData.getId())) {				 
+				 customDeviceLiveData.setAddress(allpositions.getAddress());
+				 customDeviceLiveData.setWeight(allpositions.getWeight());
+				 customDeviceLiveData.setLongitude(allpositions.getLongitude());
+				 customDeviceLiveData.setSpeed(allpositions.getSpeed());
+				 customDeviceLiveData.setAttributes(allpositions.getAttributes());
+				 customDeviceLiveData.setLatitude(allpositions.getLatitude());
+				 customDeviceLiveData.setPower(allpositions.getPower());
+				 }
+			 }
+		 }
 		
+		 // allDevicesLiveData.set(index, element)
+		// @SuppressWarnings("unchecked")
+		 
+		 
+	    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevicesLiveData);
+		logger.info("result"+allDevicesLiveData);
 		logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
 		return ResponseEntity.ok().body(getObjectResponse);
 	}
@@ -1646,6 +1742,24 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					return ResponseEntity.badRequest().body(getObjectResponse);
 			   }
 			List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getDeviceLiveData(deviceId);
+			  List<Integer> deviceIds = new ArrayList<>();
+			    for (CustomDeviceLiveData customDeviceLiveData: allDevicesLiveData) {
+			    	deviceIds.add(customDeviceLiveData.getId());
+			   }
+				 List<com.example.examplequerydslspringdatajpamaven.entity.Position>allPositionsLiveData=positionRepository.findAllBydeviceidIn(deviceIds);		 
+				 		for(com.example.examplequerydslspringdatajpamaven.entity.Position allpositions: allPositionsLiveData) {
+						 for (CustomDeviceLiveData customDeviceLiveData: allDevicesLiveData) {			
+						 if(allpositions.getDeviceid().equals(customDeviceLiveData.getId())) {				 
+						 customDeviceLiveData.setAddress(allpositions.getAddress());
+						 customDeviceLiveData.setWeight(allpositions.getWeight());
+						 customDeviceLiveData.setLongitude(allpositions.getLongitude());
+						 customDeviceLiveData.setSpeed(allpositions.getSpeed());
+						 customDeviceLiveData.setAttributes(allpositions.getAttributes());
+						 customDeviceLiveData.setLatitude(allpositions.getLatitude());
+						 customDeviceLiveData.setPower(allpositions.getPower());
+						 }
+					 }
+				 }
 			List<Map> data = new ArrayList<>();
 			if(allDevicesLiveData.size()>0) {
 				
@@ -1746,13 +1860,14 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 //				
 			    HashMap<Object, Object> map20 = new HashMap<Object, Object>();			   
 			    map20.put("key", "Sensor 1");
-				map20.put("value", allDevicesLiveData.get(0).getSensor1());			
-				data.add(map20);
-				
-			    HashMap<Object, Object> map21 = new HashMap<Object, Object>();			   
-			    map21.put("key", "Sensor 2");
-			    map21.put("value", allDevicesLiveData.get(0).getSensor2());			
-				data.add(map21);
+			    //commented by radwa
+//				map20.put("value", allDevicesLiveData.get(0).getSensor1());			
+//				data.add(map20);
+//				
+//			    HashMap<Object, Object> map21 = new HashMap<Object, Object>();			   
+//			    map21.put("key", "Sensor 2");
+//			    map21.put("value", allDevicesLiveData.get(0).getSensor2());			
+//				data.add(map21);
 			    
 			    HashMap<Object, Object> map22 = new HashMap<Object, Object>();			   
 			    map22.put("key", "Hours");

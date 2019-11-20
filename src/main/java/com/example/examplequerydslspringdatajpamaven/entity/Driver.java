@@ -32,7 +32,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 	                targetClass=DriverWorkingHours.class,
 	                  columns={
 	                     @ColumnResult(name="deviceTime",type=String.class),
-	                     @ColumnResult(name="positionId",type=Long.class),
+	                     @ColumnResult(name="positionId",type=String.class),
 	                     @ColumnResult(name="attributes",type=String.class),
 	                     @ColumnResult(name="deviceId",type=Long.class),
 	                     @ColumnResult(name="driverName",type=String.class)
@@ -87,40 +87,54 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 					" LIMIT :offset,10"),
 	
 	@NamedNativeQuery(name="getDriverWorkingHours", 
-			resultSetMapping="DriverWorkingHours", 
-			query="SELECT CAST(devicetime AS DATE) as deviceTime,"
-					+ " tc_positions.id as positionId,"
-					+ " tc_positions.attributes as attributes,"
-					+ " tc_positions.deviceid as deviceId,tc_drivers.name as driverName FROM tc_positions "
-					+ " INNER JOIN tc_device_driver ON tc_device_driver.deviceid=tc_positions.deviceid  "
-					+ " INNER JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id "
-					+ " WHERE  "
-					+ "  ((devicetime Like :search) or (tc_drivers.name Like :search) ) "
-					+ " and tc_positions.deviceid=(SELECT tc_device_driver.deviceid "
-					+ " FROM tc_drivers INNER JOIN tc_device_driver ON tc_device_driver.driverid=tc_drivers.id "
-					+ " WHERE tc_drivers.id=:driverId) AND  devicetime IN (SELECT devicetime " + 
-					" FROM (SELECT MAX(devicetime) as devicetime FROM tc_positions "
-					+ " WHERE deviceid=(SELECT tc_device_driver.deviceid FROM tc_drivers "
-					+ " INNER JOIN tc_device_driver ON tc_device_driver.driverid=tc_drivers.id "
-					+ " WHERE tc_drivers.id=:driverId) AND devicetime<=:end AND  devicetime>=:start "
-					+ " group by CAST(devicetime AS DATE) )as t1) order by devicetime DESC limit :offset,10"),
+	resultSetMapping="DriverWorkingHours", 
+	query="SELECT tc_drivers.name as driverName FROM tc_drivers "
+			+ " INNER JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id "
+			+ " WHERE  "
+			+ "  ((devicetime Like :search) or (tc_drivers.name Like :search) ) "
+			+ " and (SELECT tc_device_driver.deviceid as deviceId " 
+			+ " FROM tc_drivers INNER JOIN tc_device_driver ON tc_device_driver.driverid=tc_drivers.id "
+			+ " WHERE tc_drivers.id=:driverId) limit :offset,10"),
 
-			@NamedNativeQuery(name="getDriverWorkingHoursExport", 
-			resultSetMapping="DriverWorkingHours", 
-			query="SELECT CAST(devicetime AS DATE) as deviceTime,"
-					+ " tc_positions.id as positionId,"
-					+ " tc_positions.attributes as attributes,"
-					+ " tc_positions.deviceid as deviceId,tc_drivers.name as driverName FROM tc_positions "
-					+ " INNER JOIN tc_device_driver ON tc_device_driver.deviceid=tc_positions.deviceid  "
-					+ " INNER JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id "
-					+ " WHERE tc_positions.deviceid=(SELECT tc_device_driver.deviceid "
-					+ " FROM tc_drivers INNER JOIN tc_device_driver ON tc_device_driver.driverid=tc_drivers.id "
-					+ " WHERE tc_drivers.id=:driverId) AND  devicetime IN (SELECT devicetime " + 
-					" FROM (SELECT MAX(devicetime) as devicetime FROM tc_positions "
-					+ " WHERE deviceid=(SELECT tc_device_driver.deviceid FROM tc_drivers "
-					+ " INNER JOIN tc_device_driver ON tc_device_driver.driverid=tc_drivers.id "
-					+ " WHERE tc_drivers.id=:driverId) AND devicetime<=:end AND  devicetime>=:start "
-					+ " group by CAST(devicetime AS DATE) )as t1) order by devicetime DESC"),
+//	@NamedNativeQuery(name="getDriverWorkingHours", 
+//			resultSetMapping="DriverWorkingHours", 
+//			query="SELECT tc_drivers.name as driverName FROM tc_positions "
+//					+ " INNER JOIN tc_device_driver ON tc_device_driver.deviceid=tc_positions.deviceid  "
+//					+ " INNER JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id "
+//					+ " WHERE  "
+//					+ "  ((devicetime Like :search) or (tc_drivers.name Like :search) ) "
+//					+ " and tc_positions.deviceid=(SELECT tc_device_driver.deviceid "
+//					+ " FROM tc_drivers INNER JOIN tc_device_driver ON tc_device_driver.driverid=tc_drivers.id "
+//					+ " WHERE tc_drivers.id=:driverId) AND  devicetime IN (SELECT devicetime " + 
+//					" FROM (SELECT MAX(devicetime) as devicetime FROM tc_positions "
+//					+ " WHERE deviceid=:deviceid AND devicetime<=:end AND  devicetime>=:start "
+//					+ " group by CAST(devicetime AS DATE) )as t1) order by devicetime DESC limit :offset,10"),
+
+	@NamedNativeQuery(name="getDriverWorkingHoursExport", 
+	resultSetMapping="DriverWorkingHours", 
+	query="SELECT tc_drivers.name as driverName FROM tc_drivers "
+			+ " INNER JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id "
+			+ " WHERE  "
+			+ "  ((devicetime Like :search) or (tc_drivers.name Like :search) ) "
+			+ " and (SELECT tc_device_driver.deviceid as deviceId " 
+			+ " FROM tc_drivers INNER JOIN tc_device_driver ON tc_device_driver.driverid=tc_drivers.id "
+			+ " WHERE tc_drivers.id=:driverId)"),
+//			@NamedNativeQuery(name="getDriverWorkingHoursExport", 
+//			resultSetMapping="DriverWorkingHours", 
+//			query="SELECT CAST(devicetime AS DATE) as deviceTime,"
+//					+ " tc_positions.id as positionId,"
+//					+ " tc_positions.attributes as attributes,"
+//					+ " tc_positions.deviceid as deviceId,tc_drivers.name as driverName FROM tc_positions "
+//					+ " INNER JOIN tc_device_driver ON tc_device_driver.deviceid=tc_positions.deviceid  "
+//					+ " INNER JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id "
+//					+ " WHERE tc_positions.deviceid=(SELECT tc_device_driver.deviceid "
+//					+ " FROM tc_drivers INNER JOIN tc_device_driver ON tc_device_driver.driverid=tc_drivers.id "
+//					+ " WHERE tc_drivers.id=:driverId) AND  devicetime IN (SELECT devicetime " + 
+//					" FROM (SELECT MAX(devicetime) as devicetime FROM tc_positions "
+//					+ " WHERE deviceid=(SELECT tc_device_driver.deviceid FROM tc_drivers "
+//					+ " INNER JOIN tc_device_driver ON tc_device_driver.driverid=tc_drivers.id "
+//					+ " WHERE tc_drivers.id=:driverId) AND devicetime<=:end AND  devicetime>=:start "
+//					+ " group by CAST(devicetime AS DATE) )as t1) order by devicetime DESC"),
 
 	
 })

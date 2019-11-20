@@ -5,11 +5,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.http.ResponseEntity;
-
+import org.springframework.stereotype.Service;
 
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
-
+@Service
 public interface DeviceService {
 	
 	public Device findById(Long deviceId);
@@ -39,7 +39,7 @@ public interface DeviceService {
 	public ResponseEntity<?> getDeviceGeofences(String TOKEN,Long deviceId);
 	
 	public ResponseEntity<?> getDeviceStatus(String TOKEN,Long userId);
-	
+	//here
 	public ResponseEntity<?> getAllDeviceLiveData(String TOKEN,Long userId,int offset,String search);
 	
 	public ResponseEntity<?> getDeviceLiveData(String TOKEN,Long deviceId,Long userId);

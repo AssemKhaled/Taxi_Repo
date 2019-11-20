@@ -10,6 +10,9 @@ import org.json.JSONObject;
 
 public class CustomDeviceLiveData {
 	
+	public CustomDeviceLiveData() {
+		// TODO Auto-generated constructor stub
+	}
 	private int id;
 	private String deviceName;
 	private Date lastUpdate;
@@ -30,8 +33,8 @@ public class CustomDeviceLiveData {
 	private String status;
 	private Integer positionId;
 	private JSONObject jsonAttributes;
-	private Double sensor1;
-	private Double sensor2;
+	//private Double sensor1;
+	//private Double sensor2;
 	private String hours;
 	private Boolean motion;
 	private String totalDistance;
@@ -45,6 +48,16 @@ public class CustomDeviceLiveData {
 
 	
 	
+	public CustomDeviceLiveData(Double weight, Double latitude, Double longitude, String address, String attributes,
+			Float speed) {
+		super();
+		this.weight = weight;
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.address = address;
+		this.attributes = attributes;
+		this.speed = speed;
+	}
 	public CustomDeviceLiveData(int id ,String deviceName , Date lastUpdate , String address , String attributes ,  Double latitude ,
 			  Double longitude ,Float speed , String photo , Integer positionId) {
 		this.id = id ;
@@ -156,12 +169,12 @@ public class CustomDeviceLiveData {
 			if(jsonObject.has("ignition")) {
 				this.ignition = jsonObject.getBoolean("ignition");
 			}
-			if(jsonObject.has("adc1")) {
-				this.sensor1 = jsonObject.getDouble("adc1");
-			}
-			if(jsonObject.has("adc2")) {
-				this.sensor2 = jsonObject.getDouble("adc2");
-			}
+//			if(jsonObject.has("adc1")) {
+//				this.sensor1 = jsonObject.getDouble("adc1");
+//			}
+//			if(jsonObject.has("adc2")) {
+//				this.sensor2 = jsonObject.getDouble("adc2");
+//			}
 			
 		}else {
 			this.weight =0.0;
@@ -288,12 +301,12 @@ public class CustomDeviceLiveData {
 			if(jsonObject.has("ignition")) {
 				this.ignition = jsonObject.getBoolean("ignition");
 			}
-			if(jsonObject.has("adc1")) {
-				this.sensor1 = jsonObject.getDouble("adc1");
-			}
-			if(jsonObject.has("adc2")) {
-				this.sensor2 = jsonObject.getDouble("adc2");
-			}
+//			if(jsonObject.has("adc1")) {
+//				this.sensor1 = jsonObject.getDouble("adc1");
+//			}
+//			if(jsonObject.has("adc2")) {
+//				this.sensor2 = jsonObject.getDouble("adc2");
+//			}
 			
 		}else {
 			this.weight =0.0;
@@ -307,7 +320,29 @@ public class CustomDeviceLiveData {
 		
 	}
 	
-
+	public CustomDeviceLiveData(int id ,String deviceName , Date lastUpdate ,
+			Integer positionId, String leftLetter,String middleLetter,String rightLetter,String driverName ) {
+		this.id = id ;
+		this.deviceName = deviceName ;
+		this.lastUpdate = lastUpdate;
+		this.positionId = positionId;
+		this.leftLetter= leftLetter;
+		this.rightLetter= rightLetter;
+		this.middleLetter= middleLetter;
+		this.driverName= driverName;
+	   		
+	}
+	public CustomDeviceLiveData(int id ,String deviceName , Date lastUpdate ,
+			Integer positionId,String photo ) {
+		this.id = id ;
+		this.deviceName = deviceName ;
+		this.lastUpdate = lastUpdate;
+		this.positionId = positionId;
+		this.photo=photo;
+	   		
+	}
+	
+	
 	public int getId() {
 		return id;
 	}
@@ -466,24 +501,24 @@ public class CustomDeviceLiveData {
 	}
 
 
-	public Double getSensor1() {
-		return sensor1;
-	}
-
-
-	public void setSensor1(Double sensor1) {
-		this.sensor1 = sensor1;
-	}
-
-
-	public Double getSensor2() {
-		return sensor2;
-	}
-
-
-	public void setSensor2(Double sensor2) {
-		this.sensor2 = sensor2;
-	}
+//	public Double getSensor1() {
+//		return sensor1;
+//	}
+//
+//
+//	public void setSensor1(Double sensor1) {
+//		this.sensor1 = sensor1;
+//	}
+//
+//
+//	public Double getSensor2() {
+//		return sensor2;
+//	}
+//
+//
+//	public void setSensor2(Double sensor2) {
+//		this.sensor2 = sensor2;
+//	}
 
 
 	public String getHours() {

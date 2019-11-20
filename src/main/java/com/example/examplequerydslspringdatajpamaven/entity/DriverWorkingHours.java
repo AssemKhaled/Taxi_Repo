@@ -5,13 +5,13 @@ public class DriverWorkingHours {
 	private String deviceTime;
 	private Long positionId;
 	private String attributes;
-	private Long deviceId;
+	private Integer deviceId;
 	private String driverName;
 	private String hours;
 	
 	
 	
-	public DriverWorkingHours(String deviceTime, Long positionId, String attributes, Long deviceId, String driverName) {
+	public DriverWorkingHours(String deviceTime, Long positionId, String attributes, Integer deviceId, String driverName) {
 		super();
 		this.deviceTime = deviceTime;
 		this.positionId = positionId;
@@ -37,10 +37,10 @@ public class DriverWorkingHours {
 	public void setAttributes(String attributes) {
 		this.attributes = attributes;
 	}
-	public Long getDeviceId() {
+	public Integer getDeviceId() {
 		return deviceId;
 	}
-	public void setDeviceId(Long deviceId) {
+	public void setDeviceId(Integer deviceId) {
 		this.deviceId = deviceId;
 	}
 	public String getDriverName() {

@@ -8,16 +8,16 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class DeviceWorkingHours {
 	
 	private String deviceTime;
-	private Long positionId;
+	private String positionId;
 	private String attributes;
-	private Long deviceId;
+	private Integer deviceId;
 	private String deviceName;
 	private String hours;
 
 	
 	
 	
-	public DeviceWorkingHours(String deviceTime, Long positionId, String attributes, Long deviceId, String deviceName) {
+	public DeviceWorkingHours(String deviceTime, String positionId, String attributes, Integer deviceId, String deviceName) {
 		super();
 		this.deviceTime = deviceTime;
 		this.positionId = positionId;
@@ -31,10 +31,10 @@ public class DeviceWorkingHours {
 	public void setDeviceTime(String deviceTime) {
 		this.deviceTime = deviceTime;
 	}
-	public Long getPositionId() {
+	public String getPositionId() {
 		return positionId;
 	}
-	public void setPositionId(Long positionId) {
+	public void setPositionId(String positionId) {
 		this.positionId = positionId;
 	}
 	public String getAttributes() {
@@ -43,10 +43,10 @@ public class DeviceWorkingHours {
 	public void setAttributes(String attributes) {
 		this.attributes = attributes;
 	}
-	public Long getDeviceId() {
+	public Integer getDeviceId() {
 		return deviceId;
 	}
-	public void setDeviceId(Long deviceId) {
+	public void setDeviceId(Integer deviceId) {
 		this.deviceId = deviceId;
 	}
 	public String getDeviceName() {

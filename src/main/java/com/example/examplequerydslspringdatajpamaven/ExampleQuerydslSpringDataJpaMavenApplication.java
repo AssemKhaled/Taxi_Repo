@@ -1,35 +1,86 @@
 package com.example.examplequerydslspringdatajpamaven;
 
+import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.mongodb.MongoDbFactory;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 
 import com.example.examplequerydslspringdatajpamaven.Validator.JWKValidator;
-
-
-
-
+import com.example.examplequerydslspringdatajpamaven.config.MongoDBConfig;
+import com.example.examplequerydslspringdatajpamaven.entity.NewPosition;
+import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.PositionRepository;
 import com.example.examplequerydslspringdatajpamaven.service.DeviceServiceImpl;
 import com.example.examplequerydslspringdatajpamaven.service.DriverServiceImpl;
 import com.example.examplequerydslspringdatajpamaven.service.GeofenceServiceImpl;
 import com.example.examplequerydslspringdatajpamaven.service.ProfileServiceImpl;
 import com.example.examplequerydslspringdatajpamaven.service.ReportServiceImpl;
 import com.example.examplequerydslspringdatajpamaven.service.UserServiceImpl;
+import com.mongodb.MongoClient;
 
-
-@SpringBootApplication
-//@Configuration
+@EnableMongoRepositories(basePackageClasses = PositionRepository.class)
+@EnableJpaRepositories(basePackageClasses = DeviceRepository.class)
+@SpringBootApplication 
+@Configuration
 @ComponentScan(basePackages = { "com.example.examplequerydslspringdatajpamaven.*"})
 public class ExampleQuerydslSpringDataJpaMavenApplication  {
 
-	
+	@Bean
+	@Primary
+	@ConfigurationProperties(prefix="spring.datasource")
+	public DataSource primaryDataSource() {
+	    return  DataSourceBuilder.create().build();
+	}
+	@Bean
+	@ConfigurationProperties(prefix="spring.secondDatasource")
+	public DataSource secondaryDataSource() {
+	    return DataSourceBuilder.create().build();
+	}
 
+	  @Bean(name = "mongoTemplate")
+	    public MongoTemplate mongoTemplate()
+	    {
+	        MongoTemplate mongoTemplate = new MongoTemplate(mongoDbFactory());
+	        return mongoTemplate;
+	    }
+	  
+	   @Bean
+	   public MongoDbFactory mongoDbFactory() 
+	   {
+	        MongoClient mongoClient = new MongoClient("localhost", 27017);
+	        return new SimpleMongoDbFactory(mongoClient, "sareb");
+	    }
+	   
+	  
+//	@Bean
+//	  public MongoClient mongoClient() {
+//	    MongoClient uri = new MongoClient("jdbc:mongo://localhost:27017/sareb");
+//	    return uri;
+//	  }
 	public static void main(String[] args) {
 		SpringApplication.run(ExampleQuerydslSpringDataJpaMavenApplication.class, args);
 	}
+	
 
 //	@Bean
 //	public UserServiceImpl test() {

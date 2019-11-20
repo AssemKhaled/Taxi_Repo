@@ -54,7 +54,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 	                targetClass=DeviceWorkingHours.class,
 	                  columns={
 	                     @ColumnResult(name="deviceTime",type=String.class),
-	                     @ColumnResult(name="positionId",type=Long.class),
+	                     @ColumnResult(name="positionId",type=String.class),
 	                     @ColumnResult(name="attributes",type=String.class),
 	                     @ColumnResult(name="deviceId",type=Long.class),
 	                     @ColumnResult(name="deviceName",type=String.class)
@@ -82,30 +82,49 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 	                     }
 	           )
 	        }
-	),@SqlResultSetMapping(
-	        name="DevicesLiveDataMap",
-	        classes={
-	           @ConstructorResult(
-	                targetClass=CustomDeviceLiveData.class,
-	                  columns={
-	                     @ColumnResult(name="id",type=int.class),
-	                     @ColumnResult(name="deviceName",type=String.class),
-	                     @ColumnResult(name="lastUpdate",type=Date.class),
-	                     @ColumnResult(name="address",type=String.class),
-	                     @ColumnResult(name="attributes",type=String.class),
-	                     @ColumnResult(name="latitude",type=Double.class),
-	                     @ColumnResult(name="longitude",type=Double.class),
-	                     @ColumnResult(name="speed",type=Float.class),
-	                     @ColumnResult(name="positionId",type=Integer.class),
-	                     @ColumnResult(name="leftLetter",type=String.class),
-	                     @ColumnResult(name="middleLetter",type=String.class),
-	                     @ColumnResult(name="rightLetter",type=String.class),
-	                     @ColumnResult(name="driverName",type=String.class)
-	                     
-	                     }
-	           )
-	        }
-	),
+	        ),@SqlResultSetMapping(
+	    	        name="DevicesLiveDataMap",
+	    	        classes={
+	    	           @ConstructorResult(
+	    	                targetClass=CustomDeviceLiveData.class,
+	    	                  columns={
+	    	                     @ColumnResult(name="id",type=int.class),
+	    	                     @ColumnResult(name="deviceName",type=String.class),
+	    	                     @ColumnResult(name="lastUpdate",type=Date.class),
+	    	                     @ColumnResult(name="positionId",type=String.class),
+	    	                     @ColumnResult(name="leftLetter",type=String.class),
+	    	                     @ColumnResult(name="middleLetter",type=String.class),
+	    	                     @ColumnResult(name="rightLetter",type=String.class),
+	    	                     @ColumnResult(name="driverName",type=String.class)
+	    	                     
+	    	                     }
+	    	           )
+	    	        }
+	    	),
+//	),@SqlResultSetMapping(
+//	        name="DevicesLiveDataMap",
+//	        classes={
+//	           @ConstructorResult(
+//	                targetClass=CustomDeviceLiveData.class,
+//	                  columns={
+//	                     @ColumnResult(name="id",type=int.class),
+//	                     @ColumnResult(name="deviceName",type=String.class),
+//	                     @ColumnResult(name="lastUpdate",type=Date.class),
+//	                     @ColumnResult(name="address",type=String.class),
+//	                     @ColumnResult(name="attributes",type=String.class),
+//	                     @ColumnResult(name="latitude",type=Double.class),
+//	                     @ColumnResult(name="longitude",type=Double.class),
+//	                     @ColumnResult(name="speed",type=Float.class),
+//	                     @ColumnResult(name="positionId",type=Integer.class),
+//	                     @ColumnResult(name="leftLetter",type=String.class),
+//	                     @ColumnResult(name="middleLetter",type=String.class),
+//	                     @ColumnResult(name="rightLetter",type=String.class),
+//	                     @ColumnResult(name="driverName",type=String.class)
+//	                     
+//	                     }
+//	           )
+//	        }
+//	),
 	@SqlResultSetMapping(
 	        name="DevicesLiveData",
 	        classes={
@@ -115,17 +134,32 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 	                     @ColumnResult(name="id"),
 	                     @ColumnResult(name="deviceName"),
 	                     @ColumnResult(name="lastUpdate"),
-	                     @ColumnResult(name="address"),
-	                     @ColumnResult(name="attributes"),
-	                     @ColumnResult(name="latitude"),
-	                     @ColumnResult(name="longitude"),
-	                     @ColumnResult(name="speed"),
+	                     @ColumnResult(name="positionId"),
 	                     @ColumnResult(name="photo"),
-	                     @ColumnResult(name="positionId")
 	                     
 	                     }
 	           )
 	        }
+//	@SqlResultSetMapping(
+//	        name="DevicesLiveData",
+//	        classes={
+//	           @ConstructorResult(
+//	                targetClass=CustomDeviceLiveData.class,
+//	                  columns={
+//	                     @ColumnResult(name="id"),
+//	                     @ColumnResult(name="deviceName"),
+//	                     @ColumnResult(name="lastUpdate"),
+//	                     @ColumnResult(name="address"),
+//	                     @ColumnResult(name="attributes"),
+//	                     @ColumnResult(name="latitude"),
+//	                     @ColumnResult(name="longitude"),
+//	                     @ColumnResult(name="speed"),
+//	                     @ColumnResult(name="photo"),
+//	                     @ColumnResult(name="positionId")
+//	                     
+//	                     }
+//	           )
+//	        }
 	),
 	@SqlResultSetMapping(
 	        name="vehicleInfoData",
@@ -179,63 +213,78 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
      		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%')) ) "
      		+ "GROUP BY tc_devices.id,tc_drivers.id,tc_users.id LIMIT :offset,10"),
 
+
 @NamedNativeQuery(name="getDevicesLiveData", 
-	resultSetMapping="DevicesLiveData", 
-	query=" SELECT tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.lastupdate as lastUpdate, "
-			+ " tc_positions.address , tc_positions.attributes ,tc_positions.latitude , tc_positions.longitude, "
-			+ " tc_positions.speed,tc_devices.photo , tc_positions.id as positionId  FROM tc_devices "
-			+ " INNER JOIN  tc_user_device ON tc_devices.id=tc_user_device.deviceid " 
-			+ " LEFT JOIN tc_positions ON tc_positions.id=tc_devices.positionid"
-			+ "  where tc_user_device.userid IN (:userIds) and tc_devices.delete_date is null "
-			+ "  AND ((tc_devices.name LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))) "
-			+ " OR (tc_positions.address LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_positions.latitude LIKE LOWER(CONCAT('%',:search, '%'))) "
-			+ " OR (tc_positions.longitude LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_positions.speed LIKE LOWER(CONCAT('%',:search, '%'))))"
-			+ " GROUP BY tc_devices.id LIMIT :offset,10"),
+resultSetMapping="DevicesLiveData", 
+query=" SELECT tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.lastupdate as lastUpdate,tc_devices.positionid as positionId, "
+    +"tc_devices.photo  FROM tc_devices "
+	+ " INNER JOIN  tc_user_device ON tc_devices.id=tc_user_device.deviceid " 
+	+ " where tc_user_device.userid IN (:userIds) and tc_devices.delete_date is null "
+	+ " GROUP BY tc_devices.id LIMIT :offset,10"),
+		
+//@NamedNativeQuery(name="getDevicesLiveData", 
+//	resultSetMapping="DevicesLiveData", 
+//	query=" SELECT tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.lastupdate as lastUpdate, "
+//			+ " tc_positions.address , tc_positions.attributes ,tc_positions.latitude , tc_positions.longitude, "
+//			+ " tc_positions.speed,tc_devices.photo , tc_positions.id as positionId  FROM tc_devices "
+//			+ " INNER JOIN  tc_user_device ON tc_devices.id=tc_user_device.deviceid " 
+//			+ " LEFT JOIN tc_positions ON tc_positions.id=tc_devices.positionid"
+//			+ "  where tc_user_device.userid IN (:userIds) and tc_devices.delete_date is null "
+//			+ "  AND ((tc_devices.name LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))) "
+//			+ " OR (tc_positions.address LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_positions.latitude LIKE LOWER(CONCAT('%',:search, '%'))) "
+//			+ " OR (tc_positions.longitude LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_positions.speed LIKE LOWER(CONCAT('%',:search, '%'))))"
+//			+ " GROUP BY tc_devices.id LIMIT :offset,10"),
 
 @NamedNativeQuery(name="getDevicesLiveDataMap", 
 resultSetMapping="DevicesLiveDataMap", 
-query="SELECT tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.lastupdate as lastUpdate, " + 
-		" tc_positions.address , tc_positions.attributes ,tc_positions.latitude , tc_positions.longitude, " + 
-		" tc_positions.speed, tc_positions.id as positionId ,tc_devices.left_letter as leftLetter , " + 
+query="SELECT tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.lastupdate as lastUpdate,tc_devices.positionid as positionId , " 
+		+ " tc_devices.left_letter as leftLetter , " + 
 		" tc_devices.middle_letter as middleLetter,tc_devices.right_letter as rightLetter ,tc_drivers.name driverName " + 
 		" FROM tc_devices " + 
 		" INNER JOIN  tc_user_device ON tc_devices.id=tc_user_device.deviceid" + 
-		" LEFT JOIN tc_positions ON tc_positions.id=tc_devices.positionid " + 
 		" LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_devices.id " + 
 		" LEFT JOIN tc_drivers ON tc_drivers.id=tc_device_driver.driverid " + 
 		" where tc_user_device.userid IN(:userIds) and tc_devices.delete_date is null  GROUP BY tc_devices.id,tc_drivers.id"),
 
+//@NamedNativeQuery(name="getDevicesLiveDataMap", 
+//resultSetMapping="DevicesLiveDataMap", 
+//query="SELECT tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.lastupdate as lastUpdate, " + 
+//		" tc_positions.address , tc_positions.attributes ,tc_positions.latitude , tc_positions.longitude, " + 
+//		" tc_positions.speed, tc_positions.id as positionId ,tc_devices.left_letter as leftLetter , " + 
+//		" tc_devices.middle_letter as middleLetter,tc_devices.right_letter as rightLetter ,tc_drivers.name driverName " + 
+//		" FROM tc_devices " + 
+//		" INNER JOIN  tc_user_device ON tc_devices.id=tc_user_device.deviceid" + 
+//		" LEFT JOIN tc_positions ON tc_positions.id=tc_devices.positionid " + 
+//		" LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_devices.id " + 
+//		" LEFT JOIN tc_drivers ON tc_drivers.id=tc_device_driver.driverid " + 
+//		" where tc_user_device.userid IN(:userIds) and tc_devices.delete_date is null  GROUP BY tc_devices.id,tc_drivers.id"),
+
 
 @NamedNativeQuery(name="getDeviceLiveData", 
-
 resultSetMapping="DevicesLiveData", 
-query=" SELECT tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.lastupdate as lastUpdate, "
-		+ " tc_positions.address , tc_positions.attributes ,tc_positions.latitude , tc_positions.longitude, "
-		+ " tc_positions.speed,tc_devices.photo , tc_positions.id as positionId  FROM tc_devices "
-		+ " LEFT JOIN tc_positions ON tc_positions.id=tc_devices.positionid"
+query=" SELECT tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.lastupdate as lastUpdate "
+		+ " ,tc_devices.photo  FROM tc_devices "
 		+ " where tc_devices.id= :deviceId and tc_devices.delete_date is null "),
 @NamedNativeQuery(name="getDeviceWorkingHours", 
-
+//here
 resultSetMapping="DeviceWorkingHours", 
-query="SELECT CAST(devicetime AS DATE) as deviceTime ,tc_positions.id as positionId,tc_positions.attributes as attributes," + 
-		" deviceid as deviceId,tc_devices.name as deviceName FROM tc_positions " + 
-		" INNER JOIN tc_devices ON tc_devices.id=tc_positions.deviceid " + 
-		" WHERE deviceid=:deviceId AND " + 
-		"  ((devicetime Like :search) or (tc_devices.name Like :search) ) "
-		+ " And devicetime IN (SELECT devicetime " + 
-		" FROM (SELECT MAX(devicetime) as devicetime FROM tc_positions " + 
-		" WHERE deviceid=:deviceId AND devicetime<=:end AND  devicetime>=:start group by CAST(devicetime AS DATE) )as t1) "
-		+ "order by devicetime DESC limit :offset,10"),
+query="SELECT  deviceid as deviceId,tc_devices.name as deviceName FROM tc_devices"+
+		" WHERE deviceid=:deviceId  limit :offset,10"),
 
 @NamedNativeQuery(name="getDeviceWorkingHoursExport", 
 resultSetMapping="DeviceWorkingHours", 
-query="SELECT CAST(devicetime AS DATE) as deviceTime ,tc_positions.id as positionId,tc_positions.attributes as attributes," + 
-		" deviceid as deviceId,tc_devices.name as deviceName FROM tc_positions " + 
-		" INNER JOIN tc_devices ON tc_devices.id=tc_positions.deviceid " + 
-		" WHERE deviceid=:deviceId AND " + 
-		" devicetime IN (SELECT devicetime " + 
-		" FROM (SELECT MAX(devicetime) as devicetime FROM tc_positions " + 
-		" WHERE deviceid=:deviceId AND devicetime<=:end AND  devicetime>=:start group by CAST(devicetime AS DATE) )as t1) order by devicetime DESC"),
+query="SELECT  deviceid as deviceId,tc_devices.name as deviceName FROM tc_devices " + 
+		" WHERE deviceid=:deviceId "),
+
+//@NamedNativeQuery(name="getDeviceWorkingHoursExport", 
+//resultSetMapping="DeviceWorkingHours", 
+//query="SELECT CAST(devicetime AS DATE) as deviceTime ,tc_positions.id as positionId,tc_positions.attributes as attributes," + 
+//		" deviceid as deviceId,tc_devices.name as deviceName FROM tc_positions " + 
+//		" INNER JOIN tc_devices ON tc_devices.id=tc_positions.deviceid " + 
+//		" WHERE deviceid=:deviceId AND " + 
+//		" devicetime IN (SELECT devicetime " + 
+//		" FROM (SELECT MAX(devicetime) as devicetime FROM tc_positions " + 
+//		" WHERE deviceid=:deviceId AND devicetime<=:end AND  devicetime>=:start group by CAST(devicetime AS DATE) )as t1) order by devicetime DESC"),
 
 @NamedNativeQuery(name="vehicleInfo", 
 resultSetMapping="vehicleInfoData", 
@@ -279,7 +328,7 @@ public class Device {
 	private String lastUpdate;
 	
 	@Column(name = "positionid")
-	private Integer positionid;
+	private String positionid;
 	
 	/*@Column(name = "groupid")
 	private Integer groupId;*/
@@ -738,11 +787,11 @@ public class Device {
 		this.events = events;
 	}
 
-	public Integer getPositionid() {
+	public String getPositionid() {
 		return positionid;
 	}
 
-	public void setPositionid(Integer positionid) {
+	public void setPositionid(String positionid) {
 		this.positionid = positionid;
 	}
 	

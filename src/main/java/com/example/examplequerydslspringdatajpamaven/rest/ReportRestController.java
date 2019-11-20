@@ -32,10 +32,7 @@ public class ReportRestController {
 													 @RequestParam (value = "start", defaultValue = "0") String start,
 													 @RequestParam (value = "end", defaultValue = "0") String end,
 													 @RequestParam (value = "search", defaultValue = "") String search,
-													 @RequestParam (value = "userId",defaultValue = "0")Long userId) {
-		
-		
-		
+													 @RequestParam (value = "userId",defaultValue = "0")Long userId) {	
     	return  reportServiceImpl.getEventsReport(TOKEN,deviceId, offset, start, end,search,userId);
 
 	}
@@ -43,52 +40,46 @@ public class ReportRestController {
 	public @ResponseBody ResponseEntity<?> getDeviceWorkingHours(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 													 @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
 													 @RequestParam (value = "offset", defaultValue = "0") int offset,
-													 @RequestParam (value = "start", defaultValue = "0") String start,
-													 @RequestParam (value = "end", defaultValue = "0") String end,
 													 @RequestParam (value = "search", defaultValue = "") String search,
 													 @RequestParam (value = "userId",defaultValue = "0")Long userId) {
 		
 		
 		
-    	return  reportServiceImpl.getDeviceWorkingHours(TOKEN,deviceId, offset, start, end,search,userId);
+    	return  reportServiceImpl.getDeviceWorkingHours(TOKEN,deviceId, offset,search,userId);
 
 	}
 	@RequestMapping(value = "/getDeviceWorkingHoursExport", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getDeviceWorkingHoursExp(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 													 @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
-													 @RequestParam (value = "start", defaultValue = "0") String start,
-													 @RequestParam (value = "end", defaultValue = "0") String end,
+													
 													 @RequestParam (value = "userId",defaultValue = "0")Long userId) {
 		
 		
 		
-    	return  reportServiceImpl.getDeviceWorkingHoursExport(TOKEN,deviceId, start, end,userId);
+    	return  reportServiceImpl.getDeviceWorkingHoursExport(TOKEN,deviceId,userId);
 
 	}
 	@RequestMapping(value = "/getDriverWorkingHours", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getDriverWorkingHours(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 													 @RequestParam (value = "driverId", defaultValue = "0") Long driverId,
 													 @RequestParam (value = "offset", defaultValue = "0") int offset,
-													 @RequestParam (value = "start", defaultValue = "0") String start,
-													 @RequestParam (value = "end", defaultValue = "0") String end,
+			
 													 @RequestParam (value = "search", defaultValue = "") String search,
 													 @RequestParam (value = "userId",defaultValue = "0")Long userId) {
 		
 		
 		
-    	return  reportServiceImpl.getDriverWorkingHours(TOKEN,driverId, offset, start, end,search,userId);
+    	return  reportServiceImpl.getDriverWorkingHours(TOKEN,driverId, offset,search,userId);
 
 	}
 	@RequestMapping(value = "/getDriverWorkingHoursExport", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getDriverWorkingHoursExp(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 													 @RequestParam (value = "driverId", defaultValue = "0") Long driverId,
-													 @RequestParam (value = "start", defaultValue = "0") String start,
-													 @RequestParam (value = "end", defaultValue = "0") String end,
 													 @RequestParam (value = "userId",defaultValue = "0")Long userId) {
 		
 		
 		
-    	return  reportServiceImpl.getDriverWorkingHoursExport(TOKEN,driverId, start, end,userId);
+    	return  reportServiceImpl.getDriverWorkingHoursExport(TOKEN,driverId,userId);
 
 	}
 	@RequestMapping(value = "/getEventsReportToExcel", method = RequestMethod.GET)

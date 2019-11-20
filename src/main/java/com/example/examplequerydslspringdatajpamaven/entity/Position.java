@@ -6,6 +6,7 @@ import javax.jdo.annotations.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -13,35 +14,47 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvDate;
 
-@Entity
-@Table(name = "tc_positions" , schema = "sareb_gold")
+//@Entity
+@Document(collection = "tc_positions" )
 //@JsonIgnoreProperties(value = { "hibernateLazyInitializer", "handler" })
 public class Position {
-
+   
 	@Id
 	@GeneratedValue
 	@Column(name = "id")
-	private int id;
+	private String id;
 	
 	@Column(name = "protocol")
 	private String protocol;
 	
+	@Column(name = "deviceid")
+	private Integer deviceid;
+	
+	public Integer getDeviceid() {
+		return deviceid;
+	}
+
+	public void setDeviceid(Integer deviceid) {
+		this.deviceid = deviceid;
+	}
+
 	@CsvBindByName
 	@CsvDate(value = "E MMM d HH:mm:ss zzz yyyy")
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "servertime")
 	private Date servertime;
 	
-	@CsvBindByName
-	@CsvDate(value = "E MMM d HH:mm:ss zzz yyyy")
-	@Temporal(TemporalType.TIMESTAMP)
+	
 	@Column(name = "devicetime")
-	private Date devicetime;
+	private String devicetime;
 	
 	@CsvBindByName
 	@CsvDate(value = "E MMM d HH:mm:ss zzz yyyy")
@@ -64,8 +77,8 @@ public class Position {
 	@Column(name = "speed")
 	private float speed;
 	
-	@Column(name = "course")
-	private float course;
+//	@Column(name = "course")
+//	private float course;
 	
 	@Column(name = "address")
 	private String address;
@@ -73,31 +86,42 @@ public class Position {
 	@Column(name = "attributes")
 	private String attributes;
 	
-	@Column(name = "accuracy")
-	private Double accuracy;
-	
-	@Column(name = "network")
-	private String network;
-	
-	@Column(name = "is_sent")
-	private Integer is_sent;
-	
-	@Column(name = "is_offline")
-	private Integer is_offline;
+//	@Column(name = "accuracy")
+//	private Double accuracy;
+//	
+//	@Column(name = "network")
+//	private String network;
+//	
+//	@Column(name = "is_sent")
+//	private Integer is_sent;
+//	
+//	@Column(name = "is_offline")
+//	private Integer is_offline;
 	
 	@Column(name = "weight")
-	private Float weight;
+	private Double weight;
 	
+	@Column(name = "power")
+	private Double power;
+	
+	public Double getPower() {
+		return power;
+	}
+
+	public void setPower(Double power) {
+		this.power = power;
+	}
+
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "deviceid", nullable = false)
     @JsonIgnore
     private Device device;
 
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -117,11 +141,11 @@ public class Position {
 		this.servertime = servertime;
 	}
 
-	public Date getDevicetime() {
+	public String getDevicetime() {
 		return devicetime;
 	}
 
-	public void setDevicetime(Date devicetime) {
+	public void setDevicetime(String devicetime) {
 		this.devicetime = devicetime;
 	}
 
@@ -173,13 +197,13 @@ public class Position {
 		this.speed = speed;
 	}
 
-	public float getCourse() {
-		return course;
-	}
-
-	public void setCourse(float course) {
-		this.course = course;
-	}
+//	public float getCourse() {
+//		return course;
+//	}
+//
+//	public void setCourse(float course) {
+//		this.course = course;
+//	}
 
 	public String getAddress() {
 		return address;
@@ -197,53 +221,53 @@ public class Position {
 		this.attributes = attributes;
 	}
 
-	public Double getAccuracy() {
-		return accuracy;
-	}
+//	public Double getAccuracy() {
+//		return accuracy;
+//	}
+//
+//	public void setAccuracy(Double accuracy) {
+//		this.accuracy = accuracy;
+//	}
+//
+//	public String getNetwork() {
+//		return network;
+//	}
+//
+//	public void setNetwork(String network) {
+//		this.network = network;
+//	}
+//
+//	public Integer getIs_sent() {
+//		return is_sent;
+//	}
+//
+//	public void setIs_sent(Integer is_sent) {
+//		this.is_sent = is_sent;
+//	}
+//
+//	public Integer getIs_offline() {
+//		return is_offline;
+//	}
+//
+//	public void setIs_offline(Integer is_offline) {
+//		this.is_offline = is_offline;
+//	}
 
-	public void setAccuracy(Double accuracy) {
-		this.accuracy = accuracy;
-	}
-
-	public String getNetwork() {
-		return network;
-	}
-
-	public void setNetwork(String network) {
-		this.network = network;
-	}
-
-	public Integer getIs_sent() {
-		return is_sent;
-	}
-
-	public void setIs_sent(Integer is_sent) {
-		this.is_sent = is_sent;
-	}
-
-	public Integer getIs_offline() {
-		return is_offline;
-	}
-
-	public void setIs_offline(Integer is_offline) {
-		this.is_offline = is_offline;
-	}
-
-	public Float getWeight() {
+	public Double getWeight() {
 		return weight;
 	}
 
-	public void setWeight(Float weight) {
+	public void setWeight(Double weight) {
 		this.weight = weight;
 	}
 
-	public Device getDevice() {
-		return device;
-	}
-
-	public void setDevice(Device device) {
-		this.device = device;
-	}
+//	public Device getDevice() {
+//		return device;
+//	}
+//
+//	public void setDevice(Device device) {
+//		this.device = device;
+//	}
 	
 	/*@OneToMany(mappedBy="position", fetch=FetchType.EAGER)
 	private Set<Event> events;

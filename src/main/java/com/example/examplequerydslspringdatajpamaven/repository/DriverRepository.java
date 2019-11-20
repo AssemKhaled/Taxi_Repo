@@ -85,10 +85,10 @@ public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslP
 	
 	
 	@Query(nativeQuery = true, name = "getDriverWorkingHoursExport")
-	public List<DriverWorkingHours> getDriverWorkingHoursExport(@Param("driverId")Long driverId,@Param("start")String start,@Param("end")String end);
+	public List<DriverWorkingHours> getDriverWorkingHoursExport(@Param("driverId")Long driverId);
 	
 	@Query(nativeQuery = true, name = "getDriverWorkingHours")
-	public List<DriverWorkingHours> getDriverWorkingHours(@Param("driverId")Long driverId,@Param("start")String start,@Param("end")String end,@Param("offset")int offset,@Param("search")String search);
+	public List<DriverWorkingHours> getDriverWorkingHours(@Param("driverId")Long driverId,@Param("offset")int offset,@Param("search")String search);
 
 	@Query(value = "SELECT count(CAST(devicetime AS DATE)) "
 			+ " FROM tc_positions INNER JOIN tc_device_driver ON tc_device_driver.deviceid=tc_positions.deviceid  "

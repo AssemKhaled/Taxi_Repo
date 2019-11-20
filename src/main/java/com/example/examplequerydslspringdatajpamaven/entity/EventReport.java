@@ -17,17 +17,33 @@ public class EventReport {
 	private String driverName;
 	private Long geofenceId;
 	private String geofenceName;
-	private Long positionId;
-	private String latitude;
-	private String longitude;
+	private String positionId;
+	private Double latitude;
+	private Double longitude;
 	
 	
 	
-	
-	public EventReport(Long eventId, String eventType, String serverTime, String attributes, Long deviceId,
-			String deviceName, Long driverId, String driverName, Long geofenceId, String geofenceName, Long positionId,
-			String latitude, String longitude) {
-		super();
+
+//	public EventReport(Long eventId, String eventType, String serverTime, String attributes, Long deviceId,
+//			String deviceName, Long driverId, String driverName, Long geofenceId, String geofenceName, String positionId,
+//			Double latitude, Double longitude) {
+//		super();
+//		this.eventId = eventId;
+//		this.eventType = eventType;
+//		this.serverTime = serverTime;
+//		this.attributes = attributes;
+//		this.deviceId = deviceId;
+//		this.deviceName = deviceName;
+//		this.driverId = driverId;
+//		this.driverName = driverName;
+//		this.geofenceId = geofenceId;
+//		this.geofenceName = geofenceName;
+//		this.positionId = positionId;
+//		this.latitude = latitude;
+//		this.longitude = longitude;
+//	}
+	public EventReport(Long eventId, String eventType, String serverTime, String attributes, Long deviceId,String deviceName,
+			 Long driverId, String driverName, Long geofenceId, String geofenceName, String positionId	) {
 		this.eventId = eventId;
 		this.eventType = eventType;
 		this.serverTime = serverTime;
@@ -39,8 +55,6 @@ public class EventReport {
 		this.geofenceId = geofenceId;
 		this.geofenceName = geofenceName;
 		this.positionId = positionId;
-		this.latitude = latitude;
-		this.longitude = longitude;
 	}
 	public EventReport(Long eventId, String eventType, String serverTime, String attributes, Long deviceId,
 			String deviceName, Long driverId, String driverName) {
@@ -115,22 +129,22 @@ public class EventReport {
 	public void setGeofenceName(String geofenceName) {
 		this.geofenceName = geofenceName;
 	}
-	public Long getPositionId() {
+	public String getPositionId() {
 		return positionId;
 	}
-	public void setPositionId(Long positionId) {
+	public void setPositionId(String positionId) {
 		this.positionId = positionId;
 	}
-	public String getLatitude() {
+	public Double getLatitude() {
 		return latitude;
 	}
-	public void setLatitude(String latitude) {
+	public void setLatitude(Double latitude) {
 		this.latitude = latitude;
 	}
-	public String getLongitude() {
+	public Double getLongitude() {
 		return longitude;
 	}
-	public void setLongitude(String longitude) {
+	public void setLongitude(Double longitude) {
 		this.longitude = longitude;
 	}
 	
