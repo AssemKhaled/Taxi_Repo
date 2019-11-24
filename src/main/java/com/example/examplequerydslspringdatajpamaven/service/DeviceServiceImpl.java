@@ -2041,7 +2041,25 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					logger.info("************************ editDevice ENDED ***************************");
 					return ResponseEntity.badRequest().body(getObjectResponse);
 			}
-			List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getDeviceLiveData(deviceId);		
+			List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getDeviceLiveData(deviceId);	
+			  List<Integer> deviceIds = new ArrayList<>();
+			    for (CustomDeviceLiveData customDeviceLiveData: allDevicesLiveData) {
+			    	deviceIds.add(customDeviceLiveData.getId());
+			   }
+				 List<com.example.examplequerydslspringdatajpamaven.entity.Position>allPositionsLiveData=positionRepository.findAllBydeviceidIn(deviceIds);		 
+				 		for(com.example.examplequerydslspringdatajpamaven.entity.Position allpositions: allPositionsLiveData) {
+						 for (CustomDeviceLiveData customDeviceLiveData: allDevicesLiveData) {			
+						 if(allpositions.getDeviceid().equals(customDeviceLiveData.getId())) {				 
+						 customDeviceLiveData.setAddress(allpositions.getAddress());
+						 customDeviceLiveData.setWeight(allpositions.getWeight());
+						 customDeviceLiveData.setLongitude(allpositions.getLongitude());
+						 customDeviceLiveData.setSpeed(allpositions.getSpeed());
+						 customDeviceLiveData.setAttributes(allpositions.getAttributes());
+						 customDeviceLiveData.setLatitude(allpositions.getLatitude());
+						 customDeviceLiveData.setPower(allpositions.getPower());
+						 }
+					 }
+				 }
 			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevicesLiveData);
 			
 			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
