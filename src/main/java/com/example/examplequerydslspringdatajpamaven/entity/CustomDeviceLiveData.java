@@ -31,7 +31,7 @@ public class CustomDeviceLiveData {
 	private String photo;
 	private Float speed ;
 	private String status;
-	private Integer positionId;
+	private String positionId;
 	private JSONObject jsonAttributes;
 	//private Double sensor1;
 	//private Double sensor2;
@@ -59,7 +59,7 @@ public class CustomDeviceLiveData {
 		this.speed = speed;
 	}
 	public CustomDeviceLiveData(int id ,String deviceName , Date lastUpdate , String address , String attributes ,  Double latitude ,
-			  Double longitude ,Float speed , String photo , Integer positionId) {
+			  Double longitude ,Float speed , String photo , String positionId) {
 		this.id = id ;
 		this.deviceName = deviceName ;
 		this.lastUpdate = lastUpdate;
@@ -188,7 +188,7 @@ public class CustomDeviceLiveData {
 		
 	}
 	public CustomDeviceLiveData(int id ,String deviceName , Date lastUpdate , String address , String attributes ,  Double latitude ,
-			  Double longitude ,Float speed ,Integer positionId, String leftLetter,String middleLetter,String rightLetter,String driverName ) {
+			  Double longitude ,Float speed ,String positionId, String leftLetter,String middleLetter,String rightLetter,String driverName ) {
 		this.id = id ;
 		this.deviceName = deviceName ;
 		this.lastUpdate = lastUpdate;
@@ -321,7 +321,7 @@ public class CustomDeviceLiveData {
 	}
 	
 	public CustomDeviceLiveData(int id ,String deviceName , Date lastUpdate ,
-			Integer positionId, String leftLetter,String middleLetter,String rightLetter,String driverName ) {
+			String positionId, String leftLetter,String middleLetter,String rightLetter,String driverName ) {
 		this.id = id ;
 		this.deviceName = deviceName ;
 		this.lastUpdate = lastUpdate;
@@ -333,7 +333,7 @@ public class CustomDeviceLiveData {
 	   		
 	}
 	public CustomDeviceLiveData(int id ,String deviceName , Date lastUpdate ,
-			Integer positionId,String photo ) {
+			String positionId,String photo ) {
 		this.id = id ;
 		this.deviceName = deviceName ;
 		this.lastUpdate = lastUpdate;
@@ -482,11 +482,11 @@ public class CustomDeviceLiveData {
 		this.status = status;
 	}
 
-	public Integer getPositionId() {
+	public String getPositionId() {
 		return positionId;
 	}
 
-	public void setPositionId(Integer positionId) {
+	public void setPositionId(String positionId) {
 		this.positionId = positionId;
 	}
 

@@ -210,7 +210,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
      		+ " where tc_user_device.userid IN(:userIds) and tc_devices.delete_date is null"
      		+ " AND (tc_devices.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.uniqueid LIKE LOWER(CONCAT('%',:search, '%'))"
      		+ " OR tc_devices.sequence_number LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))"
-     		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%')) ) "
+     		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR (tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%'))) "
      		+ "GROUP BY tc_devices.id,tc_drivers.id,tc_users.id LIMIT :offset,10"),
 
 
@@ -220,6 +220,7 @@ query=" SELECT tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.l
     +"tc_devices.photo  FROM tc_devices "
 	+ " INNER JOIN  tc_user_device ON tc_devices.id=tc_user_device.deviceid " 
 	+ " where tc_user_device.userid IN (:userIds) and tc_devices.delete_date is null "
+	+ "  AND ((tc_devices.name LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))))"
 	+ " GROUP BY tc_devices.id LIMIT :offset,10"),
 		
 //@NamedNativeQuery(name="getDevicesLiveData", 

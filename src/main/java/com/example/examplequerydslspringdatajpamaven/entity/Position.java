@@ -63,7 +63,7 @@ public class Position {
 	private Date fixtime;
 	
 	@Column(name = "valid")
-	private Integer valid;
+	private boolean valid;
 	
 	@Column(name = "latitude")
 	private Double latitude;
@@ -157,11 +157,11 @@ public class Position {
 		this.fixtime = fixtime;
 	}
 
-	public Integer getValid() {
+	public boolean getValid() {
 		return valid;
 	}
 
-	public void setValid(Integer valid) {
+	public void setValid(boolean valid) {
 		this.valid = valid;
 	}
 
