@@ -60,11 +60,10 @@ public class UserRoleRestController {
 	}
 	
 	@GetMapping("/getAllRolesCreatedByUser")
-	public ResponseEntity<?> getAllRolesCreatedByUser(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,@RequestParam (value = "userId",defaultValue = "0") Long userId
-			,@RequestParam (value = "loggedId",defaultValue = "0") Long loggedId){
+	public ResponseEntity<?> getAllRolesCreatedByUser(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,@RequestParam (value = "userId",defaultValue = "0") Long userId){
 		
 		
-		return userRoleService.getAllRolesCreatedByUser(TOKEN,userId,loggedId);
+		return userRoleService.getAllRolesCreatedByUser(TOKEN,userId);
 	}
 	
 	@GetMapping("/getRolePageContent")

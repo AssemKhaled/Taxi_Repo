@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 	import org.springframework.web.bind.annotation.RequestHeader;
 	import org.springframework.web.bind.annotation.RequestMapping;
 	import org.springframework.web.bind.annotation.RequestMethod;
-	import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 	import com.example.examplequerydslspringdatajpamaven.Validator.JWKValidator;
 	import com.example.examplequerydslspringdatajpamaven.entity.User;
@@ -44,6 +45,17 @@ import com.example.examplequerydslspringdatajpamaven.service.LoginService;
 		public ResponseEntity<?> logout(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN ){
 			
 			return loginService.logout(TOKEN);
+		}
+		@GetMapping(path = "/billing")
+		public ResponseEntity<?> billing(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN ,
+				@RequestParam(value = "loggedId", defaultValue = "0")Long loggedId,
+				@RequestParam(value = "userId", defaultValue = "0")Long userId,
+				 @RequestParam (value = "start", defaultValue = "0") String start,
+				 @RequestParam (value = "end", defaultValue = "0") String end,
+				   @RequestParam(value = "offset", defaultValue = "0") int offset,
+		           @RequestParam(value = "search", defaultValue = "") String search){
+			
+			return loginService.getBilling(TOKEN,loggedId,userId,start,end,offset,search);
 		}
 		
 //		@GetMapping(path = "/checkActive")

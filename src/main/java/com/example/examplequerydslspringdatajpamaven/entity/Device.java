@@ -63,6 +63,19 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 	        }
 	),
 	@SqlResultSetMapping(
+	        name="billingsList",
+	        classes={
+	           @ConstructorResult(
+	                targetClass=BillingsList.class,
+	                  columns={
+	                     @ColumnResult(name="deviceNumbers",type=Long.class),
+	                     @ColumnResult(name="workingDate",type=String.class),
+	                     @ColumnResult(name="ownerName",type=String.class)
+	                     }
+	           )
+	        }
+	),
+	@SqlResultSetMapping(
 	        name="DeviceLiveData",
 	        classes={
 	           @ConstructorResult(
@@ -195,6 +208,19 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @NamedNativeQueries({
 	
+	@NamedNativeQuery(name="getBillingsList", 
+		     resultSetMapping="billingsList", 
+		     query="SELECT COUNT(distinct tc_devices.id) as deviceNumbers,tc_users.name as ownerName ," + 
+		     		" DATE_FORMAT(tc_positions.fixtime, '%Y-%m') as workingDate " + 
+		     		" from tc_positions " +  
+		     		" INNER JOIN tc_devices ON tc_positions.deviceid = tc_devices.id  " + 
+		     		" INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id " + 
+		     		" INNER JOIN tc_users ON tc_users.id = tc_user_device.userid " + 
+		     		" where (tc_positions.fixtime between :start and  :end ) and tc_positions.fixtime > '2018-01-01' " + 
+		     		" and ( (tc_devices.delete_date is null) or (tc_devices.delete_date > :start ) )" +
+		     		"  AND (tc_users.name LIKE LOWER(CONCAT('%',:search, '%')) ) "+
+		     		" AND tc_users.id =:userId group by workingDate limit :offset,10 " ),
+
 @NamedNativeQuery(name="getDevicesList", 
      resultSetMapping="DevicesList", 
      query=" SELECT tc_devices.id as id ,tc_devices.name as deviceName, tc_devices.uniqueid as uniqueId,"

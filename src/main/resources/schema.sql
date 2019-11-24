@@ -18,8 +18,7 @@ CREATE TABLE IF NOT EXISTS `tc_permissions` (
    PRIMARY KEY  (`id`)
 
 );
---ALTER TABLE `tc_users` 
---ADD COLUMN `delete_date` Date() NULL DEFAULT NULL;
+--ALTER TABLE `tc_users`
 --ADD COLUMN  `accountType` INT(11) NULL DEFAULT 0 ,
 --ADD COLUMN `parents` VARCHAR(255) NULL DEFAULT NULL ,
 --ADD COLUMN `roleId` INT(11) NULL DEFAULT NULL ;

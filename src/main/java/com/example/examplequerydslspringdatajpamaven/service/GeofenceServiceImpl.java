@@ -78,7 +78,7 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 				if(user.getDelete_date() == null) {
 					
 				    userServiceImpl.resetChildernArray();
-				    if(user.getAccountType() == 4) {
+				    if(user.getAccountType().equals(4)) {
 						 Set<User> parentClients = user.getUsersOfUser();
 						 if(parentClients.isEmpty()) {
 							
@@ -153,23 +153,23 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 		{
 			return super.checkActive(TOKEN);
 		}
-		if(userId == 0) {
+		if(userId.equals(0)) {
        	 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "loggedUser id is required",null);
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
        }
        User loggedUser = userServiceImpl.findById(userId);
-       if(loggedUser == null) {
+       if(loggedUser.equals(null)) {
        	getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "loggedUser is not Found",geofences);
 			return  ResponseEntity.status(404).body(getObjectResponse);
        }
-		if(geofenceId != 0) {
+		if(!geofenceId.equals(0)) {
 			
 			Geofence geofence=geofenceRepository.findOne(geofenceId);
 
 			if(geofence != null) {
 				if(geofence.getDelete_date() == null) {
 					boolean isParent = false;
-					if(loggedUser.getAccountType() == 4) {
+					if(loggedUser.getAccountType().equals(4)) {
 						Set<User> clientParents = loggedUser.getUsersOfUser();
 						if(clientParents.isEmpty()) {
 							getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this geofence",null);
@@ -185,7 +185,7 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 								 return  ResponseEntity.badRequest().body(getObjectResponse);
 							}else {
 								for(User parentObject : geofneceParents) {
-									if(parentObject.getId() == parent.getId()) {
+									if(parentObject.getId().equals(parent.getId())) {
 										isParent = true;
 										break;
 									}
@@ -269,7 +269,7 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 				
 				if(geofence.getDelete_date()==null) {
 					 boolean isParent = false;
-					 if(user.getAccountType() == 4) {
+					 if(user.getAccountType().equals(4)) {
 						 Set<User> parentClients = user.getUsersOfUser();
 						 if(parentClients.isEmpty()) {
 							 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to delete this geofnece",geofences);
@@ -285,7 +285,7 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 								 return  ResponseEntity.badRequest().body(getObjectResponse);
 							 }else {
 								 for(User parentObject : geofneceParent) {
-									 if(parentObject.getId() == parent.getId()) {
+									 if(parentObject.getId().equals(parent.getId())) {
 										 isParent = true;
 										 break;
 									 }
@@ -395,9 +395,30 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 
 						}
 						else {
+							Set<User> userDriver = new HashSet<>();
 							if(geofence.getId()==null || geofence.getId()==0) {
-								Set<User> userDriver = new HashSet<>();
-								userDriver.add(user);
+								boolean isParent = false;
+								 if(user.getAccountType().equals(4)) {
+									 Set<User> parentClients = user.getUsersOfUser();
+									 if(parentClients.isEmpty()) {
+										 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to delete this geofnece",geofences);
+										 return  ResponseEntity.badRequest().body(getObjectResponse);
+									 }else {
+										 User parent = null;
+										 for(User object : parentClients) {
+											 parent = object;
+										 }
+										userDriver.add(parent);
+
+
+									 }
+								 }
+								 else {
+									userDriver.add(user);
+
+								 }
+								
+								
 								geofence.setUserGeofence(userDriver);
 								geofenceRepository.save(geofence);
 								geofences.add(geofence);
@@ -534,8 +555,30 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 
 				    				}
 				    				else {
+				    					
+
 				    					Set<User> userDriver = new HashSet<>();
-										userDriver.add(user);
+											 if(user.getAccountType().equals(4)) {
+												 Set<User> parentClients = user.getUsersOfUser();
+												 if(parentClients.isEmpty()) {
+													 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to delete this geofnece",geofences);
+													 return  ResponseEntity.badRequest().body(getObjectResponse);
+												 }else {
+													 User parent = null;
+													 for(User object : parentClients) {
+														 parent = object;
+													 }
+													userDriver.add(parent);
+
+
+												 }
+											 }
+											 else {
+												userDriver.add(user);
+
+											 }
+				    					
+				    					
 										geofence.setUserGeofence(userDriver);
 										if(geofneceCheck.getUserGeofence().equals(geofence.getUserGeofence())) {
 											geofenceRepository.save(geofence);

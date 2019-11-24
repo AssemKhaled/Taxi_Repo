@@ -14,6 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -42,6 +43,12 @@ import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 @Component
 public class ReportServiceImpl extends RestServiceController implements ReportService {
+	
+	 @Value("${stopsUrl}")
+	 private String stopsUrl;
+	 
+	 @Value("${tripsUrl}")
+	 private String tripsUrl;
 	
 	@Autowired
 	EventRepository eventRepository;
@@ -1294,6 +1301,8 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 	}
 
+	
+	 
 	@Override
 	public ResponseEntity<?> getStopsReport(String TOKEN,Long deviceId, String type, String from, String to, int page, int start,
 			int limit,Long userId) {
@@ -1405,7 +1414,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 					HttpHeaders headers = new HttpHeaders();
 					headers.add("Authorization", "Basic " + base64Creds);
 					
-					  String GET_URL = "http://31.204.150.201:8080/api/reports/stops";
+					  String GET_URL = stopsUrl;
 					  RestTemplate restTemplate = new RestTemplate();
 					  restTemplate.getMessageConverters()
 				        .add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
@@ -1554,7 +1563,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 					HttpHeaders headers = new HttpHeaders();
 					headers.add("Authorization", "Basic " + base64Creds);
 					
-					  String GET_URL = "http://31.204.150.201:8080/api/reports/trips";
+					  String GET_URL = tripsUrl;
 					  RestTemplate restTemplate = new RestTemplate();
 					  restTemplate.getMessageConverters()
 				        .add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));

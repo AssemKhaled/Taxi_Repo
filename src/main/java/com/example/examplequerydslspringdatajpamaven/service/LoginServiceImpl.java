@@ -1,6 +1,7 @@
 package com.example.examplequerydslspringdatajpamaven.service;
 
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -8,6 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 
 import javax.servlet.http.HttpSession;
@@ -24,10 +26,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.example.examplequerydslspringdatajpamaven.Validator.JWKValidator;
+import com.example.examplequerydslspringdatajpamaven.entity.BillingsList;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceList;
+import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 import com.example.examplequerydslspringdatajpamaven.entity.Token;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.entity.UserRole;
+import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
@@ -40,9 +45,13 @@ public class LoginServiceImpl extends RestServiceController implements LoginServ
 
 	
 	
-	@Autowired
+	 @Autowired
 	 UserRepository userRepository;
 	
+	 @Autowired
+	 DeviceRepository deviceRepository;
+	 
+	 
 	@Autowired
 	UserServiceImpl userServiceImpl;
 	
@@ -168,7 +177,133 @@ public class LoginServiceImpl extends RestServiceController implements LoginServ
 		}
 		
 	}
+	
+	@Override
+	public ResponseEntity<?> getBilling(String TOKEN,Long loggedId,Long userId,String start,String end,int offset,String search) {
+		logger.info("************************ getBilling STARTED ***************************");
 
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		
+
+		if(loggedId == 0) {
+       	     getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "loggedId id is required",null);
+			 logger.info("************************ getBilling END ***************************");
+       	     return  ResponseEntity.badRequest().body(getObjectResponse);
+
+       }
+       User loggedUser = userServiceImpl.findById(loggedId);
+       if(loggedUser == null) {
+       	    getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "loggedId is not Found",null);
+			logger.info("************************ getBilling END ***************************");
+       	    return  ResponseEntity.status(404).body(getObjectResponse);
+       }
+		
+       
+       if(loggedUser.getAccountType()!= 1) {
+			if(!userRoleService.checkUserHasPermission(loggedId, "BILLING", "getBilling")) {
+				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to getBilling",null);
+				 logger.info("************************ deleteGeo ENDED ***************************");
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+	   }
+
+		User parentChilds = new User() ;
+ 		boolean isParent =false;
+ 		
+ 		userServiceImpl.resetChildernArray();
+	    List<User>childs = userServiceImpl.getAllChildernOfUser(loggedId);
+		if(!childs.isEmpty()) {
+			for(User object : childs) {
+				parentChilds = object;
+				if(parentChilds.getId().equals(userId)) {
+					isParent=true;
+					break;
+				}
+			}
+		}
+		if(isParent == false) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not allow to get billings as you are not parent of this userId ",null);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+       
+       
+       
+		if(userId == 0) {
+       	     getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "userId id is required",null);
+			 logger.info("************************ getBilling END ***************************");
+       	     return  ResponseEntity.badRequest().body(getObjectResponse);
+
+       }
+       User userBillings = userServiceImpl.findById(userId);
+       if(userBillings == null) {
+       	    getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "userId is not Found",null);
+			logger.info("************************ getBilling END ***************************");
+       	    return  ResponseEntity.status(404).body(getObjectResponse);
+       }
+       
+       if(start.equals("0") || end.equals("0")) {
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",null);
+			logger.info("************************ getBilling END ***************************");
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+
+	   }
+       else {
+			SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+			inputFormat.setLenient(false);
+			outputFormat.setLenient(false);
+
+			Date dateFrom;
+			Date dateTo;
+			try {
+				dateFrom = inputFormat.parse(start);
+				dateTo = inputFormat.parse(end);
+				
+				start = outputFormat.format(dateFrom);
+				end = outputFormat.format(dateTo);
+				
+				Date today=new Date();
+
+				if(dateFrom.getTime() > dateTo.getTime()) {
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",null);
+					logger.info("************************ getBilling END ***************************");
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",null);
+					logger.info("************************ getBilling END ***************************");
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
+				
+
+
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",null);
+				logger.info("************************ getBilling END ***************************");
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+
+			}
+		
+
+	  }
+       List<BillingsList> billings= deviceRepository.billingInfo(userId, start, end,offset,search); 
+       Integer size= deviceRepository.getBillingInfotSize(userId, start, end); 
+       getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",billings,size);
+	   logger.info("************************ getBilling END ***************************");
+       return  ResponseEntity.ok().body(getObjectResponse);
+
+	}
 
 	
 	

@@ -11,6 +11,7 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 
+import com.example.examplequerydslspringdatajpamaven.entity.BillingsList;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceList;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceLiveData;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
@@ -107,5 +108,20 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	
 	@Query(value = "SELECT tc_devices.calibrationData FROM tc_devices WHERE tc_devices.id=:deviceId AND tc_devices.delete_date IS NULL ",nativeQuery = true)
 	public List<DeviceCalibrationData> getCalibrationDataCCC(@Param("deviceId")Long deviceId);
+	
+	@Query(nativeQuery = true, name = "getBillingsList")
+	public List<BillingsList> billingInfo(@Param("userId")Long userId,@Param("start")String start,@Param("end")String end,@Param("offset")int offset,@Param("search")String search);
+
+	@Query(value = "SELECT COUNT(*) from ("
+			+ " SELECT COUNT(distinct tc_devices.id) as deviceNumbers,tc_users.name as ownerName , " + 
+			" DATE_FORMAT(tc_positions.fixtime, '%Y-%m') as workingDate " + 
+			" from tc_positions " + 
+			" INNER JOIN tc_devices ON tc_positions.deviceid = tc_devices.id  " + 
+			" INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id  " + 
+			" INNER JOIN tc_users ON tc_users.id = tc_user_device.userid  " + 
+			" where (tc_positions.fixtime between :start and  :end ) and tc_positions.fixtime > '2018-01-01' " + 
+			" and ( (tc_devices.delete_date is null) or (tc_devices.delete_date > :start ) )" + 
+			" AND tc_users.id =:userId group by workingDate ) AS DATA ",nativeQuery = true )
+	public Integer getBillingInfotSize(@Param("userId")Long userId,@Param("start")String start,@Param("end")String end);
 }
 

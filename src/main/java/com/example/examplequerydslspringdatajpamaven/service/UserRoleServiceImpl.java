@@ -60,16 +60,16 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 		{
 			return super.checkActive(TOKEN);
 		}
-		 if(userId == 0) {
+		 if(userId.equals(0)) {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "loggedUser Id is required",null);
 			 return  ResponseEntity.badRequest().body(getObjectResponse); 
 		 }
 		 User loggedUser = userService.findById(userId);
-		 if(loggedUser == null) {
+		 if(loggedUser.equals(null)) {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged User is not found ",null);
 			 return  ResponseEntity.status(404).body(getObjectResponse); 
 		 }
-		 if(loggedUser.getAccountType()!= 1) {
+		 if(!loggedUser.getAccountType().equals(1)) {
 			if(!userRoleService.checkUserHasPermission(userId, "ROLE", "create")) {
 				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to create role",null);
 				return  ResponseEntity.badRequest().body(getObjectResponse);
@@ -81,12 +81,13 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Only name and permissions are required to create Role ",null);
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
+
 		List<UserRole> roles = userRoleRepository.findByName(role.getName());
 		if(!roles.isEmpty()) {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "This Role Name was added before you can Edit or Delete it only",null);
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
-		if(loggedUser.getAccountType()==4) {
+		if(loggedUser.getAccountType().equals(4)) {
 			 Long uId=(long) 0;
 			 List<User> parents=userService.getAllParentsOfuser(loggedUser,loggedUser.getAccountType());
 			 if(parents.isEmpty()) {
@@ -111,7 +112,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 		String ParentRole="";
 		String childRole="";
 
-		if(loggedUser.getAccountType()!=1) {
+		if(!loggedUser.getAccountType().equals(1)) {
 			 List<User> parents=userService.getAllParentsOfuser(loggedUser,loggedUser.getAccountType());
 			 User parentClient = new User() ;
 			 if(parents.isEmpty()) {
@@ -125,19 +126,25 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 				 }
 				 
 			 }
-			 UserRole parentRoles = userRoleRepository.findOne(parentClient.getRoleId());
-			 if(parentRoles == null) {
-				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not allow to create role  as your direct parent not have roles yet.",null);
-				 return  ResponseEntity.badRequest().body(getObjectResponse);
-				 
+			 if(!parentClient.getAccountType().equals(1)) {
+				 UserRole parentRoles = userRoleRepository.findOne(parentClient.getRoleId());
+				 if(parentRoles == null) {
+					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not allow to create role  as your direct parent not have roles yet.",null);
+					 return  ResponseEntity.badRequest().body(getObjectResponse);
+					 
+				 }
+
+				 ParentRole=parentRoles.getPermissions();
+				 childRole=role.getPermissions();
+				 boolean check= compareRoles(ParentRole, childRole);
+
+				 if(!check) {
+					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not allow to create role has permission more than your direct parent.",null);
+					 return  ResponseEntity.badRequest().body(getObjectResponse);
+				 }
 			 }
-			 ParentRole=parentRoles.getPermissions();
-			 childRole=role.getPermissions();
-			 boolean check= compareRoles(ParentRole, childRole);
-			 if(!check) {
-				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not allow to create role has permission more than your direct parent.",null);
-				 return  ResponseEntity.badRequest().body(getObjectResponse);
-			 }
+			
+			 
 		}
 		
 		userRoleRepository.save(role);
@@ -158,16 +165,16 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 		{
 			return super.checkActive(TOKEN);
 		}
-		if(userId==0) {
+		if(userId.equals(0)) {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Logged User ID is required",null);
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		User loggedUser = userService.findById(userId);
-		 if(loggedUser == null) {
+		 if(loggedUser.equals(null)) {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged User is not found ",null);
 			 return  ResponseEntity.status(404).body(getObjectResponse); 
 		 }
-		 if(loggedUser.getAccountType()!= 1) {
+		 if(!loggedUser.getAccountType().equals(1)) {
 			if(!userRoleService.checkUserHasPermission(userId, "ROLE", "edit")) {
 				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to edit role",null);
 				return  ResponseEntity.badRequest().body(getObjectResponse);
@@ -193,7 +200,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 		}
 		Long createdByUserId=userRole.getUserId();
 		User createdByUser = userService.findById(createdByUserId);
-		if(loggedUser.getAccountType()==4) {
+		if(loggedUser.getAccountType().equals(4)) {
 			 List<User> parents=userService.getAllParentsOfuser(loggedUser,loggedUser.getAccountType());
 			 if(parents.isEmpty()) {
 				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "as you are not have parent you cannot allow to edit this role.",null);
@@ -208,7 +215,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 					 break;
 					 
 				 }
-				 if(createdByUserId == parentClient.getId()) {
+				 if(createdByUserId.equals(parentClient.getId())) {
 				 		isParent =true;
 				 }
 				if(isParent == false) {
@@ -219,7 +226,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 			 }
 			 
 		}
-		if(loggedUser.getAccountType()==3) {
+		if(loggedUser.getAccountType().equals(3)) {
 			if(userId != createdByUserId) {
 				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "As you are account type 3 and this role not created by yourself not allow to edit.",null);
 				return  ResponseEntity.badRequest().body(getObjectResponse);
@@ -227,7 +234,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 			
 			 
 		}
-		if(loggedUser.getAccountType()==2) {
+		if(loggedUser.getAccountType().equals(2)) {
 			User parentChilds = new User() ;
 	 		boolean isParent =false;
 	 		if(userId==createdByUserId) {
@@ -239,7 +246,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 				for(User object : childs) {
 					parentChilds = object;
 
-					if(parentChilds.getId()==createdByUserId) {
+					if(parentChilds.getId().equals(createdByUserId)) {
 						isParent=true;
 					}
 				}
@@ -249,7 +256,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 				return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
 		}
-		if(loggedUser.getAccountType()==1) {
+		if(loggedUser.getAccountType().equals(1)) {
 			User parentChilds = new User() ;
 	 		boolean isParent =false;
 	 		if(userId==createdByUserId) {
@@ -260,7 +267,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 			if(!childs.isEmpty()) {
 				for(User object : childs) {
 					parentChilds = object;
-					if(parentChilds.getId()==createdByUserId) {
+					if(parentChilds.getId().equals(createdByUserId)) {
 						isParent=true;
 					}
 				}
@@ -394,7 +401,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 		}
 		Long createdByUserId=role.getUserId();
 		User createdByUser = userService.findById(createdByUserId);
-		if(loggedUser.getAccountType()==4) {
+		if(loggedUser.getAccountType().equals(4)) {
 			 List<User> parents=userService.getAllParentsOfuser(loggedUser,loggedUser.getAccountType());
 			 if(parents.isEmpty()) {
 				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "as you are not have parent you cannot allow to edit this role.",null);
@@ -409,7 +416,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 					 break;
 					 
 				 }
-				 if(createdByUserId == parentClient.getId()) {
+				 if(createdByUserId.equals(parentClient.getId())) {
 				 		isParent =true;
 				 }
 				if(isParent == false) {
@@ -420,15 +427,15 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 			 }
 			 
 		}
-		if(loggedUser.getAccountType()==3) {
-			if(userId != createdByUserId) {
+		if(loggedUser.getAccountType().equals(3)) {
+			if(!userId.equals(createdByUserId)) {
 				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "As you are account type 3 and this role not created by yourself not allow to edit.",null);
 				return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
 			
 			 
 		}
-		if(loggedUser.getAccountType()==2) {
+		if(loggedUser.getAccountType().equals(2)) {
 			User parentChilds = new User() ;
 	 		boolean isParent =false;
 	 		if(userId==createdByUserId) {
@@ -440,7 +447,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 				for(User object : childs) {
 					parentChilds = object;
 
-					if(parentChilds.getId()==createdByUserId) {
+					if(parentChilds.getId().equals(createdByUserId)) {
 						isParent=true;
 					}
 				}
@@ -450,10 +457,10 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 				return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
 		}
-		if(loggedUser.getAccountType()==1) {
+		if(loggedUser.getAccountType().equals(1)) {
 			User parentChilds = new User() ;
 	 		boolean isParent =false;
-	 		if(userId==createdByUserId) {
+	 		if(userId.equals(createdByUserId)) {
 				isParent=true;
 	 		}
 	 		userService.resetChildernArray();
@@ -461,7 +468,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 			if(!childs.isEmpty()) {
 				for(User object : childs) {
 					parentChilds = object;
-					if(parentChilds.getId()==createdByUserId) {
+					if(parentChilds.getId().equals(createdByUserId)) {
 						isParent=true;
 					}
 				}
@@ -569,7 +576,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 	     int year = cal.get(Calendar.YEAR);
 	     String date =  Integer.toString(year)+"-"+ Integer.toString(month)+"-"+ Integer.toString(day);
 	     role.setDelete_date(date);
-		 Boolean removeCretedBy = TokenSecurity.getInstance().removeActiveUserById(role.getUserId());
+		 //Boolean removeCretedBy = TokenSecurity.getInstance().removeActiveUserById(role.getUserId());
 	     userRoleRepository.save(role);
 	     getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "role deleted successfully",null);
 		 return  ResponseEntity.ok().body(getObjectResponse);
@@ -612,16 +619,41 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 		Long createdBy=role.getUserId();
 		Boolean isParent=false;
 
-		if(createdBy == loggedId) {
+		if(createdBy.equals(loggedId)) {
 			isParent=true;
 		}
- 		userService.resetChildernArray();
-		List<User>childs = userService.getAllChildernOfUser(loggedId);
+		List<User>childs = new ArrayList<User>();
+		if(loggedUser.getAccountType().equals(4)) {
+			 List<User> parents=userService.getAllParentsOfuser(loggedUser,loggedUser.getAccountType());
+			 if(parents.isEmpty()) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "as you are not have parent you cannot allow to edit this role.",null);
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			 }
+			 else {
+				 User parentClient = new User() ;
+
+				 for(User object : parents) {
+					 parentClient = object;
+					 
+				 }
+				 
+				userService.resetChildernArray();
+				childs = userService.getAllChildernOfUser(parentClient.getId()); 
+			 }
+			 
+		}
+		else {
+			userService.resetChildernArray();
+			childs = userService.getAllChildernOfUser(loggedId);
+		}
+		
+		
+ 		
 		User parentChilds = new User();
 		if(!childs.isEmpty()) {
 			for(User object : childs) {
 				parentChilds = object;
-				if(parentChilds.getId() == createdBy) {
+				if(parentChilds.getId().equals(createdBy)) {
 					isParent=true;
 					break;
 				}
@@ -748,12 +780,12 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 		{
 			return super.checkActive(TOKEN);
 		}
-		if(userId == loggedId) {
+		if(userId.equals(loggedId)) {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not allow to assign to your self",null);
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		User loggedUser = userService.findById(loggedId);
-		 if(loggedUser == null) {
+		 if(loggedUser.equals(null)) {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged User is not found ",null);
 			 return  ResponseEntity.status(404).body(getObjectResponse); 
 		 }
@@ -763,18 +795,18 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 				return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
 		}
-		if(userId == 0 || roleId == 0) {
+		if(userId.equals(0) || roleId.equals(0)) {
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), " roleId  and userId are required",null);
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		UserRole role = findById(roleId);
-		if(role == null) {
+		if(role.equals(null)) {
 			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this role not found ",null);
 			return  ResponseEntity.status(404).body(getObjectResponse);
 		}
 		User userOLDROLE = userService.findById(userId);
 
-		if(roleId == userOLDROLE.getRoleId()) {
+		if(roleId.equals(userOLDROLE.getRoleId())) {
 			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Assigned Succesfully",null);
 			return  ResponseEntity.status(404).body(getObjectResponse);
 		}
@@ -783,12 +815,12 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 		
 		Long createdByUserId=role.getUserId();
 		User createdByUser = userService.findById(createdByUserId);
-		if(createdByUser == null) {
+		if(createdByUser.equals(null)) {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Creater of role is not found maybe deleted",null);
 			 return  ResponseEntity.status(404).body(getObjectResponse); 
 		}
 		
-		if(loggedUser.getAccountType()==4) {
+		if(loggedUser.getAccountType().equals(4)) {
 			 List<User> parents=userService.getAllParentsOfuser(loggedUser,loggedUser.getAccountType());
 			 if(parents.isEmpty()) {
 				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "as you are not have parent you cannot allow to edit this role.",null);
@@ -803,7 +835,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 					 break;
 					 
 				 }
-				 if(createdByUserId == parentClient.getId()) {
+				 if(createdByUserId.equals(parentClient.getId())) {
 				 		isParent =true;
 				 }
 				if(isParent == false) {
@@ -814,18 +846,18 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 			 }
 			 
 		}
-		if(loggedUser.getAccountType()==3) {
-			if(loggedId != createdByUserId) {
+		if(loggedUser.getAccountType().equals(3)) {
+			if(!loggedId.equals(createdByUserId)) {
 				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "As you are account type 3 and this role not created by yourself not allow to edit.",null);
 				return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
 			
 			 
 		}
-		if(loggedUser.getAccountType()==2) {
+		if(loggedUser.getAccountType().equals(2)) {
 			User parentChilds = new User() ;
 	 		boolean isParent =false;
-	 		if(loggedId==createdByUserId) {
+	 		if(loggedId.equals(createdByUserId)) {
 				isParent=true;
 	 		}
 	 		userService.resetChildernArray();
@@ -834,7 +866,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 				for(User object : childs) {
 					parentChilds = object;
 
-					if(parentChilds.getId()==createdByUserId) {
+					if(parentChilds.getId().equals(createdByUserId)) {
 						isParent=true;
 					}
 				}
@@ -845,21 +877,21 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 			}
 			
 			User user = userService.findById(userId);
-			if(user.getAccountType()==1) {
+			if(user.getAccountType().equals(1)) {
 				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not Allow to assign to Admin",null);
 				return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
-			if(user.getAccountType()==2) {
+			if(user.getAccountType().equals(2)) {
 				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not Allow to assign to Another Vendor",null);
 				return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
-			if(user.getAccountType()==3) {
-				if(loggedId!=createdByUserId) {
+			if(user.getAccountType().equals(3)) {
+				if(!loggedId.equals(createdByUserId)) {
 					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not Allow to assign to Client with role not your own",null);
 					return  ResponseEntity.badRequest().body(getObjectResponse);
 		 		}
 			}
-			if(user.getAccountType()==4) {
+			if(user.getAccountType().equals(4)) {
 				List<User> parents=userService.getAllParentsOfuser(user,user.getAccountType());
 				if(parents.isEmpty()) {
 					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "as you are not have parent you cannot allow to edit this role.",null);
@@ -874,7 +906,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 						 break;
 						 
 					 }
-					 if(createdByUserId == parentClient.getId()) {
+					 if(createdByUserId.equals(parentClient.getId())) {
 						 isParentt =true;
 					 }
 					if(isParentt == false) {
@@ -888,10 +920,10 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 			
 			
 		}
-		if(loggedUser.getAccountType()==1) {
+		if(loggedUser.getAccountType().equals(1)) {
 			User parentChilds = new User() ;
 	 		boolean isParent =false;
-	 		if(loggedId==createdByUserId) {
+	 		if(loggedId.equals(createdByUserId)) {
 				isParent=true;
 	 		}
 	 		userService.resetChildernArray();
@@ -899,7 +931,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 			if(!childs.isEmpty()) {
 				for(User object : childs) {
 					parentChilds = object;
-					if(parentChilds.getId()==createdByUserId) {
+					if(parentChilds.getId().equals(createdByUserId)) {
 						isParent=true;
 					}
 				}
@@ -910,17 +942,17 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 			}
 			
 			User user = userService.findById(userId);
-			if(user.getAccountType()==1) {
+			if(user.getAccountType().equals(1)) {
 				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not Allow to assign to Another Admin",null);
 				return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
-			if(user.getAccountType()==2) {
-				if(loggedId!=createdByUserId) {
+			if(user.getAccountType().equals(2)) {
+				if(!loggedId.equals(createdByUserId)) {
 					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not Allow to assign to Vendor with role not your own",null);
 					return  ResponseEntity.badRequest().body(getObjectResponse);
 		 		}
 			}
-			if(user.getAccountType()==3) {
+			if(user.getAccountType().equals(3)) {
 				List<User> parents=userService.getAllParentsOfuser(user,user.getAccountType());
 				if(parents.isEmpty()) {
 					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "as you are not have parent you cannot allow to edit this role.",null);
@@ -935,7 +967,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 						 break;
 						 
 					 }
-					 if(createdByUserId == parentClient.getId()) {
+					 if(createdByUserId.equals(parentClient.getId())) {
 						 isParentt =true;
 					 }
 					if(isParentt == false) {
@@ -946,7 +978,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 				 }
 			
 			}
-			if(user.getAccountType()==4) {
+			if(user.getAccountType().equals(4)) {
 				List<User> parents=userService.getAllParentsOfuser(user,user.getAccountType());
 				if(parents.isEmpty()) {
 					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "as you are not have parent you cannot allow to edit this role.",null);
@@ -958,10 +990,9 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 
 					 for(User object : parents) {
 						 parentClient = object;
-						 break;
 						 
 					 }
-					 if(createdByUserId == parentClient.getId()) {
+					 if(createdByUserId.equals(parentClient.getId())) {
 						 isParentt =true;
 					 }
 					if(isParentt == false) {
@@ -977,7 +1008,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 		
 		User user = userService.findById(userId);
 
-		if(user == null) {
+		if(user.equals(null)) {
 			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this user not found ",null);
 			 return  ResponseEntity.status(404).body(getObjectResponse);
 		}
@@ -1069,7 +1100,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 		return  ResponseEntity.ok().body(getObjectResponse);
 	}
 	@Override
-	public ResponseEntity<?> getAllRolesCreatedByUser(String TOKEN,Long userId,Long loggedId) {
+	public ResponseEntity<?> getAllRolesCreatedByUser(String TOKEN,Long userId) {
 		// TODO Auto-generated method stub
 		if(TOKEN.equals("")) {
 			 List<UserRole> roles = null;
@@ -1085,61 +1116,63 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "  userId is required",null);
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
-		if(loggedId == 0) {
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "  loggedId is required",null);
-			return  ResponseEntity.badRequest().body(getObjectResponse);
-		}
+		
 		User user = userService.findById(userId);
 		if(user == null) {
 			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this user not found ",null);
 			return  ResponseEntity.status(404).body(getObjectResponse);
 		}
 		
-		User loggedUser = userService.findById(loggedId);
-		if(loggedUser == null) {
-			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this user not found ",null);
-			 return  ResponseEntity.status(404).body(getObjectResponse);
-		}
-		if(loggedUser.getAccountType()!= 1) {
-			if(!userRoleService.checkUserHasPermission(loggedId, "ROLE", "list")) {
+		
+		if(user.getAccountType()!= 1) {
+			if(!userRoleService.checkUserHasPermission(userId, "ROLE", "list")) {
 				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this loggedId doesnot has permission to get list role",null);
 				return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
 		}
 		
-		
-		Boolean isParent=false;
-
-		if(userId == loggedId) {
-			isParent=true;
-		}
- 		userService.resetChildernArray();
-		List<User>childs = userService.getAllChildernOfUser(loggedId);
-		User parentChilds = new User();
-		if(!childs.isEmpty()) {
-			for(User object : childs) {
-				parentChilds = object;
-				if(parentChilds.getId() == userId) {
-					isParent=true;
-					break;
-				}
-			}
-		}
-		if(isParent == false) {
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not creater or parent of creater to get role",null);
-			return  ResponseEntity.badRequest().body(getObjectResponse);
-		}
-		
 		userService.resetChildernArray();
-		List<User> childernUsers=userService.getActiveAndInactiveChildern(userId);
-		List<Long>usersIds= new ArrayList<>();
+		List<User> childernUsers= new ArrayList<User>();
+		 List<Long>usersIds= new ArrayList<>();
+
+		if(user.getAccountType().equals(4)) {
+			 Set<User> parents = user.getUsersOfUser();
+			 if(parents.isEmpty()) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "as you are not have parent you cannot allow to edit this role.",null);
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			 }
+			 else {
+				 User parentClient = new User() ;
+				 for(User object : parents) {
+
+					 parentClient = object;
+					 break;
+				 }
+				 userService.resetChildernArray();
+				 childernUsers=userService.getActiveAndInactiveChildern(parentClient.getId());
+				 usersIds.add(parentClient.getId());
+				 
+				 
+			 }
+			 
+		}
+		else {
+
+			userService.resetChildernArray();
+			childernUsers=userService.getActiveAndInactiveChildern(userId);
+		}
+		
+		
+		
 		 if(childernUsers.isEmpty()) {
+
 			 usersIds.add(userId);
 		 }
 		 else {
 
 			 usersIds.add(userId);
 			 for(User object : childernUsers) {
+
 				 usersIds.add(object.getId());
 
 			 }

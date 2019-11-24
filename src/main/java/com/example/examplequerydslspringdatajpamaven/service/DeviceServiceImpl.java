@@ -81,26 +81,26 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		
-		if(super.checkActive(TOKEN)!= null)
+		if(super.checkActive(TOKEN) != null)
 		{
 			return super.checkActive(TOKEN);
 		}
 		
-		if(userId == 0) {
+		if(userId.equals(0)) {
 			 List<CustomDeviceList> devices= null;
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",devices);
 			 logger.info("************************ getAllUserDevices ENDED ***************************");
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		User loggedUser = userService.findById(userId);
-		if(loggedUser == null) {
+		if(loggedUser.equals(null)) {
 			 List<CustomDeviceList> devices= null;
 			 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This user is not found",devices);
 			 logger.info("************************ getAllUserDevices ENDED ***************************");
 			return  ResponseEntity.status(404).body(getObjectResponse);
 		}
 
-		if(loggedUser.getAccountType()!= 1) {
+		if(!loggedUser.getAccountType().equals(1)) {
 			if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "list")) {
 				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get devices list",null);
 				 logger.info("************************ getAllUserDevices ENDED ***************************");
@@ -108,7 +108,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			}
 		}
 		 userService.resetChildernArray();
-		 if(loggedUser.getAccountType() == 4) {
+		 if(loggedUser.getAccountType().equals(4)) {
 			 Set<User> parentClients = loggedUser.getUsersOfUser();
 			 if(parentClients.isEmpty()) {
 				
@@ -164,20 +164,20 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		{
 			return super.checkActive(TOKEN);
 		}
-		if(userId == 0) {
+		if(userId.equals(0)) {
 			
 			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "User ID is Required",null);
 			logger.info("************************ createDevice ENDED ***************************");
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		User loggedUser = userService.findById(userId);
-		if(loggedUser == null) {
+		if(loggedUser.equals(null)) {
 			
 			getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "This user is not found",null);
 			logger.info("************************ createDevice ENDED ***************************");
 			return ResponseEntity.status(404).body(getObjectResponse);
 		}
-		if(loggedUser.getAccountType()!= 1) {
+		if(!loggedUser.getAccountType().equals(1)) {
 			if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "create")) {
 				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to create device",null);
 				 logger.info("************************ createDevice ENDED ***************************");
@@ -193,13 +193,13 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		
-		if(device.getName()== null ||device.getName() == ""
-				|| device.getUniqueId()== null || device.getUniqueId() == null
-				|| device.getSequenceNumber() == null || device.getSequenceNumber()==""
-				|| device.getPlateNum() == null || device.getPlateNum() == ""
-				|| device.getLeftLetter() == null || device.getLeftLetter() == ""
-                || device.getMiddleLetter() == null || device.getMiddleLetter() == ""
-                || device.getRightLetter() == null || device.getRightLetter() == "") {
+		if(device.getName().equals(null) ||device.getName().equals("")
+				|| device.getUniqueId().equals(null) || device.getUniqueId().equals(null)
+				|| device.getSequenceNumber().equals(null) || device.getSequenceNumber().equals("")
+				|| device.getPlateNum().equals(null)|| device.getPlateNum().equals("")
+				|| device.getLeftLetter().equals(null) || device.getLeftLetter().equals("")
+                || device.getMiddleLetter().equals(null)|| device.getMiddleLetter().equals("")
+                || device.getRightLetter().equals(null)|| device.getRightLetter().equals("")) {
 			
 			List<Device> devices = null;
 			
@@ -214,7 +214,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			Set<User> user=new HashSet<>() ;
 			User userCreater ;
 			userCreater=userService.findById(userId);
-			if(userCreater == null)
+			if(userCreater.equals(null))
 			{
 
 				getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "Assigning to not found user",null);
@@ -223,7 +223,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			}
 			else {
 				User parent = null;
-				if(userCreater.getAccountType() == 4) {
+				if(userCreater.getAccountType().equals(4)) {
 					Set<User>parentClient = userCreater.getUsersOfUser();
 					if(parentClient.isEmpty()) {
 						getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "this user cannot add user",null);
@@ -287,19 +287,19 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		{
 			return super.checkActive(TOKEN);
 		}
-		if(userId == 0) {
+		if(userId.equals(0)) {
 			
 			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "User ID is Required",null);
 			logger.info("************************ editDevice ENDED ***************************");
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		User loggedUser = userService.findById(userId);
-		if(loggedUser == null) {
+		if(loggedUser.equals(null)) {
 			getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "This user is not found",null);
 			logger.info("************************ editDevice ENDED ***************************");
 			return ResponseEntity.status(404).body(getObjectResponse);
 		}
-		if(loggedUser.getAccountType()!= 1) {
+		if(!loggedUser.getAccountType().equals(1)) {
 			if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "edit")) {
 				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to edit device",null);
 				 logger.info("************************ editDevice ENDED ***************************");
@@ -307,13 +307,13 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			}
 		}
 	
-		if(device.getId() == null || device.getName()== null ||device.getName() == "" 
-			|| device.getUniqueId()== null || device.getUniqueId() == "" 
-			|| device.getSequenceNumber() == null || device.getSequenceNumber() == ""
-			|| device.getPlateNum()  == null || device.getPlateNum() == ""
-			|| device.getLeftLetter() == "" || device.getLeftLetter() == null
-			|| device.getRightLetter() == null || device.getRightLetter() == ""
-			|| device.getMiddleLetter() == null || device.getMiddleLetter() == ""	) {
+		if(device.getId().equals(null) || device.getName().equals(null) ||device.getName().equals("") 
+			|| device.getUniqueId().equals(null) || device.getUniqueId().equals("")
+			|| device.getSequenceNumber().equals(null) || device.getSequenceNumber().equals("")
+			|| device.getPlateNum().equals(null) || device.getPlateNum().equals("")
+			|| device.getLeftLetter().equals(null) || device.getLeftLetter().equals(null)
+			|| device.getRightLetter().equals(null) || device.getRightLetter().equals("")
+			|| device.getMiddleLetter().equals(null) || device.getMiddleLetter().equals("")	) {
 			
 			
 			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "atrributes [id ,name, trackerImei , sequence" + 
@@ -325,13 +325,13 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		else {
 			  boolean	isParent = false;
 			  Device oldDevice = findById(device.getId());
-			if(oldDevice == null) {
+			if(oldDevice.equals(null)) {
 				List<Device> devices = null;
 				getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "This device not found",devices);
 		    	logger.info("************************ createDevice ENDED ***************************");
 		    	return ResponseEntity.status(404).body(getObjectResponse);
 			}
-			if(loggedUser.getAccountType() == 4) {
+			if(loggedUser.getAccountType().equals(4)) {
 				Set<User>parentClient = loggedUser.getUsersOfUser();
 				if(parentClient.isEmpty()) {
 					getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
@@ -352,7 +352,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 						
 						for(User deviceUser : deviceParent) {
 							System.out.println("here"+deviceUser.getId()+"parent"+parent.getId());
-							if(deviceUser.getId() == parent.getId()) {
+							if(deviceUser.getId().equals(parent.getId())) {
 								
 								isParent = true;
 								break;
@@ -426,26 +426,26 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		    for (Device matchedDevice : duplicatedDevices) 
 		    { 
 //		        Set<User> userCreater = device.getUser();
-		    	if(matchedDevice.getId() != device.getId()) {
-		    		if(matchedDevice.getName() != null) {
+		    	if(!matchedDevice.getId().equals(device.getId())) {
+		    		if(!matchedDevice.getName().equals(null)) {
 				        if(matchedDevice.getName().equals(device.getName()))
 				        {
 				        	
 				        	duplicationCodes.add(1);
 				        }
 			    	}
-			    	if(matchedDevice.getUniqueId() != null) {
+			    	if(!matchedDevice.getUniqueId().equals(null)) {
 			    		if(matchedDevice.getUniqueId().equals(device.getUniqueId()) ) {
 				        	duplicationCodes.add(2);
 				        }
 			    	}
-			        if(matchedDevice.getSequenceNumber() != null) {
+			        if(!matchedDevice.getSequenceNumber().equals(null)) {
 			        	if(matchedDevice.getSequenceNumber().equals(device.getSequenceNumber()) ) {
 				        	duplicationCodes.add(3);
 				        }
 			        }
-			        if(matchedDevice.getPlateNum() != null || matchedDevice.getLeftLetter() != null 
-			        	|| matchedDevice.getMiddleLetter() != null || matchedDevice.getRightLetter() != null) {
+			        if(!matchedDevice.getPlateNum().equals(null) || !matchedDevice.getLeftLetter().equals(null)
+			        	|| !matchedDevice.getMiddleLetter().equals(null) || !matchedDevice.getRightLetter().equals(null)) {
 			        	if(matchedDevice.getPlateNum().equals(device.getPlateNum())  
 			 		           && matchedDevice.getLeftLetter().equals(device.getLeftLetter())
 			 		           && matchedDevice.getMiddleLetter().equals(device.getMiddleLetter())
@@ -479,20 +479,20 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		{
 			return super.checkActive(TOKEN);
 		}
-		 if(deviceId == 0 || userId == 0) {
+		 if(deviceId.equals(0) || userId.equals(0)) {
 			 List<Device> devices = null;
 			 getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "User ID and Device ID are Required",devices);
 		     logger.info("************************ deleteDevice ENDED ***************************");
 		     return ResponseEntity.badRequest().body(getObjectResponse); 
 		 }
 		User loggedUser = userService.findById(userId);
-		if(loggedUser ==null) {
+		if(loggedUser.equals(null)) {
 			List<Device> devices = null;
 			getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "User ID is not found",devices);
 		    logger.info("************************ deleteDevice ENDED ***************************");
 		    return ResponseEntity.status(404).body(getObjectResponse);
 		}
-		if(loggedUser.getAccountType()!= 1) {
+		if(!loggedUser.getAccountType().equals(1)) {
 			if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "delete")) {
 				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to delete device",null);
 				 logger.info("************************ deleteDevice ENDED ***************************");
@@ -500,7 +500,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			}
 		}
 		 Device device = findById(deviceId);
-		 if(device == null)
+		 if(device.equals(null))
 		 {
 			 List<Device> devices = null;
 			 getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "This device is not found",devices);
@@ -511,13 +511,13 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		 {
 			 boolean isParent = false;
 			 User creater= userService.findById(userId);
-			 if(creater == null) {
+			 if(creater.equals(null)) {
 				 List<Device> devices = null;
 				 getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "This user is not found",devices);
 			     logger.info("************************ deleteDevice ENDED ***************************");
 			     return ResponseEntity.status(404).body(getObjectResponse);
 			 }
-			 if(creater.getAccountType() == 4) {
+			 if(creater.getAccountType().equals(4)) {
 				 Set<User>parentClient = creater.getUsersOfUser();
 					if(parentClient.isEmpty()) {
 						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
@@ -538,7 +538,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 							
 							for(User deviceUser : deviceParent) {
 								System.out.println("here"+deviceUser.getId()+"parent"+parent.getId());
-								if(deviceUser.getId() == parent.getId()) {
+								if(deviceUser.getId().equals(parent.getId())) {
 									
 									isParent = true;
 									break;
@@ -586,7 +586,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		// TODO Auto-generated method stub
 		
 		Device device = deviceRepository.findOne(deviceId);
-		if(device == null) {
+		if(device.equals(null)) {
 			return null;
 		}
 		if(device.getDeleteDate() != null) {
@@ -614,18 +614,18 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		{
 			return super.checkActive(TOKEN);
 		}
-		if(deviceId == 0 || userId == 0) {
+		if(deviceId.equals(0) || userId.equals(0)) {
 			
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID  and logged user Id are  Required",null);
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		User loggedUser = userService.findById(userId);
-		if(loggedUser  == null) {
+		if(loggedUser.equals(null)) {
 			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged user is not found",null);
 			return ResponseEntity.status(404).body(getObjectResponse);
 		}
 		Device device = deviceRepository.findOne(deviceId);
-		if (device == null) {
+		if (device.equals(null)) {
 			
 			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",null);
 			return ResponseEntity.status(404).body(getObjectResponse);
@@ -641,7 +641,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			else
 			{
 				boolean isParent = false;
-			   if(loggedUser.getAccountType()== 4) {
+			   if(loggedUser.getAccountType().equals(4)) {
 				   Set<User>parentClient = loggedUser.getUsersOfUser();
 					if(parentClient.isEmpty()) {
 						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
@@ -662,7 +662,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 							
 							for(User deviceUser : deviceParent) {
 								System.out.println("here"+deviceUser.getId()+"parent"+parent.getId());
-								if(deviceUser.getId() == parent.getId()) {
+								if(deviceUser.getId().equals(parent.getId())) {
 									
 									isParent = true;
 									break;
@@ -700,18 +700,18 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		{
 			return super.checkActive(TOKEN);
 		}
-		if(userId == 0) {
+		if(userId.equals(0)) {
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Logged User ID is Required",null);
 			logger.info("************************ assignDeviceToDriver ENDED ***************************");
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		User loggedUser = userService.findById(userId);
-		if(loggedUser == null) {
+		if(loggedUser.equals(null)) {
 			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This loggedUser is not found",null);
 			logger.info("************************ assignDeviceToDriver ENDED ***************************");
 			return ResponseEntity.status(404).body(getObjectResponse);
 		}
-		if(loggedUser.getAccountType()!= 1) {
+		if(!loggedUser.getAccountType().equals(1)) {
 			if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "assignDeviceToDriver")) {
 				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to assignDeviceToDriver",null);
 				 logger.info("************************ deleteDevice ENDED ***************************");
@@ -722,7 +722,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		
 		
 
-		if(deviceId == 0 ) {
+		if(deviceId.equals(0) ) {
 			
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",null);
 			logger.info("************************ assignDeviceToDriver ENDED ***************************");
@@ -730,7 +730,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		}
 		else {
 			Device device = findById(deviceId);
-			if(device == null) {
+			if(device.equals(null)) {
 				
 				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",null);
 				logger.info("************************ assignDeviceToDriver ENDED ***************************");
@@ -738,7 +738,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			}
 			else {
 				boolean isParent = false;
-				   if(loggedUser.getAccountType()== 4) {
+				   if(loggedUser.getAccountType().equals(4)) {
 					   Set<User>parentClient = loggedUser.getUsersOfUser();
 						if(parentClient.isEmpty()) {
 							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
@@ -759,7 +759,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 								
 								for(User deviceUser : deviceParent) {
 									System.out.println("here"+deviceUser.getId()+"parent"+parent.getId());
-									if(deviceUser.getId() == parent.getId()) {
+									if(deviceUser.getId().equals(parent.getId())) {
 										
 										isParent = true;
 										break;
@@ -773,7 +773,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 						logger.info("************************ editDevice ENDED ***************************");
 						return ResponseEntity.badRequest().body(getObjectResponse);
 				   }
-				if(driverId == 0) {
+				if(driverId.equals(0)) {
 					Set<Driver> drivers=new HashSet<>() ;
 					drivers= device.getDriver();
 			        if(drivers.isEmpty()) {
@@ -796,7 +796,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			        }
 				}
 				Driver driver = driverService.getDriverById(driverId);
-				if(driver == null) {
+				if(driver.equals(null)) {
 					List<Device> devices = null;
 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This driver is not found",devices);
 					logger.info("************************ assignDeviceToDriver ENDED ***************************");
@@ -820,7 +820,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 						Set<Device> assignedDevices=driver.getDevice();
 						if(!assignedDevices.isEmpty()) {
 							for( Device assignedDevice :assignedDevices) {
-							 if(assignedDevice.getId() == device.getId()) {
+							 if(assignedDevice.getId().equals(device.getId())) {
 								 List<Device> devices = null;
 									getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
 									logger.info("************************ assignDeviceToDriver ENDED ***************************");
@@ -863,26 +863,26 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		{
 			return super.checkActive(TOKEN);
 		}
-		if(userId == 0) {
+		if(userId.equals(0)) {
 			 List<Device> devices = null;
 			 getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "User ID is Required",devices);
 		     logger.info("************************ deleteDevice ENDED ***************************");
 		     return ResponseEntity.badRequest().body(getObjectResponse); 
 		 }
 		User loggedUser = userService.findById(userId);
-		if(loggedUser == null) {
+		if(loggedUser.equals(null)) {
 			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This loggedUser is not found",null);
 			logger.info("************************ assignGeofenceToDevice ENDED ***************************");
 			return ResponseEntity.status(404).body(getObjectResponse);
 		}
-		if(loggedUser.getAccountType()!= 1) {
+		if(!loggedUser.getAccountType().equals(1)) {
 			if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "assignGeofenceToDevice")) {
 				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to assignGeofenceToDevice",null);
 				 logger.info("************************ assignGeofenceToDevice ENDED ***************************");
 				return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
 		}
-		if(deviceId == 0){
+		if(deviceId.equals(0)){
 			List<Device> devices = null;
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",devices);
 			logger.info("************************ assignDeviceToGeofences ENDED ***************************");
@@ -890,7 +890,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 //			return ResponseEntity.status(404).body(getObjectResponse);
 		}else {
 			 Device device = findById(deviceId);
-			 if(device == null) {
+			 if(device.equals(null)) {
 				  List<Device> devices = null;
 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",devices);
 					logger.info("************************ assignDeviceToGeofences ENDED ***************************");
@@ -971,9 +971,37 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		{
 			return super.checkActive(TOKEN);
 		}
-	    if(userId != 0) {
+	    if(!userId.equals(0)) {
 	    	User user = userService.findById(userId);
-	    	if(user != null) {
+	    	
+	    	if(user.getAccountType().equals(4)) {
+				 Set<User>parentClient = user.getUsersOfUser();
+					if(parentClient.isEmpty()) {
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
+						logger.info("************************ editDevice ENDED ***************************");
+						return ResponseEntity.badRequest().body(getObjectResponse);
+					}else {
+					  
+						User parent =null;
+						for(User object : parentClient) {
+							parent = object;
+						}
+						if(!parent.equals(null)) {
+							devices = deviceRepository.getDeviceSelect(parent.getId());
+							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
+							logger.info("************************ getDeviceSelect ENDED ***************************");
+							return ResponseEntity.ok().body(getObjectResponse);
+						}
+						else {
+							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "No parent for this type 4",null);
+							return ResponseEntity.badRequest().body(getObjectResponse);
+						}
+						
+					}
+			 }
+	    	
+	    	
+	    	if(!user.equals(null)) {
 	    		if(user.getDelete_date() == null) {
 	    			devices = deviceRepository.getDeviceSelect(userId);
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
@@ -1020,15 +1048,17 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		{
 			return super.checkActive(TOKEN);
 		}
-		if(deviceId == 0) {
+		if(deviceId.equals(0)) {
 			List<Device> devices = null;
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",devices);
 			logger.info("************************ getDeviceToDriver ENDED ***************************");
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		else {
+
 			Device device = findById(deviceId);
-			if(device == null) {
+			if(device.equals(null)) {
+
 				List<Device> devices = null;
 				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",devices);
 				logger.info("************************ getDeviceToDriver ENDED ***************************");
@@ -1036,18 +1066,22 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			}
 			else
 			{
+
 				Set<Driver> drivers=new HashSet<>() ;
 				drivers = device.getDriver();
 				if(drivers.isEmpty()) {
+
 					List<Device> devices = null;
 					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "No drivers assigned to this device",devices);
 					logger.info("************************ getDeviceToDriver ENDED ***************************");
 					return ResponseEntity.ok().body(getObjectResponse);
 				}
 				else {
+
 					List<Driver> deviceDriver = new ArrayList<>();
 					for(Driver driver : drivers ) {
 						//hint only one driver assigned to device
+
 						deviceDriver.add(driver);
 					}
 					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",deviceDriver);
@@ -1074,7 +1108,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		{
 			return super.checkActive(TOKEN);
 		}
-		if(deviceId == 0) {
+		if(deviceId.equals(0)) {
 			List<Device> devices = null;
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",devices);
 			logger.info("************************ getDeviceGeofences ENDED ***************************");
@@ -1082,7 +1116,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		}
 		else {
 			Device device = findById(deviceId);
-			if(device == null) {
+			if(device.equals(null)) {
 				List<Device> devices = null;
 				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",devices);
 				logger.info("************************ getDeviceGeofences ENDED ***************************");
@@ -1130,21 +1164,21 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		}
 		
 		
-		if(userId == 0) {
+		if(userId.equals(0)) {
 			List<Device> devices = null;
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is required",devices);
 			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		User loggedUser = userService.findById(userId);
-		if(loggedUser == null) {
+		if(loggedUser.equals(null)) {
 			List<Device> devices = null;
 			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Logged user is not found",devices);
 			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
 			return ResponseEntity.status(404).body(getObjectResponse);
 		}
 		userService.resetChildernArray();
-		 if(loggedUser.getAccountType() == 4) {
+		 if(loggedUser.getAccountType().equals(4)) {
 			 Set<User> parentClients = loggedUser.getUsersOfUser();
 			 if(parentClients.isEmpty()) {
 				
@@ -1220,7 +1254,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		{
 			return super.checkActive(TOKEN);
 		}
-		if(userId==0) {
+		if(userId.equals(0)) {
 			 List<CustomDeviceLiveData> allDevicesLiveData=	null;
 		    getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is required",allDevicesLiveData);
 			
@@ -1228,7 +1262,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 	    User loggedUser = userService.findById(userId);
-	    if( loggedUser == null) {
+	    if( loggedUser.equals(null)) {
 	    	 List<CustomDeviceLiveData> allDevicesLiveData=	null;
 			    getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Logged user is not found ",allDevicesLiveData);
 				
@@ -1236,7 +1270,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				return ResponseEntity.status(404).body(getObjectResponse);
 	    }
 	    userService.resetChildernArray();
-	    if(loggedUser.getAccountType() == 4) {
+	    if(loggedUser.getAccountType().equals(4)) {
 			 Set<User> parentClients = loggedUser.getUsersOfUser();
 			 if(parentClients.isEmpty()) {
 				
@@ -1326,7 +1360,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		{
 			return super.checkActive(TOKEN);
 		}
-		if(userId==0) {
+		if(userId.equals(0)) {
 			 List<CustomDeviceLiveData> allDevicesLiveData=	null;
 		    getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is required",allDevicesLiveData);
 			
@@ -1334,7 +1368,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 	    User loggedUser = userService.findById(userId);
-	    if( loggedUser == null) {
+	    if( loggedUser.equals(null)) {
 	    	 List<CustomDeviceLiveData> allDevicesLiveData=	null;
 			    getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Logged user is not found ",allDevicesLiveData);
 				
@@ -1342,7 +1376,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				return ResponseEntity.status(404).body(getObjectResponse);
 	    }
 	    userService.resetChildernArray();
-	    if(loggedUser.getAccountType() == 4) {
+	    if(loggedUser.getAccountType().equals(4)) {
 			 Set<User> parentClients = loggedUser.getUsersOfUser();
 			 if(parentClients.isEmpty()) {
 				
@@ -1439,17 +1473,17 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		{
 			return super.checkActive(TOKEN);
 		}
-		if(deviceId != 0 && userId !=0) {
+		if(!deviceId.equals(0) && !userId.equals(0)) {
 			User loggedUser = userService.findById(userId);
-			if(loggedUser == null) {
+			if(loggedUser.equals(null)) {
 				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",vehicleInfo);
 				 return  ResponseEntity.status(404).body(getObjectResponse);
 			}
 			Device device = findById(deviceId);
-			if(device != null) {
+			if(!device.equals(null)) {
 				if(device.getDeleteDate()==null) {
 					boolean isParent = false;
-					   if(loggedUser.getAccountType()== 4) {
+					   if(loggedUser.getAccountType().equals(4)) {
 						   Set<User>parentClient = loggedUser.getUsersOfUser();
 							if(parentClient.isEmpty()) {
 								getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
@@ -1470,7 +1504,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 									
 									for(User deviceUser : deviceParent) {
 										System.out.println("here"+deviceUser.getId()+"parent"+parent.getId());
-										if(deviceUser.getId() == parent.getId()) {
+										if(deviceUser.getId().equals(parent.getId())) {
 											
 											isParent = true;
 											break;
@@ -1684,7 +1718,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		{
 			return super.checkActive(TOKEN);
 		}
-		if(deviceId == 0 || userId == 0) {
+		if(deviceId.equals(0) || userId.equals(0)) {
 			 
 			    getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device Id  and UserId are required",null);
 				
@@ -1693,14 +1727,14 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		}
 		else {
 			 User loggedUser = userService.findById(userId);
-			 if(loggedUser == null) {
+			 if(loggedUser.equals(null)) {
 				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This user is not found",null);
 					
 					logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
 					return ResponseEntity.status(404).body(getObjectResponse);
 			 }
 			 Device device = findById(deviceId);
-			 if(device == null) {
+			 if(device.equals(null)) {
 				
 				    getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",null);
 					
@@ -1709,7 +1743,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			 }
 			 boolean isParent = false;
 		
-			 if(loggedUser.getAccountType() == 4) {
+			 if(loggedUser.getAccountType().equals(4)) {
 				 Set<User>parentClients = loggedUser.getUsersOfUser();
 				 if(parentClients.isEmpty()) {
 					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allowed to get this device",null);
@@ -1728,7 +1762,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 							return ResponseEntity.badRequest().body(getObjectResponse);
 					}else {
 						for(User parentObject : deviceParent) {
-							if(parent.getId() == parentObject.getId()) {
+							if(parent.getId().equals(parentObject.getId())) {
 								isParent = true;
 								break;
 							}
@@ -1948,7 +1982,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		{
 			return super.checkActive(TOKEN);
 		}
-		if(deviceId == 0 || userId == 0) {
+		if(deviceId.equals(0) || userId.equals(0)) {
 			
 			    getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device Id and User id are required",null);
 				
@@ -1957,7 +1991,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		}
 		else {
 			 User loggedUser = userService.findById(userId);
-			 if(loggedUser == null) {
+			 if(loggedUser.equals(null)) {
 				
 				    getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged user is not found",null);
 					
@@ -1965,7 +1999,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					return ResponseEntity.status(404).body(getObjectResponse);
 			 }
 			 Device device = findById(deviceId);
-			 if(device == null) {
+			 if(device.equals(null)) {
 				
 				    getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",null);
 					
@@ -1973,7 +2007,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					return ResponseEntity.status(404).body(getObjectResponse);
 			 }
 			 boolean isParent = false;
-			 if(loggedUser.getAccountType()==4) {
+			 if(loggedUser.getAccountType().equals(4)) {
 				 Set<User>parentClients = loggedUser.getUsersOfUser();
 				 if(parentClients.isEmpty()) {
 					  getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allowed to get this device",null);
@@ -1993,7 +2027,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 							return ResponseEntity.badRequest().body(getObjectResponse);  
 					 }else {
 						 for(User parentObject : deviceParent) {
-							 if(parent.getId() == parentObject.getId()) {
+							 if(parent.getId().equals(parentObject.getId())) {
 								  isParent =  true;
 								  break;
 							 }
@@ -2030,50 +2064,50 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		{
 			return super.checkActive(TOKEN);
 		}
-		if(userId == 0 || deviceId == 0 || toUserId == 0) {
+		if(userId.equals(0) || deviceId.equals(0) || toUserId.equals(0)) {
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "userId , deviceId and toUserId  are required",null);
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		else {
 			User loggedUser = userService.findById(userId);
 			
-			if(loggedUser == null) {
+			if(loggedUser.equals(null)) {
 				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "loggedUser is not found",null);
 				
 				return ResponseEntity.status(404).body(getObjectResponse);
 			}else {
-				if(loggedUser.getAccountType()!= 1) {
+				if(!loggedUser.getAccountType().equals(1)) {
 					if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "assignToUser")) {
 						 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to assignToUser",null);
 						 logger.info("************************ assignToUser ENDED ***************************");
 						return  ResponseEntity.badRequest().body(getObjectResponse);
 					}
 				}
-				if(loggedUser.getAccountType() == 3 || loggedUser.getAccountType() == 4) {
+				if(loggedUser.getAccountType().equals(3) || loggedUser.getAccountType().equals(4)) {
 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to assign device to any user",null);
 					
 					return ResponseEntity.status(404).body(getObjectResponse);
 				}
 				Device device = findById(deviceId);
-				if(device == null) {
+				if(device.equals(null)) {
 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "device is not found",null);
 					
 					return ResponseEntity.status(404).body(getObjectResponse);
 				}else {
 					if(checkIfParent( device ,  loggedUser)) {
 					     User toUser = userService.findById(toUserId);
-					     if(toUser == null) {
+					     if(toUser.equals(null)) {
 					    	 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "user you want to assign to  is not found",null);
 								
 								return ResponseEntity.status(404).body(getObjectResponse);
 					     }else {
-					    	  if(toUser.getAccountType()== 4) {
+					    	  if(toUser.getAccountType().equals(4)) {
 					    		  getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to assign device to this user",null);
 									
 									return ResponseEntity.status(404).body(getObjectResponse);
 					    	  }
-					    	  else if(loggedUser.getAccountType() == toUser.getAccountType()) {
-					    		  if(loggedUser.getId() == toUser.getId()) {
+					    	  else if(loggedUser.getAccountType().equals(toUser.getAccountType())) {
+					    		  if(loggedUser.getId().equals(toUser.getId())) {
 					    			  Set<User> deviceOldUser = device.getUser();
 						    			 Set<User> temp = deviceOldUser;
 						    			 deviceOldUser.removeAll(temp);
@@ -2100,7 +2134,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					    		
 					    		 boolean isParent = false;
 					    		 for(User object : toUserParents) {
-					    			 if(loggedUser.getId() ==  object.getId()) {
+					    			 if(loggedUser.getId().equals(object.getId())) {
 					    				 isParent = true;
 					    				 break;
 					    			 }
@@ -2149,11 +2183,11 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		   for (User object : deviceParent) {
 			   parent = object;
 		   }
-		   if(parent.getId() == loggedUser.getId()) {
+		   if(parent.getId().equals(loggedUser.getId())) {
 			   return true;
 		   }
-		   if(parent.getAccountType() == 1) {
-			   if(parent.getId() == loggedUser.getId()) {
+		   if(parent.getAccountType().equals(1)) {
+			   if(parent.getId().equals(loggedUser.getId())) {
 				   return true;
 			   }
 		   }else {
@@ -2163,7 +2197,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				   return false;
 			   }else {
 				   for(User object :parents) {
-					   if(object.getId() == loggedUser.getId()) {
+					   if(object.getId().equals(loggedUser.getId())) {
 						   return true;
 					   }
 				   }
@@ -2187,27 +2221,52 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			{
 				return super.checkActive(TOKEN);
 			}
-			if(userId == 0 || deviceId == 0) {
+			if(userId.equals(0) || deviceId.equals(0)) {
+
 				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "userId and deviceId are required",null);
 				 return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
 			else {
 				User loggedUser = userService.findById(userId);
-				
-				if(loggedUser == null) {
+
+				if(loggedUser.equals(null)) {
+
 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "loggedUser is not found",null);
 					
 					return ResponseEntity.status(404).body(getObjectResponse);
 				}
 				else {
+
 					Device device = findById(deviceId);
-					if(device == null) {
+					if(device.equals(null)) {
 						getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "device is not found",null);
 						return ResponseEntity.status(404).body(getObjectResponse);
 					}
 					else {
+						boolean isParent = false;
+						User parent = null;
+
+						 if(loggedUser.getAccountType().equals(4)) {
+							 Set<User>parentClients = loggedUser.getUsersOfUser();
+							 if(parentClients.isEmpty()) {
+								  getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allowed to get this device",null);
+									
+									logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+									return ResponseEntity.badRequest().body(getObjectResponse); 
+							 }else {
+								 for(User object : parentClients) {
+									 parent = object ;
+								 }
+								 loggedUser=parent;
+							 }
+								 
+							 
+						 }
+						
+						
+						
 						if(checkIfParent( device ,  loggedUser)) {
-							if(loggedUser.getAccountType()!= 1) {
+							if(!loggedUser.getAccountType().equals(1)) {
 								if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "calibration")) {
 									 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to edit calibration",null);
 									 logger.info("************************ calibration ENDED ***************************");
@@ -2215,11 +2274,12 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 								}
 							}
 							
-							
+
 							List<DeviceCalibrationData> calibrationData = new ArrayList<DeviceCalibrationData>();
                             calibrationData=deviceRepository.getCalibrationDataCCC(deviceId);
 							List<Map> data=new ArrayList<Map>();
-							if(!calibrationData.isEmpty()) {
+							if(calibrationData.get(0) != null) {
+
 								 String str = calibrationData.get(0).toString(); 
 							     String arrOfStr[] = str.split(" "); 
 							     for (String a : arrOfStr) {
@@ -2234,6 +2294,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 								
 								 
 							}
+
 							getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Success",data);
 							return ResponseEntity.ok().body(getObjectResponse);
 						}
@@ -2259,27 +2320,48 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			{
 				return super.checkActive(TOKEN);
 			}
-			if(userId == 0 || deviceId == 0) {
+			if(userId.equals(0) || deviceId.equals(0)) {
 				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "userId and deviceId are required",null);
 				return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
 			else {
 				User loggedUser = userService.findById(userId);
 				
-				if(loggedUser == null) {
+				if(loggedUser.equals(null)) {
 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "loggedUser is not found",null);
 					
 					return ResponseEntity.status(404).body(getObjectResponse);
 				}
 				else {
 					Device device = findById(deviceId);
-					if(device == null) {
+					if(device.equals(null)) {
 						getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "device is not found",null);
 						return ResponseEntity.status(404).body(getObjectResponse);
 					}
 					else {
+						boolean isParent = false;
+						User parent = null;
+
+						 if(loggedUser.getAccountType().equals(4)) {
+							 Set<User>parentClients = loggedUser.getUsersOfUser();
+							 if(parentClients.isEmpty()) {
+								  getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allowed to get this device",null);
+									
+									logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+									return ResponseEntity.badRequest().body(getObjectResponse); 
+							 }else {
+								 for(User object : parentClients) {
+									 parent = object ;
+								 }
+								 loggedUser=parent;
+							 }
+								 
+							 
+						 }
+						
+						
 						if(checkIfParent( device ,  loggedUser)) {
-							if(loggedUser.getAccountType()!= 1) {
+							if(!loggedUser.getAccountType().equals(1)) {
 								if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "calibration")) {
 									 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to edit calibration",null);
 									 logger.info("************************ calibration ENDED ***************************");
@@ -2288,7 +2370,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 							}
 							
 							
-							if(data.get("calibrationData") == null || data.get("calibrationData").size()==0) {
+							if(data.get("calibrationData").equals(null) || data.get("calibrationData").size()==0) {
 								getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Caliberation data shouldn't be null",null);
 								return  ResponseEntity.badRequest().body(getObjectResponse);
 							}
@@ -2297,7 +2379,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 							JSONArray jsArray = new JSONArray(calibrationData);
 							String req="";
 							for (Object pushed : jsArray) {
-								if(req=="") {
+								if(req.equals("")) {
 								   req+=pushed.toString();
 								}
 								else {

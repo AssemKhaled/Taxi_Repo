@@ -1,4 +1,10 @@
-UPDATE tc_users SET  tc_users.accountType = 1 where tc_users.id = 1;
+INSERT INTO tc_users(name, email, hashedpassword,accountType)
+SELECT * FROM (SELECT 'admin', 'admin@fuinco.com','21232f297a57a5a743894a0e4a801fc3' ,'1') AS tmp
+WHERE NOT EXISTS (
+    SELECT name FROM tc_users WHERE email = 'admin@fuinco.com' 
+);
+
+UPDATE tc_users SET  tc_users.accountType = 1 where tc_users.email= 'admin@fuinco.com';
 
 INSERT INTO tc_users(name, email, hashedpassword,accountType)
 SELECT * FROM (SELECT 'vendor', 'vendor@fuinco.com','21232f297a57a5a743894a0e4a801fc3' ,'2') AS tmp
@@ -7,7 +13,7 @@ WHERE NOT EXISTS (
 );
 UPDATE tc_users SET  tc_users.accountType = 2 where tc_users.email = 'vendor@fuinco.com';
 INSERT INTO tc_user_user(userid, manageduserid)
-SELECT * FROM (SELECT '1', (SELECT id FROM tc_users WHERE email = 'vendor@fuinco.com')) AS tmp
+SELECT * FROM (SELECT ( SELECT id FROM tc_users WHERE email = 'admin@fuinco.com' ), (SELECT id FROM tc_users WHERE email = 'vendor@fuinco.com')) AS tmp
 WHERE NOT EXISTS (
     SELECT manageduserid FROM tc_user_user WHERE manageduserid = (SELECT id FROM tc_users WHERE email = 'vendor@fuinco.com')
 );
@@ -68,6 +74,14 @@ SELECT * FROM (SELECT 'STOPREPORT', '{"list":true,"export":true}') AS tmp
 WHERE NOT EXISTS (
     SELECT name FROM tc_permissions WHERE name = 'STOPREPORT'
 );
+
+INSERT INTO tc_permissions(name,functionality)
+SELECT * FROM (SELECT 'BILLING', '{"getBilling":true}') AS tmp
+WHERE NOT EXISTS (
+    SELECT name FROM tc_permissions WHERE name = 'BILLING'
+);
+
+
 
 UPDATE tc_user_user SET tc_user_user.userid= (SELECT id FROM tc_users WHERE email = 'vendor@fuinco.com') 
 where tc_user_user.manageduserid IN (SELECT id FROM tc_users WHERE tc_users.accountType=0);

@@ -74,7 +74,7 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	public User findById(Long userId) {
 		// TODO Auto-generated method stub
 		User user=userRepository.findOne(userId);
-		if(user == null) {
+		if(user.equals(null)) {
 			return null;
 		}
 		if(user.getDelete_date() != null) {
@@ -221,7 +221,7 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 			return super.checkActive(TOKEN);
 		}
 		
-		if(userId == 0) {
+		if(userId.equals(0)) {
 			 List<User> users = null;
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",users);
 			 logger.info("************************ getAllUsersOfUser ENDED ***************************");
@@ -229,14 +229,14 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 		}
 		else {
 			User Loggeduser = findById(loggedUserId);
-			if(Loggeduser == null) {
+			if(Loggeduser.equals(null)) {
 				 List<User> users = null;
 				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value() ,"This logged user ID is not found",users);
 				 logger.info("************************ getAllUsersOfUser ENDED ***************************");
 				return  ResponseEntity.status(404).body(getObjectResponse);
 			}
 			User user=userRepository.findOne(userId);
-			if(user == null) {
+			if(user.equals(null)) {
 				 List<User> users = null;
 				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value() ,"This user is not found",users);
 				 logger.info("************************ getAllUsersOfUser ENDED ***************************");
@@ -250,26 +250,44 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 						return  ResponseEntity.badRequest().body(getObjectResponse);
 					}
 				}
-				
-				 List<User> parents=getAllParentsOfuser(user,user.getAccountType());
-				 boolean isParent = false; 
-				 User parentClient = new User() ;
-				 for(User object : parents) {
-					 parentClient = object;
-					 if(userId == parentClient.getId()) {
-						isParent =true;
-						break;
+				if(user.getAccountType().equals(4)) {
+					 Set<User> parentClients = user.getUsersOfUser();
+					 if(parentClients.isEmpty()) {
+						
+						 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get geofences of this user",null);
+						 logger.info("************************ getAllUserDevices ENDED ***************************");
+						return  ResponseEntity.status(404).body(getObjectResponse);
+					 }else {
+						 User parentClient = new User() ;
+						 for(User object : parentClients) {
+							 parentClient = object;
+						 }
+						 userId=parentClient.getId();
+						 
 					 }
 				 }
-				 if(userId == loggedUserId) {
-					 isParent =true;
-				 }
-				 if(isParent == false) {
-					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "as you are not the parent of this creater user you cannot allow to edit this role.",null);
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				 }
+				else {
+					 List<User> parents=getAllParentsOfuser(user,user.getAccountType());
+					 boolean isParent = false; 
+					 User parentClient = new User();
+					 for(User object : parents) {
+						 parentClient = object;
+						 if(loggedUserId.equals(parentClient.getId())) {
+							isParent =true;
+							break;
+						 }
+					 }
+					 if(userId.equals(loggedUserId)) {
+						 isParent =true;
+					 }
+					 if(isParent == false) {
+						getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "as you are not the parent of this creater user you cannot allow to edit this role.",null);
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+					 }
+				}
+				
 
-				if(active == 0) {
+				if(active  == 0) {
 					List<User> users = userRepository.getInactiveUsersOfUser(userId,offset,search);
 					Integer size=userRepository.getInactiveUsersOfUserSize(userId);
 					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users,size);
