@@ -42,6 +42,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 	                     @ColumnResult(name="companyName"),
 	                     @ColumnResult(name="driverName"),
 	                     @ColumnResult(name="geofenceName"),
+	                     @ColumnResult(name="positionId",type=String.class),
 	                     @ColumnResult(name="lastUpdate")
 	                     }
 	           )
@@ -134,7 +135,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 	                     @ColumnResult(name="id"),
 	                     @ColumnResult(name="deviceName"),
 	                     @ColumnResult(name="lastUpdate"),
-	                     @ColumnResult(name="positionId"),
+	                     @ColumnResult(name="positionId",type=String.class),
 	                     @ColumnResult(name="photo"),
 	                     
 	                     }
@@ -184,6 +185,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 	                     @ColumnResult(name="madeYear",type=String.class),
 	                     @ColumnResult(name="color",type=String.class),
 	                     @ColumnResult(name="licenceExptDate",type=String.class),
+	                     @ColumnResult(name="positionId",type=String.class),
 	                     @ColumnResult(name="carWeight",type=String.class)	                     
 	             	
 	                     }
@@ -263,8 +265,8 @@ query="SELECT tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.la
 
 @NamedNativeQuery(name="getDeviceLiveData", 
 resultSetMapping="DevicesLiveData", 
-query=" SELECT tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.lastupdate as lastUpdate "
-		+ " ,tc_devices.photo  FROM tc_devices "
+query=" SELECT tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.lastupdate as lastUpdate,tc_devices.positionid as positionId, "
+		+ "tc_devices.photo  FROM tc_devices "
 		+ " where tc_devices.id= :deviceId and tc_devices.delete_date is null "),
 @NamedNativeQuery(name="getDeviceWorkingHours", 
 //here
