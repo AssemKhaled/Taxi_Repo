@@ -288,20 +288,20 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 				
 
 				if(active  == 0) {
-					List<User> users = userRepository.getInactiveUsersOfUser(userId,offset,search);
+					List<User> users = userRepository.getInactiveUsersOfUser(loggedUserId,userId,offset,search);
 					Integer size=userRepository.getInactiveUsersOfUserSize(userId);
 					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users,size);
 					logger.info("************************ getAllUsersOfUser ENDED ***************************");
 					return  ResponseEntity.ok().body(getObjectResponse);
 				}
 				if(active == 2) {
-					List<User> users = userRepository.getAllUsersOfUser(userId,offset,search);
+					List<User> users = userRepository.getAllUsersOfUser(loggedUserId,userId,offset,search);
 					Integer size=userRepository.getAllUsersOfUserSize(userId);
 					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users,size);
 					logger.info("************************ getAllUsersOfUser ENDED ***************************");
 					return  ResponseEntity.ok().body(getObjectResponse);
 				}
-				List<User> users = userRepository.getUsersOfUser(userId,offset,search);
+				List<User> users = userRepository.getUsersOfUser(loggedUserId,userId,offset,search);
 				Integer size=userRepository.getUsersOfUserSize(userId);
 				getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users,size);
 				logger.info("************************ getAllUsersOfUser ENDED ***************************");

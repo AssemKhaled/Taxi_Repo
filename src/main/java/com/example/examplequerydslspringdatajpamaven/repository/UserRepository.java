@@ -29,24 +29,24 @@ public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredi
 	@Query(value = "select * from tc_users u where u.id =:userId and u.delete_date Is null",nativeQuery = true)
 	public User getUserData(@Param("userId") Long userId);
 	
-	@Query(value = "SELECT tc_users.* FROM tc_user_user inner join tc_users on tc_user_user.manageduserid=tc_users.id where tc_user_user.userid = :userId and delete_date is null AND  "
+	@Query(value = "SELECT tc_users.* FROM tc_user_user inner join tc_users on tc_user_user.manageduserid=tc_users.id where tc_user_user.userid = :userId and tc_users.id != :loggedUserId and delete_date is null AND  "
 			+ "(tc_users.name LIKE %:search% OR "
 			+ "tc_users.email LIKE %:search% OR tc_users.commercial_num LIKE %:search% OR "
 			+ "tc_users.identity_num LIKE %:search%) limit :offset,10", nativeQuery = true)
-	public List<User> getUsersOfUser(@Param("userId") Long userId,@Param("offset")int offset,@Param("search")String search); 
+	public List<User> getUsersOfUser(@Param("loggedUserId") Long loggedUserId,@Param("userId") Long userId,@Param("offset")int offset,@Param("search")String search); 
 	
-	@Query(value = "SELECT tc_users.* FROM tc_user_user inner join tc_users on tc_user_user.manageduserid=tc_users.id where tc_user_user.userid = :userId AND  "
+	@Query(value = "SELECT tc_users.* FROM tc_user_user inner join tc_users on tc_user_user.manageduserid=tc_users.id where tc_user_user.userid = :userId and tc_users.id != :loggedUserId AND  "
 			+ "(tc_users.name LIKE %:search% OR "
 			+ "tc_users.email LIKE %:search% OR tc_users.commercial_num LIKE %:search% OR "
 			+ "tc_users.identity_num LIKE %:search%) limit :offset,10", nativeQuery = true)
-	public List<User> getAllUsersOfUser(@Param("userId") Long userId,@Param("offset")int offset,@Param("search")String search); 
+	public List<User> getAllUsersOfUser(@Param("loggedUserId") Long loggedUserId,@Param("userId") Long userId,@Param("offset")int offset,@Param("search")String search); 
 	
 	
-	@Query(value = "SELECT tc_users.* FROM tc_user_user inner join tc_users on tc_user_user.manageduserid=tc_users.id where tc_user_user.userid = :userId and delete_date is not  null AND  "
+	@Query(value = "SELECT tc_users.* FROM tc_user_user inner join tc_users on tc_user_user.manageduserid=tc_users.id where tc_user_user.userid = :userId and tc_users.id != :loggedUserId and delete_date is not  null AND  "
 			+ "(tc_users.name LIKE %:search% OR "
 			+ "tc_users.email LIKE %:search% OR tc_users.commercial_num LIKE %:search% OR "
 			+ "tc_users.identity_num LIKE %:search%) limit :offset,10", nativeQuery = true)
-	public List<User> getInactiveUsersOfUser(@Param("userId") Long userId,@Param("offset")int offset,@Param("search")String search); 
+	public List<User> getInactiveUsersOfUser(@Param("loggedUserId") Long loggedUserId,@Param("userId") Long userId,@Param("offset")int offset,@Param("search")String search); 
 	
 	@Query(value = "SELECT count(*) FROM tc_user_user "
 			+ " inner join tc_users on tc_user_user.manageduserid=tc_users.id "
