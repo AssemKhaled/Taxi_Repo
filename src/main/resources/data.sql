@@ -81,6 +81,26 @@ WHERE NOT EXISTS (
     SELECT name FROM tc_permissions WHERE name = 'BILLING'
 );
 
+INSERT INTO tc_permissions(name,functionality)
+SELECT * FROM (SELECT 'GROUP', '{"list":true,"create":true,"edit":true,"delete":true,"assignGroupToDriver":true,"assignGroupToGeofence":true,"assignGroupToDevice":true}') AS tmp
+WHERE NOT EXISTS (
+    SELECT name FROM tc_permissions WHERE name = 'GROUP'
+);
+
+
+INSERT INTO tc_permissions(name,functionality)
+SELECT * FROM (SELECT 'COMPUTED', '{"list":true,"create":true,"edit":true,"delete":true,"assignGroupToComputed":true,"assignDeviceToComputed":true}') AS tmp
+WHERE NOT EXISTS (
+    SELECT name FROM tc_permissions WHERE name = 'COMPUTED'
+);
+
+
+
+INSERT INTO tc_permissions(name,functionality)
+SELECT * FROM (SELECT 'NOTIFICATION', '{"list":true,"create":true,"edit":true,"delete":true,"assignGroupToNotification":true,"assignDeviceToNotification":true}') AS tmp
+WHERE NOT EXISTS (
+    SELECT name FROM tc_permissions WHERE name = 'NOTIFICATION'
+);
 
 
 UPDATE tc_user_user SET tc_user_user.userid= (SELECT id FROM tc_users WHERE email = 'vendor@fuinco.com') 

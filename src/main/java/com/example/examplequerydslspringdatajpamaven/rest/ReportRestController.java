@@ -28,76 +28,91 @@ public class ReportRestController {
 	@RequestMapping(value = "/getEventsReport", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getEvents(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 													 @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+													 @RequestParam (value = "groupId", defaultValue = "0") Long groupId,
 													 @RequestParam (value = "offset", defaultValue = "0") int offset,
 													 @RequestParam (value = "start", defaultValue = "0") String start,
 													 @RequestParam (value = "end", defaultValue = "0") String end,
+													 @RequestParam (value = "type", defaultValue = "") String type,
 													 @RequestParam (value = "search", defaultValue = "") String search,
 													 @RequestParam (value = "userId",defaultValue = "0")Long userId) {	
-    	return  reportServiceImpl.getEventsReport(TOKEN,deviceId, offset, start, end,search,userId);
+    	return  reportServiceImpl.getEventsReport(TOKEN, deviceId,groupId, offset, start, end, type, search, userId);
 
 	}
 	@RequestMapping(value = "/getDeviceWorkingHours", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getDeviceWorkingHours(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 													 @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+													 @RequestParam (value = "groupId", defaultValue = "0") Long groupId,
 													 @RequestParam (value = "offset", defaultValue = "0") int offset,
+													 @RequestParam (value = "start", defaultValue = "0") String start,
+													 @RequestParam (value = "end", defaultValue = "0") String end,
 													 @RequestParam (value = "search", defaultValue = "") String search,
 													 @RequestParam (value = "userId",defaultValue = "0")Long userId) {
 		
 		
 		
-    	return  reportServiceImpl.getDeviceWorkingHours(TOKEN,deviceId, offset,search,userId);
+    	return  reportServiceImpl.getDeviceWorkingHours(TOKEN,deviceId,groupId, offset, start, end,search,userId);
 
 	}
 	@RequestMapping(value = "/getDeviceWorkingHoursExport", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getDeviceWorkingHoursExp(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 													 @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
-													
-													 @RequestParam (value = "userId",defaultValue = "0")Long userId) {
-		
-		
-		
-    	return  reportServiceImpl.getDeviceWorkingHoursExport(TOKEN,deviceId,userId);
-
-	}
-	@RequestMapping(value = "/getDriverWorkingHours", method = RequestMethod.GET)
-	public @ResponseBody ResponseEntity<?> getDriverWorkingHours(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-													 @RequestParam (value = "driverId", defaultValue = "0") Long driverId,
-													 @RequestParam (value = "offset", defaultValue = "0") int offset,
-			
-													 @RequestParam (value = "search", defaultValue = "") String search,
-													 @RequestParam (value = "userId",defaultValue = "0")Long userId) {
-		
-		
-		
-    	return  reportServiceImpl.getDriverWorkingHours(TOKEN,driverId, offset,search,userId);
-
-	}
-	@RequestMapping(value = "/getDriverWorkingHoursExport", method = RequestMethod.GET)
-	public @ResponseBody ResponseEntity<?> getDriverWorkingHoursExp(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-													 @RequestParam (value = "driverId", defaultValue = "0") Long driverId,
-													 @RequestParam (value = "userId",defaultValue = "0")Long userId) {
-		
-		
-		
-    	return  reportServiceImpl.getDriverWorkingHoursExport(TOKEN,driverId,userId);
-
-	}
-	@RequestMapping(value = "/getEventsReportToExcel", method = RequestMethod.GET)
-	public @ResponseBody ResponseEntity<?> getEventsToExcel(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-													 @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+													 @RequestParam (value = "groupId", defaultValue = "0") Long groupId,
 													 @RequestParam (value = "start", defaultValue = "0") String start,
 													 @RequestParam (value = "end", defaultValue = "0") String end,
 													 @RequestParam (value = "userId",defaultValue = "0")Long userId) {
 		
 		
 		
-    	return  reportServiceImpl.getEventsReportToExcel(TOKEN,deviceId,start,end,userId);
+    	return  reportServiceImpl.getDeviceWorkingHoursExport(TOKEN,deviceId,groupId, start, end,userId);
+
+	}
+	@RequestMapping(value = "/getDriverWorkingHours", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getDriverWorkingHours(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+													 @RequestParam (value = "driverId", defaultValue = "0") Long driverId,
+													 @RequestParam (value = "groupId", defaultValue = "0") Long groupId,
+													 @RequestParam (value = "offset", defaultValue = "0") int offset,
+													 @RequestParam (value = "start", defaultValue = "0") String start,
+													 @RequestParam (value = "end", defaultValue = "0") String end,
+													 @RequestParam (value = "search", defaultValue = "") String search,
+													 @RequestParam (value = "userId",defaultValue = "0")Long userId) {
+		
+		
+		
+    	return  reportServiceImpl.getDriverWorkingHours(TOKEN,driverId,groupId, offset,start, end,search,userId);
+
+	}
+	@RequestMapping(value = "/getDriverWorkingHoursExport", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getDriverWorkingHoursExp(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+													 @RequestParam (value = "driverId", defaultValue = "0") Long driverId,
+													 @RequestParam (value = "groupId", defaultValue = "0") Long groupId,
+													 @RequestParam (value = "start", defaultValue = "0") String start,
+													 @RequestParam (value = "end", defaultValue = "0") String end,
+													 @RequestParam (value = "userId",defaultValue = "0")Long userId) {
+		
+		
+		
+    	return  reportServiceImpl.getDriverWorkingHoursExport(TOKEN,driverId,groupId,start,end,userId);
+
+	}
+	@RequestMapping(value = "/getEventsReportToExcel", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getEventsToExcel(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+													 @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+													 @RequestParam (value = "groupId", defaultValue = "0") Long groupId,
+													 @RequestParam (value = "start", defaultValue = "0") String start,
+													 @RequestParam (value = "end", defaultValue = "0") String end,
+													 @RequestParam (value = "type", defaultValue = "") String type,
+													 @RequestParam (value = "userId",defaultValue = "0")Long userId) {
+		
+		
+		
+    	return  reportServiceImpl.getEventsReportToExcel(TOKEN,deviceId,groupId,start,end,type,userId);
 
 	}
 	
 	@RequestMapping(value = "/getStopsReport", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getStops(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 													@RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+													@RequestParam (value = "groupId", defaultValue = "0") Long groupId,
 													@RequestParam (value = "type", defaultValue = "allEvents") String type,
 													@RequestParam (value = "from", defaultValue = "0") String from,
 													@RequestParam (value = "to", defaultValue = "0") String to,
@@ -108,7 +123,7 @@ public class ReportRestController {
 		
 
 		
-    	return reportServiceImpl.getStopsReport(TOKEN,deviceId, type, from, to, page, start, limit,userId);
+    	return reportServiceImpl.getStopsReport(TOKEN,deviceId,groupId, type, from, to, page, start, limit,userId);
 		
 		
 	}
@@ -117,6 +132,7 @@ public class ReportRestController {
 	@RequestMapping(value = "/getTripsReport", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getTrips(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 													@RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+													@RequestParam (value = "groupId", defaultValue = "0") Long groupId,
 													@RequestParam (value = "type", defaultValue = "allEvents") String type,
 													@RequestParam (value = "from", defaultValue = "0") String from,
 													@RequestParam (value = "to", defaultValue = "0") String to,
@@ -126,10 +142,171 @@ public class ReportRestController {
 													@RequestParam (value = "userId",defaultValue = "0")Long userId) {
 												
 
-    	return  reportServiceImpl.getTripsReport(TOKEN,deviceId, type, from, to, page, start, limit,userId);
+    	return  reportServiceImpl.getTripsReport(TOKEN,deviceId,groupId, type, from, to, page, start, limit,userId);
 		 
 		
 	}
 	
+	@RequestMapping(value = "/getEventsReportByType", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getEvents(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+													@RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+													@RequestParam (value = "groupId", defaultValue = "0") Long groupId,
+													@RequestParam (value = "type", defaultValue = "allEvents") String type,
+													@RequestParam (value = "from", defaultValue = "0") String from,
+													@RequestParam (value = "to", defaultValue = "0") String to,
+													@RequestParam (value = "page", defaultValue = "1") int page,
+													@RequestParam (value = "start", defaultValue = "0") int start,
+													@RequestParam (value = "limit", defaultValue = "25") int limit,
+													@RequestParam (value = "userId",defaultValue = "0")Long userId) {
+												
+
+    	return  reportServiceImpl.getEventsReportByType(TOKEN,deviceId,groupId, type, from, to, page, start, limit,userId);
+		 
+		
+	}
+	
+	@RequestMapping(value = "/getSummaryReport", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getSummary(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+													@RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+													@RequestParam (value = "groupId", defaultValue = "0") Long groupId,
+													@RequestParam (value = "type", defaultValue = "allEvents") String type,
+													@RequestParam (value = "from", defaultValue = "0") String from,
+													@RequestParam (value = "to", defaultValue = "0") String to,
+													@RequestParam (value = "page", defaultValue = "1") int page,
+													@RequestParam (value = "start", defaultValue = "0") int start,
+													@RequestParam (value = "limit", defaultValue = "25") int limit,
+													@RequestParam (value = "userId",defaultValue = "0")Long userId) {
+												
+
+    	return  reportServiceImpl.getSummaryReport(TOKEN,deviceId,groupId, type, from, to, page, start, limit,userId);
+		 
+		
+	}
+	
+	@RequestMapping(value = "/getSensorsReport", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getSensors(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+													 @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+													 @RequestParam (value = "groupId", defaultValue = "0") Long groupId,
+													 @RequestParam (value = "offset", defaultValue = "0") int offset,
+													 @RequestParam (value = "start", defaultValue = "0") String start,
+													 @RequestParam (value = "end", defaultValue = "0") String end,
+													 @RequestParam (value = "search", defaultValue = "") String search,
+													 @RequestParam (value = "userId",defaultValue = "0")Long userId) {
+		
+		
+		
+    	return  reportServiceImpl.getSensorsReport(TOKEN,deviceId,groupId, offset, start, end,search,userId);
+
+	}
+	
+	@RequestMapping(value = "/getSensorsReportToExcel", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getSensorsReportToExcel(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+													 @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+													 @RequestParam (value = "groupId", defaultValue = "0") Long groupId,
+													 @RequestParam (value = "start", defaultValue = "0") String start,
+													 @RequestParam (value = "end", defaultValue = "0") String end,
+													 @RequestParam (value = "userId",defaultValue = "0")Long userId) {
+		
+		
+		
+    	return  reportServiceImpl.getSensorsReportExport(TOKEN,deviceId,groupId,start,end,userId);
+
+	}
+	
+	@RequestMapping(value = "/getNumTripsReport", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getNumTripsReport(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+													@RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+													@RequestParam (value = "driverId", defaultValue = "0") Long driverId,
+													@RequestParam (value = "groupId", defaultValue = "0") Long groupId,
+													@RequestParam (value = "type", defaultValue = "allEvents") String type,
+													@RequestParam (value = "from", defaultValue = "0") String from,
+													@RequestParam (value = "to", defaultValue = "0") String to,
+													@RequestParam (value = "page", defaultValue = "1") int page,
+													@RequestParam (value = "start", defaultValue = "0") int start,
+													@RequestParam (value = "limit", defaultValue = "25") int limit,
+													@RequestParam (value = "userId",defaultValue = "0")Long userId) {
+												
+
+    	return  reportServiceImpl.getNumTripsReport(TOKEN,deviceId,driverId,groupId, type, from, to, page, start, limit,userId);
+		 
+		
+	}
+	
+	@RequestMapping(value = "/getNumStopsReport", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getNumStopsReport(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+													@RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+													@RequestParam (value = "driverId", defaultValue = "0") Long driverId,
+													@RequestParam (value = "groupId", defaultValue = "0") Long groupId,
+													@RequestParam (value = "type", defaultValue = "allEvents") String type,
+													@RequestParam (value = "from", defaultValue = "0") String from,
+													@RequestParam (value = "to", defaultValue = "0") String to,
+													@RequestParam (value = "page", defaultValue = "1") int page,
+													@RequestParam (value = "start", defaultValue = "0") int start,
+													@RequestParam (value = "limit", defaultValue = "25") int limit,
+													@RequestParam (value = "userId",defaultValue = "0")Long userId) {
+		
+
+		
+    	return reportServiceImpl.getNumStopsReport(TOKEN,deviceId,driverId,groupId, type, from, to, page, start, limit,userId);
+		
+		
+	}
+	
+	@RequestMapping(value = "/geTotalTripsReport", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> geTotalTripsReport(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+													@RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+													@RequestParam (value = "driverId", defaultValue = "0") Long driverId,
+													@RequestParam (value = "groupId", defaultValue = "0") Long groupId,
+													@RequestParam (value = "type", defaultValue = "allEvents") String type,
+													@RequestParam (value = "from", defaultValue = "0") String from,
+													@RequestParam (value = "to", defaultValue = "0") String to,
+													@RequestParam (value = "page", defaultValue = "1") int page,
+													@RequestParam (value = "start", defaultValue = "0") int start,
+													@RequestParam (value = "limit", defaultValue = "25") int limit,
+													@RequestParam (value = "userId",defaultValue = "0")Long userId) {
+												
+
+    	return  reportServiceImpl.geTotalTripsReport(TOKEN,deviceId,driverId,groupId, type, from, to, page, start, limit,userId);
+		 
+		
+	}
+	
+	@RequestMapping(value = "/getTotalStopsReport", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getTotalStopsReport(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+													@RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+													@RequestParam (value = "driverId", defaultValue = "0") Long driverId,
+													@RequestParam (value = "groupId", defaultValue = "0") Long groupId,
+													@RequestParam (value = "type", defaultValue = "allEvents") String type,
+													@RequestParam (value = "from", defaultValue = "0") String from,
+													@RequestParam (value = "to", defaultValue = "0") String to,
+													@RequestParam (value = "page", defaultValue = "1") int page,
+													@RequestParam (value = "start", defaultValue = "0") int start,
+													@RequestParam (value = "limit", defaultValue = "25") int limit,
+													@RequestParam (value = "userId",defaultValue = "0")Long userId) {
+		
+
+		
+    	return reportServiceImpl.getTotalStopsReport(TOKEN,deviceId,driverId,groupId, type, from, to, page, start, limit,userId);
+		
+		
+	}
+	
+	@RequestMapping(value = "/getNumberDriverWorkingHours", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getNumberDriverWorkingHours(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+													 @RequestParam (value = "driverId", defaultValue = "0") Long driverId,
+													 @RequestParam (value = "groupId", defaultValue = "0") Long groupId,
+													 @RequestParam (value = "offset", defaultValue = "0") int offset,
+													 @RequestParam (value = "start", defaultValue = "0") String start,
+													 @RequestParam (value = "end", defaultValue = "0") String end,
+													 @RequestParam (value = "search", defaultValue = "") String search,
+													 @RequestParam (value = "userId",defaultValue = "0")Long userId) {
+		
+		
+		
+    	return  reportServiceImpl.getNumberDriverWorkingHours(TOKEN,driverId,groupId, offset,start, end,search,userId);
+
+	}
+	
+
 
 }

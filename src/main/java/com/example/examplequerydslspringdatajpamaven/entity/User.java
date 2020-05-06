@@ -337,10 +337,44 @@ public class User {
 	
 	
 
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            mappedBy = "userGroup")
+    private Set<Group> groups = new HashSet<>();
 
+	public Set<Group> getGroups() {
+		return groups;
+	}
+	public void setGroups(Set<Group> groups) {
+		this.groups = groups;
+	}
+    
+	
+	@JsonIgnore
+    @ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            mappedBy = "userNotification")
+    private Set<Notification> notifications = new HashSet<>();
+
+	public Set<Notification> getNotifications() {
+		return notifications;
+	}
+	public void setNotifications(Set<Notification> notifications) {
+		this.notifications = notifications;
+	}
+
+	@JsonIgnore
+    @ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            mappedBy = "userAttribute")
+    private Set<Attribute> attributes = new HashSet<>();
+
+	public Set<Attribute> getAttributes() {
+		return attributes;
+	}
+	public void setAttributes(Set<Attribute> attributes) {
+		this.attributes = attributes;
+	}
 	
 	
-
 
 
 }

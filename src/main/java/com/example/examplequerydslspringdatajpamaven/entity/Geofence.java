@@ -169,6 +169,19 @@ public class Geofence {
 	}*/
 	
 	
-	
+	 @JsonIgnore
+    @ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            mappedBy = "geofenceGroup")
+    private Set<Group> groups = new HashSet<>();
+
+	public Set<Group> getGroups() {
+		return groups;
+	}
+
+	public void setGroups(Set<Group> groups) {
+		this.groups = groups;
+	}
+	 
+	 
 
 }

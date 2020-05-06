@@ -1,6 +1,7 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
 import java.util.Date;
+import java.util.Map;
 
 public class CustomDeviceList{
 	
@@ -31,8 +32,22 @@ public class CustomDeviceList{
 	private String carWeight;
 	private String vehiclePlate;
 	private String companyName;
+	private String positionId;
+	private String latitude;
+	private String longitude;
+	private String speed;
+	private String address;
+	private String attributes;
+	private Map<Object, Object>  positionAttributes;
 
-	
+	public Map<Object, Object> getPositionAttributes() {
+		return positionAttributes;
+	}
+
+	public void setPositionAttributes(Map<Object, Object> positionAttributes) {
+		this.positionAttributes = positionAttributes;
+	}
+
 	public CustomDeviceList(int id ,String deviceName,String uniqueId , String sequenceNumber, String referenceKey , String companyName, String driverName ,String geofenceName ,Date lastUpdate ) {
 		this.id = id;
 		this.deviceName = deviceName;
@@ -50,7 +65,6 @@ public class CustomDeviceList{
 	public CustomDeviceList(int id,String uniqueId, String sequenceNumber, String driverName, Long driverId,
 			String driverPhoto,String driverUniqueId ,String plateType, String vehiclePlate, String ownerName, String ownerId, String userName, String brand, String model,
 			String madeYear, String color, String licenceExptDate, String carWeight) {
-		super();
 		this.id=id;
 		this.uniqueId = uniqueId;
 		this.sequenceNumber = sequenceNumber;
@@ -69,6 +83,38 @@ public class CustomDeviceList{
 		this.color = color;
 		this.licenceExptDate = licenceExptDate;
 		this.carWeight = carWeight;
+	}
+
+	public CustomDeviceList(int id, String deviceName,String uniqueId, String sequenceNumber, String driverName, Long driverId,
+			String driverPhoto,String driverUniqueId ,String plateType, String vehiclePlate, String ownerName, String ownerId, String userName, String brand, String model,
+			String madeYear, String color, String licenceExptDate, String carWeight,
+			String positionId, String latitude, String longitude, String speed, String address,String attributes) {
+		super();
+		this.deviceName = deviceName;
+		this.id=id;
+		this.uniqueId = uniqueId;
+		this.sequenceNumber = sequenceNumber;
+		this.driverName = driverName;
+		this.driverId = driverId;
+		this.driverPhoto = driverPhoto;
+		this.driverUniqueId = driverUniqueId;
+		this.plateType = plateType;
+		this.vehiclePlate=vehiclePlate;
+		this.ownerName = ownerName;
+		this.ownerId = ownerId;
+		this.userName = userName;
+		this.brand = brand;
+		this.model = model;
+		this.madeYear = madeYear;
+		this.color = color;
+		this.licenceExptDate = licenceExptDate;
+		this.carWeight = carWeight;
+		this.positionId = positionId;
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.speed = speed;
+		this.address = address;
+		this.attributes = attributes;
 	}
 
 	public int getId() {
@@ -288,6 +334,56 @@ public class CustomDeviceList{
 	public void setCompanyName(String companyName) {
 		this.companyName = companyName;
 	}
+
+	public String getPositionId() {
+		return positionId;
+	}
+
+	public void setPositionId(String positionId) {
+		this.positionId = positionId;
+	}
+
+	public String getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(String latitude) {
+		this.latitude = latitude;
+	}
+
+	public String getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(String longitude) {
+		this.longitude = longitude;
+	}
+
+	public String getSpeed() {
+		return speed;
+	}
+
+	public void setSpeed(String speed) {
+		this.speed = speed;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getAttributes() {
+		return attributes;
+	}
+
+	public void setAttributes(String attributes) {
+		this.attributes = attributes;
+	}
+	
+	
 	
 
 }

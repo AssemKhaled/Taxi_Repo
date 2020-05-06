@@ -104,11 +104,29 @@ import javax.persistence.Table;
 		     		+ " LEFT JOIN tc_geofences ON tc_geofences.id=tc_events.geofenceid"
 		     		+ " LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_events.deviceid"
 		     		+ " LEFT JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id"
-		     		+ " WHERE tc_events.servertime>=:start AND tc_events.servertime>=:end "
-		     		+ " and tc_events.deviceid =:deviceId AND tc_devices.delete_date IS NULL AND"
+		     		+ " WHERE tc_events.servertime between :start AND :end "
+		     		+ " and tc_events.deviceid IN(:deviceIds) AND tc_devices.delete_date IS NULL AND"
 		     		+ " tc_drivers.delete_date IS NULL AND tc_geofences.delete_date IS NULL"
 					+ " and ( (tc_events.type Like :search) OR (tc_events.attributes Like :search) OR (tc_events.servertime Like :search) OR (tc_geofences.name Like :search) OR (tc_drivers.name Like :search)  OR (tc_devices.name Like :search) )"
 		     		+ " ORDER BY tc_events.servertime DESC LIMIT :offset, 10"),
+	@NamedNativeQuery(name="getEventsSort", 
+    resultSetMapping="eventReport", 
+    query="SELECT tc_events.id as eventId,"
+    		+ " tc_events.type as eventType"
+    		+ " , tc_events.servertime as serverTime,tc_events.attributes as attributes,tc_events.positionid as positionId,"
+    		+ " tc_devices.id as deviceId,tc_devices.name as deviceName,"
+    		+ " tc_drivers.id as driverId,tc_drivers.name as driverName ,"
+    		+ " tc_geofences.id as geofenceId,tc_geofences.name as geofenceName"
+    		+ " FROM tc_events INNER JOIN tc_devices ON tc_devices.id=tc_events.deviceid"
+    		+ " LEFT JOIN tc_geofences ON tc_geofences.id=tc_events.geofenceid"
+    		+ " LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_events.deviceid"
+    		+ " LEFT JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id"
+    		+ " WHERE tc_events.servertime between :start AND :end "
+    		+ " and tc_events.type like :type"
+    		+ " and tc_events.deviceid IN(:deviceIds) AND tc_devices.delete_date IS NULL AND"
+    		+ " tc_drivers.delete_date IS NULL AND tc_geofences.delete_date IS NULL"
+			+ " and ( (tc_events.type Like :search) OR (tc_events.attributes Like :search) OR (tc_events.servertime Like :search) OR (tc_geofences.name Like :search) OR (tc_drivers.name Like :search)  OR (tc_devices.name Like :search) )"
+    		+ " ORDER BY tc_events.servertime DESC LIMIT :offset, 10"),
 //@NamedNativeQueries({
 //	@NamedNativeQuery(name="getEvents", 
 //		     resultSetMapping="eventReport", 
@@ -145,8 +163,27 @@ import javax.persistence.Table;
     		+ " LEFT JOIN tc_geofences ON tc_geofences.id=tc_events.geofenceid"
     		+ " LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_events.deviceid"
     		+ " LEFT JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id"
-    		+ " WHERE tc_events.servertime>= :start AND tc_events.servertime>= :end "
-    		+ " and tc_events.deviceid =:deviceId AND tc_devices.delete_date IS NULL AND"
+    		+ " WHERE tc_events.servertime between :start AND :end "
+    		+ " and tc_events.deviceid IN(:deviceId) AND tc_devices.delete_date IS NULL AND"
+    		+ " tc_drivers.delete_date IS NULL AND tc_geofences.delete_date IS NULL"),
+	
+	@NamedNativeQuery(name="getEventsToExcelSort", 
+    resultSetMapping="eventReport", 
+    query="SELECT tc_events.id as eventId,"
+    		+ " tc_events.type as eventType"
+    		+ " , tc_events.servertime as serverTime,tc_events.attributes as attributes"
+    		+ ",tc_events.positionid as positionId,"
+    		+ " tc_devices.id as deviceId,tc_devices.name as deviceName,"
+    		+ " tc_drivers.id as driverId,tc_drivers.name as driverName ,"
+    		+ " tc_geofences.id as geofenceId,tc_geofences.name as geofenceName"
+    		+ " FROM tc_events INNER JOIN tc_devices ON tc_devices.id=tc_events.deviceid"
+    		+ " LEFT JOIN tc_positions ON tc_positions.id=tc_events.positionid "
+    		+ " LEFT JOIN tc_geofences ON tc_geofences.id=tc_events.geofenceid"
+    		+ " LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_events.deviceid"
+    		+ " LEFT JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id"
+    		+ " WHERE tc_events.servertime between :start AND :end "
+    		+" and tc_events.type like :type"
+    		+ " and tc_events.deviceid IN(:deviceId) AND tc_devices.delete_date IS NULL AND"
     		+ " tc_drivers.delete_date IS NULL AND tc_geofences.delete_date IS NULL"),
 //	@NamedNativeQuery(name="getEventsToExcel", 
 //    resultSetMapping="eventReport", 

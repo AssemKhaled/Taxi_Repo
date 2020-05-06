@@ -57,7 +57,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 	                     @ColumnResult(name="deviceTime",type=String.class),
 	                     @ColumnResult(name="positionId",type=String.class),
 	                     @ColumnResult(name="attributes",type=String.class),
-	                     @ColumnResult(name="deviceId",type=Long.class),
+	                     @ColumnResult(name="deviceId",type=Integer.class),
 	                     @ColumnResult(name="deviceName",type=String.class)
 	                     }
 	           )
@@ -181,25 +181,31 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 	           @ConstructorResult(
 	                targetClass=CustomDeviceList.class,
 	                  columns={
-	 	                 @ColumnResult(name="id",type=int.class),
-	                     @ColumnResult(name="uniqueId",type=String.class),
-	                     @ColumnResult(name="sequenceNumber",type=String.class),
-	                     @ColumnResult(name="driverName",type=String.class),
-	                     @ColumnResult(name="driverId",type=Long.class),
-	                     @ColumnResult(name="driverPhoto",type=String.class),
-	                     @ColumnResult(name="driverUniqueId",type=String.class),
-	                     @ColumnResult(name="plateType",type=String.class),
-	                     @ColumnResult(name="vehiclePlate",type=String.class),
-	                     @ColumnResult(name="ownerName",type=String.class),
-	                     @ColumnResult(name="ownerId",type=String.class),
-	                     @ColumnResult(name="userName",type=String.class),
-	                     @ColumnResult(name="brand",type=String.class),
-	                     @ColumnResult(name="model",type=String.class),
-	                     @ColumnResult(name="madeYear",type=String.class),
-	                     @ColumnResult(name="color",type=String.class),
-	                     @ColumnResult(name="licenceExptDate",type=String.class),
-	                     @ColumnResult(name="positionId",type=String.class),
-	                     @ColumnResult(name="carWeight",type=String.class)	                     
+	                		 @ColumnResult(name="id",type=int.class),
+	 	                     @ColumnResult(name="deviceName",type=String.class),
+	 	                     @ColumnResult(name="uniqueId",type=String.class),
+	 	                     @ColumnResult(name="sequenceNumber",type=String.class),
+	 	                     @ColumnResult(name="driverName",type=String.class),
+	 	                     @ColumnResult(name="driverId",type=Long.class),
+	 	                     @ColumnResult(name="driverPhoto",type=String.class),
+	 	                     @ColumnResult(name="driverUniqueId",type=String.class),
+	 	                     @ColumnResult(name="plateType",type=String.class),
+	 	                     @ColumnResult(name="vehiclePlate",type=String.class),
+	 	                     @ColumnResult(name="ownerName",type=String.class),
+	 	                     @ColumnResult(name="ownerId",type=String.class),
+	 	                     @ColumnResult(name="userName",type=String.class),
+	 	                     @ColumnResult(name="brand",type=String.class),
+	 	                     @ColumnResult(name="model",type=String.class),
+	 	                     @ColumnResult(name="madeYear",type=String.class),
+	 	                     @ColumnResult(name="color",type=String.class),
+	 	                     @ColumnResult(name="licenceExptDate",type=String.class),
+	 	                     @ColumnResult(name="carWeight",type=String.class),
+		 	                 @ColumnResult(name="positionId",type=String.class),
+		 	                 @ColumnResult(name="latitude",type=String.class),
+		 	                 @ColumnResult(name="longitude",type=String.class),
+		 	                 @ColumnResult(name="speed",type=String.class),
+		 	                 @ColumnResult(name="address",type=String.class),
+		 	                 @ColumnResult(name="attributes",type=String.class),
 	             	
 	                     }
 	           )
@@ -297,13 +303,18 @@ query=" SELECT tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.l
 @NamedNativeQuery(name="getDeviceWorkingHours", 
 //here
 resultSetMapping="DeviceWorkingHours", 
-query="SELECT  deviceid as deviceId,tc_devices.name as deviceName FROM tc_devices"+
-		" WHERE deviceid=:deviceId  limit :offset,10"),
+query="SELECT  tc_positions.devicetime deviceTime ,tc_positions.id as positionId,tc_positions.attributes as attributes, " + 
+		" deviceid as deviceId,tc_devices.name as deviceName  FROM tc_positions "+
+		"INNER JOIN tc_devices ON tc_devices.id=tc_positions.deviceid "+
+		" WHERE deviceid IN(:deviceId) and tc_positions.devicetime between :start and  :end "
+		+ " order by devicetime DESC limit :offset,10 "),
 
 @NamedNativeQuery(name="getDeviceWorkingHoursExport", 
 resultSetMapping="DeviceWorkingHours", 
-query="SELECT  deviceid as deviceId,tc_devices.name as deviceName FROM tc_devices " + 
-		" WHERE deviceid=:deviceId "),
+query="SELECT  tc_positions.devicetime deviceTime ,tc_positions.id as positionId,tc_positions.attributes as attributes, " + 
+		" deviceid as deviceId,tc_devices.name as deviceName  FROM tc_positions "+
+		"INNER JOIN tc_devices ON tc_devices.id=tc_positions.deviceid "+
+		" WHERE deviceid IN(:deviceId) and tc_positions.devicetime between :start and  :end "),
 
 //@NamedNativeQuery(name="getDeviceWorkingHoursExport", 
 //resultSetMapping="DeviceWorkingHours", 
@@ -317,19 +328,21 @@ query="SELECT  deviceid as deviceId,tc_devices.name as deviceName FROM tc_device
 
 @NamedNativeQuery(name="vehicleInfo", 
 resultSetMapping="vehicleInfoData", 
-query=" SELECT tc_drivers.id as driverId,tc_drivers.uniqueid as driverUniqueId,tc_drivers.name as driverName,tc_drivers.photo as driverPhoto,"
-		+ " tc_devices.id as id,tc_devices.uniqueid as uniqueId,tc_devices.sequence_number as sequenceNumber,"
-		+ " tc_devices.owner_name as ownerName,tc_devices.owner_id as ownerId, "
-		+ " tc_devices.username as userName,tc_devices.model as model ,"
-		+ " tc_devices.brand as brand,tc_devices.made_year as madeYear,"
-		+ " tc_devices.color as color,tc_devices.car_weight as carWeight,"
-		+ " tc_devices.license_exp as licenceExptDate,"
-		+ " CONCAT_WS(' ',tc_devices.plate_num,tc_devices.right_letter,tc_devices.middle_letter,tc_devices.left_letter) as vehiclePlate,"
-		+ " tc_devices.plate_type as plateType"
-		+ " FROM tc_devices "
-		+ " LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_devices.id "
-		+ " LEFT JOIN tc_drivers ON tc_drivers.id=tc_device_driver.driverid "
-		+ " WHERE tc_devices.id=:deviceId AND tc_devices.delete_date IS NULL")
+query=" SELECT tc_drivers.id as driverId,tc_drivers.uniqueid as driverUniqueId,tc_drivers.name as driverName,tc_drivers.photo as driverPhoto," + 
+		" tc_devices.id as id,tc_devices.name as deviceName,tc_devices.uniqueid as uniqueId,tc_devices.sequence_number as sequenceNumber," + 
+		" tc_devices.owner_name as ownerName,tc_devices.owner_id as ownerId, " + 
+		" tc_devices.username as userName,tc_devices.model as model , " + 
+		" tc_devices.brand as brand,tc_devices.made_year as madeYear, " + 
+		" tc_devices.color as color,tc_devices.car_weight as carWeight, " + 
+		" tc_devices.license_exp as licenceExptDate, " + 
+		" CONCAT_WS(' ',tc_devices.plate_num,tc_devices.right_letter,tc_devices.middle_letter,tc_devices.left_letter) as vehiclePlate, " + 
+		" tc_devices.plate_type as plateType,tc_positions.id as positionId,tc_positions.latitude as latitude,tc_positions.longitude as longitude, " + 
+		" tc_positions.speed as speed,tc_positions.address as address,tc_positions.attributes as attributes " + 
+		" FROM tc_devices  " + 
+		" LEFT JOIN tc_positions ON tc_positions.id = tc_devices.positionid " + 
+		" LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_devices.id " + 
+		" LEFT JOIN tc_drivers ON tc_drivers.id=tc_device_driver.driverid " + 
+		" WHERE tc_devices.id=:deviceId AND tc_devices.delete_date IS NULL")
 
 
 })
@@ -422,6 +435,12 @@ public class Device {
 	
 	@Column(name = "calibrationData",length=1024)
 	private String calibrationData;
+	
+	@Column(name = "fuel",length=1024)
+	private String fuel;
+	
+	@Column(name = "sensorSettings",length=1024)
+	private String sensorSettings;
 	
 	@Column(name = "lineData")
 	private String lineData;
@@ -823,9 +842,242 @@ public class Device {
 	public void setPositionid(String positionid) {
 		this.positionid = positionid;
 	}
+
+	public String getPlate_num() {
+		return plate_num;
+	}
+
+	public void setPlate_num(String plate_num) {
+		this.plate_num = plate_num;
+	}
+
+	public String getRight_letter() {
+		return right_letter;
+	}
+
+	public void setRight_letter(String right_letter) {
+		this.right_letter = right_letter;
+	}
+
+	public String getMiddle_letter() {
+		return middle_letter;
+	}
+
+	public void setMiddle_letter(String middle_letter) {
+		this.middle_letter = middle_letter;
+	}
+
+	public String getLeft_letter() {
+		return left_letter;
+	}
+
+	public void setLeft_letter(String left_letter) {
+		this.left_letter = left_letter;
+	}
+
+	public Integer getPlate_type() {
+		return plate_type;
+	}
+
+	public void setPlate_type(Integer plate_type) {
+		this.plate_type = plate_type;
+	}
+
+	public String getReference_key() {
+		return reference_key;
+	}
+
+	public void setReference_key(String reference_key) {
+		this.reference_key = reference_key;
+	}
+
+	public Integer getIs_deleted() {
+		return is_deleted;
+	}
+
+	public void setIs_deleted(Integer is_deleted) {
+		this.is_deleted = is_deleted;
+	}
+
+	public String getDelete_date() {
+		return delete_date;
+	}
+
+	public void setDelete_date(String delete_date) {
+		this.delete_date = delete_date;
+	}
+
+	public Integer getInit_sensor() {
+		return init_sensor;
+	}
+
+	public void setInit_sensor(Integer init_sensor) {
+		this.init_sensor = init_sensor;
+	}
+
+	public Integer getInit_sensor2() {
+		return init_sensor2;
+	}
+
+	public void setInit_sensor2(Integer init_sensor2) {
+		this.init_sensor2 = init_sensor2;
+	}
+
+	public Integer getCar_weight() {
+		return car_weight;
+	}
+
+	public void setCar_weight(Integer car_weight) {
+		this.car_weight = car_weight;
+	}
+
+	public String getReject_reason() {
+		return reject_reason;
+	}
+
+	public void setReject_reason(String reject_reason) {
+		this.reject_reason = reject_reason;
+	}
+
+	public String getSequence_number() {
+		return sequence_number;
+	}
+
+	public void setSequence_number(String sequence_number) {
+		this.sequence_number = sequence_number;
+	}
+
+	public Integer getIs_valid() {
+		return is_valid;
+	}
+
+	public void setIs_valid(Integer is_valid) {
+		this.is_valid = is_valid;
+	}
+
+	public String getFuel() {
+		return fuel;
+	}
+
+	public void setFuel(String fuel) {
+		this.fuel = fuel;
+	}
+
+	public String getOwner_name() {
+		return owner_name;
+	}
+
+	public void setOwner_name(String owner_name) {
+		this.owner_name = owner_name;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getOwner_id() {
+		return owner_id;
+	}
+
+	public void setOwner_id(String owner_id) {
+		this.owner_id = owner_id;
+	}
+
+	public String getMade_year() {
+		return made_year;
+	}
+
+	public void setMade_year(String made_year) {
+		this.made_year = made_year;
+	}
+
+	public String getLicense_exp() {
+		return license_exp;
+	}
+
+	public void setLicense_exp(String license_exp) {
+		this.license_exp = license_exp;
+	}
+
+	public Integer getDate_type() {
+		return date_type;
+	}
+
+	public void setDate_type(Integer date_type) {
+		this.date_type = date_type;
+	}
 	
+	
+	public String getSensorSettings() {
+		return sensorSettings;
+	}
+
+	public void setSensorSettings(String sensorSettings) {
+		this.sensorSettings = sensorSettings;
+	}
+
+
+	@JsonIgnore
+    @ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            mappedBy = "deviceGroup")
+    private Set<Group> groups = new HashSet<>();
+
+
+	public Set<Group> getGroups() {
+		return groups;
+	}
+
+	public void setGroups(Set<Group> groups) {
+		this.groups = groups;
+	}
+
+	@JsonIgnore 
+	@ManyToMany(
+            fetch = FetchType.LAZY,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+    )
+    @JoinTable(
+            name = "tc_device_notification",
+            joinColumns = { @JoinColumn(name = "deviceid") },
+            inverseJoinColumns = { @JoinColumn(name = "notificationid") }
+    )
+	private Set<Notification> notificationDevice= new HashSet<>();
+
+
+	public Set<Notification> getNotificationDevice() {
+		return notificationDevice;
+	}
+
+	public void setNotificationDevice(Set<Notification> notificationDevice) {
+		this.notificationDevice = notificationDevice;
+	}
  
  
+	@JsonIgnore 
+	@ManyToMany(
+            fetch = FetchType.LAZY,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+    )
+    @JoinTable(
+            name = "tc_device_attribute",
+            joinColumns = { @JoinColumn(name = "deviceid") },
+            inverseJoinColumns = { @JoinColumn(name = "attributeid") }
+    )
+	private Set<Attribute> attributeDevice= new HashSet<>();
+
+
+	public Set<Attribute> getAttributeDevice() {
+		return attributeDevice;
+	}
+
+	public void setAttributeDevice(Set<Attribute> attributeDevice) {
+		this.attributeDevice = attributeDevice;
+	}
+	
 	
 }
 

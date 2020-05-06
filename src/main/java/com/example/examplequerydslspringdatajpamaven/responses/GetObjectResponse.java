@@ -1,12 +1,14 @@
 package com.example.examplequerydslspringdatajpamaven.responses;
 
 import java.util.List;
+import java.util.Map;
 
 public class GetObjectResponse {
 	
 	private Integer responseCode;
 	private String  message;
 	private List<?> entity;
+	private Map<Object, Object>  sensorSettings;
 	private Integer size;
 	
 	
@@ -16,10 +18,25 @@ public class GetObjectResponse {
 	   this.entity = entity;
 	  
    }
+   public GetObjectResponse(Integer responseCode, String message,List<?> entity, Map<Object, Object>  sensorSettings) {
+	   this.responseCode = responseCode;
+	   this.message = message;
+	   this.entity = entity;
+	   this.sensorSettings = sensorSettings;
+
+   }
    public GetObjectResponse(Integer responseCode, String message,List<?> entity,Integer size) {
 	   this.responseCode = responseCode;
 	   this.message = message;
 	   this.entity = entity;
+	   this.size = size;
+
+   }
+   public GetObjectResponse(Integer responseCode, String message,List<?> entity, Map<Object, Object>  sensorSettings,Integer size) {
+	   this.responseCode = responseCode;
+	   this.message = message;
+	   this.entity = entity;
+	   this.sensorSettings = sensorSettings;
 	   this.size = size;
 
    }
@@ -52,6 +69,12 @@ public class GetObjectResponse {
 	}
 	public void setSize(Integer size) {
 		this.size = size;
+	}
+	public  Map<Object, Object>  getSensorSettings() {
+		return sensorSettings;
+	}
+	public void setSensorSettings( Map<Object, Object>  sensorSettings) {
+		this.sensorSettings = sensorSettings;
 	}
 	   
 	  
