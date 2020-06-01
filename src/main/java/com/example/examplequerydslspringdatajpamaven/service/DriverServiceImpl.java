@@ -791,7 +791,7 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 
 	public  ResponseEntity<?> getDriverSelect(String TOKEN,Long userId) {
 
-		logger.info("************************ getDeviceSelect STARTED ***************************");
+		logger.info("************************ getDriverSelect STARTED ***************************");
 		List<DriverSelect> drivers = new ArrayList<DriverSelect>();
 		if(TOKEN.equals("")) {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",drivers);
@@ -804,6 +804,8 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 		}
 	    if(userId != 0) {
 	    	User user = userServiceImpl.findById(userId);
+	    	userServiceImpl.resetChildernArray();
+
 	    	if(user != null) {
 	    		if(user.getDelete_date() == null) {
 	    			
@@ -811,7 +813,7 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 	   				 Set<User>parentClient = user.getUsersOfUser();
 	   					if(parentClient.isEmpty()) {
 	   						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
-	   						logger.info("************************ editDevice ENDED ***************************");
+	   						logger.info("************************ getDriverSelect ENDED ***************************");
 	   						return ResponseEntity.badRequest().body(getObjectResponse);
 	   					}else {
 	   					  
@@ -820,9 +822,12 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 	   							parent = object;
 	   						}
 	   						if(!parent.equals(null)) {
-	   							drivers = driverRepository.getDriverSelect(parent.getId());
+
+					   			List<Long>usersIds= new ArrayList<>();
+			   					usersIds.add(parent.getId());
+	   							drivers = driverRepository.getDriverSelect(usersIds);
 	   							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
-	   							logger.info("************************ getDeviceSelect ENDED ***************************");
+	   							logger.info("************************ getDriverSelect ENDED ***************************");
 	   							return ResponseEntity.ok().body(getObjectResponse);
 	   						}
 	   						else {
@@ -832,11 +837,21 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 	   						
 	   					}
 	   			 }
+	    			 List<User>childernUsers = userServiceImpl.getAllChildernOfUser(userId);
+		   			 List<Long>usersIds= new ArrayList<>();
+		   			 if(childernUsers.isEmpty()) {
+		   				 usersIds.add(userId);
+		   			 }
+		   			 else {
+		   				 usersIds.add(userId);
+		   				 for(User object : childernUsers) {
+		   					 usersIds.add(object.getId());
+		   				 }
+		   			 }
 	    			
-	    			
-	    			drivers = driverRepository.getDriverSelect(userId);
+	    			drivers = driverRepository.getDriverSelect(usersIds);
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
-					logger.info("************************ getDeviceSelect ENDED ***************************");
+					logger.info("************************ getDriverSelect ENDED ***************************");
 					return ResponseEntity.ok().body(getObjectResponse);
 
 	    		}

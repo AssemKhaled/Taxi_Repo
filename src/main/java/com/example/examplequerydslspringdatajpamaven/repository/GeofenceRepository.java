@@ -8,6 +8,8 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 
 @Component
@@ -54,5 +56,10 @@ public interface GeofenceRepository extends JpaRepository<Geofence, Long>, Query
 	@Query(value = "SELECT tc_geofences.* FROM tc_geofences INNER JOIN tc_user_geofence ON tc_user_geofence.geofenceid = tc_geofences.id"
 			+ " WHERE tc_user_geofence.userid=:userId and tc_geofences.delete_date is null", nativeQuery = true)
 	public List<Geofence> getAllGeos(@Param("userId") Long userId);
+	
+	@Query(value = "SELECT tc_geofences.id,tc_geofences.name FROM tc_geofences"
+			+ " INNER JOIN tc_user_geofence ON tc_user_geofence.geofenceid = tc_geofences.id"
+			+ " WHERE tc_user_geofence.userid IN(:userIds) and tc_geofences.delete_date is null",nativeQuery = true)
+	public List<DriverSelect> getGeofenceSelect(@Param("userIds") List<Long> userIds);
 	
 }

@@ -87,5 +87,15 @@ public class GeofenceRestController {
 		return geofenceServiceImpl.getAllGeo(TOKEN,id);
 
 	}	
+	
+	@RequestMapping(value = "/getGeofenceSelect", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getGeofenceSelect(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                               @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		
+	
+    	return  geofenceServiceImpl.getGeofenceSelect(TOKEN,userId);
+
+		
+	}
 
 }

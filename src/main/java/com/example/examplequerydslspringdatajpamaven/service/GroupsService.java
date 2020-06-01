@@ -19,5 +19,8 @@ public interface GroupsService {
 	public ResponseEntity<?> assignGroupToGeofence(String TOKEN,Long groupId , Map<String, List> data, Long userId);
 	public ResponseEntity<?> assignGroupToDevice(String TOKEN,Long groupId , Map<String, List> data, Long userId);
 
+	public ResponseEntity<?> getGroupDevices(String TOKEN,Long groupId,String type);
+
+	public ResponseEntity<?> getGroupSelect(String TOKEN,Long userId);
 
 }

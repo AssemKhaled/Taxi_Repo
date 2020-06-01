@@ -659,22 +659,43 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	    	logger.info("************************createUser ENDED ***************************");
 	    	return ResponseEntity.ok().body(getObjectResponse);
 		}
-		if(user.getEmail() == null || user.getEmail() == "" || user.getPassword() == null
-		|| user.getPassword() == "" || user.getName() == null || user.getName() == "" 
-		|| user.getIdentity_num() == null || user.getIdentity_num() == ""
-		|| user.getCommercial_num() == null ||user.getCommercial_num() == ""
-		|| user.getCompany_phone() == null || user.getCompany_phone() == ""
-		|| user.getManager_phone() == null || user.getManager_phone() == ""
-		|| user.getManager_mobile() == null || user.getManager_mobile() == "" 
-		|| user.getPhone() == null || user.getPhone() == "" || user.getAccountType() == null || user.getAccountType() == 0 ) {
-		List<User> users = null;
-		String message= "attributes [email , password, name, identityNumber ,commercialNumber,"
-				+ "companyPhone ,Managerphone, ManagerMobile ,accountType] are required";
-    	//throw duplication exception with duplication list
-    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), message,users);
-    	logger.info("************************createUser ENDED ***************************");
-    	return ResponseEntity.badRequest().body(getObjectResponse);
-	  }
+		if(user.getIsCompany() == 1) {
+			if(user.getEmail() == null || user.getEmail() == "" || user.getPassword() == null
+					|| user.getPassword() == "" || user.getName() == null || user.getName() == "" 
+					|| user.getIdentity_num() == null || user.getIdentity_num() == ""
+					|| user.getCommercial_num() == null ||user.getCommercial_num() == ""
+					|| user.getCompany_phone() == null || user.getCompany_phone() == ""
+					|| user.getManager_phone() == null || user.getManager_phone() == ""
+					|| user.getManager_mobile() == null || user.getManager_mobile() == "" 
+					|| user.getAccountType() == null || user.getAccountType() == 0 ) {
+					List<User> users = null;
+					String message= "attributes [email , password, name, identityNumber ,commercialNumber,"
+							+ "companyPhone ,Managerphone, ManagerMobile ,accountType] are required";
+			    	//throw duplication exception with duplication list
+			    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), message,users);
+			    	logger.info("************************createUser ENDED ***************************");
+			    	return ResponseEntity.badRequest().body(getObjectResponse);
+				  }
+			
+		}
+		if(user.getIsCompany() == 0) {
+			if(user.getEmail() == null || user.getEmail() == "" || user.getPassword() == null
+					|| user.getPassword() == "" || user.getName() == null || user.getName() == "" 
+					|| user.getIdentity_num() == null || user.getIdentity_num() == ""
+					|| user.getDateOfBirth() == null ||user.getDateOfBirth() == ""
+					|| user.getCompany_phone() == null || user.getCompany_phone() == ""
+					|| user.getAccountType() == null || user.getAccountType() == 0 ) {
+					List<User> users = null;
+					String message= "attributes [email , password, name, identityNumber ,"
+							+ "companyPhone ,accountType] are required";
+			    	//throw duplication exception with duplication list
+			    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), message,users);
+			    	logger.info("************************createUser ENDED ***************************");
+			    	return ResponseEntity.badRequest().body(getObjectResponse);
+				  }
+			
+		}
+		
 		if(user.getAccountType() == 1) {
 		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Can't Create account type 1",null);
     	logger.info("************************createUser ENDED ***************************");
@@ -850,22 +871,44 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 					return  ResponseEntity.badRequest().body(getObjectResponse);
 				}
 		}
-		if( user.getId() == null || user.getId() == 0|| user.getEmail() == null || user.getEmail() == "" ||
-		 user.getName() == null || user.getName() == "" 
-		|| user.getIdentity_num() == null || user.getIdentity_num() == ""
-		|| user.getCommercial_num() == null ||user.getCommercial_num() == ""
-		|| user.getCompany_phone() == null || user.getCompany_phone() == ""
-		|| user.getManager_phone() == null || user.getManager_phone() == ""
-		|| user.getManager_mobile() == null || user.getManager_mobile() == ""
-		|| user.getPhone() == null || user.getPhone() == "" || user.getAccountType() ==  0 
-		|| user.getAccountType() == null) {
-		
-			String message= "attributes [id,email , name, identityNumber ,commercialNumber,"
-				+ "companyPhone ,Managerphone, ManagerMobile, accountType ] are required";
-			//throw duplication exception with duplication list
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), message,null);
-			logger.info("************************createUser ENDED ***************************");
-		}
+		 
+			if(user.getIsCompany() == 1) {
+				if(user.getId() == null || user.getId() == 0 || user.getEmail() == null || user.getEmail() == "" 
+						|| user.getName() == null || user.getName() == "" 
+						|| user.getIdentity_num() == null || user.getIdentity_num() == ""
+						|| user.getCommercial_num() == null ||user.getCommercial_num() == ""
+						|| user.getCompany_phone() == null || user.getCompany_phone() == ""
+						|| user.getManager_phone() == null || user.getManager_phone() == ""
+						|| user.getManager_mobile() == null || user.getManager_mobile() == "" 
+						|| user.getAccountType() == null || user.getAccountType() == 0 ) {
+						List<User> users = null;
+						String message= "attributes [id , email , password, name, identityNumber ,commercialNumber,"
+								+ "companyPhone ,Managerphone, ManagerMobile ,accountType] are required";
+				    	//throw duplication exception with duplication list
+				    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), message,users);
+				    	logger.info("************************createUser ENDED ***************************");
+				    	return ResponseEntity.badRequest().body(getObjectResponse);
+					  }
+				
+			}
+			if(user.getIsCompany() == 0) {
+				if(user.getId() == null || user.getId() == 0 || user.getEmail() == null || user.getEmail() == ""
+						|| user.getName() == null || user.getName() == "" 
+						|| user.getIdentity_num() == null || user.getIdentity_num() == ""
+						|| user.getDateOfBirth() == null ||user.getDateOfBirth() == ""
+						|| user.getCompany_phone() == null || user.getCompany_phone() == ""
+						|| user.getAccountType() == null || user.getAccountType() == 0 ) {
+						List<User> users = null;
+						String message= "attributes [id ,email , password, name, identityNumber ,"
+								+ "companyPhone, dateOfBirth ,accountType] are required";
+				    	//throw duplication exception with duplication list
+				    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), message,users);
+				    	logger.info("************************createUser ENDED ***************************");
+				    	return ResponseEntity.badRequest().body(getObjectResponse);
+					  }
+				
+			}
+		 
 		if(user.getPassword()!= null) {
 		
 			String message= "you are not allowed to edit password";
@@ -1647,13 +1690,19 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 		 String managerPhone = user.getManager_phone();
 		 String managerMobile = user.getManager_mobile();
 		 String phone = user.getPhone();
-		 List<User>userDuolicationList = userRepository.checkUserDuplication(email, identityNum, commercialNum, companyPhone, managerPhone, managerMobile,phone);
+		 List<User>userDuolicationList = new ArrayList<User>();
+		 if(user.getIsCompany() == 1) {
+			 userDuolicationList = userRepository.checkUserDuplication(email, identityNum, commercialNum, companyPhone, managerPhone, managerMobile,phone);
+		 }
+		 if(user.getIsCompany() == 0) {
+			 userDuolicationList = userRepository.checkUserDuplicationIndvidual(email, identityNum, companyPhone,phone);
+
+		 }
 		 List<Integer>duplicationCodes = new ArrayList<Integer>();
 		    for (User matchedUser : userDuolicationList) 
 		    { 
 		    	
 		    	if(matchedUser.getId() != user.getId() ) {
-		    		System.out.println("matched User"+matchedUser.getId()+"---user"+user.getId());
 		    		if(matchedUser.getEmail() != null) {
 		    			if(matchedUser.getEmail().equals(user.getEmail()))
 				        {
@@ -2167,8 +2216,6 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	@Override
 	public List<User> getAllChildernOfUser(Long userId) {
 		// TODO Auto-generated method stub
-		System.out.println("parentId"+userId);
-
 		List<User>childrenReturned = userRepository.getChildrenOfUser(userId);
 		if(!childrenReturned.isEmpty()) {
 			for(User object : childrenReturned) {
@@ -2192,8 +2239,6 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	public List<User> getActiveAndInactiveChildern(Long userId) {
 		// TODO Auto-generated method stub
 		// TODO Auto-generated method stub
-				System.out.println("parentId"+userId);
-
 				List<User>childrenReturned = userRepository.getActiveAndInactiveChildrenOfUser(userId);
 				if(!childrenReturned.isEmpty()) {
 					for(User object : childrenReturned) {

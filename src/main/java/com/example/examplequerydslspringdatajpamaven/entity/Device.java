@@ -43,7 +43,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 	                     @ColumnResult(name="driverName"),
 	                     @ColumnResult(name="geofenceName"),
 	                     //@ColumnResult(name="positionId",type=String.class),
-	                     @ColumnResult(name="lastUpdate")
+	                     @ColumnResult(name="lastUpdate",type=String.class)
 	                     }
 	           )
 	        }
@@ -84,7 +84,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 	                  columns={
 	                     @ColumnResult(name="id"),
 	                     @ColumnResult(name="deviceName"),
-	                     @ColumnResult(name="lastUpdate"),
+	                     @ColumnResult(name="lastUpdate",type=String.class),
 	                     @ColumnResult(name="address"),
 	                     @ColumnResult(name="attributes"),
 	                     @ColumnResult(name="latitude"),
@@ -104,13 +104,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 	    	                  columns={
 	    	                     @ColumnResult(name="id",type=int.class),
 	    	                     @ColumnResult(name="deviceName",type=String.class),
-	    	                     @ColumnResult(name="lastUpdate",type=Date.class),
+	    	                     @ColumnResult(name="lastUpdate",type=String.class),
 	    	                     @ColumnResult(name="positionId",type=String.class),
 	    	                     @ColumnResult(name="leftLetter",type=String.class),
 	    	                     @ColumnResult(name="middleLetter",type=String.class),
 	    	                     @ColumnResult(name="rightLetter",type=String.class),
-	    	                     @ColumnResult(name="driverName",type=String.class)
-	    	                     
+	    	                     @ColumnResult(name="driverName",type=String.class),
+	    	                     @ColumnResult(name="latitude",type=Double.class),
+	    	                     @ColumnResult(name="longitude",type=Double.class)
 	    	                     }
 	    	           )
 	    	        }
@@ -123,7 +124,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 //	                  columns={
 //	                     @ColumnResult(name="id",type=int.class),
 //	                     @ColumnResult(name="deviceName",type=String.class),
-//	                     @ColumnResult(name="lastUpdate",type=Date.class),
+//	                     @ColumnResult(name="lastUpdate",type=String.class),
 //	                     @ColumnResult(name="address",type=String.class),
 //	                     @ColumnResult(name="attributes",type=String.class),
 //	                     @ColumnResult(name="latitude",type=Double.class),
@@ -145,12 +146,17 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 	           @ConstructorResult(
 	                targetClass=CustomDeviceLiveData.class,
 	                  columns={
-	                     @ColumnResult(name="id"),
-	                     @ColumnResult(name="deviceName"),
-	                     @ColumnResult(name="lastUpdate"),
+	                     @ColumnResult(name="id",type=int.class),
+	                     @ColumnResult(name="deviceName",type=String.class),
+	                     @ColumnResult(name="lastUpdate",type=String.class),
 	                     @ColumnResult(name="positionId",type=String.class),
-	                     @ColumnResult(name="photo"),
-	                     
+	                     @ColumnResult(name="photo",type=String.class),
+	                     @ColumnResult(name="attributes",type=String.class),
+	                     @ColumnResult(name="speed",type=Float.class),
+	                     @ColumnResult(name="latitude",type=Double.class),
+	                     @ColumnResult(name="longitude",type=Double.class),
+	                     @ColumnResult(name="valid",type=Boolean.class),
+
 	                     }
 	           )
 	        }
@@ -250,8 +256,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @NamedNativeQuery(name="getDevicesLiveData", 
 resultSetMapping="DevicesLiveData", 
-query=" SELECT tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.lastupdate as lastUpdate,tc_devices.positionid as positionId, "
-    +"tc_devices.photo  FROM tc_devices "
+query=" SELECT  tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.lastupdate as lastUpdate, " + 
+		"  tc_devices.positionid as positionId, " + 
+		" tc_devices.photo as photo ,tc_positions.attributes as attributes,tc_positions.speed as speed ,"
+		+ " tc_positions.latitude as latitude, " + 
+		" tc_positions.longitude as longitude  ,tc_positions.valid as valid  FROM tc_devices "+
+		" Left JOIN tc_positions ON tc_positions.id=tc_devices.positionid  "
 	+ " INNER JOIN  tc_user_device ON tc_devices.id=tc_user_device.deviceid " 
 	+ " where tc_user_device.userid IN (:userIds) and tc_devices.delete_date is null "
 	+ "  AND ((tc_devices.name LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))))"
@@ -274,8 +284,10 @@ query=" SELECT tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.l
 resultSetMapping="DevicesLiveDataMap", 
 query="SELECT tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.lastupdate as lastUpdate,tc_devices.positionid as positionId , " 
 		+ " tc_devices.left_letter as leftLetter , " + 
-		" tc_devices.middle_letter as middleLetter,tc_devices.right_letter as rightLetter ,tc_drivers.name driverName " + 
-		" FROM tc_devices " + 
+		" tc_devices.middle_letter as middleLetter,tc_devices.right_letter as rightLetter ,tc_drivers.name driverName, "  
+		+" tc_positions.latitude as latitude,tc_positions.longitude as longitude  "
+		+ " FROM tc_devices " + 
+		" Left JOIN tc_positions ON tc_positions.id=tc_devices.positionid  " + 
 		" INNER JOIN  tc_user_device ON tc_devices.id=tc_user_device.deviceid" + 
 		" LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_devices.id " + 
 		" LEFT JOIN tc_drivers ON tc_drivers.id=tc_device_driver.driverid " + 

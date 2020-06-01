@@ -8,8 +8,10 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 
 import com.example.examplequerydslspringdatajpamaven.entity.CustomPositions;
+import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Position;
 import com.example.examplequerydslspringdatajpamaven.entity.PositionSql;
+import com.example.examplequerydslspringdatajpamaven.entity.TripPositions;
 
 public interface PositionSqlRepository extends  JpaRepository<PositionSql, Long>, QueryDslPredicateExecutor<PositionSql> {
 	@Query(nativeQuery = true, name = "getPositionsList")
@@ -30,4 +32,10 @@ public interface PositionSqlRepository extends  JpaRepository<PositionSql, Long>
 	
 	@Query(nativeQuery = true, name = "getDriverHoursList")
 	public  List<CustomPositions> getDriverHoursList(@Param("userIds")List<Long> userIds);
+	
+
+	@Query(value = "SELECT latitude,longitude FROM tc_positions "
+			+ " where deviceid=:deviceId AND  id BETWEEN :start  AND :end "
+			+ " AND latitude!=0 AND longitude !=0 order by devicetime ASC ",nativeQuery = true)
+	public List<TripPositions> getTripPositions(@Param("deviceId")Long deviceId,@Param("start")Long start,@Param("end")Long end);
 }

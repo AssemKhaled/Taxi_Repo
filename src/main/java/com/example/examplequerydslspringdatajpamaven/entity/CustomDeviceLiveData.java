@@ -6,6 +6,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import javax.persistence.ColumnResult;
+
 import org.json.JSONObject;
 
 public class CustomDeviceLiveData {
@@ -15,9 +17,10 @@ public class CustomDeviceLiveData {
 	}
 	private int id;
 	private String deviceName;
-	private Date lastUpdate;
+	private String lastUpdate;
 	private Double weight;
 	private Double latitude;
+	private Double operator;
 	private Double longitude;
 	private String address;
 	private String attributes;
@@ -37,6 +40,7 @@ public class CustomDeviceLiveData {
 	//private Double sensor2;
 	private String hours;
 	private Boolean motion;
+	private Boolean valid;
 	private String totalDistance;
 	private Boolean ignition;
 	private String alarm;
@@ -58,7 +62,7 @@ public class CustomDeviceLiveData {
 		this.attributes = attributes;
 		this.speed = speed;
 	}
-	public CustomDeviceLiveData(int id ,String deviceName , Date lastUpdate , String address , String attributes ,  Double latitude ,
+	public CustomDeviceLiveData(int id ,String deviceName , String lastUpdate , String address , String attributes ,  Double latitude ,
 			  Double longitude ,Float speed , String photo , String positionId) {
 		this.id = id ;
 		this.deviceName = deviceName ;
@@ -187,7 +191,7 @@ public class CustomDeviceLiveData {
 		
 		
 	}
-	public CustomDeviceLiveData(int id ,String deviceName , Date lastUpdate , String address , String attributes ,  Double latitude ,
+	public CustomDeviceLiveData(int id ,String deviceName , String lastUpdate , String address , String attributes ,  Double latitude ,
 			  Double longitude ,Float speed ,String positionId, String leftLetter,String middleLetter,String rightLetter,String driverName ) {
 		this.id = id ;
 		this.deviceName = deviceName ;
@@ -320,8 +324,9 @@ public class CustomDeviceLiveData {
 		
 	}
 	
-	public CustomDeviceLiveData(int id ,String deviceName , Date lastUpdate ,
-			String positionId, String leftLetter,String middleLetter,String rightLetter,String driverName ) {
+	public CustomDeviceLiveData(int id ,String deviceName , String lastUpdate ,
+			String positionId, String leftLetter,String middleLetter,String rightLetter,String driverName,
+			Double latitude ,Double longitude) {
 		this.id = id ;
 		this.deviceName = deviceName ;
 		this.lastUpdate = lastUpdate;
@@ -330,15 +335,23 @@ public class CustomDeviceLiveData {
 		this.rightLetter= rightLetter;
 		this.middleLetter= middleLetter;
 		this.driverName= driverName;
+		this.latitude= latitude;
+		this.longitude= longitude;
 	   		
 	}
-	public CustomDeviceLiveData(int id ,String deviceName , Date lastUpdate ,
-			String positionId,String photo ) {
+	public CustomDeviceLiveData(int id ,String deviceName , String lastUpdate ,String positionId,String photo
+			,String attributes , Float speed,Double latitude ,Double longitude,Boolean valid) {
 		this.id = id ;
 		this.deviceName = deviceName ;
 		this.lastUpdate = lastUpdate;
 		this.positionId = positionId;
 		this.photo=photo;
+		this.attributes= attributes;
+		this.speed= speed;
+		this.latitude= latitude;
+		this.longitude= longitude;
+		this.valid= valid;
+
 	   		
 	}
 	
@@ -359,11 +372,11 @@ public class CustomDeviceLiveData {
 		this.deviceName = deviceName;
 	}
 
-	public Date getLastUpdate() {
+	public String getLastUpdate() {
 		return lastUpdate;
 	}
 
-	public void setLastUpdate(Date lastUpdate) {
+	public void setLastUpdate(String lastUpdate) {
 		this.lastUpdate = lastUpdate;
 	}
 
@@ -607,6 +620,18 @@ public class CustomDeviceLiveData {
 	}
 	public void setRightLetter(String rightLetter) {
 		this.rightLetter = rightLetter;
+	}
+	public Boolean getValid() {
+		return valid;
+	}
+	public void setValid(Boolean valid) {
+		this.valid = valid;
+	}
+	public Double getOperator() {
+		return operator;
+	}
+	public void setOperator(Double operator) {
+		this.operator = operator;
 	}
 	
 	

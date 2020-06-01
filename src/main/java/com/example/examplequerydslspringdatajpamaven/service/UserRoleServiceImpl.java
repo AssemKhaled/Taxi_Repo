@@ -990,11 +990,13 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 
 					 for(User object : parents) {
 						 parentClient = object;
-						 
+						 break;
 					 }
+
 					 if(createdByUserId.equals(parentClient.getId())) {
 						 isParentt =true;
 					 }
+					 
 					if(isParentt == false) {
 						getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "As you are account type 4 and this role not created by direct parent not allow to edit.",null);
 						return  ResponseEntity.badRequest().body(getObjectResponse);
@@ -1100,7 +1102,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 		return  ResponseEntity.ok().body(getObjectResponse);
 	}
 	@Override
-	public ResponseEntity<?> getAllRolesCreatedByUser(String TOKEN,Long userId) {
+	public ResponseEntity<?> getAllRolesCreatedByUser(String TOKEN,Long userId,int offset,String search) {
 		// TODO Auto-generated method stub
 		if(TOKEN.equals("")) {
 			 List<UserRole> roles = null;
@@ -1177,8 +1179,9 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 
 			 }
 		 }
-		List<UserRole> roles = userRoleRepository.getAllRolesCreatedByUser(usersIds);
-		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",roles);
+		List<UserRole> roles = userRoleRepository.getAllRolesCreatedByUserOffset(usersIds,offset,search);
+		Integer size=userRoleRepository.getRolesSize(usersIds);
+		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",roles,size);
 		
 		return ResponseEntity.ok().body(getObjectResponse);
 	}

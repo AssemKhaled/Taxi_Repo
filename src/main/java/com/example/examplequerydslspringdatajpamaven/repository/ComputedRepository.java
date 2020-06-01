@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.examplequerydslspringdatajpamaven.entity.Attribute;
+import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Notification;;
 
 public interface ComputedRepository  extends  JpaRepository<Attribute, Long>, QueryDslPredicateExecutor<Attribute>{
@@ -32,4 +33,11 @@ public interface ComputedRepository  extends  JpaRepository<Attribute, Long>, Qu
     @Modifying
 	@Query(value = "Delete from tc_group_attribute where tc_group_attribute.attributeid=:attributeId", nativeQuery = true)
 	public void deleteAttributeGroupId(@Param("attributeId") Long attributeId);
+	
+	
+	@Query(value = "SELECT tc_attributes.id,tc_attributes.attribute FROM tc_attributes"
+			+ " INNER JOIN tc_user_attribute ON tc_user_attribute.attributeid = tc_attributes.id"
+			+ " WHERE tc_user_attribute.userid IN(:userIds) and tc_attributes.delete_date is null",nativeQuery = true)
+	public List<DriverSelect> getComputedSelect(@Param("userIds") List<Long> userIds);
+	
 }

@@ -91,4 +91,14 @@ public class ComputedRestController {
 		return computedServiceImpl.assignComputedToDevice(TOKEN,deviceId,data,userId);	
 		
 	}
+	
+	@RequestMapping(value = "/getComputedSelect", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getComputedSelect(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                               @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		
+	
+    	return  computedServiceImpl.getComputedSelect(TOKEN,userId);
+
+		
+	}
 }

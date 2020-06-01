@@ -11,6 +11,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
+import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
+import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 import com.example.examplequerydslspringdatajpamaven.entity.Group;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
@@ -440,12 +443,22 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 
 						if(groupCheck != null) {
 							if(groupCheck.getIs_deleted() == null) {
-								
-								if(group.getType() != groupCheck.getType()) {
-									getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "not allow to edit type of group",null);
-									logger.info("************************ deleteGeo ENDED ***************************");
-									return  ResponseEntity.badRequest().body(getObjectResponse);
+								if(groupCheck.getType() != null) {
+									if(groupCheck.getType() != "") {
+										if(group.getType().equals(groupCheck.getType())) {
+											
+										}
+										else {
+											
+											getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "not allow to edit type of group",null);
+											logger.info("************************ deleteGeo ENDED ***************************");
+											return  ResponseEntity.badRequest().body(getObjectResponse);
+											
+											
+										}
+									}
 								}
+								
 								List<Group> checkDublicateInEdit= groupRepository.checkDublicateGroupInEdit(group.getId(),id,group.getName());
 							    List<Integer> duplictionList =new ArrayList<Integer>();
 								if(!checkDublicateInEdit.isEmpty()) {
@@ -526,7 +539,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 									if(groupCheck.getUserGroup().equals(group.getUserGroup())) {
 										groupRepository.save(group);
 										groups.add(group);
-										getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Updated Successfully",groups);
+										getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Updated Successfully",null);
 										logger.info("************************ editGeofence ENDED ***************************");
 										return ResponseEntity.ok().body(getObjectResponse);
 
@@ -869,7 +882,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 		}
 		if(!loggedUser.getAccountType().equals(1)) {
 			if(!userRoleService.checkUserHasPermission(userId, "GROUP", "assignGroupToGeofence")) {
-				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to assignDeviceToDriver",null);
+				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to assignGroupToGeofence",null);
 				 logger.info("************************ deleteDevice ENDED ***************************");
 				return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
@@ -926,7 +939,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 							}
 					   }
 					   if(!checkIfParent(group , loggedUser)&& ! isParent) {
-							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to assign driver to this group ",null);
+							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to assign Geofence to this group ",null);
 							logger.info("************************ editDevice ENDED ***************************");
 							return ResponseEntity.badRequest().body(getObjectResponse);
 					   }
@@ -935,7 +948,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 						geofences= group.getGeofenceGroup();
 				        if(geofences.isEmpty()) {
 				        	List<Group> groups = null;
-							getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "No driver to assign or remove",groups);
+							getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "No Geofence to assign or remove",groups);
 							logger.info("************************ groupAssignGeofence ENDED ***************************");
 							return ResponseEntity.status(404).body(getObjectResponse);
 				        }
@@ -947,7 +960,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 			        	    group.setGeofenceGroup(geofences);
 						    groupRepository.save(group);
 				        	List<Group> groups = null;
-				        	getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Driver removed successfully",groups);
+				        	getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Geofence removed successfully",groups);
 							logger.info("************************ groupAssignGeofence ENDED ***************************");
 							return ResponseEntity.ok().body(getObjectResponse);
 				        }
@@ -1150,6 +1163,171 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 			}
 			
 		}
+	}
+
+	@Override
+	public ResponseEntity<?> getGroupDevices(String TOKEN, Long groupId,String type) {
+		// TODO Auto-generated method stub
+		logger.info("************************ getGroupDevices STARTED ***************************");
+		if(TOKEN.equals("")) {
+			 List<DeviceSelect> devices = new ArrayList<DeviceSelect>();
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(groupId.equals(0)) {
+			 List<DeviceSelect> devices = new ArrayList<DeviceSelect>();
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "group ID is Required",devices);
+			logger.info("************************ getGroupDevices ENDED ***************************");
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		else {
+			Group group = groupRepository.findOne(groupId);
+			if(group.equals(null)) {
+				List<DeviceSelect> devices = new ArrayList<DeviceSelect>();
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This group is not found",devices);
+				logger.info("************************ getGroupDevices ENDED ***************************");
+				return ResponseEntity.status(404).body(getObjectResponse);
+			}
+			else
+			{
+				if(type.equals(null)) {
+					List<DeviceSelect> devices = new ArrayList<DeviceSelect>();
+					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "type is Required",devices);
+					logger.info("************************ getGroupDevices ENDED ***************************");
+					return ResponseEntity.status(404).body(getObjectResponse);
+				}
+				else {
+					if(type.equals("")) {
+						List<DeviceSelect> devices = new ArrayList<DeviceSelect>();
+						getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "type is Required",devices);
+						logger.info("************************ getGroupDevices ENDED ***************************");
+						return ResponseEntity.status(404).body(getObjectResponse);
+					}
+					else {
+						List<DeviceSelect> devices = new ArrayList<DeviceSelect>();
+						if(type.equals("devices")) {
+							devices = groupRepository.getGroupDevicesSelect(groupId);
+						}
+						if(type.equals("drivers")) {
+							devices = groupRepository.getGroupDriverSelect(groupId);
+						}
+						if(type.equals("geofences")) {
+							devices = groupRepository.getGroupGeofencesSelect(groupId);
+						}
+						if(type.equals("notifications")) {
+							devices = groupRepository.getGroupNotificationsSelect(groupId);
+						}
+						if(type.equals("attributes")) {
+							devices = groupRepository.getGroupAttrbuitesSelect(groupId);
+						}
+						
+						
+						getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
+						logger.info("************************ getGroupDevices ENDED ***************************");
+						return ResponseEntity.ok().body(getObjectResponse);
+					}
+					
+				}
+				 
+					
+				
+			}
+		}
+		
+	}
+
+	@Override
+	public ResponseEntity<?> getGroupSelect(String TOKEN, Long userId) {
+		logger.info("************************ getDriverSelect STARTED ***************************");
+		List<DriverSelect> drivers = new ArrayList<DriverSelect>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",drivers);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+	    if(userId != 0) {
+	    	User user = userService.findById(userId);
+	    	userService.resetChildernArray();
+
+	    	if(user != null) {
+	    		if(user.getDelete_date() == null) {
+	    			
+	    			if(user.getAccountType().equals(4)) {
+	   				 Set<User>parentClient = user.getUsersOfUser();
+	   					if(parentClient.isEmpty()) {
+	   						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
+	   						logger.info("************************ getDriverSelect ENDED ***************************");
+	   						return ResponseEntity.badRequest().body(getObjectResponse);
+	   					}else {
+	   					  
+	   						User parent =null;
+	   						for(User object : parentClient) {
+	   							parent = object;
+	   						}
+	   						if(!parent.equals(null)) {
+
+					   			List<Long>usersIds= new ArrayList<>();
+			   					usersIds.add(parent.getId());
+				    			drivers = groupRepository.getGroupSelect(usersIds);
+	   							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
+	   							logger.info("************************ getDriverSelect ENDED ***************************");
+	   							return ResponseEntity.ok().body(getObjectResponse);
+	   						}
+	   						else {
+	   							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "No parent for this type 4",null);
+	   							return ResponseEntity.badRequest().body(getObjectResponse);
+	   						}
+	   						
+	   					}
+	   			 }
+	    			 List<User>childernUsers = userService.getAllChildernOfUser(userId);
+		   			 List<Long>usersIds= new ArrayList<>();
+		   			 if(childernUsers.isEmpty()) {
+		   				 usersIds.add(userId);
+		   			 }
+		   			 else {
+		   				 usersIds.add(userId);
+		   				 for(User object : childernUsers) {
+		   					 usersIds.add(object.getId());
+		   				 }
+		   			 }
+	    			
+	    			drivers = groupRepository.getGroupSelect(usersIds);
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
+					logger.info("************************ getDriverSelect ENDED ***************************");
+					return ResponseEntity.ok().body(getObjectResponse);
+
+	    		}
+	    		else {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",drivers);
+					return ResponseEntity.status(404).body(getObjectResponse);
+
+	    		}
+	    	
+	    	}
+	    	else {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",drivers);
+				return ResponseEntity.status(404).body(getObjectResponse);
+
+	    	}
+			
+		}
+		else {
+			
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",drivers);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
+	
 	}
 	
 	

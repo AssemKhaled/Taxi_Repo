@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
+import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Group;
 import com.example.examplequerydslspringdatajpamaven.entity.Notification;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
@@ -162,7 +163,7 @@ public class NotificationServiceImpl extends RestServiceController implements No
 	}
 
 	@Override
-	public ResponseEntity<?> getAllNotifications(String TOKEN, Long id) {
+	public ResponseEntity<?> getAllNotifications(String TOKEN, Long id,int offset,String search) {
        logger.info("************************ getAllNotifications STARTED ***************************");
 		
 		List<Notification> notifications = new ArrayList<Notification>();
@@ -209,8 +210,9 @@ public class NotificationServiceImpl extends RestServiceController implements No
 							 }
 							 List<Long>usersIds= new ArrayList<>();
 							 usersIds.add(parentClient.getId());
-							 notifications = notificationRepository.getAllNotifications(usersIds);
-							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",notifications);
+							 notifications = notificationRepository.getAllNotifications(usersIds,offset,search);
+							 Integer size=notificationRepository.getAllNotificationsSize(usersIds);
+							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",notifications,size);
 							logger.info("************************ getAllNotifications ENDED ***************************");
 							return  ResponseEntity.ok().body(getObjectResponse);
 						 }
@@ -229,8 +231,9 @@ public class NotificationServiceImpl extends RestServiceController implements No
 
 					
 					
-					notifications = notificationRepository.getAllNotifications(usersIds);
-					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",notifications);
+					notifications = notificationRepository.getAllNotifications(usersIds,offset,search);
+					Integer size=notificationRepository.getAllNotificationsSize(usersIds);
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",notifications,size);
 					logger.info("************************ getAllNotifications ENDED ***************************");
 					return  ResponseEntity.ok().body(getObjectResponse);
 
@@ -921,6 +924,95 @@ public class NotificationServiceImpl extends RestServiceController implements No
 			}
 			
 		}
+	}
+
+	@Override
+	public ResponseEntity<?> getNotificationSelect(String TOKEN, Long userId) {
+		logger.info("************************ getNotificationSelect STARTED ***************************");
+		List<DriverSelect> drivers = new ArrayList<DriverSelect>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",drivers);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+	    if(userId != 0) {
+	    	User user = userService.findById(userId);
+	    	userService.resetChildernArray();
+
+	    	if(user != null) {
+	    		if(user.getDelete_date() == null) {
+	    			
+	    			if(user.getAccountType().equals(4)) {
+	   				 Set<User>parentClient = user.getUsersOfUser();
+	   					if(parentClient.isEmpty()) {
+	   						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
+	   						logger.info("************************ getNotificationSelect ENDED ***************************");
+	   						return ResponseEntity.badRequest().body(getObjectResponse);
+	   					}else {
+	   					  
+	   						User parent =null;
+	   						for(User object : parentClient) {
+	   							parent = object;
+	   						}
+	   						if(!parent.equals(null)) {
+
+					   			List<Long>usersIds= new ArrayList<>();
+			   					usersIds.add(parent.getId());
+	   							drivers = notificationRepository.getNotificationSelect(usersIds);
+	   							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
+	   							logger.info("************************ getNotificationSelect ENDED ***************************");
+	   							return ResponseEntity.ok().body(getObjectResponse);
+	   						}
+	   						else {
+	   							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "No parent for this type 4",null);
+	   							return ResponseEntity.badRequest().body(getObjectResponse);
+	   						}
+	   						
+	   					}
+	   			 }
+	    			 List<User>childernUsers = userService.getAllChildernOfUser(userId);
+		   			 List<Long>usersIds= new ArrayList<>();
+		   			 if(childernUsers.isEmpty()) {
+		   				 usersIds.add(userId);
+		   			 }
+		   			 else {
+		   				 usersIds.add(userId);
+		   				 for(User object : childernUsers) {
+		   					 usersIds.add(object.getId());
+		   				 }
+		   			 }
+	    			
+	    			drivers = notificationRepository.getNotificationSelect(usersIds);
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
+					logger.info("************************ getNotificationSelect ENDED ***************************");
+					return ResponseEntity.ok().body(getObjectResponse);
+
+	    		}
+	    		else {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",drivers);
+					return ResponseEntity.status(404).body(getObjectResponse);
+
+	    		}
+	    	
+	    	}
+	    	else {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",drivers);
+				return ResponseEntity.status(404).body(getObjectResponse);
+
+	    	}
+			
+		}
+		else {
+			
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",drivers);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
+	
 	}
 		
 }

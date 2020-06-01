@@ -80,6 +80,14 @@ public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredi
 			                               @Param("commercialNum")String commercialNum , @Param("companyPhone")String companyPhone,
 			                               @Param("managerPhone")String managerPhone , @Param("managerMobile")String managerMobile,
 			                               @Param("phone")String phone);
+	
+	@Query(value = "SELECT * from tc_users where delete_date is null and (email = :email or "
+			+ "identity_num = :identityNum or "
+			+ "company_phone = :companyPhone or  phone = :phone) ", nativeQuery = true)
+	public List<User> checkUserDuplicationIndvidual(@Param("email") String email, @Param("identityNum")String identityNum, 
+			                                        @Param("companyPhone")String companyPhone,@Param("phone")String phone);
+	
+	
 	@Modifying
     @Transactional
 	@Query(value = "delete  from tc_user_user where manageduserid = :userId", nativeQuery = true )

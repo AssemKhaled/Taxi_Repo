@@ -17,6 +17,7 @@ public interface ComputedService {
 	public ResponseEntity<?> assignComputedToGroup(String TOKEN,Long groupId , Map<String, List> data, Long userId);
 	public ResponseEntity<?> assignComputedToDevice(String TOKEN,Long deviceId , Map<String, List> data, Long userId);
 
+	public ResponseEntity<?> getComputedSelect(String TOKEN,Long userId);
 
 
 }

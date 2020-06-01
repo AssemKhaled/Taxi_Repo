@@ -199,4 +199,14 @@ public class DeviceRestController {
 		return deviceService.addSensorSettings(TOKEN,userId,deviceId,data);
 	}
 	
+	@GetMapping(value = "/getDeviceDataSelected")
+	public @ResponseBody ResponseEntity<?> getDeviceDataSelected(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                               @RequestParam (value = "deviceId",defaultValue = "0") Long deviceId,
+			                                               @RequestParam (value = "type", defaultValue = "") String type) {
+		
+			
+			return deviceService.getDeviceDataSelected(TOKEN,deviceId,type);
+
+	}
+	
 }

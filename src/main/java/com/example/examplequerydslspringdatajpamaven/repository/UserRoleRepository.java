@@ -24,6 +24,14 @@ public interface UserRoleRepository extends  JpaRepository<UserRole, Long>, Quer
 	@Query(value = "SELECT * from tc_user_roles where tc_user_roles.userId IN(:userIds) AND delete_date IS NULL",nativeQuery = true)
 	public List<UserRole>getAllRolesCreatedByUser(@Param("userIds")List<Long> userIds);
 	
+	@Query(value = "SELECT * from tc_user_roles where tc_user_roles.userId IN(:userIds) AND delete_date IS NULL"
+			+ " and tc_user_roles.name LIKE %:search% limit :offset,10 ",nativeQuery = true)
+	public List<UserRole>getAllRolesCreatedByUserOffset(@Param("userIds")List<Long> userIds,@Param("offset")int offset,@Param("search")String search);
+	
+	@Query(value = "SELECT count(*) from tc_user_roles where tc_user_roles.userId IN(:userIds) AND delete_date IS NULL", nativeQuery = true)
+	public Integer getRolesSize(@Param("userIds")List<Long> userIds);
+	
+	
 	@Query(value = "SELECT * from tc_user_roles where tc_user_roles.userId=:userId AND delete_date IS NULL",nativeQuery = true)
 	public List<UserRole>getAllRolesCreatedByUserToCompare(@Param("userId")Long userId);
 	

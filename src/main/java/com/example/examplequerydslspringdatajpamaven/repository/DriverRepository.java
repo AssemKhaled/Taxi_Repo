@@ -107,6 +107,6 @@ public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslP
 
 	@Query(value = "SELECT tc_drivers.id,tc_drivers.name FROM tc_drivers"
 			+ " INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id"
-			+ " WHERE tc_user_driver.userid=:userId and tc_drivers.delete_date is null",nativeQuery = true)
-	public List<DriverSelect> getDriverSelect(@Param("userId")Long userId);
+			+ " WHERE tc_user_driver.userid IN(:userIds) and tc_drivers.delete_date is null",nativeQuery = true)
+	public List<DriverSelect> getDriverSelect(@Param("userIds") List<Long> userIds);
 }

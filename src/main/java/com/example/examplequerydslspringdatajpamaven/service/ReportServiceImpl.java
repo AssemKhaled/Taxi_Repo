@@ -44,6 +44,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.Group;
 import com.example.examplequerydslspringdatajpamaven.entity.Position;
 import com.example.examplequerydslspringdatajpamaven.entity.StopReport;
 import com.example.examplequerydslspringdatajpamaven.entity.SummaryReport;
+import com.example.examplequerydslspringdatajpamaven.entity.TripPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.TripReport;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
@@ -2630,6 +2631,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 							  if(tripReport.size()>0) {
 
 								  for(TripReport tripReportOne : tripReport ) {
+										
 									  Device device= deviceServiceImpl.findById(tripReportOne.getDeviceId());
 									  Set<Driver>  drivers = device.getDriver();
 									  for(Driver driver : drivers ) {
@@ -2637,28 +2639,41 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 										 tripReportOne.setDriverName(driver.getName());
 										 tripReportOne.setDriverUniqueId(driver.getUniqueid());
 
-										 if( device.getFuel() != null) {
+										
+										 
+									}
+									  if( device.getFuel() != null) {
 											 
-											int litres=0;
-											int Fuel =0;
-											int distance=0;
+											Double litres=0.0;
+											Double Fuel =0.0;
+											Double distance=0.0;
+											
 											JSONObject obj = new JSONObject(device.getFuel());	
 											if(obj.has("fuelPerKM")) {
-												litres=Integer.parseInt(obj.get("fuelPerKM").toString());
+												litres=Double.parseDouble(obj.get("fuelPerKM").toString());
 											}
 
-											distance = Integer.parseInt(tripReportOne.getDistance());
+											distance = Double.parseDouble(tripReportOne.getDistance());
 											if(distance > 0) {
 												Fuel = (distance/100)*litres;
 											}
 
-											tripReportOne.setSpentFuel(Integer.toString(Fuel));
+											tripReportOne.setSpentFuel(Double.toString(Fuel));
 
 											
 
 										 }
-										 
-									}
+									  Long time=(long) 0;
+
+									  time = Math.abs( Long.parseLong(tripReportOne.getDuration().toString()) );
+
+									  Long hoursEngine =   TimeUnit.MILLISECONDS.toHours(time) ;
+									  Long minutesEngine = TimeUnit.MILLISECONDS.toMinutes(time) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(time));
+									  Long secondsEngine = TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time));
+									  
+									  String totalHours = String.valueOf(hoursEngine)+":"+String.valueOf(minutesEngine)+":"+String.valueOf(secondsEngine);
+									  tripReportOne.setDuration(totalHours);
+
 								  }
 							  }
 							  
@@ -2789,28 +2804,40 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								 tripReportOne.setDriverName(driver.getName());
 								 tripReportOne.setDriverUniqueId(driver.getUniqueid());
 
-								 if( device.getFuel() != null) {
+								 
+								 
+							}
+							  if( device.getFuel() != null) {
 									 
-									int litres=0;
-									int Fuel =0;
-									int distance=0;
+									Double litres=0.0;
+									Double Fuel =0.0;
+									Double distance=0.0;
+									
 									JSONObject obj = new JSONObject(device.getFuel());	
 									if(obj.has("fuelPerKM")) {
-										litres=Integer.parseInt(obj.get("fuelPerKM").toString());
+										litres=Double.parseDouble(obj.get("fuelPerKM").toString());
 									}
 
-									distance = Integer.parseInt(tripReportOne.getDistance());
+									distance = Double.parseDouble(tripReportOne.getDistance());
 									if(distance > 0) {
 										Fuel = (distance/100)*litres;
 									}
 
-									tripReportOne.setSpentFuel(Integer.toString(Fuel));
+									tripReportOne.setSpentFuel(Double.toString(Fuel));
 
 									
 
 								 }
-								 
-							}
+							  Long time=(long) 0;
+
+							  time = Math.abs( Long.parseLong(tripReportOne.getDuration().toString()) );
+
+							  Long hoursEngine =   TimeUnit.MILLISECONDS.toHours(time) ;
+							  Long minutesEngine = TimeUnit.MILLISECONDS.toMinutes(time) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(time));
+							  Long secondsEngine = TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time));
+							  
+							  String totalHours = String.valueOf(hoursEngine)+":"+String.valueOf(minutesEngine)+":"+String.valueOf(secondsEngine);
+							  tripReportOne.setDuration(totalHours);
 						  }
 					  }
 					  
@@ -6222,6 +6249,38 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		else {
 			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID and userId is Required",driverHours);
 			return  ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
+		
+	}
+
+	@Override
+	public ResponseEntity<?> getviewTrip(String TOKEN, Long deviceId, Long startPositionId, Long endPositionId) {
+		logger.info("************************ getStopsReport STARTED ***************************");
+
+		List<TripPositions> positions = new ArrayList<TripPositions>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",positions);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+
+			    
+		Device device = deviceServiceImpl.findById(deviceId);
+		
+		if(device != null) {
+			positions = positionSqlRepository.getTripPositions(deviceId, startPositionId, endPositionId);
+			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",positions,positions.size());
+			logger.info("************************ getStopsReport ENDED ***************************");
+			return  ResponseEntity.ok().body(getObjectResponse);
+		}
+		else {
+			getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Device ID is not found",positions);
+			return  ResponseEntity.status(404).body(getObjectResponse);
 
 		}
 		

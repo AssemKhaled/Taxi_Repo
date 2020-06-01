@@ -60,6 +60,12 @@ public class User {
 	@Column(name = "commercial_reg")
 	private String commercial_reg;
 	
+	@Column(name = "dateOfBirth")
+	private String dateOfBirth;
+	
+	@Column(name = "dateType",columnDefinition = "int default 0")
+	private Integer dateType;
+	
 	@Column(name = "reference_key")
 	private String reference_key;
 	
@@ -335,9 +341,22 @@ public class User {
 		this.parents = parents;
 	}
 	
-	
+    public String getDateOfBirth() {
+		return dateOfBirth;
+	}
+	public void setDateOfBirth(String dateOfBirth) {
+		this.dateOfBirth = dateOfBirth;
+	}
+	public Integer getDateType() {
+		return dateType;
+	}
+	public void setDateType(Integer dateType) {
+		this.dateType = dateType;
+	}
 
-    @JsonIgnore
+
+
+	@JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE},
             mappedBy = "userGroup")
     private Set<Group> groups = new HashSet<>();

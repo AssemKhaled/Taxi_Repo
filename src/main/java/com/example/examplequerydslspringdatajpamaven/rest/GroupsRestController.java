@@ -109,5 +109,25 @@ public class GroupsRestController {
 		return groupsServiceImpl.assignGroupToDevice(TOKEN,groupId,data,userId);	
 		
 	}
+	
+	@GetMapping(value = "/getGroupDataSelected")
+	public @ResponseBody ResponseEntity<?> getGroupDevices(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                               @RequestParam (value = "groupId",defaultValue = "0") Long groupId,
+			                                               @RequestParam (value = "type", defaultValue = "") String type) {
+		
+			
+			return groupsServiceImpl.getGroupDevices(TOKEN,groupId,type);
+
+	}
+	
+	@RequestMapping(value = "/getGroupSelect", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getGroupSelect(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                               @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		
+	
+    	return  groupsServiceImpl.getGroupSelect(TOKEN,userId);
+
+		
+	}
 
 }

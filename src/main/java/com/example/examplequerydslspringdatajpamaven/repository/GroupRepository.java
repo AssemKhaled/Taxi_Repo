@@ -9,6 +9,8 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
+import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 import com.example.examplequerydslspringdatajpamaven.entity.Group;
 
@@ -87,4 +89,35 @@ public interface GroupRepository extends  JpaRepository<Group, Long>, QueryDslPr
 			" inner join tc_group_geofence on tc_group_geofence.geofenceid =  tc_device_geofence.geofenceid " + 
 			" where tc_group_geofence.groupid=:groupId ", nativeQuery = true)
 	public List<Long> getDriversFromGeofence(@Param("groupId") Long groupId);
+	
+	@Query(value = "SELECT tc_devices.id,tc_devices.name FROM tc_devices " + 
+			" INNER JOIN tc_group_device ON tc_group_device.deviceid = tc_devices.id " + 
+			" WHERE tc_group_device.groupid =:groupId ",nativeQuery = true)
+	public List<DeviceSelect> getGroupDevicesSelect(@Param("groupId") Long groupId);
+	
+	@Query(value = "SELECT tc_drivers.id,tc_drivers.name FROM tc_drivers " + 
+			" INNER JOIN tc_group_driver ON tc_group_driver.driverid = tc_drivers.id " + 
+			" WHERE tc_group_driver.groupid =:groupId ",nativeQuery = true)
+	public List<DeviceSelect> getGroupDriverSelect(@Param("groupId") Long groupId);
+	
+	@Query(value = "SELECT tc_geofences.id,tc_geofences.name FROM tc_geofences " + 
+			" INNER JOIN tc_group_geofence ON tc_group_geofence.geofenceid = tc_geofences.id " + 
+			" WHERE tc_group_geofence.groupid =:groupId ",nativeQuery = true)
+	public List<DeviceSelect> getGroupGeofencesSelect(@Param("groupId") Long groupId);
+	
+	@Query(value = "SELECT tc_notifications.id,tc_notifications.type FROM tc_notifications " + 
+			" INNER JOIN tc_group_notification ON tc_group_notification.notificationid = tc_notifications.id " + 
+			" WHERE tc_group_notification.groupid =:groupId ",nativeQuery = true)
+	public List<DeviceSelect> getGroupNotificationsSelect(@Param("groupId") Long groupId);
+	
+	@Query(value = "SELECT tc_attributes.id,tc_attributes.attribute FROM tc_attributes " + 
+			" INNER JOIN tc_group_attribute ON tc_group_attribute.attributeid = tc_attributes.id " + 
+			" WHERE tc_group_attribute.groupid =:groupId ",nativeQuery = true)
+	public List<DeviceSelect> getGroupAttrbuitesSelect(@Param("groupId") Long groupId);
+	
+	@Query(value = "SELECT tc_groups.id,tc_groups.name FROM tc_groups"
+			+ " INNER JOIN tc_user_group ON tc_user_group.groupid = tc_groups.id"
+			+ " WHERE tc_user_group.userid IN(:userIds) and tc_groups.is_deleted is null",nativeQuery = true)
+	public List<DriverSelect> getGroupSelect(@Param("userIds") List<Long> userIds);
+	
 }

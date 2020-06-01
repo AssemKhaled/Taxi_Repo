@@ -52,7 +52,6 @@ public class DashBoardRestController {
 												   @RequestParam (value = "search", defaultValue = "") String search ){
 		return deviceService.getAllDeviceLiveData(TOKEN,userId, offset, search);
 
-		//return deviceService.getAllDeviceLiveData(TOKEN,userId, offset, search);
 	}
 	
 	@GetMapping(path = "/getAllDevicesLastInfoMap")
