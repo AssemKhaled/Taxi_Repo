@@ -104,10 +104,26 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	@Query(nativeQuery = true, name = "getDeviceWorkingHours")
 	public List<DeviceWorkingHours> getDeviceWorkingHours(@Param("deviceId")List<Long> deviceId,@Param("offset")int offset,@Param("start")String start,@Param("end")String end);
 
-	@Query(value = "SELECT  COUNT(*)  FROM tc_positions " + 
-			" INNER JOIN tc_devices ON tc_devices.id=tc_positions.deviceid " + 
-			" WHERE deviceid IN(:deviceIds)and tc_positions.devicetime between :start and  :end ",nativeQuery = true )
+	@Query(nativeQuery = true, name = "getDeviceCustom")
+	public List<DeviceWorkingHours> getDeviceCustom(@Param("deviceId")List<Long> deviceId,@Param("offset")int offset,@Param("start")String start,@Param("end")String end,@Param("custom")String custom,@Param("value")String value);
+
+	@Query(value = "SELECT  count(*) FROM tc_positions " + 
+			" INNER JOIN tc_devices ON tc_devices.id=tc_positions.deviceid  WHERE deviceid IN(:deviceIds) " + 
+			" and tc_positions.devicetime " + 
+			" IN (SELECT devicetime " + 
+			" FROM (SELECT MAX(devicetime) as devicetime FROM tc_positions WHERE deviceid IN(:deviceIds) " + 
+			" AND devicetime between :start and :end group by CAST(devicetime AS DATE) )as t1) " + 
+			" order by devicetime DESC  ",nativeQuery = true )
 	public Integer getDeviceWorkingHoursSize(@Param("deviceIds")List<Long>  deviceIds,@Param("start")String start,@Param("end")String end);
+
+	@Query(value = "SELECT count(*) " + 
+			" FROM tc_positions  " + 
+			" INNER JOIN tc_devices ON tc_devices.id=tc_positions.deviceid  "
+			+ "WHERE tc_positions.deviceid IN(:deviceId) and " +
+			" CAST(json_extract(tc_positions.attributes, :custom) AS character) =:value "+
+			" and tc_positions.devicetime between :start and :end " + 
+			" order by tc_positions.devicetime DESC ",nativeQuery = true )
+	public Integer getDeviceCustomSize(@Param("deviceId")List<Long>  deviceId,@Param("start")String start,@Param("end")String end,@Param("custom")String custom,@Param("value")String value);
 
 	
 	@Query(value = "SELECT tc_devices.calibrationData FROM tc_devices WHERE tc_devices.id=:deviceId AND tc_devices.delete_date IS NULL ",nativeQuery = true)

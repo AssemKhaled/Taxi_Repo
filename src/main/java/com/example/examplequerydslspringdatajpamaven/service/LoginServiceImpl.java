@@ -207,13 +207,7 @@ public class LoginServiceImpl extends RestServiceController implements LoginServ
        }
 		
        
-       if(loggedUser.getAccountType()!= 1) {
-			if(!userRoleService.checkUserHasPermission(loggedId, "BILLING", "getBilling")) {
-				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to getBilling",null);
-				 logger.info("************************ deleteGeo ENDED ***************************");
-				return  ResponseEntity.badRequest().body(getObjectResponse);
-			}
-	   }
+
 
 		User parentChilds = new User() ;
  		boolean isParent =false;

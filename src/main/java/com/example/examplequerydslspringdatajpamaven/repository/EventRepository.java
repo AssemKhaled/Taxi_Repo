@@ -57,6 +57,10 @@ public interface EventRepository  extends JpaRepository<Event, Long>, QueryDslPr
 	@Query(nativeQuery = true, name = "getNotifications")
 	public List<EventReport> getNotifications(@Param("userId") List<Long> userId,@Param("offset")int offset,@Param("search")String search);
 
+
+	@Query(nativeQuery = true, name = "getNotificationsChart")
+	public List<EventReport> getNotificationsChart(@Param("userId") List<Long> userId);
+
 	@Query (value = "SELECT count(tc_events.id)"+
 			" FROM tc_user_device" + 
 			" INNER JOIN tc_events ON tc_user_device.deviceid=tc_events.deviceid " + 

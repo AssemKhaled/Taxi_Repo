@@ -88,25 +88,31 @@ public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslP
 	public List<DriverWorkingHours> getDriverWorkingHoursExport(@Param("driverId")List<Long> driverId,@Param("start")String start,@Param("end")String end);
 	
 	@Query(nativeQuery = true, name = "getDriverWorkingHours")
-	public List<DriverWorkingHours> getDriverWorkingHours(@Param("driverId") List<Long> driverId,@Param("offset")int offset,@Param("start")String start,@Param("end")String end);
+	public List<DriverWorkingHours> getDriverWorkingHours(@Param("deviceId") List<Long> deviceId,@Param("offset")int offset,@Param("start")String start,@Param("end")String end);
 
 	@Query(nativeQuery = true, name = "getNumberDriverWorkingHours")
 	public List<DriverWorkingHours> getNumberDriverWorkingHours(@Param("driverId") List<Long> driverId,@Param("start")String start,@Param("end")String end);
 
 	
-	@Query(value = "SELECT count(*) "+
-			" FROM tc_positions " + 
-			" INNER JOIN tc_devices ON tc_devices.id=tc_positions.deviceid " + 
-			" INNER JOIN tc_device_driver ON tc_positions.deviceid=tc_device_driver.deviceid " + 
-			" INNER JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id  "+
-			" WHERE tc_positions.deviceid IN (SELECT tc_device_driver.deviceid " + 
-			" FROM tc_drivers INNER JOIN tc_device_driver ON tc_device_driver.driverid=tc_drivers.id WHERE tc_drivers.id IN(:driverId) )"
-			+ " and tc_positions.fixtime between :start and  :end",nativeQuery = true )
+	@Query(value = "SELECT  count(*) FROM tc_positions  " + 
+			" INNER JOIN tc_devices ON tc_devices.id=tc_positions.deviceid  WHERE deviceid IN(:deviceId) " + 
+			" and tc_positions.devicetime " + 
+			" IN (SELECT devicetime " + 
+			" FROM (SELECT MAX(devicetime) as devicetime FROM tc_positions WHERE deviceid IN(:deviceId) " + 
+			" AND devicetime between :start and :end group by CAST(devicetime AS DATE) )as t1) " + 
+			" order by devicetime DESC",nativeQuery = true )
 	
-	public Integer getDriverWorkingHoursSize(@Param("driverId") List<Long> driverId,@Param("start")String start,@Param("end")String end);
+	public Integer getDriverWorkingHoursSize(@Param("deviceId") List<Long> deviceId,@Param("start")String start,@Param("end")String end);
 
 	@Query(value = "SELECT tc_drivers.id,tc_drivers.name FROM tc_drivers"
 			+ " INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id"
 			+ " WHERE tc_user_driver.userid IN(:userIds) and tc_drivers.delete_date is null",nativeQuery = true)
 	public List<DriverSelect> getDriverSelect(@Param("userIds") List<Long> userIds);
+	
+	@Query(value = "Select tc_device_driver.deviceid,tc_drivers.name from tc_device_driver " + 
+			" INNER JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id " + 
+			" where tc_drivers.id IN(:driverIds) and tc_drivers.delete_date is null ",nativeQuery = true)
+	public List<DriverSelect> devicesOfDrivers(@Param("driverIds") List<Long> driverIds);
+	
+	
 }

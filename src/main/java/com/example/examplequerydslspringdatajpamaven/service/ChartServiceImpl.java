@@ -34,9 +34,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
+import com.example.examplequerydslspringdatajpamaven.entity.EventReport;
 import com.example.examplequerydslspringdatajpamaven.entity.SummaryReport;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.EventRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.PositionSqlRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
@@ -54,7 +56,9 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 	@Autowired 
 	DeviceRepository deviceRepository;
 	
-
+	@Autowired
+	EventRepository eventRepository;
+	
 	@Autowired 
 	PositionSqlRepository positionRepository;
 	
@@ -130,7 +134,7 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 				return  ResponseEntity.ok().body(getObjectResponse);
 			 }
 		 }
-		 List<User>childernUsers = userService.getActiveAndInactiveChildern(userId);
+		 List<User>childernUsers = userService.getAllChildernOfUser(userId);
 		 List<Long>usersIds= new ArrayList<>();
 		 if(childernUsers.isEmpty()) {
 			 usersIds.add(userId);
@@ -255,7 +259,7 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 				return  ResponseEntity.ok().body(getObjectResponse);
 			 }
 		 }
-		 List<User>childernUsers = userService.getActiveAndInactiveChildern(userId);
+		 List<User>childernUsers = userService.getAllChildernOfUser(userId);
 		 List<Long>usersIds= new ArrayList<>();
 		 if(childernUsers.isEmpty()) {
 			 usersIds.add(userId);
@@ -390,18 +394,39 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 						    devicesList.put("driverName", positionsList.get(i).getDriverName());
 						    devicesList.put("deviceName", positionsList.get(i).getDeviceName());
 
-							data.add(devicesList);
+						    if(data.size() == 10) {
+					    		Integer newData = Integer.parseInt( devicesList.get("hours").toString() );
 
+						    	for(int k=0;k<data.size();k++) {
+						    		Integer oldData = Integer.parseInt( data.get(k).get("hours").toString() );
+
+						    		if(newData > oldData) {
+
+						    			data.get(k).replace("hours", devicesList.get("hours"));
+						    			data.get(k).replace("driverName", devicesList.get("driverName"));
+						    			data.get(k).replace("deviceName", devicesList.get("deviceName"));
+						    			break;
+
+						    		}
+
+						    	
+
+						    	}
+
+						    }
+						    if(data.size() < 10) {
+								data.add(devicesList);
+						    }
 							
 						}
 					
 					}
-					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",data);
+					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",data,data.size());
 				 logger.info("************************ getIgnitionMotion ENDED ***************************");
 				return  ResponseEntity.ok().body(getObjectResponse);
 			 }
 		 }
-		 List<User>childernUsers = userService.getActiveAndInactiveChildern(userId);
+		 List<User>childernUsers = userService.getAllChildernOfUser(userId);
 		 List<Long>usersIds= new ArrayList<>();
 		 if(childernUsers.isEmpty()) {
 			 usersIds.add(userId);
@@ -442,16 +467,40 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 			    devicesList.put("driverName", positionsList.get(i).getDriverName());
 			    devicesList.put("deviceName", positionsList.get(i).getDeviceName());
 
-				data.add(devicesList);
+			    if(data.size() == 10) {
+		    		Integer newData = Integer.parseInt( devicesList.get("hours").toString() );
+
+			    	for(int k=0;k<data.size();k++) {
+			    		Integer oldData = Integer.parseInt( data.get(k).get("hours").toString() );
+
+			    		if(newData > oldData) {
+
+			    			data.get(k).replace("hours", devicesList.get("hours"));
+			    			data.get(k).replace("driverName", devicesList.get("driverName"));
+			    			data.get(k).replace("deviceName", devicesList.get("deviceName"));
+			    			break;
+
+			    		}
+
+			    	
+
+			    	}
+
+			    }
+			    if(data.size() < 10) {
+					data.add(devicesList);
+			    }
 
 				
 			}
+			
+			
 		
 		}
 	    
 		
 		
-		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",data);
+		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",data,data.size());
 		logger.info("************************ getIgnitionMotion ENDED ***************************");
 		return ResponseEntity.ok().body(getObjectResponse);
 	}
@@ -472,7 +521,7 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 		}
 		
 		
-		if(userId.equals(0)) {
+		if(userId == 0) {
 			List<Device> devices = null;
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is required",devices);
 			logger.info("************************ getDistanceFuelEngine ENDED ***************************");
@@ -554,44 +603,64 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 							  URL +="&deviceId="+allDevices.get(i);
 						  }
 					  }
-					  System.out.println(URL);
 					  ResponseEntity<List<SummaryReport>> rateResponse =
 						        restTemplate.exchange(URL,
 						                    HttpMethod.GET,request, new ParameterizedTypeReference<List<SummaryReport>>() {
 						            });
 					  summaryReport = rateResponse.getBody();
 					  if(summaryReport.size()>0) {
-						  System.out.println(summaryReport.get(0));
 
 						  for(SummaryReport summaryReportOne : summaryReport ) {
+							  
+							  if(!summaryReportOne.getEngineHours().equals(null)) {
+								  if(!summaryReportOne.getEngineHours().equals("0")) {
+										SimpleDateFormat time = new SimpleDateFormat("HH:mm");
+										try {
+											Date date =  time.parse((String) summaryReportOne.getEngineHours());
+											summaryReportOne.setEngineHours(String.valueOf(date.getHours()));
+										} catch (JSONException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (ParseException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										}
+
+
+									}
+								  
+							  }
+							  
+							  
 							  Device device= deviceServiceImpl.findById(summaryReportOne.getDeviceId());
 							  if(device != null) {
 								  Set<Driver>  drivers = device.getDriver();
 								  for(Driver driver : drivers ) {
 
 									 summaryReportOne.setDriverName(driver.getName());
-									 if(device.getFuel() != null) {
+									 
+								  }
+								  if(device.getFuel() != null) {
 										 
 										
-										int litres=0;
-										int Fuel =0;
-										int distance=0;
+										Double litres=0.0;
+										Double Fuel =0.0;
+										Double distance=0.0;
 										JSONObject obj = new JSONObject(device.getFuel());	
 										if(obj.has("fuelPerKM")) {
-											litres=obj.getInt("fuelPerKM");
+											litres=obj.getDouble("fuelPerKM");
 										}
 
-										distance = Integer.parseInt(summaryReportOne.getDistance());
+										distance = Double.parseDouble(summaryReportOne.getDistance().toString());
 										if(distance > 0) {
 											Fuel = (distance/100)*litres;
 										}
 
-										summaryReportOne.setSpentFuel(Integer.toString(Fuel));
+										summaryReportOne.setSpentFuel(Double.toString(Fuel));
 
 										
 
 									 }
-								}
 							  }
 							 }
 							  
@@ -655,14 +724,13 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 					  URL +="&deviceId="+allDevices.get(i);
 				  }
 			  }
-			  System.out.println(URL);
 			  ResponseEntity<List<SummaryReport>> rateResponse =
 				        restTemplate.exchange(URL,
 				                    HttpMethod.GET,request, new ParameterizedTypeReference<List<SummaryReport>>() {
 				            });
+			  
 			  summaryReport = rateResponse.getBody();
 			  if(summaryReport.size()>0) {
-				  System.out.println(summaryReport.get(0));
 
 				  for(SummaryReport summaryReportOne : summaryReport ) {
 					  if(!summaryReportOne.getEngineHours().equals(null)) {
@@ -693,28 +761,30 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 						  for(Driver driver : drivers ) {
 
 							 summaryReportOne.setDriverName(driver.getName());
-							 if(device.getFuel() != null) {
+							 
+						}
+						  if(device.getFuel() != null) {
 								 
 								
-								int litres=0;
-								int Fuel =0;
-								int distance=0;
+								Double litres=0.0;
+								Double Fuel =0.0;
+								Double distance=0.0;
 								JSONObject obj = new JSONObject(device.getFuel());	
 								if(obj.has("fuelPerKM")) {
-									litres=obj.getInt("fuelPerKM");
+									litres=obj.getDouble("fuelPerKM");
 								}
 
-								distance = Integer.parseInt(summaryReportOne.getDistance());
+								distance = Double.parseDouble(summaryReportOne.getDistance().toString());
 								if(distance > 0) {
 									Fuel = (distance/100)*litres;
 								}
 
-								summaryReportOne.setSpentFuel(Integer.toString(Fuel));
+								summaryReportOne.setSpentFuel(Double.toString(Fuel));
+
 
 								
 
 							 }
-						}
 					  }
 					 }
 					  
@@ -725,6 +795,246 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",summaryReport);
 		logger.info("************************ getDistanceFuelEngine ENDED ***************************");
 		return ResponseEntity.ok().body(getObjectResponse);
+	}
+
+
+	@Override
+	public ResponseEntity<?> getNotificationsChart(String TOKEN, Long userId) {
+logger.info("************************ getNotifications STARTED ***************************");
+		
+		List<EventReport> notifications = new ArrayList<EventReport>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",notifications);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		
+		if(userId != 0) {
+		
+			User user = userService.findById(userId);
+			if(user != null) {
+				userService.resetChildernArray();
+				 if(user.getAccountType() == 4) {
+					 Set<User> parentClients = user.getUsersOfUser();
+					 if(parentClients.isEmpty()) {
+						
+						 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get devices of this user",null);
+						 logger.info("************************ getAllUserDevices ENDED ***************************");
+						return  ResponseEntity.status(404).body(getObjectResponse);
+					 }else {
+						 User parentClient = new User() ;
+						 for(User object : parentClients) {
+							 parentClient = object;
+						 }
+						 List<Long>usersIds= new ArrayList<>();
+						 usersIds.add(parentClient.getId());
+						
+							notifications= eventRepository.getNotificationsChart(usersIds);
+							if(notifications.size()>0) {
+								for(int i=0;i<notifications.size();i++) {
+									if(notifications.get(i).getEventType().equals("alarm")) {
+										JSONObject obj = new JSONObject(notifications.get(i).getAttributes());
+										notifications.get(i).setEventType(obj.getString("alarm"));
+									}
+								}
+									
+							}
+							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",notifications,notifications.size());
+							logger.info("************************ getNotifications ENDED ***************************");
+							return  ResponseEntity.ok().body(getObjectResponse);
+					 }
+				 }
+				 
+				 List<Long>usersIds= new ArrayList<>();
+				 usersIds.add(userId);
+
+					notifications= eventRepository.getNotificationsChart(usersIds);
+					
+					List<Map> data = new ArrayList<>();
+
+					Integer deviceOverspeed = 0;
+					Integer ignitionOn = 0;
+					Integer driverChanged = 0;
+					Integer deviceOffline = 0;
+					Integer geofenceEnter = 0;
+					Integer commandResult = 0;
+					Integer deviceMoving = 0;
+					Integer textMessage = 0;
+					Integer deviceOnline = 0;
+					Integer deviceUnknown = 0;
+					Integer maintenance = 0;
+					Integer alarm = 0;
+					Integer deviceFuelDrop = 0;
+					Integer ignitionOff = 0;
+					Integer geofenceExit = 0;
+					Integer deviceStopped = 0;
+					
+					if(notifications.size()>0) {
+						for(int i=0;i<notifications.size();i++) {
+							if(notifications.get(i).getEventType().equals("deviceStopped")) {
+								deviceOverspeed = deviceOverspeed+1;
+							}
+							if(notifications.get(i).getEventType().equals("ignitionOn")) {
+								ignitionOn = ignitionOn+1;
+							}
+							if(notifications.get(i).getEventType().equals("driverChanged")) {
+								driverChanged = driverChanged+1;
+							}
+							if(notifications.get(i).getEventType().equals("deviceOffline")) {
+								deviceOffline = deviceOffline+1;
+							}
+							if(notifications.get(i).getEventType().equals("geofenceEnter")) {
+								geofenceEnter = geofenceEnter+1;
+							}
+							if(notifications.get(i).getEventType().equals("commandResult")) {
+								commandResult = commandResult+1;
+							}
+							if(notifications.get(i).getEventType().equals("deviceMoving")) {
+								deviceMoving = deviceMoving+1;
+							}
+							if(notifications.get(i).getEventType().equals("textMessage")) {
+								textMessage = textMessage+1;
+							}
+							if(notifications.get(i).getEventType().equals("deviceOnline")) {
+								deviceOnline = deviceOnline+1;
+							}
+							if(notifications.get(i).getEventType().equals("deviceUnknown")) {
+								deviceUnknown = deviceUnknown+1;
+							}
+							if(notifications.get(i).getEventType().equals("maintenance")) {
+								maintenance = maintenance+1;
+							}
+							if(notifications.get(i).getEventType().equals("alarm")) {
+								alarm = alarm+1;
+							}
+							if(notifications.get(i).getEventType().equals("deviceFuelDrop")) {
+								deviceFuelDrop = deviceFuelDrop+1;
+							}
+							if(notifications.get(i).getEventType().equals("ignitionOff")) {
+								ignitionOff = ignitionOff+1;
+							}
+							if(notifications.get(i).getEventType().equals("geofenceExit")) {
+								geofenceExit = geofenceExit+1;
+							}
+							if(notifications.get(i).getEventType().equals("deviceStopped")) {
+								deviceStopped = deviceStopped+1;
+							}
+							
+						}
+							
+					}
+					
+					
+					Map notificationList1 = new HashMap();
+					notificationList1.put("type", "deviceOverspeed");
+					notificationList1.put("count", deviceOverspeed);
+					data.add(notificationList1);
+					
+					Map notificationList2 = new HashMap();
+					notificationList2.put("type", "ignitionOn");
+					notificationList2.put("count", ignitionOn);
+					data.add(notificationList2);
+					
+					Map notificationList3 = new HashMap();
+					notificationList3.put("type", "driverChanged");
+					notificationList3.put("count", driverChanged);
+					data.add(notificationList3);
+					
+					Map notificationList4 = new HashMap();
+					notificationList4.put("type", "deviceOffline");
+					notificationList4.put("count", deviceOffline);
+					data.add(notificationList4);
+					
+					Map notificationList5 = new HashMap();
+					notificationList5.put("type", "geofenceEnter");
+					notificationList5.put("count", geofenceEnter);
+					data.add(notificationList5);
+					
+					Map notificationList6 = new HashMap();
+					notificationList6.put("type", "commandResult");
+					notificationList6.put("count", commandResult);
+					data.add(notificationList6);
+					
+					Map notificationList7 = new HashMap();
+					notificationList7.put("type", "deviceMoving");
+					notificationList7.put("count", deviceMoving);
+					data.add(notificationList7);
+					
+					Map notificationList8 = new HashMap();
+					notificationList8.put("type", "textMessage");
+					notificationList8.put("count", textMessage);
+					data.add(notificationList8);
+					
+					Map notificationList9 = new HashMap();
+					notificationList9.put("type", "deviceOnline");
+					notificationList9.put("count", deviceOnline);
+					data.add(notificationList9);
+					
+					Map notificationList10 = new HashMap();
+					notificationList10.put("type", "deviceUnknown");
+					notificationList10.put("count", deviceUnknown);
+					data.add(notificationList10);
+					
+
+					Map notificationList11 = new HashMap();
+					notificationList11.put("type", "maintenance");
+					notificationList11.put("count", maintenance);
+					data.add(notificationList11);
+					
+
+					Map notificationList12 = new HashMap();
+					notificationList12.put("type", "alarm");
+					notificationList12.put("count", alarm);
+					data.add(notificationList12);
+					
+					Map notificationList13 = new HashMap();
+					notificationList13.put("type", "deviceFuelDrop");
+					notificationList13.put("count", deviceFuelDrop);
+					data.add(notificationList13);
+					
+					Map notificationList14 = new HashMap();
+					notificationList14.put("type", "ignitionOff");
+					notificationList14.put("count", ignitionOff);
+					data.add(notificationList14);
+					
+
+					Map notificationList15 = new HashMap();
+					notificationList15.put("type", "geofenceExit");
+					notificationList15.put("count", geofenceExit);
+					data.add(notificationList15);
+					
+					Map notificationList16 = new HashMap();
+					notificationList16.put("type", "deviceStopped");
+					notificationList16.put("count", deviceStopped);
+					data.add(notificationList16);
+					
+					
+					
+							
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",data,notifications.size());
+					logger.info("************************ getNotifications ENDED ***************************");
+					return  ResponseEntity.ok().body(getObjectResponse);
+
+				
+			}
+			else {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",notifications);
+				return  ResponseEntity.status(404).body(getObjectResponse);
+
+			}
+			
+			
+			
+		}
+		else {
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",notifications);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
 	}
 	
 	

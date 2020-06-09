@@ -37,6 +37,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.CustomPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
+import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.EventReport;
 import com.example.examplequerydslspringdatajpamaven.entity.EventReportByCurl;
@@ -130,13 +131,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",eventReport);
 				return  ResponseEntity.status(404).body(getObjectResponse);
 			}
-			if(loggedUser.getAccountType()!= 1) {
-				if(!userRoleService.checkUserHasPermission(userId, "EVENTREPORT", "list")) {
-					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get EVENTREPORT list",null);
-					 logger.info("************************ EVENTREPORT ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-			}
+
 			List<Long>allDevices= new ArrayList<>();
 
 			if(groupId != 0) {
@@ -233,7 +228,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 							}
 							
 							search = "%"+search+"%";
-							Integer size = null;
+							Integer size = 0;
 							if(type.equals("")) {
 								eventReport = eventRepository.getEvents(allDevices, offset, start, end,search);
 								if(eventReport.size()>0) {
@@ -362,7 +357,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 						return ResponseEntity.badRequest().body(getObjectResponse);
 					}
 					search = "%"+search+"%";
-					Integer size = null;
+					Integer size = 0;
 					allDevices.add(deviceId);
 					if(type.equals("")) {
 						eventReport = eventRepository.getEvents(allDevices, offset, start, end,search);
@@ -447,22 +442,12 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			return super.checkActive(TOKEN);
 		}
 		if(userId != 0) {
-			offset=offset-1;
-			if(offset <0) {
-				offset=0;
-			}
 			User loggedUser = userServiceImpl.findById(userId);
 			if(loggedUser == null) {
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",deviceHours);
 				return  ResponseEntity.status(404).body(getObjectResponse);
 			}
-			if(loggedUser.getAccountType()!= 1) {
-				if(!userRoleService.checkUserHasPermission(userId, "DEVICEWORKINGHOURSREPORT", "list")) {
-					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get DEVICEWORKINGHOURSREPORT list",null);
-					 logger.info("************************ DEVICEWORKINGHOURSREPORT ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-			}
+
 			
 			List<Long>allDevices= new ArrayList<>();
 
@@ -560,7 +545,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 							}
 							search = "%"+search+"%";		
 							deviceHours = deviceRepository.getDeviceWorkingHours(allDevices,offset,start,end);
-							Integer size = null;
+							Integer size = 0;
 							if(deviceHours.size()>0) {
 		       				    size=deviceRepository.getDeviceWorkingHoursSize(allDevices,start, end);
 								for(int i=0;i<deviceHours.size();i++) {
@@ -736,7 +721,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 //							 }
 //						 }
 //					 	}
-					Integer size = null;
+					Integer size = 0;
 					if(deviceHours.size()>0) {
        				    size=deviceRepository.getDeviceWorkingHoursSize(allDevices,start, end);
 						for(int i=0;i<deviceHours.size();i++) {
@@ -799,13 +784,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",deviceHours);
 				return  ResponseEntity.status(404).body(getObjectResponse);
 			}
-			if(loggedUser.getAccountType()!= 1) {
-				if(!userRoleService.checkUserHasPermission(userId, "DEVICEWORKINGHOURSREPORT", "export")) {
-					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get DEVICEWORKINGHOURSREPORT export",null);
-					 logger.info("************************ DEVICEWORKINGHOURSREPORTExport ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-			}
+
 			
 			if(groupId != 0) {
 		    	
@@ -900,7 +879,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 							}
 							deviceHours = deviceRepository.getDeviceWorkingHoursExport(allDevices,start,end);
-							Integer size = null;
+							Integer size = 0;
 							if(deviceHours.size()>0) {
 								size=deviceRepository.getDeviceWorkingHoursSize(allDevices,start, end);
 								for(int i=0;i<deviceHours.size();i++) {
@@ -1074,7 +1053,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 //							 }
 //						 }
 //					 	}
-					Integer size = null;
+					Integer size = 0;
 					if(deviceHours.size()>0) {
 						size=deviceRepository.getDeviceWorkingHoursSize(allDevices,start, end);
 						for(int i=0;i<deviceHours.size();i++) {
@@ -1131,24 +1110,18 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			return super.checkActive(TOKEN);
 		}
 		if( userId != 0) {
-			offset=offset-1;
-			if(offset <0) {
-				offset=0;
-			}
+
 			User loggedUser = userServiceImpl.findById(userId);
 			if(loggedUser == null) {
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",driverHours);
 				return  ResponseEntity.status(404).body(getObjectResponse);
 			}
-			if(loggedUser.getAccountType()!= 1) {
-				if(!userRoleService.checkUserHasPermission(userId, "DRIVERWORKINGHOURSREPORT", "list")) {
-					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get DRIVERWORKINGHOURSREPORT list",null);
-					 logger.info("************************ DRIVERWORKINGHOURSREPORT ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-			}
+
 			
 			List<Long>allDrivers= new ArrayList<>();
+			
+			List<Long>allDevices= new ArrayList<>();
+			List<DriverSelect>allDevicesList= new ArrayList<DriverSelect>();
 
 			if(groupId != 0) {
 		    	
@@ -1243,11 +1216,27 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 							}
 							search = "%"+search+"%";
-							driverHours = driverRepository.getDriverWorkingHours(allDrivers,offset,start,end);
-							Integer size = null;
+							
+							allDevicesList = driverRepository.devicesOfDrivers(allDrivers);
+							
+							for(DriverSelect object : allDevicesList) {
+								allDevices.add(object.getId());
+							}
+							driverHours = driverRepository.getDriverWorkingHours(allDevices,offset,start,end);
+							
+
+							Integer size = 0;
 							if(driverHours.size()>0) {
-		       				    size=driverRepository.getDriverWorkingHoursSize(allDrivers,start,end);
+		       				    size=driverRepository.getDriverWorkingHoursSize(allDevices,start,end);
 								for(int i=0;i<driverHours.size();i++) {
+									for(int j=0;j<allDevicesList.size();j++) {
+										Long id1 = driverHours.get(i).getDeviceId().longValue();
+										Long id2 = allDevicesList.get(j).getId();
+
+										if(id1.equals(id2)) {
+											driverHours.get(i).setDriverName(allDevicesList.get(j).getName());
+										}
+									}
 									JSONObject obj = new JSONObject(driverHours.get(i).getAttributes());
 									if(obj.has("todayHoursString")) {
 										driverHours.get(i).setHours(obj.getString("todayHoursString"));
@@ -1358,69 +1347,26 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 					}
 					search = "%"+search+"%";
 					allDrivers.add(driverId);
-					driverHours = driverRepository.getDriverWorkingHours(allDrivers,offset,start,end);
-//					 List<Integer> deviceIds = new ArrayList<>();
-//					    for (DriverWorkingHours devicehours: driverHours) {
-//					    	deviceIds.add(devicehours.getDeviceId());
-//					   }
-//						 List<Position>allPositions=poitionRepository.findAllBydeviceidIn(deviceIds);
-//						 String start="";
-//						 String end="";
-//						 Position pos=poitionRepository.findTopByOrderByOrderdevicetimeDesc(start,end);
-//						 if(start.equals("0") || end.equals("0")) {
-//								getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",driverHours);
-//								return  ResponseEntity.badRequest().body(getObjectResponse);
-//			
-//							}
-//							else {
-//								SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-//								SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
-//								inputFormat.setLenient(false);
-//								outputFormat.setLenient(false);
-//			
-//								Date dateFrom;
-//								Date dateTo;
-//								try {
-//									dateFrom = inputFormat.parse(start);
-//									dateTo = inputFormat.parse(end);
-//									
-//									start = outputFormat.format(dateFrom);
-//									end = outputFormat.format(dateTo);
-//									
-//									Date today=new Date();
-//			
-//									if(dateFrom.getTime() > dateTo.getTime()) {
-//										getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",driverHours);
-//										return  ResponseEntity.badRequest().body(getObjectResponse);
-//									}
-//									if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
-//										getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",driverHours);
-//										return  ResponseEntity.badRequest().body(getObjectResponse);
-//									}
-//									
-//									
-//			
-//			
-//								} catch (ParseException e) {
-//									// TODO Auto-generated catch block
-//									getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",driverHours);
-//									return  ResponseEntity.badRequest().body(getObjectResponse);
-//			
-//								}
-//							}
-////					 	for(Position allpositions: allPositions) {
-//						 for (DriverWorkingHours driverhours: driverHours) {			
-//							 if(allpositions.getDeviceid().equals(driverhours.getDeviceId())) {				 
-//								 driverhours.setAttributes(allpositions.getAttributes());
-//								 driverhours.setDeviceTime(allpositions.getDevicetime());
-//							
-//							 }
-//						 }
-//					 	}
-					Integer size = null;
+					allDevicesList = driverRepository.devicesOfDrivers(allDrivers);
+					
+					for(DriverSelect object : allDevicesList) {
+						allDevices.add(object.getId());
+					}
+					driverHours = driverRepository.getDriverWorkingHours(allDevices,offset,start,end);
+					
+
+					Integer size = 0;
 					if(driverHours.size()>0) {
-       				    size=driverRepository.getDriverWorkingHoursSize(allDrivers,start,end);
+       				    size=driverRepository.getDriverWorkingHoursSize(allDevices,start,end);
 						for(int i=0;i<driverHours.size();i++) {
+							for(int j=0;j<allDevicesList.size();j++) {
+								Long id1 = driverHours.get(i).getDeviceId().longValue();
+								Long id2 = allDevicesList.get(j).getId();
+
+								if(id1.equals(id2)) {
+									driverHours.get(i).setDriverName(allDevicesList.get(j).getName());
+								}
+							}
 							JSONObject obj = new JSONObject(driverHours.get(i).getAttributes());
 							if(obj.has("todayHoursString")) {
 								driverHours.get(i).setHours(obj.getString("todayHoursString"));
@@ -1478,13 +1424,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",driverHours);
 				return  ResponseEntity.status(404).body(getObjectResponse);
 			}
-			if(loggedUser.getAccountType()!= 1) {
-				if(!userRoleService.checkUserHasPermission(userId, "DRIVERWORKINGHOURSREPORT", "export")) {
-					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get DRIVERWORKINGHOURSREPORT export",null);
-					 logger.info("************************ DRIVERWORKINGHOURSREPORT ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-			}
+
 			List<Long>allDrivers= new ArrayList<>();
 
 			if(groupId != 0) {
@@ -1582,7 +1522,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 							
 							driverHours = driverRepository.getDriverWorkingHoursExport(allDrivers,start,end);
 							
-							Integer size = null;
+							Integer size = 0;
 							if(driverHours.size()>0) {
 								size=driverRepository.getDriverWorkingHoursSize(allDrivers,start, end);
 								for(int i=0;i<driverHours.size();i++) {
@@ -1696,7 +1636,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 					allDrivers.add(driverId);
 					driverHours = driverRepository.getDriverWorkingHoursExport(allDrivers,start,end);
 					
-					Integer size = null;
+					Integer size = 0;
 					if(driverHours.size()>0) {
 						size=driverRepository.getDriverWorkingHoursSize(allDrivers,start, end);
 						for(int i=0;i<driverHours.size();i++) {
@@ -1758,13 +1698,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",eventReport);
 				return  ResponseEntity.status(404).body(getObjectResponse);
 			}
-			if(loggedUser.getAccountType()!= 1) {
-				if(!userRoleService.checkUserHasPermission(userId, "EVENTREPORT", "export")) {
-					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get EVENTREPORT export",null);
-					 logger.info("************************ EVENTREPORT ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-			}
+
 			List<Long>allDevices= new ArrayList<>();
 
 			if(groupId != 0) {
@@ -2163,13 +2097,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",stopReport);
 				return  ResponseEntity.status(404).body(getObjectResponse);
 			}
-			if(loggedUser.getAccountType()!= 1) {
-				if(!userRoleService.checkUserHasPermission(userId, "STOPREPORT", "list")) {
-					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get STOPREPORT list",null);
-					 logger.info("************************ STOPREPORT ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-			}
+
 			
 			 if(groupId != 0) {
 			    	
@@ -2301,12 +2229,44 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 									  for(StopReport stopReportOne : stopReport ) {
 										  Device device= deviceServiceImpl.findById(stopReportOne.getDeviceId());
+										  Long timeDuration = (long) 0;
+										  Long timeEngine= (long) 0;
+										  String totalDuration = "00:00:00";
+										  String totalEngineHours = "00:00:00";
+
+										  
 										  Set<Driver>  drivers = device.getDriver();
 										  for(Driver driver : drivers ) {
 
 											 stopReportOne.setDriverName(driver.getName());
 											 stopReportOne.setDriverUniqueId(driver.getUniqueid());
 										}
+										  if(stopReportOne.getDuration() != null && stopReportOne.getDuration() != "") {
+
+											  timeDuration = Math.abs(  Long.parseLong(stopReportOne.getDuration())  );
+
+			     							  Long hoursDuration =   TimeUnit.MILLISECONDS.toHours(timeDuration) ;
+											  Long minutesDuration = TimeUnit.MILLISECONDS.toMinutes(timeDuration) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(timeDuration));
+											  Long secondsDuration = TimeUnit.MILLISECONDS.toSeconds(timeDuration) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(timeDuration));
+											  
+											  totalDuration = String.valueOf(hoursDuration)+":"+String.valueOf(minutesDuration)+":"+String.valueOf(secondsDuration);
+											  stopReportOne.setDuration(totalDuration.toString());
+
+										  }
+										  
+										  if(stopReportOne.getEngineHours() != null && stopReportOne.getEngineHours() != "") {
+
+											  timeEngine = Math.abs(  Long.parseLong(stopReportOne.getEngineHours())  );
+
+			     							  Long hoursEngine =   TimeUnit.MILLISECONDS.toHours(timeEngine) ;
+											  Long minutesEngine = TimeUnit.MILLISECONDS.toMinutes(timeEngine) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(timeEngine));
+											  Long secondsEngine = TimeUnit.MILLISECONDS.toSeconds(timeEngine) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(timeEngine));
+											  
+											  totalEngineHours = String.valueOf(hoursEngine)+":"+String.valueOf(minutesEngine)+":"+String.valueOf(secondsEngine);
+											  stopReportOne.setEngineHours(totalEngineHours.toString());
+
+										  }
+										  
 									  }
 								  }
 								  
@@ -2439,6 +2399,10 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 					  
 					  if(stopReport.size()>0) {
 						  Set<Driver>  drivers = device.getDriver();
+						  Long timeDuration = (long) 0;
+						  Long timeEngine= (long) 0;
+						  String totalDuration = "00:00:00";
+						  String totalEngineHours = "00:00:00";
 
 						  for(StopReport stopReportOne : stopReport ) {
 							  for(Driver driver : drivers ) {
@@ -2446,6 +2410,31 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								 stopReportOne.setDriverName(driver.getName());
 								 stopReportOne.setDriverUniqueId(driver.getUniqueid());
 							}
+							  if(stopReportOne.getDuration() != null && stopReportOne.getDuration() != "") {
+
+								  timeDuration = Math.abs(  Long.parseLong(stopReportOne.getDuration())  );
+
+     							  Long hoursDuration =   TimeUnit.MILLISECONDS.toHours(timeDuration) ;
+								  Long minutesDuration = TimeUnit.MILLISECONDS.toMinutes(timeDuration) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(timeDuration));
+								  Long secondsDuration = TimeUnit.MILLISECONDS.toSeconds(timeDuration) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(timeDuration));
+								  
+								  totalDuration = String.valueOf(hoursDuration)+":"+String.valueOf(minutesDuration)+":"+String.valueOf(secondsDuration);
+								  stopReportOne.setDuration(totalDuration.toString());
+
+							  }
+							  
+							  if(stopReportOne.getEngineHours() != null && stopReportOne.getEngineHours() != "") {
+
+								  timeEngine = Math.abs(  Long.parseLong(stopReportOne.getEngineHours())  );
+
+     							  Long hoursEngine =   TimeUnit.MILLISECONDS.toHours(timeEngine) ;
+								  Long minutesEngine = TimeUnit.MILLISECONDS.toMinutes(timeEngine) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(timeEngine));
+								  Long secondsEngine = TimeUnit.MILLISECONDS.toSeconds(timeEngine) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(timeEngine));
+								  
+								  totalEngineHours = String.valueOf(hoursEngine)+":"+String.valueOf(minutesEngine)+":"+String.valueOf(secondsEngine);
+								  stopReportOne.setEngineHours(totalEngineHours.toString());
+
+							  }
 						  }
 					  }
 					  
@@ -2498,13 +2487,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",tripReport);
 				return  ResponseEntity.status(404).body(getObjectResponse);
 			}
-			if(loggedUser.getAccountType()!= 1) {
-				if(!userRoleService.checkUserHasPermission(userId, "TRIPREPORT", "list")) {
-					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get TRIPREPORT list",null);
-					 logger.info("************************ TRIPREPORT ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-			}
+
 			
 		    if(groupId != 0) {
 		    	
@@ -2631,7 +2614,10 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 							  if(tripReport.size()>0) {
 
 								  for(TripReport tripReportOne : tripReport ) {
-										
+									  Double totalDistance = 0.0 ;
+									  double roundOffDistance = 0.0;
+									  double roundOffFuel = 0.0;
+									  
 									  Device device= deviceServiceImpl.findById(tripReportOne.getDeviceId());
 									  Set<Driver>  drivers = device.getDriver();
 									  for(Driver driver : drivers ) {
@@ -2658,24 +2644,53 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 												Fuel = (distance/100)*litres;
 											}
 
-											tripReportOne.setSpentFuel(Double.toString(Fuel));
 
-											
+											roundOffFuel = Math.round(Fuel * 100.0 / 100.0);
+
+											tripReportOne.setSpentFuel(Double.toString(roundOffFuel));
 
 										 }
-									  Long time=(long) 0;
-
-									  time = Math.abs( Long.parseLong(tripReportOne.getDuration().toString()) );
-
-									  Long hoursEngine =   TimeUnit.MILLISECONDS.toHours(time) ;
-									  Long minutesEngine = TimeUnit.MILLISECONDS.toMinutes(time) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(time));
-									  Long secondsEngine = TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time));
 									  
-									  String totalHours = String.valueOf(hoursEngine)+":"+String.valueOf(minutesEngine)+":"+String.valueOf(secondsEngine);
-									  tripReportOne.setDuration(totalHours);
+									  
+									  if(tripReportOne.getDuration() != null && tripReportOne.getDuration() != "") {
+										  Long time=(long) 0;
+
+										  time = Math.abs( Long.parseLong(tripReportOne.getDuration().toString()) );
+
+										  Long hoursEngine =   TimeUnit.MILLISECONDS.toHours(time) ;
+										  Long minutesEngine = TimeUnit.MILLISECONDS.toMinutes(time) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(time));
+										  Long secondsEngine = TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time));
+										  
+										  String totalHours = String.valueOf(hoursEngine)+":"+String.valueOf(minutesEngine)+":"+String.valueOf(secondsEngine);
+										  tripReportOne.setDuration(totalHours);
+									  }
+									  if(tripReportOne.getDistance() != null && tripReportOne.getDistance() != "") {
+										  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getDistance())/1000  );
+										  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+										  tripReportOne.setDistance(Double.toString(roundOffDistance));
+
+
+									  }
+									  if(tripReportOne.getAverageSpeed() != null && tripReportOne.getAverageSpeed() != "") {
+										  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getAverageSpeed())  );
+										  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+										  tripReportOne.setAverageSpeed(Double.toString(roundOffDistance));
+
+
+									  }
+									  if(tripReportOne.getMaxSpeed() != null && tripReportOne.getMaxSpeed() != "") {
+										  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getMaxSpeed())  );
+										  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+										  tripReportOne.setMaxSpeed(Double.toString(roundOffDistance));
+
+
+									  }
+									  
+									  
 
 								  }
 							  }
+
 							  
 							  
 							  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",tripReport,tripReport.size());
@@ -2796,15 +2811,19 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 						            });
 					  tripReport = rateResponse.getBody();
 					  if(tripReport.size()>0) {
-						  Set<Driver>  drivers = device.getDriver();
 
 						  for(TripReport tripReportOne : tripReport ) {
+							  Double totalDistance = 0.0 ;
+							  double roundOffDistance = 0.0;
+							  double roundOffFuel = 0.0;
+							  
+							  Set<Driver>  drivers = device.getDriver();
 							  for(Driver driver : drivers ) {
 
 								 tripReportOne.setDriverName(driver.getName());
 								 tripReportOne.setDriverUniqueId(driver.getUniqueid());
 
-								 
+								
 								 
 							}
 							  if( device.getFuel() != null) {
@@ -2823,21 +2842,50 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 										Fuel = (distance/100)*litres;
 									}
 
-									tripReportOne.setSpentFuel(Double.toString(Fuel));
 
-									
+									roundOffFuel = Math.round(Fuel * 100.0 / 100.0);
+
+									tripReportOne.setSpentFuel(Double.toString(roundOffFuel));
 
 								 }
-							  Long time=(long) 0;
-
-							  time = Math.abs( Long.parseLong(tripReportOne.getDuration().toString()) );
-
-							  Long hoursEngine =   TimeUnit.MILLISECONDS.toHours(time) ;
-							  Long minutesEngine = TimeUnit.MILLISECONDS.toMinutes(time) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(time));
-							  Long secondsEngine = TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time));
 							  
-							  String totalHours = String.valueOf(hoursEngine)+":"+String.valueOf(minutesEngine)+":"+String.valueOf(secondsEngine);
-							  tripReportOne.setDuration(totalHours);
+							  
+							  if(tripReportOne.getDuration() != null && tripReportOne.getDuration() != "") {
+								  Long time=(long) 0;
+
+								  time = Math.abs( Long.parseLong(tripReportOne.getDuration().toString()) );
+
+								  Long hoursEngine =   TimeUnit.MILLISECONDS.toHours(time) ;
+								  Long minutesEngine = TimeUnit.MILLISECONDS.toMinutes(time) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(time));
+								  Long secondsEngine = TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time));
+								  
+								  String totalHours = String.valueOf(hoursEngine)+":"+String.valueOf(minutesEngine)+":"+String.valueOf(secondsEngine);
+								  tripReportOne.setDuration(totalHours);
+							  }
+							  if(tripReportOne.getDistance() != null && tripReportOne.getDistance() != "") {
+								  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getDistance())/1000  );
+								  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+								  tripReportOne.setDistance(Double.toString(roundOffDistance));
+
+
+							  }
+							  if(tripReportOne.getAverageSpeed() != null && tripReportOne.getAverageSpeed() != "") {
+								  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getAverageSpeed())  );
+								  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+								  tripReportOne.setAverageSpeed(Double.toString(roundOffDistance));
+
+
+							  }
+							  if(tripReportOne.getMaxSpeed() != null && tripReportOne.getMaxSpeed() != "") {
+								  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getMaxSpeed())  );
+								  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+								  tripReportOne.setMaxSpeed(Double.toString(roundOffDistance));
+
+
+							  }
+							  
+							  
+
 						  }
 					  }
 					  
@@ -2889,13 +2937,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",eventReport);
 				return  ResponseEntity.status(404).body(getObjectResponse);
 			}
-			if(loggedUser.getAccountType()!= 1) {
-				if(!userRoleService.checkUserHasPermission(userId, "TRIPREPORT", "list")) {
-					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get TRIPREPORT list",null);
-					 logger.info("************************ TRIPREPORT ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-			}
+
 		    if(groupId != 0) {
 		    	
 		    	Group group=groupRepository.findOne(groupId);
@@ -3231,13 +3273,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",summaryReport);
 				return  ResponseEntity.status(404).body(getObjectResponse);
 			}
-			if(loggedUser.getAccountType()!= 1) {
-				if(!userRoleService.checkUserHasPermission(userId, "TRIPREPORT", "list")) {
-					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get TRIPREPORT list",null);
-					 logger.info("************************ TRIPREPORT ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-			}
+
 			
             if(groupId != 0) {
 		    	
@@ -3356,16 +3392,17 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 									  URL +="&deviceId="+allDevices.get(i);
 								  }
 							  }
-							  System.out.println(URL);
 							  ResponseEntity<List<SummaryReport>> rateResponse =
 								        restTemplate.exchange(URL,
 								                    HttpMethod.GET,request, new ParameterizedTypeReference<List<SummaryReport>>() {
 								            });
 							  summaryReport = rateResponse.getBody();
-							  System.out.println(summaryReport);
 
 							  if(summaryReport.size()>0) {
-
+								  Double totalDistance = 0.0 ;
+								  double roundOffDistance = 0.0;
+								  double roundOffFuel = 0.0;
+								  
 								  for(SummaryReport summaryReportOne : summaryReport ) {
 									  Device device= deviceServiceImpl.findById(summaryReportOne.getDeviceId());
 									  if(device != null) {
@@ -3373,29 +3410,66 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 									  for(Driver driver : drivers ) {
 
 										 summaryReportOne.setDriverName(driver.getName());
+									  }
 										 if(device.getFuel() != null) {
 											 
 											
-											int litres=0;
-											int Fuel =0;
-											int distance=0;
+											Double litres=0.0;
+											Double Fuel =0.0;
+											Double distance=0.0;
 											JSONObject obj = new JSONObject(device.getFuel());	
 											if(obj.has("fuelPerKM")) {
-												litres=obj.getInt("fuelPerKM");
+												litres=obj.getDouble("fuelPerKM");
 											}
 
-											distance = Integer.parseInt(summaryReportOne.getDistance());
+											distance = Double.parseDouble(summaryReportOne.getDistance());
 											if(distance > 0) {
 												Fuel = (distance/100)*litres;
 											}
 
-											summaryReportOne.setSpentFuel(Integer.toString(Fuel));
 
+											roundOffFuel = Math.round(Fuel * 100.0 / 100.0);
+
+											summaryReportOne.setSpentFuel(Double.toString(roundOffFuel));
 											
 
 										 }
-									}
+									
 								  }
+									  if(summaryReportOne.getEngineHours() != null && summaryReportOne.getEngineHours() != "") {
+										  Long time=(long) 0;
+
+										  time = Math.abs( Long.parseLong(summaryReportOne.getEngineHours().toString()) );
+
+										  Long hoursEngine =   TimeUnit.MILLISECONDS.toHours(time) ;
+										  Long minutesEngine = TimeUnit.MILLISECONDS.toMinutes(time) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(time));
+										  Long secondsEngine = TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time));
+										  
+										  String totalHours = String.valueOf(hoursEngine)+":"+String.valueOf(minutesEngine)+":"+String.valueOf(secondsEngine);
+										  summaryReportOne.setEngineHours(totalHours);
+									  }
+									  if(summaryReportOne.getDistance() != null && summaryReportOne.getDistance() != "") {
+										  totalDistance = Math.abs(  Double.parseDouble(summaryReportOne.getDistance())/1000  );
+										  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+										  summaryReportOne.setDistance(Double.toString(roundOffDistance));
+
+
+									  }
+									  if(summaryReportOne.getAverageSpeed() != null && summaryReportOne.getAverageSpeed() != "") {
+										  totalDistance = Math.abs(  Double.parseDouble(summaryReportOne.getAverageSpeed())  );
+										  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+										  summaryReportOne.setAverageSpeed(Double.toString(roundOffDistance));
+
+
+									  }
+									  if(summaryReportOne.getMaxSpeed() != null && summaryReportOne.getMaxSpeed() != "") {
+										  totalDistance = Math.abs(  Double.parseDouble(summaryReportOne.getMaxSpeed())  );
+										  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+										  summaryReportOne.setMaxSpeed(Double.toString(roundOffDistance));
+
+
+									  }
+									  
 								}
 							  }
 							  
@@ -3519,37 +3593,78 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 						            });
 					  summaryReport = rateResponse.getBody();
 					  if(summaryReport.size()>0) {
-						  Set<Driver>  drivers = device.getDriver();
-
+						  Double totalDistance = 0.0 ;
+						  double roundOffDistance = 0.0;
+						  double roundOffFuel = 0.0;
+						  
 						  for(SummaryReport summaryReportOne : summaryReport ) {
+							  if(device != null) {
+							  Set<Driver>  drivers = device.getDriver();
 							  for(Driver driver : drivers ) {
 
 								 summaryReportOne.setDriverName(driver.getName());
+							  }
 								 if(device.getFuel() != null) {
 									 
 									
-									int litres=0;
-									int Fuel =0;
-									int distance=0;
+									Double litres=0.0;
+									Double Fuel =0.0;
+									Double distance=0.0;
 									JSONObject obj = new JSONObject(device.getFuel());	
 									if(obj.has("fuelPerKM")) {
-										litres=obj.getInt("fuelPerKM");
+										litres=obj.getDouble("fuelPerKM");
 									}
 
-									distance = Integer.parseInt(summaryReportOne.getDistance());
+									distance = Double.parseDouble(summaryReportOne.getDistance());
 									if(distance > 0) {
 										Fuel = (distance/100)*litres;
 									}
 
-									summaryReportOne.setSpentFuel(Integer.toString(Fuel));
 
+									roundOffFuel = Math.round(Fuel * 100.0 / 100.0);
+
+									summaryReportOne.setSpentFuel(Double.toString(roundOffFuel));
 									
 
 								 }
-							}
+							
 						  }
+							  if(summaryReportOne.getEngineHours() != null && summaryReportOne.getEngineHours() != "") {
+								  Long time=(long) 0;
+
+								  time = Math.abs( Long.parseLong(summaryReportOne.getEngineHours().toString()) );
+
+								  Long hoursEngine =   TimeUnit.MILLISECONDS.toHours(time) ;
+								  Long minutesEngine = TimeUnit.MILLISECONDS.toMinutes(time) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(time));
+								  Long secondsEngine = TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time));
+								  
+								  String totalHours = String.valueOf(hoursEngine)+":"+String.valueOf(minutesEngine)+":"+String.valueOf(secondsEngine);
+								  summaryReportOne.setEngineHours(totalHours);
+							  }
+							  if(summaryReportOne.getDistance() != null && summaryReportOne.getDistance() != "") {
+								  totalDistance = Math.abs(  Double.parseDouble(summaryReportOne.getDistance())/1000  );
+								  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+								  summaryReportOne.setDistance(Double.toString(roundOffDistance));
+
+
+							  }
+							  if(summaryReportOne.getAverageSpeed() != null && summaryReportOne.getAverageSpeed() != "") {
+								  totalDistance = Math.abs(  Double.parseDouble(summaryReportOne.getAverageSpeed())  );
+								  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+								  summaryReportOne.setAverageSpeed(Double.toString(roundOffDistance));
+
+
+							  }
+							  if(summaryReportOne.getMaxSpeed() != null && summaryReportOne.getMaxSpeed() != "") {
+								  totalDistance = Math.abs(  Double.parseDouble(summaryReportOne.getMaxSpeed())  );
+								  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+								  summaryReportOne.setMaxSpeed(Double.toString(roundOffDistance));
+
+
+							  }
+							  
+						}
 					  }
-					  
 					  
 					  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",summaryReport,summaryReport.size());
 					  logger.info("************************ getEventsReport ENDED ***************************");
@@ -3600,13 +3715,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",positionsList);
 				return  ResponseEntity.status(404).body(getObjectResponse);
 			}
-			if(loggedUser.getAccountType()!= 1) {
-				if(!userRoleService.checkUserHasPermission(userId, "DEVICEWORKINGHOURSREPORT", "list")) {
-					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get DEVICEWORKINGHOURSREPORT list",null);
-					 logger.info("************************ DEVICEWORKINGHOURSREPORT ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-			}
+
 			List<Long>allDevices= new ArrayList<>();
 
 			if(groupId != 0) {
@@ -3703,7 +3812,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 							}
 							search = "%"+search+"%";
 							positionsList = positionSqlRepository.getSensorsList(allDevices,start, end,offset);
-							Integer size = null;
+							Integer size = 0;
 							if(positionsList.size()>0) {
 		       				    size=positionSqlRepository.getSensorsListSize(allDevices,start, end);
 								for(int i=0;i<positionsList.size();i++) {
@@ -3822,7 +3931,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 					search = "%"+search+"%";
 					allDevices.add(deviceId);
 					positionsList = positionSqlRepository.getSensorsList(allDevices,start, end,offset);
-					Integer size = null;
+					Integer size = 0;
 					if(positionsList.size()>0) {
        				    size=positionSqlRepository.getSensorsListSize(allDevices,start, end);
 						for(int i=0;i<positionsList.size();i++) {
@@ -3889,13 +3998,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",positionList);
 				return  ResponseEntity.status(404).body(getObjectResponse);
 			}
-			if(loggedUser.getAccountType()!= 1) {
-				if(!userRoleService.checkUserHasPermission(userId, "DEVICEWORKINGHOURSREPORT", "export")) {
-					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get DEVICEWORKINGHOURSREPORT export",null);
-					 logger.info("************************ DEVICEWORKINGHOURSREPORTExport ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-			}
+
 			List<Long>allDevices= new ArrayList<>();
 
 			if(groupId != 0) {
@@ -3991,7 +4094,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 							}
 							positionList = positionSqlRepository.getSensorsListExport(allDevices,start, end);
-							Integer size = null;
+							Integer size = 0;
 							if(positionList.size()>0) {
 								for(int i=0;i<positionList.size();i++) {
 									JSONObject obj = new JSONObject(positionList.get(i).getAttributes());
@@ -4109,7 +4212,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 						return ResponseEntity.badRequest().body(getObjectResponse);
 					}
 					positionList = positionSqlRepository.getSensorsListExport(allDevices,start, end);
-					Integer size = null;
+					Integer size = 0;
 					if(positionList.size()>0) {
 						for(int i=0;i<positionList.size();i++) {
 							JSONObject obj = new JSONObject(positionList.get(i).getAttributes());
@@ -4175,14 +4278,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",tripReport);
 				return  ResponseEntity.status(404).body(getObjectResponse);
 			}
-			if(loggedUser.getAccountType()!= 1) {
-				if(!userRoleService.checkUserHasPermission(userId, "TRIPREPORT", "list")) {
-					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get TRIPREPORT list",null);
-					 logger.info("************************ TRIPREPORT ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-			}
-			
+
 		    if(groupId != 0) {
 		    	
 		    	Group group=groupRepository.findOne(groupId);
@@ -4312,12 +4408,21 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								  Map devicesStatus = new HashMap();
 							      devicesStatus.put("groupName", group.getName());
 								  devicesStatus.put("groupId" ,group.getId());
+								  devicesStatus.put("trips" ,tripReport.size());
+
+								  
+								  devicesStatus.put("deviceName", null);
+								  devicesStatus.put("deviceId" ,null);
+
+								  devicesStatus.put("driverName", null);
+								  devicesStatus.put("driverUniqueId",null);
+								  
 								  
 								  data.add(devicesStatus);
 							  }
 							  
 							  
-							  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",data,tripReport.size());
+							  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",data,data.size());
 							  logger.info("************************ getTripsReport ENDED ***************************");
 								return  ResponseEntity.ok().body(getObjectResponse);
 						}
@@ -4505,12 +4610,14 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 							  devicesStatus.put("driverName", driver.getName());
 							  devicesStatus.put("driverUniqueId", driver.getUniqueid());
 						  }
-
+						  devicesStatus.put("trips" ,tripReport.size());
+						  devicesStatus.put("groupName", null);
+						  devicesStatus.put("groupId" ,null);
 						  data.add(devicesStatus);
 					  }
 					  
 					  
-					  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",data,tripReport.size());
+					  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",data,data.size());
 					  logger.info("************************ getTripsReport ENDED ***************************");
 						return  ResponseEntity.ok().body(getObjectResponse);
 
@@ -4554,13 +4661,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",stopReport);
 				return  ResponseEntity.status(404).body(getObjectResponse);
 			}
-			if(loggedUser.getAccountType()!= 1) {
-				if(!userRoleService.checkUserHasPermission(userId, "STOPREPORT", "list")) {
-					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get STOPREPORT list",null);
-					 logger.info("************************ STOPREPORT ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-			}
+
 			
 			 if(groupId != 0) {
 			    	
@@ -4692,11 +4793,16 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 									  Map devicesStatus = new HashMap();
 								      devicesStatus.put("groupName", group.getName());
 									  devicesStatus.put("groupId" ,group.getId());
+									  devicesStatus.put("stops" ,stopReport.size());
+									  devicesStatus.put("deviceName", null);
+									  devicesStatus.put("deviceId" ,null);
+									  devicesStatus.put("driverName", null);
+									  devicesStatus.put("driverUniqueId",null);
 									  
 									  data.add(devicesStatus);
 								  }
 								  
-								  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",data,stopReport.size());
+								  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",data,data.size());
 								  logger.info("************************ getStopsReport ENDED ***************************");
 									return  ResponseEntity.ok().body(getObjectResponse);
 
@@ -4894,12 +5000,15 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 							  devicesStatus.put("driverName", driver.getName());
 							  devicesStatus.put("driverUniqueId", driver.getUniqueid());
 						  }
+						  devicesStatus.put("stops" ,stopReport.size());
 
+					      devicesStatus.put("groupName", null);
+						  devicesStatus.put("groupId" ,null);
 						  data.add(devicesStatus);
 					  }
 					  
 					  
-					  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",data,stopReport.size());
+					  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",data,data.size());
 					  logger.info("************************ getStopsReport ENDED ***************************");
 						return  ResponseEntity.ok().body(getObjectResponse);
 
@@ -4945,13 +5054,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",tripReport);
 				return  ResponseEntity.status(404).body(getObjectResponse);
 			}
-			if(loggedUser.getAccountType()!= 1) {
-				if(!userRoleService.checkUserHasPermission(userId, "TRIPREPORT", "list")) {
-					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get TRIPREPORT list",null);
-					 logger.info("************************ TRIPREPORT ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-			}
+
 			
 		    if(groupId != 0) {
 		    	
@@ -5109,20 +5212,20 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 										  Device device= deviceServiceImpl.findById(tripReportOne.getDeviceId());
 										  if( device.getFuel() != null) {
 												 
-												int litres=0;
-												int Fuel =0;
-												int distance=0;
+												Double litres=0.0;
+												Double Fuel =0.0;
+												Double distance=0.0;
 												JSONObject obj = new JSONObject(device.getFuel());	
 												if(obj.has("fuelPerKM")) {
-													litres=Math.abs( Integer.parseInt(obj.get("fuelPerKM").toString()) );
+													litres=Math.abs( Double.parseDouble(obj.get("fuelPerKM").toString()) );
 												}
 
-												distance =Math.abs( Integer.parseInt(tripReportOne.getDistance()) );
+												distance =Math.abs( Double.parseDouble(tripReportOne.getDistance()) );
 												if(distance > 0) {
 													Fuel = (distance/100)*litres;
 												}
 
-												tripReportOne.setSpentFuel(Integer.toString(Fuel));
+												tripReportOne.setSpentFuel(Double.toString(Fuel));
 
 
 											 }
@@ -5140,6 +5243,15 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 							      devicesStatus.put("totalSpentFuel", roundOffFuel);
 							      devicesStatus.put("groupName", group.getName());
 								  devicesStatus.put("groupId" ,group.getId());
+								  
+								  
+
+								  devicesStatus.put("driverName", null);
+								  devicesStatus.put("driverUniqueId", null);
+
+							      devicesStatus.put("deviceName", null);
+								  devicesStatus.put("deviceId" ,null);
+								  
 								  
 								  data.add(devicesStatus);
 							  }
@@ -5353,20 +5465,20 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 							  if(tripReportOne.getSpentFuel() != null && tripReportOne.getSpentFuel() != "") {
 								  if( device.getFuel() != null) {
 										 
-										int litres=0;
-										int Fuel =0;
-										int distance=0;
+									    Double litres=0.0;
+										Double Fuel =0.0;
+										Double distance=0.0;
 										JSONObject obj = new JSONObject(device.getFuel());	
 										if(obj.has("fuelPerKM")) {
-											litres=Math.abs( Integer.parseInt(obj.get("fuelPerKM").toString()) );
+											litres=Math.abs( Double.parseDouble(obj.get("fuelPerKM").toString()) );
 										}
 
-										distance =Math.abs( Integer.parseInt(tripReportOne.getDistance()) );
+										distance =Math.abs( Double.parseDouble(tripReportOne.getDistance()) );
 										if(distance > 0) {
 											Fuel = (distance/100)*litres;
 										}
 
-										tripReportOne.setSpentFuel(Integer.toString(Fuel));
+										tripReportOne.setSpentFuel(Double.toString(Fuel));
 
 
 									 }
@@ -5390,7 +5502,8 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 							  devicesStatus.put("driverName", driver.getName());
 							  devicesStatus.put("driverUniqueId", driver.getUniqueid());
 						  }
-
+					      devicesStatus.put("groupName", null);
+						  devicesStatus.put("groupId" ,null);
 						  data.add(devicesStatus);
 					  }
 					  
@@ -5438,13 +5551,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",stopReport);
 				return  ResponseEntity.status(404).body(getObjectResponse);
 			}
-			if(loggedUser.getAccountType()!= 1) {
-				if(!userRoleService.checkUserHasPermission(userId, "STOPREPORT", "list")) {
-					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get STOPREPORT list",null);
-					 logger.info("************************ STOPREPORT ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-			}
+
 			
 			 if(groupId != 0) {
 			    	
@@ -5614,20 +5721,20 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 											  Device device= deviceServiceImpl.findById(stopReportOne.getDeviceId());
 											  if( device.getFuel() != null) {
 													 
-													int litres=0;
-													int Fuel =0;
-													int distance=0;
+													Double litres=0.0;
+													Double Fuel =0.0;
+													Double distance=0.0;
 													JSONObject obj = new JSONObject(device.getFuel());	
 													if(obj.has("fuelPerKM")) {
-														litres=Math.abs( Integer.parseInt(obj.get("fuelPerKM").toString()) );
+														litres=Math.abs( Double.parseDouble(obj.get("fuelPerKM").toString()) );
 													}
 
-													distance =Math.abs( Integer.parseInt(stopReportOne.getDistance()) );
+													distance =Math.abs( Double.parseDouble(stopReportOne.getDistance()) );
 													if(distance > 0) {
 														Fuel = (distance/100)*litres;
 													}
 
-													stopReportOne.setSpentFuel(Integer.toString(Fuel));
+													stopReportOne.setSpentFuel(Double.toString(Fuel));
 
 
 												 }
@@ -5647,7 +5754,10 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 									  devicesStatus.put("groupId" ,group.getId());
 								        Map<String, Long> couterMap = duplicateAddressList.stream().collect(Collectors.groupingBy(e -> e.toString(),Collectors.counting()));
 									  devicesStatus.put("totalVisitedPlace" ,couterMap.size());
-									  
+									  devicesStatus.put("driverName", null);
+									  devicesStatus.put("driverUniqueId", null);
+								      devicesStatus.put("deviceName", null);
+									  devicesStatus.put("deviceId" ,null);
 									  data.add(devicesStatus);
 								  }
 								  
@@ -5878,20 +5988,20 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 							  if(stopReportOne.getSpentFuel() != null && stopReportOne.getSpentFuel() != "") {
 								  if( device.getFuel() != null) {
 										 
-										int litres=0;
-										int Fuel =0;
-										int distance=0;
+									    Double litres=0.0;
+										Double Fuel =0.0;
+										Double distance=0.0;
 										JSONObject obj = new JSONObject(device.getFuel());	
 										if(obj.has("fuelPerKM")) {
-											litres=Math.abs( Integer.parseInt(obj.get("fuelPerKM").toString()) );
+											litres=Math.abs( Double.parseDouble(obj.get("fuelPerKM").toString()) );
 										}
 
-										distance =Math.abs( Integer.parseInt(stopReportOne.getDistance()) );
+										distance =Math.abs( Double.parseDouble(stopReportOne.getDistance()) );
 										if(distance > 0) {
 											Fuel = (distance/100)*litres;
 										}
 
-										stopReportOne.setSpentFuel(Integer.toString(Fuel));
+										stopReportOne.setSpentFuel(Double.toString(Fuel));
 
 
 									 }
@@ -5917,6 +6027,11 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 							  devicesStatus.put("driverName", driver.getName());
 							  devicesStatus.put("driverUniqueId", driver.getUniqueid());
 						  }
+
+
+
+					      devicesStatus.put("groupName", null);
+						  devicesStatus.put("groupId" ,null);
 
 
 
@@ -5974,13 +6089,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",driverHours);
 				return  ResponseEntity.status(404).body(getObjectResponse);
 			}
-			if(loggedUser.getAccountType()!= 1) {
-				if(!userRoleService.checkUserHasPermission(userId, "DRIVERWORKINGHOURSREPORT", "list")) {
-					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get DRIVERWORKINGHOURSREPORT list",null);
-					 logger.info("************************ DRIVERWORKINGHOURSREPORT ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-			}
+
 			
 			List<Long>allDrivers= new ArrayList<>();
 
@@ -6102,7 +6211,8 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 							  Map devicesStatus = new HashMap();;
 						      devicesStatus.put("groupName", group.getName());
 						      devicesStatus.put("totalHours", totalHours);
-			
+						      devicesStatus.put("driverName", null);
+
 							  data.add(devicesStatus);
 							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",data);
 							logger.info("************************ HoursDev ENDED ***************************");
@@ -6225,10 +6335,11 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 					
 					}
 					  List<Map> data = new ArrayList<Map>();
-					  Map devicesStatus = new HashMap();;
+					  Map devicesStatus = new HashMap();
 				      devicesStatus.put("driverName", driver.getName());
 				      devicesStatus.put("totalHours", totalHours);
-	
+				      devicesStatus.put("groupName", null);
+
 					  data.add(devicesStatus);
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",data);
 					logger.info("************************ HoursDev ENDED ***************************");
@@ -6283,6 +6394,851 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			return  ResponseEntity.status(404).body(getObjectResponse);
 
 		}
+		
+	}
+
+	@Override
+	public ResponseEntity<?> getDriveMoreThanReport(String TOKEN, Long deviceId,Long driverId, Long groupId, String type, String from,
+			String to, int page, int start, int limit, Long userId) {
+		logger.info("************************ getTripsReport STARTED ***************************");
+
+		List<TripReport> tripReport = new ArrayList<>();
+		List<TripReport> tripData = new ArrayList<>();
+
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",tripReport);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(userId != 0) {
+			User loggedUser = userServiceImpl.findById(userId);
+			if(loggedUser == null) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",tripReport);
+				return  ResponseEntity.status(404).body(getObjectResponse);
+			}
+
+			
+		    if(groupId != 0) {
+		    	
+		    	Group group=groupRepository.findOne(groupId);
+
+				if(group != null) {
+					if(group.getIs_deleted() == null) {
+						boolean isParent = false;
+						if(loggedUser.getAccountType().equals(4)) {
+							Set<User> clientParents = loggedUser.getUsersOfUser();
+							if(clientParents.isEmpty()) {
+								getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this geofence",null);
+								 return  ResponseEntity.badRequest().body(getObjectResponse);
+							}else {
+								User parent = null;
+								for(User object : clientParents) {
+									parent = object ;
+								}
+								Set<User>groupParents = group.getUserGroup();
+								if(groupParents.isEmpty()) {
+									getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this geofnece",null);
+									 return  ResponseEntity.badRequest().body(getObjectResponse);
+								}else {
+									for(User parentObject : groupParents) {
+										if(parentObject.getId().equals(parent.getId())) {
+											isParent = true;
+											break;
+										}
+									}
+								}
+							}
+						}
+						if(!groupsServiceImpl.checkIfParent(group , loggedUser) && ! isParent) {
+							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group ",null);
+							logger.info("************************ getgroupById ENDED ***************************");
+							return ResponseEntity.badRequest().body(getObjectResponse);
+						}
+						List<Long>allDevices= new ArrayList<>();
+						if(group.getType().equals("driver")) {
+							allDevices = groupRepository.getDevicesFromDriver(groupId);
+
+						}
+						else if(group.getType().equals("device")) {
+							allDevices = groupRepository.getDevicesFromGroup(groupId);
+							
+						}
+						else if(group.getType().equals("geofence")) {
+							allDevices = groupRepository.getDevicesFromGeofence(groupId);
+
+						}
+						else {
+							getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "group not has type from  (driver,device,geofence,attribute,command,maintenance,notification)",null);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}
+						if(from.equals("0") || to.equals("0")) {
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date from and to is Required",tripReport);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+
+						}
+						else {
+							SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+							SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+							inputFormat.setLenient(false);
+							outputFormat.setLenient(false);
+							Date dateFrom;
+							Date dateTo;
+							try {
+								dateFrom = inputFormat.parse(from);
+								dateTo = inputFormat.parse(to);
+
+								from = outputFormat.format(dateFrom);
+								to = outputFormat.format(dateTo);
+								
+								Date today=new Date();
+
+								if(dateFrom.getTime() > dateTo.getTime()) {
+									getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",tripReport);
+									return  ResponseEntity.badRequest().body(getObjectResponse);
+								}
+								if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+									getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",tripReport);
+									return  ResponseEntity.badRequest().body(getObjectResponse);
+								}
+
+							} catch (ParseException e) {
+								// TODO Auto-generated catch block
+								getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",tripReport);
+								return  ResponseEntity.badRequest().body(getObjectResponse);
+
+							}
+							String plainCreds = "admin@fuinco.com:admin";
+							byte[] plainCredsBytes = plainCreds.getBytes();
+							
+							byte[] base64CredsBytes = Base64.getEncoder().encode(plainCredsBytes);
+							String base64Creds = new String(base64CredsBytes);
+
+							HttpHeaders headers = new HttpHeaders();
+							headers.add("Authorization", "Basic " + base64Creds);
+							
+							  String GET_URL = tripsUrl;
+							  RestTemplate restTemplate = new RestTemplate();
+							  restTemplate.getMessageConverters()
+						        .add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
+
+							  UriComponents builder = UriComponentsBuilder.fromHttpUrl(GET_URL)
+								        .queryParam("type", type)
+								        .queryParam("from", from)
+								        .queryParam("to", to)
+								        .queryParam("page", page)
+								        .queryParam("start", start)
+								        .queryParam("limit",limit).build();
+							  HttpEntity<String> request = new HttpEntity<String>(headers);
+							  String URL = builder.toString();
+							  if(allDevices.size()>0) {
+								  for(int i=0;i<allDevices.size();i++) {
+									  URL +="&deviceId="+allDevices.get(i);
+								  }
+							  }
+							  ResponseEntity<List<TripReport>> rateResponse =
+								        restTemplate.exchange(URL,
+								                    HttpMethod.GET,request, new ParameterizedTypeReference<List<TripReport>>() {
+								            });
+							  tripReport = rateResponse.getBody();
+							  if(tripReport.size()>0) {
+
+								  for(TripReport tripReportOne : tripReport ) {
+									  
+									  Long hours = (long) 0;
+									  if(tripReportOne.getDuration() != null && tripReportOne.getDuration() != "") {
+										  Long data = Math.abs( Long.parseLong(tripReportOne.getDuration().toString()) ); 
+										  hours=   TimeUnit.MILLISECONDS.toHours(data) ;
+									  
+									  }
+									  
+
+									  if(hours > 4) {
+
+
+										  Double totalDistance = 0.0 ;
+										  double roundOffDistance = 0.0;
+										  double roundOffFuel = 0.0;
+										  
+										  Device device= deviceServiceImpl.findById(tripReportOne.getDeviceId());
+										  Set<Driver>  drivers = device.getDriver();
+										  for(Driver driver : drivers ) {
+
+											 tripReportOne.setDriverName(driver.getName());
+											 tripReportOne.setDriverUniqueId(driver.getUniqueid());
+
+											
+											 
+										}
+										  if( device.getFuel() != null) {
+												 
+												Double litres=0.0;
+												Double Fuel =0.0;
+												Double distance=0.0;
+												
+												JSONObject obj = new JSONObject(device.getFuel());	
+												if(obj.has("fuelPerKM")) {
+													litres=Double.parseDouble(obj.get("fuelPerKM").toString());
+												}
+
+												distance = Double.parseDouble(tripReportOne.getDistance());
+												if(distance > 0) {
+													Fuel = (distance/100)*litres;
+												}
+
+
+												roundOffFuel = Math.round(Fuel * 100.0 / 100.0);
+
+												tripReportOne.setSpentFuel(Double.toString(roundOffFuel));
+
+											 }
+										  
+										  
+										  if(tripReportOne.getDuration() != null && tripReportOne.getDuration() != "") {
+											  Long time=(long) 0;
+
+											  time = Math.abs( Long.parseLong(tripReportOne.getDuration().toString()) );
+
+											  Long hoursEngine =   TimeUnit.MILLISECONDS.toHours(time) ;
+											  Long minutesEngine = TimeUnit.MILLISECONDS.toMinutes(time) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(time));
+											  Long secondsEngine = TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time));
+											  
+											  String totalHours = String.valueOf(hoursEngine)+":"+String.valueOf(minutesEngine)+":"+String.valueOf(secondsEngine);
+											  tripReportOne.setDuration(totalHours);
+										  }
+										  if(tripReportOne.getDistance() != null && tripReportOne.getDistance() != "") {
+											  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getDistance())/1000  );
+											  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+											  tripReportOne.setDistance(Double.toString(roundOffDistance));
+
+
+										  }
+										  if(tripReportOne.getAverageSpeed() != null && tripReportOne.getAverageSpeed() != "") {
+											  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getAverageSpeed())  );
+											  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+											  tripReportOne.setAverageSpeed(Double.toString(roundOffDistance));
+
+
+										  }
+										  if(tripReportOne.getMaxSpeed() != null && tripReportOne.getMaxSpeed() != "") {
+											  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getMaxSpeed())  );
+											  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+											  tripReportOne.setMaxSpeed(Double.toString(roundOffDistance));
+
+
+										  }
+										  
+										  
+										  tripData.add(tripReportOne);
+										  
+									  }
+									  
+									  
+
+								  }
+							  }
+
+							  
+							  
+							  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",tripData,tripData.size());
+							  logger.info("************************ getTripsReport ENDED ***************************");
+								return  ResponseEntity.ok().body(getObjectResponse);
+						}
+						
+						
+					}
+					else {
+						getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This group id is not Found",null);
+						return  ResponseEntity.status(404).body(getObjectResponse);
+
+					}
+				}
+				else {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This group id is not Found",null);
+					return  ResponseEntity.status(404).body(getObjectResponse);
+
+				}
+		    }
+		    
+		    
+		    if(driverId != 0) {
+		    	
+		    	Driver driver=driverRepository.findOne(driverId);
+
+				if(driver != null) {
+					if(driver.getDelete_date() == null) {
+						boolean isParent = false;
+						if(loggedUser.getAccountType().equals(4)) {
+							Set<User> clientParents = loggedUser.getUsersOfUser();
+							if(clientParents.isEmpty()) {
+								getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this driver",null);
+								 return  ResponseEntity.badRequest().body(getObjectResponse);
+							}else {
+								User parent = null;
+								for(User object : clientParents) {
+									parent = object ;
+								}
+								Set<User>driverParents = driver.getUserDriver();
+								if(driverParents.isEmpty()) {
+									getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this driver",null);
+									 return  ResponseEntity.badRequest().body(getObjectResponse);
+								}else {
+									for(User parentObject : driverParents) {
+										if(parentObject.getId().equals(parent.getId())) {
+											isParent = true;
+											break;
+										}
+									}
+								}
+							}
+						}
+						if(!driverServiceImpl.checkIfParent(driver , loggedUser) && ! isParent) {
+							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group ",null);
+							logger.info("************************ getgroupById ENDED ***************************");
+							return ResponseEntity.badRequest().body(getObjectResponse);
+						}
+						Set<Device>  devices = driver.getDevice();
+						for(Device device : devices ) {
+	
+							deviceId = device.getId();
+						}
+						
+						
+						
+					}
+					else {
+						getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This driver id is not Found",null);
+						return  ResponseEntity.status(404).body(getObjectResponse);
+
+					}
+				}
+				else {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This driver id is not Found",null);
+					return  ResponseEntity.status(404).body(getObjectResponse);
+
+				}
+		    }
+		    
+		    
+		    
+            Device device = deviceServiceImpl.findById(deviceId);
+			
+			if(device != null) {
+				if(from.equals("0") || to.equals("0")) {
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date from and to is Required",tripReport);
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+
+				}
+				else {
+					SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+					SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+					inputFormat.setLenient(false);
+					outputFormat.setLenient(false);
+					Date dateFrom;
+					Date dateTo;
+					try {
+						dateFrom = inputFormat.parse(from);
+						dateTo = inputFormat.parse(to);
+
+						from = outputFormat.format(dateFrom);
+						to = outputFormat.format(dateTo);
+						
+						Date today=new Date();
+
+						if(dateFrom.getTime() > dateTo.getTime()) {
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",tripReport);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}
+						if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",tripReport);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}
+
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",tripReport);
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+
+					}
+					boolean isParent = false;
+					if(loggedUser.getAccountType() == 4) {
+						Set<User>parentClients = loggedUser.getUsersOfUser();
+						if(parentClients.isEmpty()) {
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this device ",tripReport);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}else {
+							User parent = null;
+							for(User object : parentClients) {
+								parent = object ;
+							}
+							Set<User>deviceParent = device.getUser();
+							if(deviceParent.isEmpty()) {
+								getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this device ",tripReport);
+								return  ResponseEntity.badRequest().body(getObjectResponse);
+							}else {
+								for(User  parentObject : deviceParent) {
+									if(parent.getId() == parentObject.getId()) {
+										isParent = true;
+										break;
+									}
+								}
+							}
+						}
+					}
+					if(!deviceServiceImpl.checkIfParent(device , loggedUser) && ! isParent) {
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allow to get data as not from parents ",null);
+						logger.info("************************ getDeviceWorkingHours ENDED ***************************");
+						return ResponseEntity.badRequest().body(getObjectResponse);
+					}
+					String plainCreds = "admin@fuinco.com:admin";
+					byte[] plainCredsBytes = plainCreds.getBytes();
+					
+					byte[] base64CredsBytes = Base64.getEncoder().encode(plainCredsBytes);
+					String base64Creds = new String(base64CredsBytes);
+
+					HttpHeaders headers = new HttpHeaders();
+					headers.add("Authorization", "Basic " + base64Creds);
+					
+					  String GET_URL = tripsUrl;
+					  RestTemplate restTemplate = new RestTemplate();
+					  restTemplate.getMessageConverters()
+				        .add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
+
+					  UriComponents builder = UriComponentsBuilder.fromHttpUrl(GET_URL)
+						        .queryParam("deviceId",deviceId)
+						        .queryParam("type", type)
+						        .queryParam("from", from)
+						        .queryParam("to", to)
+						        .queryParam("page", page)
+						        .queryParam("start", start)
+						        .queryParam("limit",limit).build();
+					  HttpEntity<String> request = new HttpEntity<String>(headers);
+//					  tripReport=restTemplate.exchange(builder.toString(), HttpMethod.GET, request,List.class).getBody();
+					  ResponseEntity<List<TripReport>> rateResponse =
+						        restTemplate.exchange(builder.toString(),
+						                    HttpMethod.GET,request, new ParameterizedTypeReference<List<TripReport>>() {
+						            });
+					  tripReport = rateResponse.getBody();
+					  if(tripReport.size()>0) {
+
+						  for(TripReport tripReportOne : tripReport ) {
+							  Long hours = (long) 0;
+							  if(tripReportOne.getDuration() != null && tripReportOne.getDuration() != "") {
+								  Long data = Math.abs( Long.parseLong(tripReportOne.getDuration().toString()) ); 
+								  hours=   TimeUnit.MILLISECONDS.toHours(data) ;
+							  
+							  }
+							  
+
+							  if(hours > 4) {
+
+
+								  Double totalDistance = 0.0 ;
+								  double roundOffDistance = 0.0;
+								  double roundOffFuel = 0.0;
+								  
+								  Set<Driver>  drivers = device.getDriver();
+								  for(Driver driver : drivers ) {
+
+									 tripReportOne.setDriverName(driver.getName());
+									 tripReportOne.setDriverUniqueId(driver.getUniqueid());
+
+									
+									 
+								}
+								  if( device.getFuel() != null) {
+										 
+										Double litres=0.0;
+										Double Fuel =0.0;
+										Double distance=0.0;
+										
+										JSONObject obj = new JSONObject(device.getFuel());	
+										if(obj.has("fuelPerKM")) {
+											litres=Double.parseDouble(obj.get("fuelPerKM").toString());
+										}
+
+										distance = Double.parseDouble(tripReportOne.getDistance());
+										if(distance > 0) {
+											Fuel = (distance/100)*litres;
+										}
+
+
+										roundOffFuel = Math.round(Fuel * 100.0 / 100.0);
+
+										tripReportOne.setSpentFuel(Double.toString(roundOffFuel));
+
+									 }
+								  
+								  
+								  if(tripReportOne.getDuration() != null && tripReportOne.getDuration() != "") {
+									  Long time=(long) 0;
+
+									  time = Math.abs( Long.parseLong(tripReportOne.getDuration().toString()) );
+
+									  Long hoursEngine =   TimeUnit.MILLISECONDS.toHours(time) ;
+									  Long minutesEngine = TimeUnit.MILLISECONDS.toMinutes(time) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(time));
+									  Long secondsEngine = TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time));
+									  
+									  String totalHours = String.valueOf(hoursEngine)+":"+String.valueOf(minutesEngine)+":"+String.valueOf(secondsEngine);
+									  tripReportOne.setDuration(totalHours);
+								  }
+								  if(tripReportOne.getDistance() != null && tripReportOne.getDistance() != "") {
+									  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getDistance())/1000  );
+									  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+									  tripReportOne.setDistance(Double.toString(roundOffDistance));
+
+
+								  }
+								  if(tripReportOne.getAverageSpeed() != null && tripReportOne.getAverageSpeed() != "") {
+									  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getAverageSpeed())  );
+									  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+									  tripReportOne.setAverageSpeed(Double.toString(roundOffDistance));
+
+
+								  }
+								  if(tripReportOne.getMaxSpeed() != null && tripReportOne.getMaxSpeed() != "") {
+									  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getMaxSpeed())  );
+									  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+									  tripReportOne.setMaxSpeed(Double.toString(roundOffDistance));
+
+
+								  }
+								  
+								  
+								  tripData.add(tripReportOne);
+								  
+							  }
+							  
+							  
+
+						  }
+					  }
+					  
+					  
+					  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",tripData,tripData.size());
+					  logger.info("************************ getTripsReport ENDED ***************************");
+						return  ResponseEntity.ok().body(getObjectResponse);
+
+				}
+				
+			}
+			else {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Device ID is not found",tripReport);
+				return  ResponseEntity.status(404).body(getObjectResponse);
+
+			}
+			
+			
+		}
+		else {
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "userId is Required",tripReport);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
+		
+
+	}
+
+	@Override
+	public ResponseEntity<?> getCustomReport(String TOKEN, Long deviceId, Long groupId, int offset, String start,
+			String end, String search, Long userId, String custom, String value) {
+		logger.info("************************ HoursDev STARTED ***************************");
+		
+		List<DeviceWorkingHours> deviceHours = new ArrayList<DeviceWorkingHours>();
+
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",deviceHours);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(custom.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "custom is required",deviceHours);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		if(custom.equals(null)) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "custom is required",deviceHours);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(userId != 0) {
+			User loggedUser = userServiceImpl.findById(userId);
+			if(loggedUser == null) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",deviceHours);
+				return  ResponseEntity.status(404).body(getObjectResponse);
+			}
+
+			
+			List<Long>allDevices= new ArrayList<>();
+
+			if(groupId != 0) {
+		    	
+		    	Group group=groupRepository.findOne(groupId);
+
+				if(group != null) {
+					if(group.getIs_deleted() == null) {
+						boolean isParent = false;
+						if(loggedUser.getAccountType().equals(4)) {
+							Set<User> clientParents = loggedUser.getUsersOfUser();
+							if(clientParents.isEmpty()) {
+								getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group",null);
+								 return  ResponseEntity.badRequest().body(getObjectResponse);
+							}else {
+								User parent = null;
+								for(User object : clientParents) {
+									parent = object ;
+								}
+								Set<User>groupParents = group.getUserGroup();
+								if(groupParents.isEmpty()) {
+									getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group",null);
+									 return  ResponseEntity.badRequest().body(getObjectResponse);
+								}else {
+									for(User parentObject : groupParents) {
+										if(parentObject.getId().equals(parent.getId())) {
+											isParent = true;
+											break;
+										}
+									}
+								}
+							}
+						}
+						if(!groupsServiceImpl.checkIfParent(group , loggedUser) && ! isParent) {
+							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group ",null);
+							logger.info("************************ getgroupById ENDED ***************************");
+							return ResponseEntity.badRequest().body(getObjectResponse);
+						}
+						if(group.getType().equals("driver")) {
+							allDevices = groupRepository.getDevicesFromDriver(groupId);
+
+						}
+						else if(group.getType().equals("device")) {
+							allDevices = groupRepository.getDevicesFromGroup(groupId);
+							
+						}
+						else if(group.getType().equals("geofence")) {
+							allDevices = groupRepository.getDevicesFromGeofence(groupId);
+
+						}
+						else {
+							getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "group not has type from  (driver,device,geofence,attribute,command,maintenance,notification)",null);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}
+						if(start.equals("0") || end.equals("0")) {
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",null);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+
+						}
+						else {
+							SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+							SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+							inputFormat.setLenient(false);
+							outputFormat.setLenient(false);
+
+							Date dateFrom;
+							Date dateTo;
+							try {
+								dateFrom = inputFormat.parse(start);
+								dateTo = inputFormat.parse(end);
+								
+								start = outputFormat.format(dateFrom);
+								end = outputFormat.format(dateTo);
+								
+								Date today=new Date();
+
+								if(dateFrom.getTime() > dateTo.getTime()) {
+									getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",null);
+									return  ResponseEntity.badRequest().body(getObjectResponse);
+								}
+								if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+									getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",null);
+									return  ResponseEntity.badRequest().body(getObjectResponse);
+								}
+								
+								
+
+
+							} catch (ParseException e) {
+								// TODO Auto-generated catch block
+								getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",null);
+								return  ResponseEntity.badRequest().body(getObjectResponse);
+
+							}
+							search = "%"+search+"%";
+							custom = "$."+custom;
+
+							deviceHours = deviceRepository.getDeviceCustom(allDevices,offset,start,end,custom,value);
+							Integer size = 0;
+							if(deviceHours.size()>0) {
+		       				    size=deviceRepository.getDeviceCustomSize(allDevices,start, end,custom,value);
+								for(int i=0;i<deviceHours.size();i++) {
+									JSONObject obj = new JSONObject(deviceHours.get(i).getAttributes());
+									
+									if(obj.has("todayHoursString")) {
+										deviceHours.get(i).setHours(obj.getString("todayHoursString"));
+									}
+									else {
+										deviceHours.get(i).setHours("0");
+			
+									}
+									
+									deviceHours.get(i).setAttributes(custom.substring(2) +":"+value);
+
+									
+								}
+							
+							}
+							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",deviceHours,size);
+							logger.info("************************ HoursDev ENDED ***************************");
+							return  ResponseEntity.ok().body(getObjectResponse);
+							
+						}
+						
+					 
+						
+						
+						
+					}
+					else {
+						getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This group id is not Found",null);
+						return  ResponseEntity.status(404).body(getObjectResponse);
+
+					}
+				}
+				else {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This group id is not Found",null);
+					return  ResponseEntity.status(404).body(getObjectResponse);
+
+				}
+		    }
+			
+			Device device =deviceServiceImpl.findById(deviceId);
+			if(device != null) {
+				if(start.equals("0") || end.equals("0")) {
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",deviceHours);
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+
+				}
+				else {
+					SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+					SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+					inputFormat.setLenient(false);
+					outputFormat.setLenient(false);
+
+					Date dateFrom;
+					Date dateTo;
+					try {
+						dateFrom = inputFormat.parse(start);
+						dateTo = inputFormat.parse(end);
+						
+						start = outputFormat.format(dateFrom);
+						end = outputFormat.format(dateTo);
+						
+						Date today=new Date();
+
+						if(dateFrom.getTime() > dateTo.getTime()) {
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",deviceHours);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}
+						if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",deviceHours);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}
+						
+						
+
+
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",deviceHours);
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+
+					}
+					boolean isParent = false;
+					if(loggedUser.getAccountType() == 4) {
+						Set<User>parentClients = loggedUser.getUsersOfUser();
+						if(parentClients.isEmpty()) {
+							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this device ",deviceHours);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}else {
+							User parent = null;
+							for(User object : parentClients) {
+								parent = object ;
+							}
+							Set<User>deviceParent = device.getUser();
+							if(deviceParent.isEmpty()) {
+								getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this device ",deviceHours);
+								return  ResponseEntity.badRequest().body(getObjectResponse);
+							}else {
+								for(User  parentObject : deviceParent) {
+									if(parent.getId() == parentObject.getId()) {
+										isParent = true;
+										break;
+									}
+								}
+							}
+						}
+					}
+					
+					if(!deviceServiceImpl.checkIfParent(device , loggedUser) && ! isParent) {
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this device",null);
+						logger.info("************************ getDeviceWorkingHours ENDED ***************************");
+						return ResponseEntity.badRequest().body(getObjectResponse);
+					}
+
+					search = "%"+search+"%";
+					custom = "$."+custom;
+
+					allDevices.add(deviceId);
+					deviceHours = deviceRepository.getDeviceCustom(allDevices,offset,start,end,custom,value);
+
+					Integer size = 0;
+					if(deviceHours.size()>0) {
+						size=deviceRepository.getDeviceCustomSize(allDevices,start, end,custom,value);
+						for(int i=0;i<deviceHours.size();i++) {
+							JSONObject obj = new JSONObject(deviceHours.get(i).getAttributes());
+							
+							if(obj.has("todayHoursString")) {
+								deviceHours.get(i).setHours(obj.getString("todayHoursString"));
+							}
+							else {
+								deviceHours.get(i).setHours("0");
+	
+							}
+							deviceHours.get(i).setAttributes(custom.substring(2) +":"+value);
+							
+
+							
+						}
+					
+					}
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",deviceHours,size);
+					logger.info("************************ HoursDev ENDED ***************************");
+					return  ResponseEntity.ok().body(getObjectResponse);
+
+				
+				}
+			}
+			else {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Device ID is not found",deviceHours);
+				return  ResponseEntity.status(404).body(getObjectResponse);
+
+			}
+			
+			
+
+		}
+		else {
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User Id is Required",deviceHours);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
+		
 		
 	}
 

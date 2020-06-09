@@ -63,6 +63,13 @@ public class EventReport {
 		this.driverId = driverId;
 		this.driverName = driverName;
 	}
+	public EventReport(Long eventId,String eventType, String serverTime, String attributes) {
+		super();
+		this.eventId = eventId;
+		this.eventType = eventType;
+		this.serverTime = serverTime;
+		this.attributes = attributes;
+	}
 	
 	public Long getEventId() {
 		return eventId;

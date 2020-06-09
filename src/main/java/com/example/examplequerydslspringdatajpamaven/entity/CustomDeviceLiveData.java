@@ -326,7 +326,7 @@ public class CustomDeviceLiveData {
 	
 	public CustomDeviceLiveData(int id ,String deviceName , String lastUpdate ,
 			String positionId, String leftLetter,String middleLetter,String rightLetter,String driverName,
-			Double latitude ,Double longitude) {
+			Double latitude ,Double longitude,String attributes) {
 		this.id = id ;
 		this.deviceName = deviceName ;
 		this.lastUpdate = lastUpdate;
@@ -337,6 +337,7 @@ public class CustomDeviceLiveData {
 		this.driverName= driverName;
 		this.latitude= latitude;
 		this.longitude= longitude;
+		this.attributes= attributes;
 	   		
 	}
 	public CustomDeviceLiveData(int id ,String deviceName , String lastUpdate ,String positionId,String photo

@@ -1651,6 +1651,74 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 
 				 }
 				 List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getAllDevicesLiveDataMap(usersIds);
+			     if(allDevicesLiveData.size() > 0) {
+					for(int i=0;i<allDevicesLiveData.size();i++) {
+						if(allDevicesLiveData.get(i).getAttributes() != null) {
+							long minutes = 0;
+							JSONObject obj = new JSONObject(allDevicesLiveData.get(i).getAttributes().toString());
+							
+							SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+							Date now = new Date();
+							String strDate = formatter.format(now);
+							try {
+								Date dateLast = formatter.parse(allDevicesLiveData.get(i).getLastUpdate());
+								Date dateNow = formatter.parse(strDate);
+								
+						        minutes = getDateDiff (dateLast, dateNow, TimeUnit.MINUTES);  
+						        
+
+							} catch (ParseException e) {
+								e.printStackTrace();
+							}
+							
+							if(minutes > 8) {
+		                    	allDevicesLiveData.get(i).setStatus("In active");
+								
+							}
+							else {
+								if(obj.has("ignition")) {
+
+									if(obj.get("ignition").equals(true)) {
+										if(obj.has("motion")) {
+
+						                    if(obj.get("motion").equals(false)) {
+						                    	allDevicesLiveData.get(i).setStatus("Idle");
+											}
+						                    if(obj.get("motion").equals(true)) {
+						                    	allDevicesLiveData.get(i).setStatus("Running");
+											}
+										}
+									}
+				                    if(obj.get("ignition").equals(false)) {
+				                    	allDevicesLiveData.get(i).setStatus("Stopped");
+
+									}
+								}
+								
+							}
+							
+							if(obj.has("power")) {
+								allDevicesLiveData.get(i).setPower(obj.getDouble("power"));
+
+							}
+							if(obj.has("operator")) {
+								allDevicesLiveData.get(i).setOperator(obj.getDouble("operator"));
+
+							}
+							if(obj.has("ignition")) {
+								allDevicesLiveData.get(i).setIgnition(obj.getBoolean("ignition"));
+
+							}
+						}
+						else {
+		                	allDevicesLiveData.get(i).setStatus("No data");
+						}
+						
+					}
+				}
+			 
+				 
+				 
 				    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevicesLiveData);
 					
 					logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
@@ -1692,6 +1760,73 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			 }
 		 }
 		List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getAllDevicesLiveDataMap(usersIds);
+		
+		if(allDevicesLiveData.size() > 0) {
+			for(int i=0;i<allDevicesLiveData.size();i++) {
+				if(allDevicesLiveData.get(i).getAttributes() != null) {
+					long minutes = 0;
+					JSONObject obj = new JSONObject(allDevicesLiveData.get(i).getAttributes().toString());
+					
+					SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+					Date now = new Date();
+					String strDate = formatter.format(now);
+					try {
+						Date dateLast = formatter.parse(allDevicesLiveData.get(i).getLastUpdate());
+						Date dateNow = formatter.parse(strDate);
+						
+				        minutes = getDateDiff (dateLast, dateNow, TimeUnit.MINUTES);  
+				        
+
+					} catch (ParseException e) {
+						e.printStackTrace();
+					}
+					
+					if(minutes > 8) {
+                    	allDevicesLiveData.get(i).setStatus("In active");
+						
+					}
+					else {
+						if(obj.has("ignition")) {
+
+							if(obj.get("ignition").equals(true)) {
+								if(obj.has("motion")) {
+
+				                    if(obj.get("motion").equals(false)) {
+				                    	allDevicesLiveData.get(i).setStatus("Idle");
+									}
+				                    if(obj.get("motion").equals(true)) {
+				                    	allDevicesLiveData.get(i).setStatus("Running");
+									}
+								}
+							}
+		                    if(obj.get("ignition").equals(false)) {
+		                    	allDevicesLiveData.get(i).setStatus("Stopped");
+
+							}
+						}
+						
+					}
+					
+					if(obj.has("power")) {
+						allDevicesLiveData.get(i).setPower(obj.getDouble("power"));
+
+					}
+					if(obj.has("operator")) {
+						allDevicesLiveData.get(i).setOperator(obj.getDouble("operator"));
+
+					}
+					if(obj.has("ignition")) {
+						allDevicesLiveData.get(i).setIgnition(obj.getBoolean("ignition"));
+
+					}
+				}
+				else {
+                	allDevicesLiveData.get(i).setStatus("No data");
+				}
+				
+			}
+		}
+		
 	    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevicesLiveData);
 		
 		logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
@@ -2770,7 +2905,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 						
 						if(checkIfParent( device ,  loggedUser)) {
 							if(!loggedUser.getAccountType().equals(1)) {
-								if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "fuel")) {
+								if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "GetSpentFuel")) {
 									 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to edit Fuel",null);
 									 logger.info("************************ calibration ENDED ***************************");
 									return  ResponseEntity.badRequest().body(getObjectResponse);
@@ -2870,7 +3005,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 						
 						if(checkIfParent( device ,  loggedUser)) {
 							if(!loggedUser.getAccountType().equals(1)) {
-								if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "calibration")) {
+								if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "GetSpentFuel")) {
 									 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to edit calibration",null);
 									 logger.info("************************ calibration ENDED ***************************");
 									return  ResponseEntity.badRequest().body(getObjectResponse);
@@ -3042,7 +3177,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					
 					if(checkIfParent( device ,  loggedUser)) {
 						if(!loggedUser.getAccountType().equals(1)) {
-							if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "sensorSettings")) {
+							if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "GetSensorSetting")) {
 								 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to edit sensorSettings",null);
 								 logger.info("************************ calibration ENDED ***************************");
 								return  ResponseEntity.badRequest().body(getObjectResponse);
@@ -3141,7 +3276,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					
 					if(checkIfParent( device ,  loggedUser)) {
 						if(!loggedUser.getAccountType().equals(1)) {
-							if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "sensorSettings")) {
+							if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "GetSensorSetting")) {
 								 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to edit sensorSettings",null);
 								 logger.info("************************ sensorSettings ENDED ***************************");
 								return  ResponseEntity.badRequest().body(getObjectResponse);

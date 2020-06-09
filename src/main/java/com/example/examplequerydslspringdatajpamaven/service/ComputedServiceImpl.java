@@ -156,7 +156,7 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 	}
 
 	@Override
-	public ResponseEntity<?> getAllComputed(String TOKEN, Long id) {
+	public ResponseEntity<?> getAllComputed(String TOKEN, Long id,int offset,String search) {
 		  logger.info("************************ getAllComputed STARTED ***************************");
 			
 			List<Attribute> attrbuites = new ArrayList<Attribute>();
@@ -203,8 +203,9 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 								 }
 								 List<Long>usersIds= new ArrayList<>();
 								 usersIds.add(parentClient.getId());
-								 attrbuites = computedRepository.getAllComputed(usersIds);
-								getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",attrbuites);
+								 attrbuites = computedRepository.getAllComputed(usersIds,offset,search);
+								 Integer size=computedRepository.getAllComputedSize(usersIds);
+								getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",attrbuites,size);
 								logger.info("************************ getAllComputed ENDED ***************************");
 								return  ResponseEntity.ok().body(getObjectResponse);
 							 }
@@ -223,8 +224,10 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 
 						
 						
-						 attrbuites = computedRepository.getAllComputed(usersIds);
-						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",attrbuites);
+						 attrbuites = computedRepository.getAllComputed(usersIds,offset,search);
+						 Integer size=computedRepository.getAllComputedSize(usersIds);
+
+						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",attrbuites,size);
 						logger.info("************************ getAllComputed ENDED ***************************");
 						return  ResponseEntity.ok().body(getObjectResponse);
 

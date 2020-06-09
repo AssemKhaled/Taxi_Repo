@@ -34,16 +34,16 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 	           @ConstructorResult(
 	                targetClass=CustomDeviceList.class,
 	                  columns={
-	                     @ColumnResult(name="id"),
-	                     @ColumnResult(name="deviceName"),
-	                     @ColumnResult(name="uniqueId"),
-	                     @ColumnResult(name="sequenceNumber"),
-	                     @ColumnResult(name="referenceKey"),
-	                     @ColumnResult(name="companyName"),
-	                     @ColumnResult(name="driverName"),
-	                     @ColumnResult(name="geofenceName"),
-	                     //@ColumnResult(name="positionId",type=String.class),
-	                     @ColumnResult(name="lastUpdate",type=String.class)
+	                     @ColumnResult(name="id",type=int.class),
+	                     @ColumnResult(name="deviceName",type=String.class),
+	                     @ColumnResult(name="uniqueId",type=String.class),
+	                     @ColumnResult(name="sequenceNumber",type=String.class),
+	                     @ColumnResult(name="lastUpdate",type=String.class),
+	                     @ColumnResult(name="referenceKey",type=String.class),
+	                     @ColumnResult(name="driverName",type=String.class),
+	                     @ColumnResult(name="companyName",type=String.class),
+	                     @ColumnResult(name="geofenceName",type=String.class),
+
 	                     }
 	           )
 	        }
@@ -111,7 +111,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 	    	                     @ColumnResult(name="rightLetter",type=String.class),
 	    	                     @ColumnResult(name="driverName",type=String.class),
 	    	                     @ColumnResult(name="latitude",type=Double.class),
-	    	                     @ColumnResult(name="longitude",type=Double.class)
+	    	                     @ColumnResult(name="longitude",type=Double.class),
+	    	                     @ColumnResult(name="attributes",type=String.class)
 	    	                     }
 	    	           )
 	    	        }
@@ -285,7 +286,7 @@ resultSetMapping="DevicesLiveDataMap",
 query="SELECT tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.lastupdate as lastUpdate,tc_devices.positionid as positionId , " 
 		+ " tc_devices.left_letter as leftLetter , " + 
 		" tc_devices.middle_letter as middleLetter,tc_devices.right_letter as rightLetter ,tc_drivers.name driverName, "  
-		+" tc_positions.latitude as latitude,tc_positions.longitude as longitude  "
+		+" tc_positions.latitude as latitude,tc_positions.longitude as longitude ,tc_positions.attributes as attributes  "
 		+ " FROM tc_devices " + 
 		" Left JOIN tc_positions ON tc_positions.id=tc_devices.positionid  " + 
 		" INNER JOIN  tc_user_device ON tc_devices.id=tc_user_device.deviceid" + 
@@ -312,14 +313,29 @@ resultSetMapping="DevicesLiveData",
 query=" SELECT tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.lastupdate as lastUpdate,tc_devices.positionid as positionId, "
 		+ "tc_devices.photo  FROM tc_devices "
 		+ " where tc_devices.id= :deviceId and tc_devices.delete_date is null "),
+
 @NamedNativeQuery(name="getDeviceWorkingHours", 
-//here
 resultSetMapping="DeviceWorkingHours", 
-query="SELECT  tc_positions.devicetime deviceTime ,tc_positions.id as positionId,tc_positions.attributes as attributes, " + 
-		" deviceid as deviceId,tc_devices.name as deviceName  FROM tc_positions "+
-		"INNER JOIN tc_devices ON tc_devices.id=tc_positions.deviceid "+
-		" WHERE deviceid IN(:deviceId) and tc_positions.devicetime between :start and  :end "
-		+ " order by devicetime DESC limit :offset,10 "),
+query="SELECT  CAST(tc_positions.devicetime AS DATE) as deviceTime ,tc_positions.id as positionId, " + 
+		" tc_positions.attributes as attributes,  deviceid as deviceId,tc_devices.name as deviceName  "
+		+ " FROM tc_positions  " + 
+		" INNER JOIN tc_devices ON tc_devices.id=tc_positions.deviceid  WHERE deviceid IN(:deviceId) "
+		+ " and tc_positions.devicetime " + 
+		" IN (SELECT devicetime" + 
+		" FROM (SELECT MAX(devicetime) as devicetime FROM tc_positions WHERE deviceid IN(:deviceId) " + 
+		" AND devicetime between :start and :end group by CAST(devicetime AS DATE) )as t1) " + 
+		" order by devicetime DESC  limit :offset,10 " ),
+
+@NamedNativeQuery(name="getDeviceCustom", 
+resultSetMapping="DeviceWorkingHours", 
+query="SELECT tc_positions.devicetime as deviceTime ,tc_positions.id as positionId, " + 
+		" tc_positions.attributes as attributes,  deviceid as deviceId,tc_devices.name as deviceName " + 
+		" FROM tc_positions  " + 
+		" INNER JOIN tc_devices ON tc_devices.id=tc_positions.deviceid  "+
+		" WHERE tc_positions.deviceid IN(:deviceId) and " + 
+		"  CAST(json_extract(tc_positions.attributes, :custom) AS character) =:value "+
+		" and tc_positions.devicetime between :start and :end "+
+		" order by devicetime DESC  limit :offset,10 " ),
 
 @NamedNativeQuery(name="getDeviceWorkingHoursExport", 
 resultSetMapping="DeviceWorkingHours", 
@@ -327,6 +343,9 @@ query="SELECT  tc_positions.devicetime deviceTime ,tc_positions.id as positionId
 		" deviceid as deviceId,tc_devices.name as deviceName  FROM tc_positions "+
 		"INNER JOIN tc_devices ON tc_devices.id=tc_positions.deviceid "+
 		" WHERE deviceid IN(:deviceId) and tc_positions.devicetime between :start and  :end "),
+
+
+
 
 //@NamedNativeQuery(name="getDeviceWorkingHoursExport", 
 //resultSetMapping="DeviceWorkingHours", 

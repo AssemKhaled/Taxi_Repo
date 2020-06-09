@@ -85,6 +85,21 @@ import javax.persistence.Table;
 	                     }
 	           )
 	        }
+	),
+	@SqlResultSetMapping(
+	        name="notificationChart",
+	        classes={
+	           @ConstructorResult(
+	                targetClass=EventReport.class,
+	                  columns={
+	 	                 @ColumnResult(name="eventId",type=Long.class),
+	                     @ColumnResult(name="eventType",type=String.class),
+	                     @ColumnResult(name="serverTime",type=String.class),
+	                     @ColumnResult(name="attributes",type=String.class)
+	                     
+	                     }
+	           )
+	        }
 	)
 	
 
@@ -216,7 +231,19 @@ import javax.persistence.Table;
     		+ " WHERE tc_user_device.userid IN(:userId) AND tc_devices.delete_date IS NULL AND tc_drivers.delete_date IS NULL "
     		+ " AND Date(tc_events.servertime)=CURRENT_DATE() " 
     		+ " and ( (tc_events.type Like :search)  OR (tc_events.attributes Like :search) OR (tc_events.servertime Like :search) OR (tc_drivers.name Like :search)  OR (tc_devices.name Like :search) )"
-    		+ " ORDER BY tc_events.servertime DESC LIMIT :offset, 10")
+    		+ " ORDER BY tc_events.servertime DESC LIMIT :offset, 10"),
+	
+	@NamedNativeQuery(name="getNotificationsChart",
+    resultSetMapping="notificationChart", 
+    query="SELECT tc_events.id as eventId , tc_events.type as eventType ,tc_events.servertime as serverTime, " + 
+    		" tc_events.attributes as attributes"
+    		+ " FROM tc_user_device " 
+    		+ " INNER JOIN tc_events ON tc_user_device.deviceid=tc_events.deviceid" 
+    		+ " INNER JOIN tc_devices ON tc_events.deviceid=tc_devices.id "
+    		+ " WHERE tc_user_device.userid IN(:userId) AND tc_devices.delete_date IS NULL "
+    		+ " AND Date(tc_events.servertime)=CURRENT_DATE() " 
+    		+ " ORDER BY tc_events.servertime DESC ")
+	
 
 
 })	

@@ -16,8 +16,15 @@ import com.example.examplequerydslspringdatajpamaven.entity.Notification;;
 public interface ComputedRepository  extends  JpaRepository<Attribute, Long>, QueryDslPredicateExecutor<Attribute>{
 
 	@Query(value = "SELECT tc_attributes.* FROM tc_attributes INNER JOIN tc_user_attribute ON tc_user_attribute.attributeid = tc_attributes.id"
-			+ " WHERE tc_user_attribute.userid IN(:userIds) and  tc_attributes.delete_date is null", nativeQuery = true)
-	public List<Attribute> getAllComputed(@Param("userIds")List<Long> userIds);
+			+ " WHERE tc_user_attribute.userid IN(:userIds) and  tc_attributes.delete_date is null"
+			+ " and ( (tc_attributes.type Like %:search%) ) " + 
+			" LIMIT :offset,10 ", nativeQuery = true)
+	public List<Attribute> getAllComputed(@Param("userIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
+	
+	
+	@Query(value = "SELECT count(*) FROM tc_attributes INNER JOIN tc_user_attribute ON tc_user_attribute.attributeid = tc_attributes.id " + 
+			"  WHERE tc_user_attribute.userid IN(:userIds) and  tc_attributes.delete_date is null", nativeQuery = true)
+	public Integer getAllComputedSize(@Param("userIds")List<Long> userIds);
 	
 	@Transactional
     @Modifying

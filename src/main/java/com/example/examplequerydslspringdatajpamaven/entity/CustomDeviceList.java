@@ -9,7 +9,7 @@ public class CustomDeviceList{
 	private String deviceName;
 	private String uniqueId;
 	private String sequenceNumber;
-	private Date lastUpdate;
+	private String lastUpdate;
 	private String referenceKey;
 	private String driverName;
 	private String geofenceName;
@@ -48,7 +48,7 @@ public class CustomDeviceList{
 		this.positionAttributes = positionAttributes;
 	}
 
-	public CustomDeviceList(int id ,String deviceName,String uniqueId , String sequenceNumber, String referenceKey , String companyName, String driverName ,String geofenceName ,Date lastUpdate ) {
+	public CustomDeviceList(int id ,String deviceName,String uniqueId , String sequenceNumber,String lastUpdate, String referenceKey , String driverName ,String companyName, String geofenceName  ) {
 		this.id = id;
 		this.deviceName = deviceName;
 		this.uniqueId = uniqueId;
@@ -149,11 +149,11 @@ public class CustomDeviceList{
 		this.sequenceNumber = sequenceNumber;
 	}
 
-	public Date getLastUpdate() {
+	public String getLastUpdate() {
 		return lastUpdate;
 	}
 
-	public void setLastUpdate(Date lastUpdate) {
+	public void setLastUpdate(String lastUpdate) {
 		this.lastUpdate = lastUpdate;
 	}
 

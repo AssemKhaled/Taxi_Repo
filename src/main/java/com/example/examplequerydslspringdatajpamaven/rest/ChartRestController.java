@@ -7,7 +7,10 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.example.examplequerydslspringdatajpamaven.service.ChartServiceImpl;
 
 @CrossOrigin
@@ -50,6 +53,13 @@ public class ChartRestController {
 		return chartServiceImpl.getDistanceFuelEngine(TOKEN,userId);
 	}
 	
+	@RequestMapping(value = "/getNotificationsChart", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getNotificationsChart(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+															@RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		
+    	return  chartServiceImpl.getNotificationsChart(TOKEN,userId);
+
+	}
 	
 
 }

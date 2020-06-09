@@ -1,5 +1,7 @@
 package com.example.examplequerydslspringdatajpamaven.rest;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -51,6 +53,23 @@ public class ReportRestController {
 		
 		
     	return  reportServiceImpl.getDeviceWorkingHours(TOKEN,deviceId,groupId, offset, start, end,search,userId);
+
+	}
+	@RequestMapping(value = "/getCustomReport", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getCustomReport(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+													 @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+													 @RequestParam (value = "groupId", defaultValue = "0") Long groupId,
+													 @RequestParam (value = "offset", defaultValue = "0") int offset,
+													 @RequestParam (value = "start", defaultValue = "0") String start,
+													 @RequestParam (value = "end", defaultValue = "0") String end,
+													 @RequestParam (value = "search", defaultValue = "") String search,
+													 @RequestParam (value = "userId",defaultValue = "0")Long userId,
+													 @RequestParam (value = "custom", defaultValue = "") String custom,
+													 @RequestParam (value = "value", defaultValue = "") String value) {
+		
+		
+		
+    	return  reportServiceImpl.getCustomReport(TOKEN,deviceId,groupId, offset, start, end,search,userId,custom,value);
 
 	}
 	@RequestMapping(value = "/getDeviceWorkingHoursExport", method = RequestMethod.GET)
@@ -143,6 +162,25 @@ public class ReportRestController {
 												
 
     	return  reportServiceImpl.getTripsReport(TOKEN,deviceId,groupId, type, from, to, page, start, limit,userId);
+		 
+		
+	}
+	
+	@RequestMapping(value = "/getDriveMoreThanReport", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getDriveMoreThanReport(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+													@RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+													@RequestParam (value = "driverId", defaultValue = "0") Long driverId,
+													@RequestParam (value = "groupId", defaultValue = "0") Long groupId,
+													@RequestParam (value = "type", defaultValue = "allEvents") String type,
+													@RequestParam (value = "from", defaultValue = "0") String from,
+													@RequestParam (value = "to", defaultValue = "0") String to,
+													@RequestParam (value = "page", defaultValue = "1") int page,
+													@RequestParam (value = "start", defaultValue = "0") int start,
+													@RequestParam (value = "limit", defaultValue = "25") int limit,
+													@RequestParam (value = "userId",defaultValue = "0")Long userId) {
+												
+
+    	return  reportServiceImpl.getDriveMoreThanReport(TOKEN,deviceId,driverId,groupId, type, from, to, page, start, limit,userId);
 		 
 		
 	}

@@ -19,7 +19,7 @@ WHERE NOT EXISTS (
 );
 
 INSERT INTO tc_permissions(name,functionality)
-SELECT * FROM (SELECT 'DEVICE', '{"list":true,"create":true,"edit":true,"delete":true,"assignDeviceToDriver":true,"assignGeofenceToDevice":true,"assignToUser":true,"connectToElm":true,"verifyInElm":true,"updateInElm":true,"calibration":true}') AS tmp
+SELECT * FROM (SELECT 'DEVICE', '{"list":true,"create":true,"edit":true,"delete":true,"assignDeviceToDriver":true,"assignGeofenceToDevice":true,"assignToUser":true,"connectToElm":true,"verifyInElm":true,"updateInElm":true,"calibration":true,"GetSpentFuel":true,"GetSensorSetting":true}') AS tmp
 WHERE NOT EXISTS (
     SELECT name FROM tc_permissions WHERE name = 'DEVICE'
 );
@@ -37,48 +37,15 @@ WHERE NOT EXISTS (
 );
 
 INSERT INTO tc_permissions(name,functionality)
-SELECT * FROM (SELECT 'EVENTREPORT', '{"list":true,"export":true}') AS tmp
-WHERE NOT EXISTS (
-    SELECT name FROM tc_permissions WHERE name = 'EVENTREPORT'
-);
-
-INSERT INTO tc_permissions(name,functionality)
-SELECT * FROM (SELECT 'USER', '{"list":true,"create":true,"edit":true,"delete":true}') AS tmp
+SELECT * FROM (SELECT 'USER', '{"list":true,"create":true,"edit":true,"delete":true,"connectToElm":true,"verifyInElm":true,"updateInElm":true}') AS tmp
 WHERE NOT EXISTS (
     SELECT name FROM tc_permissions WHERE name = 'USER'
 );
+
 INSERT INTO tc_permissions(name,functionality)
 SELECT * FROM (SELECT 'ROLE', '{"list":true,"create":true,"edit":true,"delete":true,"assignToUser":true}') AS tmp
 WHERE NOT EXISTS (
     SELECT name FROM tc_permissions WHERE name = 'ROLE'
-);
-INSERT INTO tc_permissions(name,functionality)
-SELECT * FROM (SELECT 'DEVICEWORKINGHOURSREPORT', '{"list":true,"export":true}') AS tmp
-WHERE NOT EXISTS (
-    SELECT name FROM tc_permissions WHERE name = 'DEVICEWORKINGHOURSREPORT'
-);
-
-INSERT INTO tc_permissions(name,functionality)
-SELECT * FROM (SELECT 'DRIVERWORKINGHOURSREPORT', '{"list":true,"export":true}') AS tmp
-WHERE NOT EXISTS (
-    SELECT name FROM tc_permissions WHERE name = 'DRIVERWORKINGHOURSREPORT'
-);
-
-INSERT INTO tc_permissions(name,functionality)
-SELECT * FROM (SELECT 'TRIPREPORT', '{"list":true,"export":true}') AS tmp
-WHERE NOT EXISTS (
-    SELECT name FROM tc_permissions WHERE name = 'TRIPREPORT'
-);
-INSERT INTO tc_permissions(name,functionality)
-SELECT * FROM (SELECT 'STOPREPORT', '{"list":true,"export":true}') AS tmp
-WHERE NOT EXISTS (
-    SELECT name FROM tc_permissions WHERE name = 'STOPREPORT'
-);
-
-INSERT INTO tc_permissions(name,functionality)
-SELECT * FROM (SELECT 'BILLING', '{"getBilling":true}') AS tmp
-WHERE NOT EXISTS (
-    SELECT name FROM tc_permissions WHERE name = 'BILLING'
 );
 
 INSERT INTO tc_permissions(name,functionality)

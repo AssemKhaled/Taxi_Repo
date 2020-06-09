@@ -1,5 +1,7 @@
 package com.example.examplequerydslspringdatajpamaven.service;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 
 public interface ReportService {
@@ -39,5 +41,10 @@ public interface ReportService {
 
 	
 	public ResponseEntity<?> getviewTrip(String TOKEN,Long deviceId,Long startPositionId,Long endPositionId);
+
+	
+	public ResponseEntity<?> getDriveMoreThanReport(String TOKEN,Long deviceId,Long driverId,Long groupId,String type,String from,String to,int page,int start,int limit,Long userId);
+
+	public ResponseEntity<?> getCustomReport(String TOKEN,Long deviceId,Long groupId,int offset,String start,String end,String search,Long userId,String custom,String  value);
 
 }
