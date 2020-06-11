@@ -191,17 +191,18 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 
 					}
 					else {
-						if(driver.getPhoto() != null) {
+						DecodePhoto decodePhoto=new DecodePhoto();
+				    	if(driver.getPhoto() !=null) {
 							
-							//base64_Image
-							DecodePhoto decodePhoto=new DecodePhoto();
-							String photo=driver.getPhoto().toString();
-							driver.setPhoto(decodePhoto.Base64_Image(photo));				
+				    		
+				        	String photo=driver.getPhoto();
+				        	driver.setPhoto(decodePhoto.Base64_Image(photo,"driver"));				
 							
 						}
 						else {
+							
 							driver.setPhoto("Not-available.png");
-						}
+						}	
 						
 						List<Driver> res1=checkDublicateDriverInAddName(id,driver.getName());					    
 					    List<Driver> res2=checkDublicateDriverInAddUniqueMobile(driver.getUniqueid(),driver.getMobile_num());
@@ -381,17 +382,44 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 
 								}
 								else {
-									if(driver.getPhoto() != null) {
-										
-										//base64_Image
-										DecodePhoto decodePhoto=new DecodePhoto();
-										String photo=driver.getPhoto().toString();
-										driver.setPhoto(decodePhoto.Base64_Image(photo));				
-										
+									DecodePhoto decodePhoto=new DecodePhoto();
+						        	String newPhoto=driver.getPhoto();
+						        	String oldPhoto=driverCheck.getPhoto();
+
+						        	if(newPhoto !=null) {
+										if(newPhoto != oldPhoto) {
+											if(!oldPhoto.equals("")) {
+												if(!oldPhoto.equals(null)) {
+													if(!oldPhoto.equals("Not-available.png")) {
+														decodePhoto.deletePhoto(driverCheck.getPhoto(), "vehicle");
+														driver.setPhoto(decodePhoto.Base64_Image(newPhoto,"vehicle"));	
+
+													}
+												}
+											}
+											if(oldPhoto.equals("")) {
+												if(oldPhoto.equals(null)) {
+													if(oldPhoto.equals("Not-available.png")) {
+														driver.setPhoto(decodePhoto.Base64_Image(newPhoto,"vehicle"));	
+
+													}
+												}
+											}
+											
+										}
+										//base64_Image			
+
 									}
 									else {
-										driver.setPhoto(driverCheck.getPhoto());
-									}
+										if(!driverCheck.getPhoto().equals("")) {
+											if(!driverCheck.getPhoto().equals(null)) {
+												if(!driverCheck.getPhoto().equals("Not-available.png")) {
+													decodePhoto.deletePhoto(driverCheck.getPhoto(), "vehicle");
+												}
+											}
+										}
+										driver.setPhoto("Not-available.png");			
+									}	
 									
 									List<Driver> res1=checkDublicateDriverInEditName(driver.getId(),id,driver.getName());
 									List<Driver> res2=checkDublicateDriverInEditMobileUnique(driver.getId(),driver.getUniqueid(),driver.getMobile_num());

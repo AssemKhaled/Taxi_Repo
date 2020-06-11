@@ -125,7 +125,11 @@ public class ProfileServiceImpl extends RestServiceController implements Profile
 						user.setDevices(Data.getDevices());
 						user.setDrivers(Data.getDrivers());
 						user.setGeofences(Data.getGeofences());
-					    List<Integer> duplictionList = userServiceImpl.checkUserDuplication(user);
+						user.setAttributes(Data.getAttributes());
+						user.setGroups(Data.getGroups());
+						user.setNotifications(Data.getNotifications());
+
+						List<Integer> duplictionList = userServiceImpl.checkUserDuplication(user);
 					    if(duplictionList.size()>0) {
 					    	getObjectResponse= new GetObjectResponse(501, "was found before",duplictionList);
 							return ResponseEntity.ok().body(getObjectResponse);
@@ -289,14 +293,32 @@ public class ProfileServiceImpl extends RestServiceController implements Profile
 
 					}
 					else {
+						
+						
+						DecodePhoto decodePhoto=new DecodePhoto();
 						String photo = data.get("photo").toString();
 						if(photo.equals("")) {
-							user.setPhoto("Not-available.jpg");				
+							if(!user.getPhoto().equals("")) {
+								if(!user.getPhoto().equals(null)) {
+									if(!user.getPhoto().equals("Not-available.png")) {
+										decodePhoto.deletePhoto(user.getPhoto(), "user");
+									}
+								}
+							}
+							user.setPhoto("Not-available.png");				
 						}
 						else {
-							//base64_Image
-							DecodePhoto decodePhoto=new DecodePhoto();
-							user.setPhoto(decodePhoto.Base64_Image(photo));
+							if(!user.getPhoto().equals("")) {
+								if(!user.getPhoto().equals(null)) {
+									if(!user.getPhoto().equals("Not-available.png")) {
+										decodePhoto.deletePhoto(user.getPhoto(), "user");
+										user.setPhoto(decodePhoto.Base64_Image(photo,"user"));
+
+									}
+								}
+							}
+
+
 					    }
 						profileRepository.save(user);
 						users.add(user);

@@ -1,5 +1,6 @@
 package com.example.examplequerydslspringdatajpamaven.photo;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -9,26 +10,55 @@ import java.util.Random;
 
 public class DecodePhoto {
 	
-public String Base64_Image(String photo) {
+	
+	public Boolean deletePhoto(String photo,String modleType) {
+		String path ="";
+		if(modleType.equals("user")) {
+			path ="/var/www/html/sareb_photo/user_photos/"+photo;
+		}
+		if(modleType.equals("driver")) {
+			path ="/var/www/html/sareb_photo/driver_photos/"+photo;
+		}
+		if(modleType.equals("vehicle")) {
+			path ="/var/www/html/sareb_photo/vehicle_photos/"+photo;
+		}
+		File file = new File(path);
+		
+		return file.delete();
+	}
+	public String Base64_Image(String photo,String modleType) {
 		
 		int pos1=photo.indexOf(":");
 		int pos2=photo.indexOf(";");
 		
 		String type=photo.substring(pos1+1,pos2);
 		
-		if(type.equalsIgnoreCase("image/png"))
+		if(type.equals("image/png"))
         {
         	type=".png";
         }
-        else
+        if(type.equals("image/jpg"))
         {
         	type=".jpg";
+        }
+        if(type.equals("image/jpeg"))
+        {
+        	type=".jpeg";
         }
 		Random rand = new Random();
 		int n = rand.nextInt(999999);
 		
 		String fileName=n + type;
-		String path="/assets/"+fileName;
+		String path ="";
+		if(modleType.equals("user")) {
+			path ="/var/www/html/sareb_photo/user_photos/"+fileName;
+		}
+		if(modleType.equals("driver")) {
+			path ="/var/www/html/sareb_photo/driver_photos/"+fileName;
+		}
+		if(modleType.equals("vehicle")) {
+			path ="/var/www/html/sareb_photo/vehicle_photos/"+fileName;
+		}
 		
 
 		int pos=photo.indexOf(",");

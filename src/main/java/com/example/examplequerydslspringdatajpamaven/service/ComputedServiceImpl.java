@@ -439,42 +439,20 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 								else {
 									
 
-			    					Set<User> userDriver = new HashSet<>();
-									 if(user.getAccountType().equals(4)) {
-										 Set<User> parentClients = user.getUsersOfUser();
-										 if(parentClients.isEmpty()) {
-											 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to delete this attribute",attributes);
-											 return  ResponseEntity.badRequest().body(getObjectResponse);
-										 }else {
-											 User parent = null;
-											 for(User object : parentClients) {
-												 parent = object;
-											 }
-											userDriver.add(parent);
-
-
-										 }
-									 }
-									 else {
-										userDriver.add(user);
-
-									 }
 			    					
 			    					
-									attribute.setUserAttribute(userDriver);
-									if(attributeCheck.getUserAttribute().equals(attribute.getUserAttribute())) {
-										computedRepository.save(attribute);
-										attributes.add(attribute);
-										getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Updated Successfully",attributes);
-										logger.info("************************ editGeofence ENDED ***************************");
-										return ResponseEntity.ok().body(getObjectResponse);
+									 
+									Set<User> userCreater=new HashSet<>();
+			    					userCreater = attributeCheck.getUserAttribute();			    					
+									attribute.setUserAttribute(userCreater);
+									
+									computedRepository.save(attribute);
+									attributes.add(attribute);
+									getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Updated Successfully",attributes);
+									logger.info("************************ editGeofence ENDED ***************************");
+									return ResponseEntity.ok().body(getObjectResponse);
 
-									}
-									else {
-										getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(),"Not allow to edit this attribute it belongs to another user",attributes);
-										return ResponseEntity.status(404).body(getObjectResponse);
-
-									}
+									
 			    					
 			    				}	
 								

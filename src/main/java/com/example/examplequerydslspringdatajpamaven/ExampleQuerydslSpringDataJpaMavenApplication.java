@@ -1,5 +1,7 @@
 package com.example.examplequerydslspringdatajpamaven;
 
+import java.io.File;
+
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +80,45 @@ public class ExampleQuerydslSpringDataJpaMavenApplication  {
 //	    return uri;
 //	  }
 	public static void main(String[] args) {
+		
+		String directoryPath = "/var/www/html/sareb_photo";
+		String user = "/var/www/html/sareb_photo/user_photos";
+		String driver = "/var/www/html/sareb_photo/driver_photos";
+		String vehicle = "/var/www/html/sareb_photo/vehicle_photos";
+
+
+		File photo = new File(directoryPath);
+		if (photo.isDirectory()) {
+			System.out.println("File Photos is a Directory");
+		} else {
+			photo.mkdirs();
+			System.out.println("Directory Photos doesn't exist!!");
+		}
+		
+		File userPhoto = new File(user);
+		if (userPhoto.isDirectory()) {
+			System.out.println("File User Photos is a Directory");
+		} else {
+			userPhoto.mkdirs();
+			System.out.println("Directory User Photos doesn't exist!!");
+		}
+		
+		File driverPhoto = new File(driver);
+		if (driverPhoto.isDirectory()) {
+			System.out.println("File Driver Photos is a Directory");
+		} else {
+			driverPhoto.mkdirs();
+			System.out.println("Directory Driver Photos doesn't exist!!");
+		}
+		
+		File vehiclePhoto = new File(vehicle);
+		if (vehiclePhoto.isDirectory()) {
+			System.out.println("File Vehicle Photos is a Directory");
+		} else {
+			vehiclePhoto.mkdirs();
+			System.out.println("Directory Vehicle Photos doesn't exist!!");
+		}
+		
 		SpringApplication.run(ExampleQuerydslSpringDataJpaMavenApplication.class, args);
 	}
 	

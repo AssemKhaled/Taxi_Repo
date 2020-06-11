@@ -526,6 +526,7 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 									}
 								}
 								if(!checkIfParent(geofneceCheck , user) && ! isParent) {
+
 									getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this geofence ",null);
 									logger.info("************************ editGeofnece ENDED ***************************");
 									return ResponseEntity.badRequest().body(getObjectResponse);
@@ -558,42 +559,18 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 				    				else {
 				    					
 
-				    					Set<User> userDriver = new HashSet<>();
-											 if(user.getAccountType().equals(4)) {
-												 Set<User> parentClients = user.getUsersOfUser();
-												 if(parentClients.isEmpty()) {
-													 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to delete this geofnece",geofences);
-													 return  ResponseEntity.badRequest().body(getObjectResponse);
-												 }else {
-													 User parent = null;
-													 for(User object : parentClients) {
-														 parent = object;
-													 }
-													userDriver.add(parent);
+				    					Set<User> userCreater=new HashSet<>();
+				    					userCreater = geofneceCheck.getUserGeofence();
+										geofence.setUserGeofence(userCreater);
+										
+										geofenceRepository.save(geofence);
+										geofences.add(geofence);
+										getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Updated Successfully",geofences);
+										logger.info("************************ editGeofence ENDED ***************************");
+										return ResponseEntity.ok().body(getObjectResponse);
 
-
-												 }
-											 }
-											 else {
-												userDriver.add(user);
-
-											 }
-				    					
-				    					
-										geofence.setUserGeofence(userDriver);
-										if(geofneceCheck.getUserGeofence().equals(geofence.getUserGeofence())) {
-											geofenceRepository.save(geofence);
-											geofences.add(geofence);
-											getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Updated Successfully",geofences);
-											logger.info("************************ editGeofence ENDED ***************************");
-											return ResponseEntity.ok().body(getObjectResponse);
-
-										}
-										else {
-											getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(),"Not allow to edit this geofence it belongs to another user",geofences);
-											return ResponseEntity.status(404).body(getObjectResponse);
-
-										}
+										
+										
 				    					
 				    				}	
 								}
@@ -723,9 +700,11 @@ logger.info("************************ getAllUserGeofences STARTED **************
 	}
 	
 	 public Boolean checkIfParent(Geofence geofnece , User loggedUser) {
+
 		   Set<User> geofenceParent = geofnece.getUserGeofence();
+
 		   if(geofenceParent.isEmpty()) {
-			  
+
 			   return false;
 		   }else {
 			   User parent = null;
@@ -733,20 +712,23 @@ logger.info("************************ getAllUserGeofences STARTED **************
 				   parent = object;
 			   }
 			   if(parent.getId() == loggedUser.getId()) {
+
 				   return true;
 			   }
 			   if(parent.getAccountType() == 1) {
 				   if(parent.getId() == loggedUser.getId()) {
+
 					   return true;
 				   }
 			   }else {
 				   List<User> parents = userServiceImpl.getAllParentsOfuser(parent, parent.getAccountType());
 				   if(parents.isEmpty()) {
-					   
+
 					   return false;
 				   }else {
 					   for(User object :parents) {
 						   if(object.getId() == loggedUser.getId()) {
+
 							   return true;
 						   }
 					   }
@@ -754,6 +736,7 @@ logger.info("************************ getAllUserGeofences STARTED **************
 			   }
 			  
 		   }
+
 		   return false;
 	   }
 

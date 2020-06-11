@@ -259,15 +259,16 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			    }
 			    else
 			    {
+					DecodePhoto decodePhoto=new DecodePhoto();
 			    	if(device.getPhoto() !=null) {
 						
-						//base64_Image
+			    		
 			        	String photo=device.getPhoto();
-						DecodePhoto decodePhoto=new DecodePhoto();
-						device.setPhoto(decodePhoto.Base64_Image(photo));				
+						device.setPhoto(decodePhoto.Base64_Image(photo,"vehicle"));				
 						
 					}
 					else {
+						
 						device.setPhoto("Not-available.png");
 					}	
 			    	deviceRepository.save(device);
@@ -385,16 +386,43 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		    	return ResponseEntity.ok().body(getObjectResponse);
 		    }
 	        else {
-	        	if(device.getPhoto() !=null) {
-					
-					//base64_Image
-		        	String photo=device.getPhoto();
-					DecodePhoto decodePhoto=new DecodePhoto();
-					device.setPhoto(decodePhoto.Base64_Image(photo));				
-					
+				DecodePhoto decodePhoto=new DecodePhoto();
+	        	String newPhoto=device.getPhoto();
+	        	String oldPhoto=oldDevice.getPhoto();
+
+	        	if(newPhoto !=null) {
+					if(newPhoto != oldPhoto) {
+						if(!oldPhoto.equals("")) {
+							if(!oldPhoto.equals(null)) {
+								if(!oldPhoto.equals("Not-available.png")) {
+									decodePhoto.deletePhoto(oldDevice.getPhoto(), "vehicle");
+									device.setPhoto(decodePhoto.Base64_Image(newPhoto,"vehicle"));	
+
+								}
+							}
+						}
+						if(oldPhoto.equals("")) {
+							if(oldPhoto.equals(null)) {
+								if(oldPhoto.equals("Not-available.png")) {
+									device.setPhoto(decodePhoto.Base64_Image(newPhoto,"vehicle"));	
+
+								}
+							}
+						}
+						
+					}
+					//base64_Image			
+
 				}
 				else {
-					device.setPhoto("Not-available.png");
+					if(!oldDevice.getPhoto().equals("")) {
+						if(!oldDevice.getPhoto().equals(null)) {
+							if(!oldDevice.getPhoto().equals("Not-available.png")) {
+								decodePhoto.deletePhoto(oldDevice.getPhoto(), "vehicle");
+							}
+						}
+					}
+					device.setPhoto("Not-available.png");			
 				}	
 		    	deviceRepository.save(device);
 		    	List<Device> devices = null;

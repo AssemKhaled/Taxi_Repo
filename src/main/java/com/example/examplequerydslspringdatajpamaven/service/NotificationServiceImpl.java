@@ -445,42 +445,18 @@ public class NotificationServiceImpl extends RestServiceController implements No
 								else {
 									
 
-			    					Set<User> userDriver = new HashSet<>();
-									 if(user.getAccountType().equals(4)) {
-										 Set<User> parentClients = user.getUsersOfUser();
-										 if(parentClients.isEmpty()) {
-											 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to delete this notification",notifications);
-											 return  ResponseEntity.badRequest().body(getObjectResponse);
-										 }else {
-											 User parent = null;
-											 for(User object : parentClients) {
-												 parent = object;
-											 }
-											userDriver.add(parent);
-
-
-										 }
-									 }
-									 else {
-										userDriver.add(user);
-
-									 }
 			    					
-			    					
-									notification.setUserNotification(userDriver);
-									if(notificationCheck.getUserNotification().equals(notification.getUserNotification())) {
-										notificationRepository.save(notification);
-										notifications.add(notification);
-										getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Updated Successfully",notifications);
-										logger.info("************************ editGeofence ENDED ***************************");
-										return ResponseEntity.ok().body(getObjectResponse);
+									Set<User> userCreater=new HashSet<>();
+			    					userCreater = notificationCheck.getUserNotification();			    					
+									notification.setUserNotification(userCreater);
+									
+									notificationRepository.save(notification);
+									notifications.add(notification);
+									getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Updated Successfully",notifications);
+									logger.info("************************ editGeofence ENDED ***************************");
+									return ResponseEntity.ok().body(getObjectResponse);
 
-									}
-									else {
-										getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(),"Not allow to edit this notification it belongs to another user",notifications);
-										return ResponseEntity.status(404).body(getObjectResponse);
-
-									}
+									
 			    					
 			    				}	
 								

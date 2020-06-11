@@ -513,42 +513,17 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 								else {
 									
 
-			    					Set<User> userDriver = new HashSet<>();
-									 if(user.getAccountType().equals(4)) {
-										 Set<User> parentClients = user.getUsersOfUser();
-										 if(parentClients.isEmpty()) {
-											 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to delete this group",groups);
-											 return  ResponseEntity.badRequest().body(getObjectResponse);
-										 }else {
-											 User parent = null;
-											 for(User object : parentClients) {
-												 parent = object;
-											 }
-											userDriver.add(parent);
+									Set<User> userCreater=new HashSet<>();
+			    					userCreater = groupCheck.getUserGroup();			    					
+			    					group.setUserGroup(userCreater);
 
+									groupRepository.save(group);
+									groups.add(group);
+									getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Updated Successfully",null);
+									logger.info("************************ editGeofence ENDED ***************************");
+									return ResponseEntity.ok().body(getObjectResponse);
 
-										 }
-									 }
-									 else {
-										userDriver.add(user);
-
-									 }
-			    					
-			    					
-									group.setUserGroup(userDriver);
-									if(groupCheck.getUserGroup().equals(group.getUserGroup())) {
-										groupRepository.save(group);
-										groups.add(group);
-										getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Updated Successfully",null);
-										logger.info("************************ editGeofence ENDED ***************************");
-										return ResponseEntity.ok().body(getObjectResponse);
-
-									}
-									else {
-										getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(),"Not allow to edit this geofence it belongs to another user",groups);
-										return ResponseEntity.status(404).body(getObjectResponse);
-
-									}
+									
 			    					
 			    				}	
 								

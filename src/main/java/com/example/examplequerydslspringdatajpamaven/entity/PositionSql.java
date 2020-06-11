@@ -79,7 +79,7 @@ import com.opencsv.bean.CsvDate;
 		     query="SELECT tc_devices.id as id,tc_devices.name as deviceName, tc_positions.attributes as attributes "
 		     		+ " FROM tc_devices INNER JOIN tc_positions ON tc_positions.id=tc_devices.positionid " + 
 		     		" INNER JOIN tc_user_device ON tc_user_device.deviceid=tc_devices.id " + 
-		     		" AND tc_user_device.userid IN ( :userIds) " ),
+		     		" AND tc_user_device.userid IN ( :userIds) AND Date(tc_positions.servertime)=CURRENT_DATE() " ),
 		@NamedNativeQuery(name="getDriverHoursList", 
 			     resultSetMapping="DriverHoursList", 
 			     query="SELECT tc_devices.id as id,tc_devices.name as deviceName,tc_drivers.name as driverName, tc_positions.attributes as attributes "
@@ -87,7 +87,7 @@ import com.opencsv.bean.CsvDate;
 			     		" INNER JOIN tc_user_device ON tc_user_device.deviceid=tc_devices.id " + 
 			     		" INNER JOIN tc_device_driver ON tc_device_driver.deviceid=tc_devices.id " + 
 			     		" INNER JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id "+
-			     		" AND tc_user_device.userid IN ( :userIds) " ),	
+			     		" AND tc_user_device.userid IN ( :userIds) AND Date(tc_positions.servertime)=CURRENT_DATE() " ),	
 	
 	
 @NamedNativeQuery(name="getPositionsList", 
