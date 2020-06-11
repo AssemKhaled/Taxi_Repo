@@ -2033,7 +2033,6 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 						 usersIds.add(object.getId());
 					 }
 				 }
-				 System.out.println("Ids"+usersIds.toString());
 				
 					search = "%"+search+"%";
 					notifications= eventRepository.getNotifications(usersIds, offset,search);

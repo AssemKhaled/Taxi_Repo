@@ -1321,7 +1321,6 @@ public ResponseEntity<?> getRolePageContent(String TOKEN,Long userId) {
 					JSONObject myjson = new JSONObject(userRole.getPermissions());
 					
 					JSONArray the_json_array = myjson.getJSONArray("permissions");
-					System.out.println("myJson"+the_json_array);
 					List<Permission> list = new ArrayList<Permission>();
 					
 					for(Object object : the_json_array) {	

@@ -5,6 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,7 +41,8 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	@Autowired
 	private UserRoleService userRoleService;
 	
-	private List<User> childernUsers = new ArrayList<>();
+//	private List<User> childernUsers = new ArrayList<>();
+	
 	private static final Log logger = LogFactory.getLog(DeviceServiceImpl.class);
 	
 	GetObjectResponse getObjectResponse;
@@ -2216,39 +2218,175 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	@Override
 	public List<User> getAllChildernOfUser(Long userId) {
 		// TODO Auto-generated method stub
-		List<User>childrenReturned = userRepository.getChildrenOfUser(userId);
-		if(!childrenReturned.isEmpty()) {
-			for(User object : childrenReturned) {
-				childernUsers.add(object);
-				if(object.getAccountType() != 4) {
-					getAllChildernOfUser(object.getId());
+		List<User> childernUsers = new ArrayList<>();
+		
+		
+		User user = userRepository.findOne(userId);
+		if(user != null) {
+			if(user.getAccountType() == 1) {
+				List<User>childrenReturned1 = userRepository.getChildrenOfUser(userId);
+				if(!childrenReturned1.isEmpty()) {
+					for(User object1 : childrenReturned1) {
+						childernUsers.add(object1);
+						
+						
+						if(object1.getAccountType() == 2) {
+							List<User>childrenReturned2 = userRepository.getChildrenOfUser(object1.getId());
+							if(!childrenReturned2.isEmpty()) {
+								for(User object2 : childrenReturned2) {
+									childernUsers.add(object2);
+									
+									
+									
+									if(object2.getAccountType() == 3) {
+										List<User>childrenReturned3 = userRepository.getChildrenOfUser(object2.getId());
+										if(!childrenReturned3.isEmpty()) {
+											for(User object3 : childrenReturned3) {
+												childernUsers.add(object3);
+											
+											}
+
+										}
+
+									}
+									
+
+								}
+							}
+
+						
+						}
+					}
+				}
+			}
+			if(user.getAccountType() == 2) {
+				List<User>childrenReturned1 = userRepository.getChildrenOfUser(userId);
+				if(!childrenReturned1.isEmpty()) {
+					for(User object1 : childrenReturned1) {
+						childernUsers.add(object1);
+						
+						
+						if(object1.getAccountType() == 3) {
+							List<User>childrenReturned2 = userRepository.getChildrenOfUser(object1.getId());
+							if(!childrenReturned2.isEmpty()) {
+								for(User object2 : childrenReturned2) {
+									childernUsers.add(object2);
+									
+									
+									
+
+								}
+							}
+
+						
+						}
+					}
+				}
+			}
+			if(user.getAccountType() == 3) {
+				List<User>childrenReturned1 = userRepository.getChildrenOfUser(userId);
+				if(!childrenReturned1.isEmpty()) {
+					for(User object1 : childrenReturned1) {
+						childernUsers.add(object1);
+						
+					}
 				}
 			}
 		}
+		
 		return childernUsers;
 	}
 
 	@Override
 	public void resetChildernArray() {
 		// TODO Auto-generated method stub
+		List<User> childernUsers = new ArrayList<>();
 		childernUsers = new ArrayList<>();
 		
 	}
+	
 
-	@Override
+	@Override	
 	public List<User> getActiveAndInactiveChildern(Long userId) {
 		// TODO Auto-generated method stub
 		// TODO Auto-generated method stub
-				List<User>childrenReturned = userRepository.getActiveAndInactiveChildrenOfUser(userId);
-				if(!childrenReturned.isEmpty()) {
-					for(User object : childrenReturned) {
-						childernUsers.add(object);
-						if(object.getAccountType() != 4) {
-							getActiveAndInactiveChildern(object.getId());
+       List<User> childernUsers = new ArrayList<>();
+		
+		
+		User user = userRepository.findOne(userId);
+		if(user != null) {
+			if(user.getAccountType() == 1) {
+				List<User>childrenReturned1 = userRepository.getActiveAndInactiveChildrenOfUser(userId);
+				if(!childrenReturned1.isEmpty()) {
+					for(User object1 : childrenReturned1) {
+						childernUsers.add(object1);
+						
+						
+						if(object1.getAccountType() == 2) {
+							List<User>childrenReturned2 = userRepository.getActiveAndInactiveChildrenOfUser(object1.getId());
+							if(!childrenReturned2.isEmpty()) {
+								for(User object2 : childrenReturned2) {
+									childernUsers.add(object2);
+									
+									
+									
+									if(object2.getAccountType() == 3) {
+										List<User>childrenReturned3 = userRepository.getActiveAndInactiveChildrenOfUser(object2.getId());
+										if(!childrenReturned3.isEmpty()) {
+											for(User object3 : childrenReturned3) {
+												childernUsers.add(object3);
+											
+											}
+
+										}
+
+									}
+									
+
+								}
+							}
+
+						
 						}
 					}
 				}
-				return childernUsers;
+			}
+			if(user.getAccountType() == 2) {
+				List<User>childrenReturned1 = userRepository.getActiveAndInactiveChildrenOfUser(userId);
+				if(!childrenReturned1.isEmpty()) {
+					for(User object1 : childrenReturned1) {
+						childernUsers.add(object1);
+						
+						
+						if(object1.getAccountType() == 3) {
+							List<User>childrenReturned2 = userRepository.getActiveAndInactiveChildrenOfUser(object1.getId());
+							if(!childrenReturned2.isEmpty()) {
+								for(User object2 : childrenReturned2) {
+									childernUsers.add(object2);
+									
+									
+									
+
+								}
+							}
+
+						
+						}
+					}
+				}
+			}
+			if(user.getAccountType() == 3) {
+				List<User>childrenReturned1 = userRepository.getActiveAndInactiveChildrenOfUser(userId);
+				if(!childrenReturned1.isEmpty()) {
+					for(User object1 : childrenReturned1) {
+						childernUsers.add(object1);
+						
+					}
+				}
+			}
+		}
+		
+		return childernUsers;
 	}
 	
 	@Override

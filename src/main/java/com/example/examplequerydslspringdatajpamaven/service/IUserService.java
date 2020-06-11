@@ -35,7 +35,7 @@ public interface IUserService {
 	public List<User>getAllChildernOfUser(Long userId);
 	public List<User>getActiveAndInactiveChildern(Long userId);
 	public void resetChildernArray();
-	
+
 	public ResponseEntity<?> getUserSelectWithChild(String TOKEN,Long userId);
 
 
