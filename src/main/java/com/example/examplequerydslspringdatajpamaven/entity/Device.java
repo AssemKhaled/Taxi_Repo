@@ -503,7 +503,7 @@ public class Device {
 	//should be date_type
 	@Column(name = "date_type")
 	private Integer date_type;
-	
+
 	@Column(name = "photo")
 	private String photo;
 	

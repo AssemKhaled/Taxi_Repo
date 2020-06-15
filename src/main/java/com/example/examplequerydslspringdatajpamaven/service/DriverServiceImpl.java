@@ -114,7 +114,6 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 							 usersIds.add(object.getId());
 						 }
 					 }
-					 System.out.println("Ids"+usersIds.toString());
 					//drivers = driverRepository.getAllDrivers(usersIds,offset,search);
 				    customDrivers= driverRepository.getAllDriversCustom(usersIds,offset,search);
 
@@ -157,6 +156,8 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 
 		logger.info("************************ addDriver STARTED ***************************");
 
+		String image = driver.getPhoto();
+		driver.setPhoto("not_available.png");
 		List<Driver> drivers = new ArrayList<Driver>();
 		if(TOKEN.equals("")) {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",drivers);
@@ -192,17 +193,12 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 					}
 					else {
 						DecodePhoto decodePhoto=new DecodePhoto();
-				    	if(driver.getPhoto() !=null) {
-							
-				    		
-				        	String photo=driver.getPhoto();
-				        	driver.setPhoto(decodePhoto.Base64_Image(photo,"driver"));				
-							
+				    	if(image !=null) {
+					    	if(image !="") {
+					        	driver.setPhoto(decodePhoto.Base64_Image(image,"driver"));				
+					    	}
 						}
-						else {
 							
-							driver.setPhoto("Not-available.png");
-						}	
 						
 						List<Driver> res1=checkDublicateDriverInAddName(id,driver.getName());					    
 					    List<Driver> res2=checkDublicateDriverInAddUniqueMobile(driver.getUniqueid(),driver.getMobile_num());
@@ -312,7 +308,12 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 	@Override
 	public ResponseEntity<?> editDriver(String TOKEN,Driver driver,Long id) {
 		logger.info("************************ editDriver STARTED ***************************");
-
+    	String newPhoto= driver.getPhoto();
+		
+		driver.setPhoto("not_available.png");
+			
+		
+		
 		List<Driver> drivers = new ArrayList<Driver>();
 		if(TOKEN.equals("")) {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",drivers);
@@ -383,43 +384,32 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 								}
 								else {
 									DecodePhoto decodePhoto=new DecodePhoto();
-						        	String newPhoto=driver.getPhoto();
 						        	String oldPhoto=driverCheck.getPhoto();
 
-						        	if(newPhoto !=null) {
-										if(newPhoto != oldPhoto) {
-											if(!oldPhoto.equals("")) {
-												if(!oldPhoto.equals(null)) {
-													if(!oldPhoto.equals("Not-available.png")) {
-														decodePhoto.deletePhoto(driverCheck.getPhoto(), "vehicle");
-														driver.setPhoto(decodePhoto.Base64_Image(newPhoto,"vehicle"));	
-
-													}
-												}
+						        	if(!oldPhoto.equals("")) {
+										if(!oldPhoto.equals(null)) {
+											if(!oldPhoto.equals("not_available.png")) {
+												decodePhoto.deletePhoto(oldPhoto, "driver");
 											}
-											if(oldPhoto.equals("")) {
-												if(oldPhoto.equals(null)) {
-													if(oldPhoto.equals("Not-available.png")) {
-														driver.setPhoto(decodePhoto.Base64_Image(newPhoto,"vehicle"));	
-
-													}
-												}
-											}
-											
 										}
-										//base64_Image			
+									}
 
+									if(newPhoto.equals("")) {
+										
+										driver.setPhoto("not_available.png");				
 									}
 									else {
-										if(!driverCheck.getPhoto().equals("")) {
-											if(!driverCheck.getPhoto().equals(null)) {
-												if(!driverCheck.getPhoto().equals("Not-available.png")) {
-													decodePhoto.deletePhoto(driverCheck.getPhoto(), "vehicle");
-												}
-											}
+										if(newPhoto.equals(oldPhoto)) {
+											driver.setPhoto(oldPhoto);				
 										}
-										driver.setPhoto("Not-available.png");			
-									}	
+										else{
+											driver.setPhoto(decodePhoto.Base64_Image(newPhoto,"driver"));
+
+										}
+
+								    }
+									
+										
 									
 									List<Driver> res1=checkDublicateDriverInEditName(driver.getId(),id,driver.getName());
 									List<Driver> res2=checkDublicateDriverInEditMobileUnique(driver.getId(),driver.getUniqueid(),driver.getMobile_num());

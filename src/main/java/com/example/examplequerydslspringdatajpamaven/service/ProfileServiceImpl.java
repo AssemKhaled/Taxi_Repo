@@ -190,7 +190,6 @@ public class ProfileServiceImpl extends RestServiceController implements Profile
 			else {
 				if(user.getDelete_date() == null) {
 					if(check.equals("")) {
-						System.out.println("dskjdsjkbvkjbvdjs");
 						if(data.get("oldPassword") == null || data.get("newPassword") == null ||
 								data.get("oldPassword") == "" || data.get("newPassword") == "") {
 							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "newPassword and oldPassword is Required",users);
@@ -221,7 +220,7 @@ public class ProfileServiceImpl extends RestServiceController implements Profile
 						}
 					}
 					else {
-						System.out.println("user");
+
 
 						if(data.get("newPassword") == null || data.get("newPassword") == "") {
 							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "newPassword is Required",users);
@@ -297,28 +296,21 @@ public class ProfileServiceImpl extends RestServiceController implements Profile
 						
 						DecodePhoto decodePhoto=new DecodePhoto();
 						String photo = data.get("photo").toString();
-						if(photo.equals("")) {
-							if(!user.getPhoto().equals("")) {
-								if(!user.getPhoto().equals(null)) {
-									if(!user.getPhoto().equals("Not-available.png")) {
-										decodePhoto.deletePhoto(user.getPhoto(), "user");
-									}
+						
+						if(!user.getPhoto().equals("")) {
+							if(!user.getPhoto().equals(null)) {
+								if(!user.getPhoto().equals("not_available.png")) {
+									decodePhoto.deletePhoto(user.getPhoto(), "user");
 								}
 							}
-							user.setPhoto("Not-available.png");				
+						}
+						if(photo.equals("")) {
+							
+							user.setPhoto("not_available.png");				
 						}
 						else {
-							if(!user.getPhoto().equals("")) {
-								if(!user.getPhoto().equals(null)) {
-									if(!user.getPhoto().equals("Not-available.png")) {
-										decodePhoto.deletePhoto(user.getPhoto(), "user");
-										user.setPhoto(decodePhoto.Base64_Image(photo,"user"));
-
-									}
-								}
-							}
-
-
+							
+							user.setPhoto(decodePhoto.Base64_Image(photo,"user"));
 					    }
 						profileRepository.save(user);
 						users.add(user);

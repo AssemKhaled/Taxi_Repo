@@ -162,6 +162,8 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	public ResponseEntity<?> createDevice(String TOKEN,Device device,Long userId) {
 		// TODO Auto-generated method stub
 		logger.info("************************ createDevice STARTED ***************************");
+		String image = device.getPhoto();
+		device.setPhoto("not_available.png");
 		if(TOKEN.equals("")) {
 			 List<Device> devices = null;
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
@@ -259,18 +261,13 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			    }
 			    else
 			    {
-					DecodePhoto decodePhoto=new DecodePhoto();
-			    	if(device.getPhoto() !=null) {
-						
-			    		
-			        	String photo=device.getPhoto();
-						device.setPhoto(decodePhoto.Base64_Image(photo,"vehicle"));				
-						
+					
+			    	DecodePhoto decodePhoto=new DecodePhoto();
+			    	if(image !=null) {
+				    	if(image !="") {
+				    		device.setPhoto(decodePhoto.Base64_Image(image,"vehicle"));				
+				    	}
 					}
-					else {
-						
-						device.setPhoto("Not-available.png");
-					}	
 			    	deviceRepository.save(device);
 			    	List<Device> devices = null;
 			    	getObjectResponse = new GetObjectResponse(HttpStatus.OK.value() , "success",devices);
@@ -286,6 +283,9 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	@Override
 	public ResponseEntity<?> editDevice(String TOKEN,Device device, Long userId) {
 		logger.info("************************ editDevice STARTED ***************************");
+    	String newPhoto= device.getPhoto();
+		
+    	device.setPhoto("not_available.png");
 		if(TOKEN.equals("")) {
 			 List<Device> devices = null;
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
@@ -360,7 +360,6 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					}else {
 						
 						for(User deviceUser : deviceParent) {
-							System.out.println("here"+deviceUser.getId()+"parent"+parent.getId());
 							if(deviceUser.getId().equals(parent.getId())) {
 								
 								isParent = true;
@@ -387,43 +386,30 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		    }
 	        else {
 				DecodePhoto decodePhoto=new DecodePhoto();
-	        	String newPhoto=device.getPhoto();
 	        	String oldPhoto=oldDevice.getPhoto();
 
-	        	if(newPhoto !=null) {
-					if(newPhoto != oldPhoto) {
-						if(!oldPhoto.equals("")) {
-							if(!oldPhoto.equals(null)) {
-								if(!oldPhoto.equals("Not-available.png")) {
-									decodePhoto.deletePhoto(oldDevice.getPhoto(), "vehicle");
-									device.setPhoto(decodePhoto.Base64_Image(newPhoto,"vehicle"));	
-
-								}
-							}
+	        	if(!oldPhoto.equals("")) {
+					if(!oldPhoto.equals(null)) {
+						if(!oldPhoto.equals("not_available.png")) {
+							decodePhoto.deletePhoto(oldPhoto, "vehicle");
 						}
-						if(oldPhoto.equals("")) {
-							if(oldPhoto.equals(null)) {
-								if(oldPhoto.equals("Not-available.png")) {
-									device.setPhoto(decodePhoto.Base64_Image(newPhoto,"vehicle"));	
-
-								}
-							}
-						}
-						
 					}
-					//base64_Image			
+				}
 
+				if(newPhoto.equals("")) {
+					
+					device.setPhoto("not_available.png");				
 				}
 				else {
-					if(!oldDevice.getPhoto().equals("")) {
-						if(!oldDevice.getPhoto().equals(null)) {
-							if(!oldDevice.getPhoto().equals("Not-available.png")) {
-								decodePhoto.deletePhoto(oldDevice.getPhoto(), "vehicle");
-							}
-						}
+					if(newPhoto.equals(oldPhoto)) {
+						device.setPhoto(oldPhoto);				
 					}
-					device.setPhoto("Not-available.png");			
-				}	
+					else{
+						device.setPhoto(decodePhoto.Base64_Image(newPhoto,"vehicle"));
+
+					}
+
+			    }
 		    	deviceRepository.save(device);
 		    	List<Device> devices = null;
 		    	getObjectResponse = new GetObjectResponse(HttpStatus.OK.value() , "success",devices);
@@ -456,7 +442,6 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			String deviceLeftLetter = device.getLeftLetter();
 			String deviceMiddleLetter = device.getMiddleLetter();
 			String deviceRightLetter = device.getRightLetter();
-			System.out.println("left_letter"+deviceLeftLetter );
 		    List<Device>duplicatedDevices = deviceRepository.checkDeviceDuplication(deviceName,deviceUniqueId,deviceSequenceNumber,devicePlateNum,deviceLeftLetter,deviceMiddleLetter,deviceRightLetter);
 		    List<Integer>duplicationCodes = new ArrayList<Integer>();
 		    for (Device matchedDevice : duplicatedDevices) 
@@ -573,7 +558,6 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 						}else {
 							
 							for(User deviceUser : deviceParent) {
-								System.out.println("here"+deviceUser.getId()+"parent"+parent.getId());
 								if(deviceUser.getId().equals(parent.getId())) {
 									
 									isParent = true;
@@ -697,7 +681,6 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 						}else {
 							
 							for(User deviceUser : deviceParent) {
-								System.out.println("here"+deviceUser.getId()+"parent"+parent.getId());
 								if(deviceUser.getId().equals(parent.getId())) {
 									
 									isParent = true;
@@ -794,7 +777,6 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 							}else {
 								
 								for(User deviceUser : deviceParent) {
-									System.out.println("here"+deviceUser.getId()+"parent"+parent.getId());
 									if(deviceUser.getId().equals(parent.getId())) {
 										
 										isParent = true;
@@ -1935,7 +1917,6 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 								}else {
 									
 									for(User deviceUser : deviceParent) {
-										System.out.println("here"+deviceUser.getId()+"parent"+parent.getId());
 										if(deviceUser.getId().equals(parent.getId())) {
 											
 											isParent = true;
@@ -2859,7 +2840,6 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 									req+=" "+pushed.toString();
 								}
 							}
-							System.out.println("len : "+req.length());
 							device.setCalibrationData(req);
 							deviceRepository.save(device);
 
@@ -3064,7 +3044,6 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 							String data = deviceRepository.getFuelData(deviceId);
 							List<Map> dataMap=new ArrayList<Map>();
 							if(data != null) {
-								System.out.print("dsvvvvvvvvvvvvvvvv");
 
 							JSONObject obj = new JSONObject(data.toString());
 						     Map list   = new HashMap<>();
