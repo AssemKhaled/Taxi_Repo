@@ -40,45 +40,12 @@ import com.example.examplequerydslspringdatajpamaven.service.ReportServiceImpl;
 import com.example.examplequerydslspringdatajpamaven.service.UserServiceImpl;
 import com.mongodb.MongoClient;
 
-@EnableMongoRepositories(basePackageClasses = PositionRepository.class)
-@EnableJpaRepositories(basePackageClasses = DeviceRepository.class)
 @SpringBootApplication 
 @Configuration
 @ComponentScan(basePackages = { "com.example.examplequerydslspringdatajpamaven.*"})
 public class ExampleQuerydslSpringDataJpaMavenApplication  {
 
-	@Bean
-	@Primary
-	@ConfigurationProperties(prefix="spring.datasource")
-	public DataSource primaryDataSource() {
-	    return  DataSourceBuilder.create().build();
-	}
-	@Bean
-	@ConfigurationProperties(prefix="spring.secondDatasource")
-	public DataSource secondaryDataSource() {
-	    return DataSourceBuilder.create().build();
-	}
-
-	  @Bean(name = "mongoTemplate")
-	    public MongoTemplate mongoTemplate()
-	    {
-	        MongoTemplate mongoTemplate = new MongoTemplate(mongoDbFactory());
-	        return mongoTemplate;
-	    }
-	  
-	   @Bean
-	   public MongoDbFactory mongoDbFactory() 
-	   {
-	        MongoClient mongoClient = new MongoClient("localhost", 27017);
-	        return new SimpleMongoDbFactory(mongoClient, "sareb");
-	    }
-	   
-	  
-//	@Bean
-//	  public MongoClient mongoClient() {
-//	    MongoClient uri = new MongoClient("jdbc:mongo://localhost:27017/sareb");
-//	    return uri;
-//	  }
+	
 	public static void main(String[] args) {
 		
 		String directoryPath = "/var/www/html/sareb_photo";
@@ -122,53 +89,9 @@ public class ExampleQuerydslSpringDataJpaMavenApplication  {
 		SpringApplication.run(ExampleQuerydslSpringDataJpaMavenApplication.class, args);
 	}
 	
-
-//	@Bean
-//	public UserServiceImpl test() {
-//		return new UserServiceImpl();
-//	}
-	
-//	@Bean
-//	public DeviceServiceImpl testDevice() {
-//		return new DeviceServiceImpl();
-//	}
-	
-//	@Bean
-//	public DriverServiceImpl testDriver() {
-//		return new DriverServiceImpl();
-//	}
-	
-//	@Bean
-//	public GeofenceServiceImpl testGeofence() {
-//		return new GeofenceServiceImpl();
-//	}
-	
-//	@Bean
-//	public ReportServiceImpl testReport() {
-//		return new ReportServiceImpl();
-//	}
-//	@Bean
-//	public LoginServiceImpl testLogin() {
-//		return new LoginServiceImpl();
-//	}
-	/*@Bean
-	public JWKValidator  testJWKValidator() {
-		return new JWKValidator();
-	}*/
-	
 	@Bean
 	public ProfileServiceImpl testProfile() {
 		return new ProfileServiceImpl();
 	}
-	
-//	@Bean(name = "mainDataSource")
-//	@Primary
-//	public DataSource mainDataSource() {
-//		DriverManagerDataSource dataSource = new DriverManagerDataSource();
-//
-//		dataSource.setUrl(config.getProperty("datasource.url"));
-//		dataSource.setUsername(config.getProperty("datasource.user"));
-//		dataSource.setPassword(config.getProperty("datasource.pwd"));
-//		return dataSource;
-//	}
+
 }

@@ -21,21 +21,20 @@ import org.springframework.stereotype.Repository;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceLiveData;
 import com.example.examplequerydslspringdatajpamaven.entity.NewPosition;
 import com.example.examplequerydslspringdatajpamaven.entity.NewcustomerDivice;
-import com.example.examplequerydslspringdatajpamaven.entity.Position;
+import com.example.examplequerydslspringdatajpamaven.entity.MongoPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
-//@ComponentScan
-@Repository
-public interface PositionRepository extends MongoRepository<Position, String>{
-    @org.springframework.data.mongodb.repository.Query( fields = "{ '_id': 0, 'protocol': 0}")
-    //List<NewPosition> f indAllByProt();
-     //findByProtocol(String protocol);
-      //List<Position> findByProtocol(String protocol);
-     public List<Position> findAllBydeviceidIn(List<Integer>deviceId);
-    @org.springframework.data.mongodb.repository.Query("{ 'devicetime': ?0, 'devicetime': ?1}")
-     Position findTopByOrderByOrderdevicetimeDesc(String start,String end);
-     public List<Position> findAllByidIn(List<String>positionId);
 
-   // public  findByProtocol(String Protocol);
+public interface PositionRepository extends MongoRepository<MongoPositions, String>{
+//    @org.springframework.data.mongodb.repository.Query( fields = "{ '_id': 0, 'protocol': 0}")
+//    //List<NewPosition> f indAllByProt();
+//     //findByProtocol(String protocol);
+//      //List<Position> findByProtocol(String protocol);
+//     public List<MongoPositions> findAllBydeviceidIn(List<Integer>deviceId);
+//    @org.springframework.data.mongodb.repository.Query("{ 'devicetime': ?0, 'devicetime': ?1}")
+//    MongoPositions findTopByOrderByOrderdevicetimeDesc(String start,String end);
+//     public List<MongoPositions> findAllByidIn(List<String>positionId);
+
+    public List<MongoPositions> findByProtocol(String Protocol);
        
 }
 
