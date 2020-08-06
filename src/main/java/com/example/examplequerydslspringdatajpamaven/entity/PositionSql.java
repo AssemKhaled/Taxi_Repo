@@ -79,15 +79,16 @@ import com.opencsv.bean.CsvDate;
 		     query="SELECT tc_devices.id as id,tc_devices.name as deviceName, tc_positions.attributes as attributes "
 		     		+ " FROM tc_devices INNER JOIN tc_positions ON tc_positions.id=tc_devices.positionid " + 
 		     		" INNER JOIN tc_user_device ON tc_user_device.deviceid=tc_devices.id " + 
-		     		" AND tc_user_device.userid IN ( :userIds) AND Date(tc_positions.servertime)=CURRENT_DATE() " ),
+		     		" where tc_user_device.userid IN ( :userIds) AND Date(tc_positions.servertime)=CURRENT_DATE() " ),
 		@NamedNativeQuery(name="getDriverHoursList", 
 			     resultSetMapping="DriverHoursList", 
 			     query="SELECT tc_devices.id as id,tc_devices.name as deviceName,tc_drivers.name as driverName, tc_positions.attributes as attributes "
-			     		+ " FROM tc_devices INNER JOIN tc_positions ON tc_positions.id=tc_devices.positionid " + 
+			     		+ " FROM tc_devices "
+			     		+ " INNER JOIN tc_positions ON tc_positions.id=tc_devices.positionid " + 
 			     		" INNER JOIN tc_user_device ON tc_user_device.deviceid=tc_devices.id " + 
-			     		" INNER JOIN tc_device_driver ON tc_device_driver.deviceid=tc_devices.id " + 
-			     		" INNER JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id "+
-			     		" AND tc_user_device.userid IN ( :userIds) AND Date(tc_positions.servertime)=CURRENT_DATE() " ),	
+			     		" LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_devices.id " + 
+			     		" LEFT JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id "+
+			     		" where tc_user_device.userid IN ( :userIds) AND Date(tc_positions.servertime)=CURRENT_DATE() " ),	
 	
 	
 @NamedNativeQuery(name="getPositionsList", 
@@ -98,16 +99,17 @@ import com.opencsv.bean.CsvDate;
      		+ " INNER JOIN tc_devices ON tc_devices.id=tc_positions.deviceid "
      		+ " WHERE deviceid IN(:deviceId) AND tc_positions.fixtime<=:end AND "
      		+ " tc_positions.fixtime>=:start AND tc_devices.delete_date IS NULL"
-    		+ " ORDER BY tc_positions.fixtime DESC LIMIT :offset, 10" ),
+    		+ " ORDER BY tc_positions.servertime DESC LIMIT :offset, 10" ),
 
-@NamedNativeQuery(name="getPositionsListExport", 
+@NamedNativeQuery(name="getPositionsListScheduled", 
 resultSetMapping="PositionsList", 
 query=" SELECT tc_positions.id as id, tc_devices.name as deviceName , tc_positions.servertime as servertime , tc_positions.attributes as attributes , "
  		+ " tc_positions.speed as speed "
 		+ " FROM tc_positions "
 		+ " INNER JOIN tc_devices ON tc_devices.id=tc_positions.deviceid "
 		+ " WHERE deviceid IN(:deviceId) AND tc_positions.fixtime<=:end AND "
-		+ " tc_positions.fixtime>=:start AND tc_devices.delete_date IS NULL")
+		+ " tc_positions.fixtime>=:start AND tc_devices.delete_date IS NULL"
+		+ " ORDER BY tc_positions.servertime DESC ")
 })
 
 public class PositionSql {

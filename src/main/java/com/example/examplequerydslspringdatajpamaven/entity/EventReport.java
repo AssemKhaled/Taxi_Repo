@@ -1,5 +1,6 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
+
 public class EventReport {
 
 	private Long eventId;
@@ -12,33 +13,33 @@ public class EventReport {
 	private String driverName;
 	private Long geofenceId;
 	private String geofenceName;
-	private String positionId;
+	private Long positionId;
 	private Double latitude;
 	private Double longitude;
 	
 	
 	
 
-//	public EventReport(Long eventId, String eventType, String serverTime, String attributes, Long deviceId,
-//			String deviceName, Long driverId, String driverName, Long geofenceId, String geofenceName, String positionId,
-//			Double latitude, Double longitude) {
-//		super();
-//		this.eventId = eventId;
-//		this.eventType = eventType;
-//		this.serverTime = serverTime;
-//		this.attributes = attributes;
-//		this.deviceId = deviceId;
-//		this.deviceName = deviceName;
-//		this.driverId = driverId;
-//		this.driverName = driverName;
-//		this.geofenceId = geofenceId;
-//		this.geofenceName = geofenceName;
-//		this.positionId = positionId;
-//		this.latitude = latitude;
-//		this.longitude = longitude;
-//	}
+	public EventReport(Long eventId, String eventType, String serverTime, String attributes, Long deviceId,
+			String deviceName, Long driverId, String driverName, Long geofenceId, String geofenceName, Long positionId,
+			Double latitude, Double longitude) {
+		super();
+		this.eventId = eventId;
+		this.eventType = eventType;
+		this.serverTime = serverTime;
+		this.attributes = attributes;
+		this.deviceId = deviceId;
+		this.deviceName = deviceName;
+		this.driverId = driverId;
+		this.driverName = driverName;
+		this.geofenceId = geofenceId;
+		this.geofenceName = geofenceName;
+		this.positionId = positionId;
+		this.latitude = latitude;
+		this.longitude = longitude;
+	}
 	public EventReport(Long eventId, String eventType, String serverTime, String attributes, Long deviceId,String deviceName,
-			 Long driverId, String driverName, Long geofenceId, String geofenceName, String positionId	) {
+			 Long driverId, String driverName, Long geofenceId, String geofenceName, Long positionId	) {
 		this.eventId = eventId;
 		this.eventType = eventType;
 		this.serverTime = serverTime;
@@ -63,12 +64,22 @@ public class EventReport {
 		this.driverId = driverId;
 		this.driverName = driverName;
 	}
+	public EventReport(Long eventId,String eventType, String serverTime, String attributes,Long deviceId) {
+		super();
+		this.eventId = eventId;
+		this.eventType = eventType;
+		this.serverTime = serverTime;
+		this.attributes = attributes;
+		this.deviceId = deviceId;
+
+	}
 	public EventReport(Long eventId,String eventType, String serverTime, String attributes) {
 		super();
 		this.eventId = eventId;
 		this.eventType = eventType;
 		this.serverTime = serverTime;
 		this.attributes = attributes;
+
 	}
 	
 	public Long getEventId() {
@@ -131,10 +142,10 @@ public class EventReport {
 	public void setGeofenceName(String geofenceName) {
 		this.geofenceName = geofenceName;
 	}
-	public String getPositionId() {
+	public Long getPositionId() {
 		return positionId;
 	}
-	public void setPositionId(String positionId) {
+	public void setPositionId(Long positionId) {
 		this.positionId = positionId;
 	}
 	public Double getLatitude() {

@@ -80,7 +80,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		User loggedUser = userService.findById(userId);
-		if(loggedUser.equals(null)) {
+		if(loggedUser == null) {
 			
 			getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "This user is not found",null);
 			logger.info("************************ createDevice ENDED ***************************");
@@ -102,8 +102,8 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		
-		if( group.getName().equals(null) || group.getName().equals("") ||
-				group.getType().equals(null) || group.getType().equals("")) {
+		if( group.getName() == null || group.getName().equals("") ||
+				group.getType() == null || group.getType().equals("")) {
 			
 			List<Group> groups = null;
 			
@@ -139,7 +139,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 				Set<User> user=new HashSet<>() ;
 				User userCreater ;
 				userCreater=userService.findById(userId);
-				if(userCreater.equals(null))
+				if(userCreater == null)
 				{
 	
 					getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "Assigning to not found user",null);
@@ -302,7 +302,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
        }
        User loggedUser = userService.findById(userId);
-       if(loggedUser.equals(null)) {
+       if(loggedUser == null) {
        	getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "loggedUser is not Found",groups);
 			return  ResponseEntity.status(404).body(getObjectResponse);
        }
@@ -695,7 +695,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		User loggedUser = userService.findById(userId);
-		if(loggedUser.equals(null)) {
+		if(loggedUser == null) {
 			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This loggedUser is not found",null);
 			logger.info("************************ groupAssignDriver ENDED ***************************");
 			return ResponseEntity.status(404).body(getObjectResponse);
@@ -719,7 +719,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 		}
 		else {
 			Group group = groupRepository.findOne(groupId);
-			if(group.equals(null)) {
+			if(group == null) {
 				
 				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This group is not found",null);
 				logger.info("************************ assignDeviceToDriver ENDED ***************************");
@@ -765,7 +765,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 							logger.info("************************ editDevice ENDED ***************************");
 							return ResponseEntity.badRequest().body(getObjectResponse);
 					   }
-					if(data.get("drivers").equals(null) || data.get("drivers").size() == 0) {
+					if(data.get("drivers") == null || data.get("drivers").size() == 0) {
 						Set<Driver> drivers=new HashSet<>() ;
 						drivers= group.getDriverGroup();
 				        if(drivers.isEmpty()) {
@@ -850,7 +850,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		User loggedUser = userService.findById(userId);
-		if(loggedUser.equals(null)) {
+		if(loggedUser == null) {
 			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This loggedUser is not found",null);
 			logger.info("************************ groupAssignGeofence ENDED ***************************");
 			return ResponseEntity.status(404).body(getObjectResponse);
@@ -874,7 +874,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 		}
 		else {
 			Group group = groupRepository.findOne(groupId);
-			if(group.equals(null)) {
+			if(group == null) {
 				
 				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This group is not found",null);
 				logger.info("************************ groupAssignGeofence ENDED ***************************");
@@ -918,7 +918,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 							logger.info("************************ editDevice ENDED ***************************");
 							return ResponseEntity.badRequest().body(getObjectResponse);
 					   }
-					if(data.get("geofences").equals(null) || data.get("geofences").size() == 0) {
+					if(data.get("geofences") == null || data.get("geofences").size() == 0) {
 						Set<Geofence> geofences=new HashSet<>() ;
 						geofences= group.getGeofenceGroup();
 				        if(geofences.isEmpty()) {
@@ -1003,7 +1003,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		User loggedUser = userService.findById(userId);
-		if(loggedUser.equals(null)) {
+		if(loggedUser == null) {
 			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This loggedUser is not found",null);
 			logger.info("************************ groupAssignDevice ENDED ***************************");
 			return ResponseEntity.status(404).body(getObjectResponse);
@@ -1027,7 +1027,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 		}
 		else {
 			Group group = groupRepository.findOne(groupId);
-			if(group.equals(null)) {
+			if(group == null) {
 				
 				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This group is not found",null);
 				logger.info("************************ groupAssignDevice ENDED ***************************");
@@ -1074,7 +1074,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 							return ResponseEntity.badRequest().body(getObjectResponse);
 					   }
 					   
-					if(data.get("devices").equals(null) || data.get("devices").size() == 0) {
+					if(data.get("devices") == null || data.get("devices").size() == 0) {
 						Set<Device> devices=new HashSet<>() ;
 						devices= group.getDeviceGroup();
 				        if(devices.isEmpty()) {
@@ -1162,7 +1162,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 		}
 		else {
 			Group group = groupRepository.findOne(groupId);
-			if(group.equals(null)) {
+			if(group == null) {
 				List<DeviceSelect> devices = new ArrayList<DeviceSelect>();
 				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This group is not found",devices);
 				logger.info("************************ getGroupDevices ENDED ***************************");
@@ -1170,7 +1170,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 			}
 			else
 			{
-				if(type.equals(null)) {
+				if(type == null) {
 					List<DeviceSelect> devices = new ArrayList<DeviceSelect>();
 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "type is Required",devices);
 					logger.info("************************ getGroupDevices ENDED ***************************");
@@ -1248,7 +1248,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 	   						for(User object : parentClient) {
 	   							parent = object;
 	   						}
-	   						if(!parent.equals(null)) {
+	   						if(parent != null) {
 
 					   			List<Long>usersIds= new ArrayList<>();
 			   					usersIds.add(parent.getId());

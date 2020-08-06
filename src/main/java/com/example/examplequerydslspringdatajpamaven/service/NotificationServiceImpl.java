@@ -31,7 +31,7 @@ import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 @Component
 @Service
 public class NotificationServiceImpl extends RestServiceController implements NotificationService{
-	private static final Log logger = LogFactory.getLog(GroupsServiceImpl.class);
+	private static final Log logger = LogFactory.getLog(NotificationServiceImpl.class);
 
 	GetObjectResponse getObjectResponse;
 	
@@ -78,7 +78,7 @@ public class NotificationServiceImpl extends RestServiceController implements No
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		User loggedUser = userService.findById(userId);
-		if(loggedUser.equals(null)) {
+		if(loggedUser == null) {
 			
 			getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "This user is not found",null);
 			logger.info("************************ createNotification ENDED ***************************");
@@ -122,7 +122,7 @@ public class NotificationServiceImpl extends RestServiceController implements No
 			Set<User> user=new HashSet<>() ;
 			User userCreater ;
 			userCreater=userService.findById(userId);
-			if(userCreater.equals(null))
+			if(userCreater == null)
 			{
 
 				getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "Assigning to not found user",null);
@@ -274,7 +274,7 @@ public class NotificationServiceImpl extends RestServiceController implements No
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
        }
        User loggedUser = userService.findById(userId);
-       if(loggedUser.equals(null)) {
+       if(loggedUser == null) {
        	getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "loggedUser is not Found",notifications);
 			return  ResponseEntity.status(404).body(getObjectResponse);
        }
@@ -626,7 +626,7 @@ public class NotificationServiceImpl extends RestServiceController implements No
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		User loggedUser = userService.findById(userId);
-		if(loggedUser.equals(null)) {
+		if(loggedUser == null) {
 			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This loggedUser is not found",null);
 			logger.info("************************ assignNotificationToGroup ENDED ***************************");
 			return ResponseEntity.status(404).body(getObjectResponse);
@@ -650,7 +650,7 @@ public class NotificationServiceImpl extends RestServiceController implements No
 		}
 		else {
 			Group group = groupRepository.findOne(groupId);
-			if(group.equals(null)) {
+			if(group == null) {
 				
 				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This group is not found",null);
 				logger.info("************************ assignNotificationToGroup ENDED ***************************");
@@ -693,7 +693,7 @@ public class NotificationServiceImpl extends RestServiceController implements No
 							logger.info("************************ assignNotificationToGroup ENDED ***************************");
 							return ResponseEntity.badRequest().body(getObjectResponse);
 					   }
-					if(data.get("notifications").equals(null) || data.get("notifications").size() == 0) {
+					if(data.get("notifications") == null || data.get("notifications").size() == 0) {
 						Set<Notification> notifications=new HashSet<>() ;
 						notifications= group.getNotificationGroup();
 				        if(notifications.isEmpty()) {
@@ -773,7 +773,7 @@ public class NotificationServiceImpl extends RestServiceController implements No
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		User loggedUser = userService.findById(userId);
-		if(loggedUser.equals(null)) {
+		if(loggedUser == null) {
 			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This loggedUser is not found",null);
 			logger.info("************************ assignNotificationToDevice ENDED ***************************");
 			return ResponseEntity.status(404).body(getObjectResponse);
@@ -798,7 +798,7 @@ public class NotificationServiceImpl extends RestServiceController implements No
 		else {
 			Device device = deviceRepository.findOne(deviceId);
 
-			if(device.equals(null)) {
+			if(device == null) {
 				
 				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",null);
 				logger.info("************************ assignNotificationToDevice ENDED ***************************");
@@ -842,7 +842,7 @@ public class NotificationServiceImpl extends RestServiceController implements No
 							logger.info("************************ assignNotificationToDevice ENDED ***************************");
 							return ResponseEntity.badRequest().body(getObjectResponse);
 					   }
-					if(data.get("notifications").equals(null) || data.get("notifications").size() == 0) {
+					if(data.get("notifications") == null || data.get("notifications").size() == 0) {
 						Set<Notification> notifications=new HashSet<>() ;
 						notifications= device.getNotificationDevice();
 				        if(notifications.isEmpty()) {
@@ -934,7 +934,7 @@ public class NotificationServiceImpl extends RestServiceController implements No
 	   						for(User object : parentClient) {
 	   							parent = object;
 	   						}
-	   						if(!parent.equals(null)) {
+	   						if(parent != null) {
 
 					   			List<Long>usersIds= new ArrayList<>();
 			   					usersIds.add(parent.getId());

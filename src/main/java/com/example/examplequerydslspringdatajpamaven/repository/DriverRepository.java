@@ -35,16 +35,16 @@ public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslP
 	
 	
 	@Query(value = "select * from tc_drivers INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id"
-			+ " where tc_drivers.name=:name and tc_user_driver.userid=:userId and tc_drivers.delete_date IS NULL", nativeQuery = true)
-	public List<Driver> checkDublicateDriverInAddName(@Param("userId") Long id,@Param("name") String name);
+			+ " where tc_drivers.email=:email and tc_user_driver.userid=:userId and tc_drivers.delete_date IS NULL", nativeQuery = true)
+	public List<Driver> checkDublicateDriverInAddEmail(@Param("userId") Long id,@Param("email") String email);
 	
 	@Query(value = "select * from tc_drivers INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id"
 			+ " where (tc_drivers.mobile_num=:mobileNum OR tc_drivers.uniqueid=:uniqueId) and tc_drivers.delete_date IS NULL", nativeQuery = true)
 	public List<Driver> checkDublicateDriverInAddUniqueMobile(@Param("uniqueId") String uniqueId,@Param("mobileNum") String mobileNum);
 	
 	@Query(value = "select * from tc_drivers INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id"
-			+ " where tc_drivers.name=:name and tc_drivers.id !=:driverId and tc_user_driver.userid=:userId and tc_drivers.delete_date IS NULL", nativeQuery = true)
-	public List<Driver> checkDublicateDriverInEditName(@Param("driverId") Long driverId,@Param("userId") Long userId,@Param("name") String name);
+			+ " where tc_drivers.email=:email and tc_drivers.id !=:driverId and tc_user_driver.userid=:userId and tc_drivers.delete_date IS NULL", nativeQuery = true)
+	public List<Driver> checkDublicateDriverInEditEmail(@Param("driverId") Long driverId,@Param("userId") Long userId,@Param("email") String email);
 	
 	@Query(value = "select * from tc_drivers INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id"
 			+ " where (tc_drivers.mobile_num=:mobileNum OR tc_drivers.uniqueid=:uniqueId) and tc_drivers.id !=:driverId and tc_drivers.delete_date IS NULL", nativeQuery = true)
@@ -65,13 +65,13 @@ public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslP
 	//added by maryam
 	@Query(value = "SELECT  * FROM tc_drivers A " + 
 			" INNER JOIN tc_user_driver ON tc_user_driver.driverid =A.id " + 
-			" WHERE tc_user_driver.userid= :userId AND delete_date IS NULL " + 
+			" WHERE tc_user_driver.userid IN (:userIds) AND delete_date IS NULL " + 
 			" And Not EXISTS " + 
 			" (SELECT *  FROM tc_drivers B " + 
 			" INNER JOIN tc_user_driver ON tc_user_driver.driverid =B.id " + 
 			" INNER JOIN tc_device_driver ON tc_device_driver.driverid =B.id " + 
-			" WHERE A.id=B.id AND tc_user_driver.userid= :userId AND delete_date IS NULL )", nativeQuery = true)
-	public List<Driver> getUnassignedDrivers(@Param("userId") Long userId);
+			" WHERE A.id=B.id AND tc_user_driver.userid IN (:userIds) AND delete_date IS NULL )", nativeQuery = true)
+	public List<Driver> getUnassignedDrivers(@Param("userIds") List<Long> userIds);
 	
 	@Query(value = "SELECT count(tc_drivers.id) FROM tc_drivers INNER JOIN tc_user_driver "
 			+ "ON tc_user_driver.driverid = tc_drivers.id AND "
@@ -83,15 +83,15 @@ public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslP
 			+ " WHERE tc_user_driver.userid IN(:userIds) and tc_drivers.delete_date is null", nativeQuery = true)
 	public Integer getAllDriversSize(@Param("userIds") List<Long> userIds);
 	
-	
-	@Query(nativeQuery = true, name = "getDriverWorkingHoursExport")
-	public List<DriverWorkingHours> getDriverWorkingHoursExport(@Param("driverId")List<Long> driverId,@Param("start")String start,@Param("end")String end);
-	
 	@Query(nativeQuery = true, name = "getDriverWorkingHours")
 	public List<DriverWorkingHours> getDriverWorkingHours(@Param("deviceId") List<Long> deviceId,@Param("offset")int offset,@Param("start")String start,@Param("end")String end);
 
+	@Query(nativeQuery = true, name = "getDriverWorkingHoursScheduled")
+	public List<DriverWorkingHours> getDriverWorkingHoursScheduled(@Param("deviceId") List<Long> deviceId,@Param("start")String start,@Param("end")String end);
+
+	
 	@Query(nativeQuery = true, name = "getNumberDriverWorkingHours")
-	public List<DriverWorkingHours> getNumberDriverWorkingHours(@Param("driverId") List<Long> driverId,@Param("start")String start,@Param("end")String end);
+	public List<DriverWorkingHours> getNumberDriverWorkingHours(@Param("deviceId") List<Long> deviceId,@Param("start")String start,@Param("end")String end);
 
 	
 	@Query(value = "SELECT  count(*) FROM tc_positions  " + 
@@ -115,4 +115,10 @@ public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslP
 	public List<DriverSelect> devicesOfDrivers(@Param("driverIds") List<Long> driverIds);
 	
 	
+	@Query(value = "select * from tc_drivers " + 
+			"	inner join tc_device_driver on tc_device_driver.driverid = tc_drivers.id " + 
+			"	where deviceid=:deviceId",nativeQuery = true)
+	public Driver driverOfDevice(@Param("deviceId") Long deviceId);
+	
+	;
 }

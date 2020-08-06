@@ -31,11 +31,6 @@ public class GeofenceRestController {
 			                                            @RequestParam (value = "userId", defaultValue = "0") Long id,
 														@RequestParam (value = "offset", defaultValue = "0") int offset,
 														@RequestParam (value = "search", defaultValue = "") String search) {
-		offset=offset-1;
-		if(offset <0) {
-			offset=0;
-		}
-		
 		
     	return  geofenceServiceImpl.getAllGeofences(TOKEN,id,offset,search);
 
@@ -61,7 +56,7 @@ public class GeofenceRestController {
 	}
 	
 	@RequestMapping(value = "/addGeofence", method = RequestMethod.POST)
-	public @ResponseBody ResponseEntity<?> addDriver(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+	public @ResponseBody ResponseEntity<?> addGeofence(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 			                                         @RequestBody(required = false) Geofence geofence,
 			                                         @RequestParam (value = "userId", defaultValue = "0") Long id) {
 		

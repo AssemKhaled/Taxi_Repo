@@ -55,10 +55,12 @@ public interface DeviceService {
 	public ResponseEntity<?> getCalibrationData(String TOKEN,Long userId,Long deviceId);
 	public ResponseEntity<?> getFuelData(String TOKEN,Long userId,Long deviceId);
 	public ResponseEntity<?> getSensorSettings(String TOKEN,Long userId,Long deviceId);
+	public ResponseEntity<?> getIcon(String TOKEN,Long userId,Long deviceId);
 
 	public ResponseEntity<?> addDataToCaliberation(String TOKEN,Long userId,Long deviceId,Map<String, List> data);
 	public ResponseEntity<?> addDataToFuel(String TOKEN,Long userId,Long deviceId,Map<String, Object> data);
 	public ResponseEntity<?> addSensorSettings(String TOKEN,Long userId,Long deviceId,Map<String, Object> data);
+	public ResponseEntity<?> addIcon(String TOKEN,Long userId,Long deviceId,Map<String, Object> data);
 
 	
 	public ResponseEntity<?> getDeviceDataSelected(String TOKEN,Long deviceId,String type);

@@ -17,6 +17,7 @@ public class CustomDeviceLiveData {
 	}
 	private int id;
 	private String deviceName;
+	private String uniqueId;
 	private String lastUpdate;
 	private Double weight;
 	private Double latitude;
@@ -34,6 +35,7 @@ public class CustomDeviceLiveData {
 	private String photo;
 	private Float speed ;
 	private String status;
+	private String vehicleStatus;
 	private String positionId;
 	private JSONObject jsonAttributes;
 	//private Double sensor1;
@@ -49,9 +51,12 @@ public class CustomDeviceLiveData {
 	private String leftLetter;
 	private String middleLetter;
 	private String rightLetter;
+	private String plate_num;
+	private String sequence_number;
+	private String owner_name;
 
-	
-	
+     
+
 	public CustomDeviceLiveData(Double weight, Double latitude, Double longitude, String address, String attributes,
 			Float speed) {
 		super();
@@ -326,7 +331,8 @@ public class CustomDeviceLiveData {
 	
 	public CustomDeviceLiveData(int id ,String deviceName , String lastUpdate ,
 			String positionId, String leftLetter,String middleLetter,String rightLetter,String driverName,
-			Double latitude ,Double longitude,String attributes) {
+			Double latitude ,Double longitude,String attributes,String address,Float speed,String plate_num
+			,String sequence_number,String owner_name,Boolean valid) {
 		this.id = id ;
 		this.deviceName = deviceName ;
 		this.lastUpdate = lastUpdate;
@@ -338,11 +344,44 @@ public class CustomDeviceLiveData {
 		this.latitude= latitude;
 		this.longitude= longitude;
 		this.attributes= attributes;
-	   		
+		this.address= address;
+		this.speed = speed;
+		this.plate_num = plate_num;
+		this.sequence_number = sequence_number;
+		this.owner_name = owner_name;
+		this.valid = valid;
+		if(attributes != null) {
+			JSONObject jsonObject = new JSONObject(attributes);
+			if(jsonObject.has("todayHoursString")) {
+				this.todayHoursString = jsonObject.getString("todayHoursString");
+			}else
+			{
+				this.todayHoursString = "00:00";
+			}
+			if(jsonObject.has("totalDistance")) {
+				DecimalFormat df = new DecimalFormat("######.##");
+				this.totalDistance = df.format((jsonObject.getDouble("totalDistance")/1000));
+			}
+			else {
+				this.totalDistance = "0.0";
+			}
+			if(jsonObject.has("weight")) {
+				this.weight = jsonObject.getDouble("weight");
+			}else
+			{
+				this.weight =0.0;
+			}
+		}
+		else {
+			this.todayHoursString = "00:00";
+			this.totalDistance = "0.0";
+			this.weight =0.0;
+		}
 	}
-	public CustomDeviceLiveData(int id ,String deviceName , String lastUpdate ,String positionId,String photo
+	public CustomDeviceLiveData(int id ,String deviceName , String uniqueId,String lastUpdate ,String positionId,String photo
 			,String attributes , Float speed,Double latitude ,Double longitude,Boolean valid) {
 		this.id = id ;
+		this.uniqueId = uniqueId ;
 		this.deviceName = deviceName ;
 		this.lastUpdate = lastUpdate;
 		this.positionId = positionId;
@@ -633,6 +672,36 @@ public class CustomDeviceLiveData {
 	}
 	public void setOperator(Double operator) {
 		this.operator = operator;
+	}
+	public String getPlate_num() {
+		return plate_num;
+	}
+	public void setPlate_num(String plate_num) {
+		this.plate_num = plate_num;
+	}
+	public String getSequence_number() {
+		return sequence_number;
+	}
+	public void setSequence_number(String sequence_number) {
+		this.sequence_number = sequence_number;
+	}
+	public String getOwner_name() {
+		return owner_name;
+	}
+	public void setOwner_name(String owner_name) {
+		this.owner_name = owner_name;
+	}
+	public String getVehicleStatus() {
+		return vehicleStatus;
+	}
+	public void setVehicleStatus(String vehicleStatus) {
+		this.vehicleStatus = vehicleStatus;
+	}
+	public String getUniqueId() {
+		return uniqueId;
+	}
+	public void setUniqueId(String uniqueId) {
+		this.uniqueId = uniqueId;
 	}
 	
 	

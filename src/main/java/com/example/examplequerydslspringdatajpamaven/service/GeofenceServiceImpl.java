@@ -159,7 +159,7 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
        }
        User loggedUser = userServiceImpl.findById(userId);
-       if(loggedUser.equals(null)) {
+       if(loggedUser == null) {
        	getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "loggedUser is not Found",geofences);
 			return  ResponseEntity.status(404).body(getObjectResponse);
        }
@@ -772,7 +772,7 @@ logger.info("************************ getAllUserGeofences STARTED **************
 	   						for(User object : parentClient) {
 	   							parent = object;
 	   						}
-	   						if(!parent.equals(null)) {
+	   						if(parent != null) {
 
 					   			List<Long>usersIds= new ArrayList<>();
 			   					usersIds.add(parent.getId());

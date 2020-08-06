@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -102,7 +103,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		User loggedUser = userService.findById(userId);
-		if(loggedUser.equals(null)) {
+		if(loggedUser == null) {
 			 List<CustomDeviceList> devices= null;
 			 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This user is not found",devices);
 			 logger.info("************************ getAllUserDevices ENDED ***************************");
@@ -162,8 +163,16 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	public ResponseEntity<?> createDevice(String TOKEN,Device device,Long userId) {
 		// TODO Auto-generated method stub
 		logger.info("************************ createDevice STARTED ***************************");
+		
+		Date now = new Date();
+		SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String nowTime = isoFormat.format(now);
+		
+		device.setCreate_date(nowTime);
+				
 		String image = device.getPhoto();
 		device.setPhoto("not_available.png");
+
 		if(TOKEN.equals("")) {
 			 List<Device> devices = null;
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
@@ -181,7 +190,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		User loggedUser = userService.findById(userId);
-		if(loggedUser.equals(null)) {
+		if(loggedUser == null) {
 			
 			getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "This user is not found",null);
 			logger.info("************************ createDevice ENDED ***************************");
@@ -203,13 +212,13 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		
-		if(device.getName().equals(null) ||device.getName().equals("")
-				|| device.getUniqueId().equals(null) || device.getUniqueId().equals(null)
-				|| device.getSequenceNumber().equals(null) || device.getSequenceNumber().equals("")
-				|| device.getPlateNum().equals(null)|| device.getPlateNum().equals("")
-				|| device.getLeftLetter().equals(null) || device.getLeftLetter().equals("")
-                || device.getMiddleLetter().equals(null)|| device.getMiddleLetter().equals("")
-                || device.getRightLetter().equals(null)|| device.getRightLetter().equals("")) {
+		if(device.getName() == null ||device.getName().equals("")
+				|| device.getUniqueId() == null|| device.getUniqueId() == null
+				|| device.getSequenceNumber() == null || device.getSequenceNumber().equals("")
+				|| device.getPlateNum() == null|| device.getPlateNum().equals("")
+				|| device.getLeftLetter() == null || device.getLeftLetter().equals("")
+                || device.getMiddleLetter() == null|| device.getMiddleLetter().equals("")
+                || device.getRightLetter() == null|| device.getRightLetter().equals("")) {
 			
 			List<Device> devices = null;
 			
@@ -224,7 +233,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			Set<User> user=new HashSet<>() ;
 			User userCreater ;
 			userCreater=userService.findById(userId);
-			if(userCreater.equals(null))
+			if(userCreater == null)
 			{
 
 				getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "Assigning to not found user",null);
@@ -257,7 +266,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			    {
 			    	getObjectResponse = new GetObjectResponse( 201, "Duplication in data",duplictionList);
 			    	logger.info("************************ createDevice ENDED ***************************");
-			    	return ResponseEntity.ok().body(getObjectResponse);
+			    	return ResponseEntity.status(201).body(getObjectResponse);
 			    }
 			    else
 			    {
@@ -265,9 +274,14 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			    	DecodePhoto decodePhoto=new DecodePhoto();
 			    	if(image !=null) {
 				    	if(image !="") {
-				    		device.setPhoto(decodePhoto.Base64_Image(image,"vehicle"));				
+				    		if(image.startsWith("data:image")) {
+					    		device.setPhoto(decodePhoto.Base64_Image(image,"vehicle"));				
+
+				    		}
 				    	}
 					}
+			    	
+			    	
 			    	deviceRepository.save(device);
 			    	List<Device> devices = null;
 			    	getObjectResponse = new GetObjectResponse(HttpStatus.OK.value() , "success",devices);
@@ -286,6 +300,8 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
     	String newPhoto= device.getPhoto();
 		
     	device.setPhoto("not_available.png");
+    	
+    	
 		if(TOKEN.equals("")) {
 			 List<Device> devices = null;
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
@@ -303,7 +319,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		User loggedUser = userService.findById(userId);
-		if(loggedUser.equals(null)) {
+		if(loggedUser == null) {
 			getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "This user is not found",null);
 			logger.info("************************ editDevice ENDED ***************************");
 			return ResponseEntity.status(404).body(getObjectResponse);
@@ -316,13 +332,13 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			}
 		}
 	
-		if(device.getId().equals(null) || device.getName().equals(null) ||device.getName().equals("") 
-			|| device.getUniqueId().equals(null) || device.getUniqueId().equals("")
-			|| device.getSequenceNumber().equals(null) || device.getSequenceNumber().equals("")
-			|| device.getPlateNum().equals(null) || device.getPlateNum().equals("")
-			|| device.getLeftLetter().equals(null) || device.getLeftLetter().equals(null)
-			|| device.getRightLetter().equals(null) || device.getRightLetter().equals("")
-			|| device.getMiddleLetter().equals(null) || device.getMiddleLetter().equals("")	) {
+		if(device.getId() == null || device.getName() == null ||device.getName().equals("") 
+			|| device.getUniqueId() == null || device.getUniqueId().equals("")
+			|| device.getSequenceNumber() == null || device.getSequenceNumber().equals("")
+			|| device.getPlateNum() == null || device.getPlateNum().equals("")
+			|| device.getLeftLetter() == null || device.getLeftLetter() == null
+			|| device.getRightLetter() == null || device.getRightLetter().equals("")
+			|| device.getMiddleLetter() == null || device.getMiddleLetter().equals("")	) {
 			
 			
 			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "atrributes [id ,name, trackerImei , sequence" + 
@@ -334,7 +350,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		else {
 			  boolean	isParent = false;
 			  Device oldDevice = findById(device.getId());
-			if(oldDevice.equals(null)) {
+			if(oldDevice == null) {
 				List<Device> devices = null;
 				getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "This device not found",devices);
 		    	logger.info("************************ createDevice ENDED ***************************");
@@ -382,14 +398,14 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		    {
 		    	getObjectResponse = new GetObjectResponse( 201, "Duplication in data",duplictionList);
 		    	logger.info("************************ createDevice ENDED ***************************");
-		    	return ResponseEntity.ok().body(getObjectResponse);
+		    	return ResponseEntity.status(201).body(getObjectResponse);
 		    }
 	        else {
 				DecodePhoto decodePhoto=new DecodePhoto();
 	        	String oldPhoto=oldDevice.getPhoto();
 
 	        	if(!oldPhoto.equals("")) {
-					if(!oldPhoto.equals(null)) {
+					if(oldPhoto != null) {
 						if(!oldPhoto.equals("not_available.png")) {
 							decodePhoto.deletePhoto(oldPhoto, "vehicle");
 						}
@@ -405,11 +421,18 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 						device.setPhoto(oldPhoto);				
 					}
 					else{
-						device.setPhoto(decodePhoto.Base64_Image(newPhoto,"vehicle"));
+			    		if(newPhoto.startsWith("data:image")) {
 
+			    			device.setPhoto(decodePhoto.Base64_Image(newPhoto,"vehicle"));
+			    		}
 					}
 
 			    }
+				
+				
+				
+				
+				
 		    	deviceRepository.save(device);
 		    	List<Device> devices = null;
 		    	getObjectResponse = new GetObjectResponse(HttpStatus.OK.value() , "success",devices);
@@ -448,25 +471,25 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		    { 
 //		        Set<User> userCreater = device.getUser();
 		    	if(!matchedDevice.getId().equals(device.getId())) {
-		    		if(!matchedDevice.getName().equals(null)) {
+		    		if(matchedDevice.getName() != null) {
 				        if(matchedDevice.getName().equals(device.getName()))
 				        {
 				        	
 				        	duplicationCodes.add(1);
 				        }
 			    	}
-			    	if(!matchedDevice.getUniqueId().equals(null)) {
+			    	if(matchedDevice.getUniqueId() != null) {
 			    		if(matchedDevice.getUniqueId().equals(device.getUniqueId()) ) {
 				        	duplicationCodes.add(2);
 				        }
 			    	}
-			        if(!matchedDevice.getSequenceNumber().equals(null)) {
+			        if(matchedDevice.getSequenceNumber() != null) {
 			        	if(matchedDevice.getSequenceNumber().equals(device.getSequenceNumber()) ) {
 				        	duplicationCodes.add(3);
 				        }
 			        }
-			        if(!matchedDevice.getPlateNum().equals(null) || !matchedDevice.getLeftLetter().equals(null)
-			        	|| !matchedDevice.getMiddleLetter().equals(null) || !matchedDevice.getRightLetter().equals(null)) {
+			        if(matchedDevice.getPlateNum() != null || matchedDevice.getLeftLetter() != null
+			        	|| matchedDevice.getMiddleLetter() != null || matchedDevice.getRightLetter() != null) {
 			        	if(matchedDevice.getPlateNum().equals(device.getPlateNum())  
 			 		           && matchedDevice.getLeftLetter().equals(device.getLeftLetter())
 			 		           && matchedDevice.getMiddleLetter().equals(device.getMiddleLetter())
@@ -507,7 +530,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		     return ResponseEntity.badRequest().body(getObjectResponse); 
 		 }
 		User loggedUser = userService.findById(userId);
-		if(loggedUser.equals(null)) {
+		if(loggedUser == null) {
 			List<Device> devices = null;
 			getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "User ID is not found",devices);
 		    logger.info("************************ deleteDevice ENDED ***************************");
@@ -521,7 +544,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			}
 		}
 		 Device device = findById(deviceId);
-		 if(device.equals(null))
+		 if(device == null)
 		 {
 			 List<Device> devices = null;
 			 getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "This device is not found",devices);
@@ -532,7 +555,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		 {
 			 boolean isParent = false;
 			 User creater= userService.findById(userId);
-			 if(creater.equals(null)) {
+			 if(creater == null) {
 				 List<Device> devices = null;
 				 getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "This user is not found",devices);
 			     logger.info("************************ deleteDevice ENDED ***************************");
@@ -606,7 +629,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		// TODO Auto-generated method stub
 		
 		Device device = deviceRepository.findOne(deviceId);
-		if(device.equals(null)) {
+		if(device == null ) {
 			return null;
 		}
 		if(device.getDeleteDate() != null) {
@@ -640,12 +663,12 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		User loggedUser = userService.findById(userId);
-		if(loggedUser.equals(null)) {
+		if(loggedUser == null) {
 			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged user is not found",null);
 			return ResponseEntity.status(404).body(getObjectResponse);
 		}
 		Device device = deviceRepository.findOne(deviceId);
-		if (device.equals(null)) {
+		if (device == null) {
 			
 			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",null);
 			return ResponseEntity.status(404).body(getObjectResponse);
@@ -719,13 +742,13 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		{
 			return super.checkActive(TOKEN);
 		}
-		if(userId.equals(0)) {
+		if(userId == 0) {
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Logged User ID is Required",null);
 			logger.info("************************ assignDeviceToDriver ENDED ***************************");
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		User loggedUser = userService.findById(userId);
-		if(loggedUser.equals(null)) {
+		if(loggedUser == null) {
 			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This loggedUser is not found",null);
 			logger.info("************************ assignDeviceToDriver ENDED ***************************");
 			return ResponseEntity.status(404).body(getObjectResponse);
@@ -741,7 +764,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		
 		
 
-		if(deviceId.equals(0) ) {
+		if(deviceId == 0 ) {
 			
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",null);
 			logger.info("************************ assignDeviceToDriver ENDED ***************************");
@@ -749,7 +772,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		}
 		else {
 			Device device = findById(deviceId);
-			if(device.equals(null)) {
+			if(device == null) {
 				
 				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",null);
 				logger.info("************************ assignDeviceToDriver ENDED ***************************");
@@ -791,7 +814,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 						logger.info("************************ editDevice ENDED ***************************");
 						return ResponseEntity.badRequest().body(getObjectResponse);
 				   }
-				if(driverId.equals(0)) {
+				if(driverId == 0) {
 					Set<Driver> drivers=new HashSet<>() ;
 					drivers= device.getDriver();
 			        if(drivers.isEmpty()) {
@@ -814,7 +837,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			        }
 				}
 				Driver driver = driverService.getDriverById(driverId);
-				if(driver.equals(null)) {
+				if(driver == null) {
 					List<Device> devices = null;
 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This driver is not found",devices);
 					logger.info("************************ assignDeviceToDriver ENDED ***************************");
@@ -881,14 +904,14 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		{
 			return super.checkActive(TOKEN);
 		}
-		if(userId.equals(0)) {
+		if(userId == 0) {
 			 List<Device> devices = null;
 			 getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "User ID is Required",devices);
 		     logger.info("************************ deleteDevice ENDED ***************************");
 		     return ResponseEntity.badRequest().body(getObjectResponse); 
 		 }
 		User loggedUser = userService.findById(userId);
-		if(loggedUser.equals(null)) {
+		if(loggedUser == null) {
 			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This loggedUser is not found",null);
 			logger.info("************************ assignGeofenceToDevice ENDED ***************************");
 			return ResponseEntity.status(404).body(getObjectResponse);
@@ -900,7 +923,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
 		}
-		if(deviceId.equals(0)){
+		if(deviceId == 0){
 			List<Device> devices = null;
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",devices);
 			logger.info("************************ assignDeviceToGeofences ENDED ***************************");
@@ -908,7 +931,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 //			return ResponseEntity.status(404).body(getObjectResponse);
 		}else {
 			 Device device = findById(deviceId);
-			 if(device.equals(null)) {
+			 if(device == null) {
 				  List<Device> devices = null;
 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",devices);
 					logger.info("************************ assignDeviceToGeofences ENDED ***************************");
@@ -989,12 +1012,15 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		{
 			return super.checkActive(TOKEN);
 		}
-	    if(!userId.equals(0)) {
+	    if(userId != 0) {
 	    	
 			userService.resetChildernArray();
 
 	    	User user = userService.findById(userId);
-	    	
+	    	if(user == null) {
+	    		getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",devices);
+				return ResponseEntity.status(404).body(getObjectResponse);
+	    	}
 	    	if(user.getAccountType().equals(4)) {
 				 Set<User>parentClient = user.getUsersOfUser();
 					if(parentClient.isEmpty()) {
@@ -1007,7 +1033,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 						for(User object : parentClient) {
 							parent = object;
 						}
-						if(!parent.equals(null)) {
+						if(parent != null) {
 				   			List<Long>usersIds= new ArrayList<>();
 		   					usersIds.add(parent.getId());
 
@@ -1025,7 +1051,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			 }
 	    	
 	    	
-	    	if(!user.equals(null)) {
+	    	if(user != null) {
 	    		if(user.getDelete_date() == null) {
 	    			
 	    		 List<User>childernUsers = userService.getAllChildernOfUser(userId);
@@ -1084,7 +1110,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		{
 			return super.checkActive(TOKEN);
 		}
-		if(deviceId.equals(0)) {
+		if(deviceId == 0) {
 			List<Device> devices = null;
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",devices);
 			logger.info("************************ getDeviceToDriver ENDED ***************************");
@@ -1093,7 +1119,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		else {
 
 			Device device = findById(deviceId);
-			if(device.equals(null)) {
+			if(device == null) {
 
 				List<Device> devices = null;
 				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",devices);
@@ -1144,7 +1170,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		{
 			return super.checkActive(TOKEN);
 		}
-		if(deviceId.equals(0)) {
+		if(deviceId == 0) {
 			List<Device> devices = null;
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",devices);
 			logger.info("************************ getDeviceGeofences ENDED ***************************");
@@ -1152,7 +1178,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		}
 		else {
 			Device device = findById(deviceId);
-			if(device.equals(null)) {
+			if(device == null) {
 				List<Device> devices = null;
 				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",devices);
 				logger.info("************************ getDeviceGeofences ENDED ***************************");
@@ -1207,7 +1233,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		User loggedUser = userService.findById(userId);
-		if(loggedUser.equals(null)) {
+		if(loggedUser == null) {
 			List<Device> devices = null;
 			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Logged user is not found",devices);
 			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
@@ -1379,7 +1405,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 	    User loggedUser = userService.findById(userId);
-	    if( loggedUser.equals(null)) {
+	    if( loggedUser == null) {
 	    	 List<CustomDeviceLiveData> allDevicesLiveData=	null;
 			    getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Logged user is not found ",allDevicesLiveData);
 				
@@ -1406,10 +1432,9 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				 Integer size=deviceRepository.getAllDevicesLiveDataSize(usersIds);
 				 if(size > 0) {
 						for(int i=0;i<allDevicesLiveData.size();i++) {
-							if(allDevicesLiveData.get(i).getAttributes() != null) {
-								long minutes = 0;
-								JSONObject obj = new JSONObject(allDevicesLiveData.get(i).getAttributes().toString());
-								
+							long minutes = 0;
+
+							if(allDevicesLiveData.get(i).getLastUpdate() != null) {
 								SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
 								Date now = new Date();
 								String strDate = formatter.format(now);
@@ -1423,6 +1448,26 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 								} catch (ParseException e) {
 									e.printStackTrace();
 								}
+								
+								if(minutes < 3) {
+			                    	allDevicesLiveData.get(i).setVehicleStatus("online");
+								}
+								if(minutes > 8) {
+			                    	allDevicesLiveData.get(i).setVehicleStatus("unknown");
+								}
+								if(minutes < 8 && minutes > 3) {
+			                    	allDevicesLiveData.get(i).setVehicleStatus("offline");
+								}	
+							}
+							else {
+		                    	allDevicesLiveData.get(i).setVehicleStatus("offline");
+
+							}
+							
+							if(allDevicesLiveData.get(i).getAttributes() != null) {
+								JSONObject obj = new JSONObject(allDevicesLiveData.get(i).getAttributes().toString());
+
+								
 								
 								if(minutes > 8) {
 			                    	allDevicesLiveData.get(i).setStatus("In active");
@@ -1474,31 +1519,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				 logger.info("************************ getAllUserDevices ENDED ***************************");
 				 return  ResponseEntity.ok().body(getObjectResponse);
 				 
-//				 List<Long>usersIds= new ArrayList<>();
-//				 usersIds.add(parentClient.getId());
-//				 List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getAllDevicesLiveData(usersIds,offset,search);
-//				  List<Integer> deviceIds = new ArrayList<>();
-//				    for (CustomDeviceLiveData customDeviceLiveData: allDevicesLiveData) {
-//				    	deviceIds.add(customDeviceLiveData.getId());
-//				   }
-//					 List<com.example.examplequerydslspringdatajpamaven.entity.Position>allPositionsLiveData=positionRepository.findAllBydeviceidIn(deviceIds);		 
-//					 		for(com.example.examplequerydslspringdatajpamaven.entity.Position allpositions: allPositionsLiveData) {
-//							 for (CustomDeviceLiveData customDeviceLiveData: allDevicesLiveData) {			
-//							 if(allpositions.getDeviceid().equals(customDeviceLiveData.getId())) {				 
-//							 customDeviceLiveData.setAddress(allpositions.getAddress());
-//							 customDeviceLiveData.setWeight(allpositions.getWeight());
-//							 customDeviceLiveData.setLongitude(allpositions.getLongitude());
-//							 customDeviceLiveData.setSpeed(allpositions.getSpeed());
-//							 customDeviceLiveData.setAttributes(allpositions.getAttributes());
-//							 customDeviceLiveData.setLatitude(allpositions.getLatitude());
-//							 customDeviceLiveData.setPower(allpositions.getPower());
-//							 }
-//						 }
-//					 }*/
-//				 Integer size=deviceRepository.getAllDevicesLiveDataSize(userId);
-//				  getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevicesLiveData,size);
-//				 logger.info("************************ getAllUserDevices ENDED ***************************");
-//				return  ResponseEntity.ok().body(getObjectResponse);
+
 			 }
 		 }
 	     List<User>childernUsers = userService.getAllChildernOfUser(userId);
@@ -1516,10 +1537,9 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	    Integer size=deviceRepository.getAllDevicesLiveDataSize(usersIds);
 	    if(size > 0) {
 			for(int i=0;i<allDevicesLiveData.size();i++) {
-				if(allDevicesLiveData.get(i).getAttributes() != null) {
-					long minutes = 0;
-					JSONObject obj = new JSONObject(allDevicesLiveData.get(i).getAttributes().toString());
-					
+				long minutes = 0;
+
+				if(allDevicesLiveData.get(i).getLastUpdate() != null) {
 					SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
 					Date now = new Date();
 					String strDate = formatter.format(now);
@@ -1533,6 +1553,25 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					} catch (ParseException e) {
 						e.printStackTrace();
 					}
+					
+					if(minutes < 3) {
+                    	allDevicesLiveData.get(i).setVehicleStatus("online");
+					}
+					if(minutes > 8) {
+                    	allDevicesLiveData.get(i).setVehicleStatus("unknown");
+					}
+					if(minutes < 8 && minutes > 3) {
+                    	allDevicesLiveData.get(i).setVehicleStatus("offline");
+					}	
+				}
+				else {
+                	allDevicesLiveData.get(i).setVehicleStatus("offline");
+
+				}
+				if(allDevicesLiveData.get(i).getAttributes() != null) {
+					JSONObject obj = new JSONObject(allDevicesLiveData.get(i).getAttributes().toString());
+					
+					
 					
 					if(minutes > 8) {
                     	allDevicesLiveData.get(i).setStatus("In active");
@@ -1636,7 +1675,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 	    User loggedUser = userService.findById(userId);
-	    if( loggedUser.equals(null)) {
+	    if( loggedUser == null) {
 	    	 List<CustomDeviceLiveData> allDevicesLiveData=	null;
 			    getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Logged user is not found ",allDevicesLiveData);
 				
@@ -1663,23 +1702,45 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				 List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getAllDevicesLiveDataMap(usersIds);
 			     if(allDevicesLiveData.size() > 0) {
 					for(int i=0;i<allDevicesLiveData.size();i++) {
-						if(allDevicesLiveData.get(i).getAttributes() != null) {
-							long minutes = 0;
-							JSONObject obj = new JSONObject(allDevicesLiveData.get(i).getAttributes().toString());
+						
+						long minutes = 0;
+
+						if(allDevicesLiveData.get(i).getLastUpdate() != null) {
 							
 							SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
 							Date now = new Date();
 							String strDate = formatter.format(now);
 							try {
+								
 								Date dateLast = formatter.parse(allDevicesLiveData.get(i).getLastUpdate());
 								Date dateNow = formatter.parse(strDate);
 								
-						        minutes = getDateDiff (dateLast, dateNow, TimeUnit.MINUTES);  
-						        
-
+								minutes = getDateDiff (dateLast, dateNow, TimeUnit.MINUTES);  
+								
+								
 							} catch (ParseException e) {
 								e.printStackTrace();
 							}
+							if(minutes < 3) {
+			                	allDevicesLiveData.get(i).setVehicleStatus("online");
+							}
+							if(minutes > 8) {
+			                	allDevicesLiveData.get(i).setVehicleStatus("unknown");
+							}
+							if(minutes < 8 && minutes > 3) {
+			                	allDevicesLiveData.get(i).setVehicleStatus("offline");
+							}
+						}
+						else {
+		                	allDevicesLiveData.get(i).setVehicleStatus("offline");
+
+						}
+						
+						
+						if(allDevicesLiveData.get(i).getAttributes() != null) {
+							JSONObject obj = new JSONObject(allDevicesLiveData.get(i).getAttributes().toString());
+
+							
 							
 							if(minutes > 8) {
 		                    	allDevicesLiveData.get(i).setStatus("In active");
@@ -1733,29 +1794,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					
 					logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
 				return  ResponseEntity.ok().body(getObjectResponse);
-//				 List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getAllDevicesLiveDataMap(usersIds);
-//				   List<Integer> deviceIds = new ArrayList<>();
-//				    for (CustomDeviceLiveData customDeviceLiveData: allDevicesLiveData) {
-//				    	deviceIds.add(customDeviceLiveData.getId());
-//				   }
-//					 List<com.example.examplequerydslspringdatajpamaven.entity.Position>allPositionsLiveData=positionRepository.findAllBydeviceidIn(deviceIds);		 
-//					 		for(com.example.examplequerydslspringdatajpamaven.entity.Position allpositions: allPositionsLiveData) {
-//							 for (CustomDeviceLiveData customDeviceLiveData: allDevicesLiveData) {			
-//							 if(allpositions.getDeviceid().equals(customDeviceLiveData.getId())) {				 
-//							 customDeviceLiveData.setAddress(allpositions.getAddress());
-//							 customDeviceLiveData.setWeight(allpositions.getWeight());
-//							 customDeviceLiveData.setLongitude(allpositions.getLongitude());
-//							 customDeviceLiveData.setSpeed(allpositions.getSpeed());
-//							 customDeviceLiveData.setAttributes(allpositions.getAttributes());
-//							 customDeviceLiveData.setLatitude(allpositions.getLatitude());
-//							 customDeviceLiveData.setPower(allpositions.getPower());
-//							 }
-//						 }
-//					 }
-//				    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevicesLiveData);
-//					logger.info("result"+allDevicesLiveData);
-//					logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
-//				return  ResponseEntity.ok().body(getObjectResponse);
+
 			 }
 		 }
 	    List<User>childernUsers = userService.getAllChildernOfUser(userId);
@@ -1773,23 +1812,43 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		
 		if(allDevicesLiveData.size() > 0) {
 			for(int i=0;i<allDevicesLiveData.size();i++) {
-				if(allDevicesLiveData.get(i).getAttributes() != null) {
-					long minutes = 0;
-					JSONObject obj = new JSONObject(allDevicesLiveData.get(i).getAttributes().toString());
+				long minutes = 0;
+
+				if(allDevicesLiveData.get(i).getLastUpdate() != null) {
 					
 					SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
 					Date now = new Date();
 					String strDate = formatter.format(now);
 					try {
+						
 						Date dateLast = formatter.parse(allDevicesLiveData.get(i).getLastUpdate());
 						Date dateNow = formatter.parse(strDate);
 						
-				        minutes = getDateDiff (dateLast, dateNow, TimeUnit.MINUTES);  
-				        
-
+						minutes = getDateDiff (dateLast, dateNow, TimeUnit.MINUTES);  
+						
+						
 					} catch (ParseException e) {
 						e.printStackTrace();
 					}
+					if(minutes < 3) {
+	                	allDevicesLiveData.get(i).setVehicleStatus("online");
+					}
+					if(minutes > 8) {
+	                	allDevicesLiveData.get(i).setVehicleStatus("unknown");
+					}
+					if(minutes < 8 && minutes > 3) {
+	                	allDevicesLiveData.get(i).setVehicleStatus("offline");
+					}
+				}
+				else {
+                	allDevicesLiveData.get(i).setVehicleStatus("offline");
+
+				}
+
+				
+				
+				if(allDevicesLiveData.get(i).getAttributes() != null) {
+					JSONObject obj = new JSONObject(allDevicesLiveData.get(i).getAttributes().toString());
 					
 					if(minutes > 8) {
                     	allDevicesLiveData.get(i).setStatus("In active");
@@ -1889,12 +1948,12 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		}
 		if(!deviceId.equals(0) && !userId.equals(0)) {
 			User loggedUser = userService.findById(userId);
-			if(loggedUser.equals(null)) {
+			if(loggedUser == null ) {
 				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",vehicleInfo);
 				 return  ResponseEntity.status(404).body(getObjectResponse);
 			}
 			Device device = findById(deviceId);
-			if(!device.equals(null)) {
+			if(device != null ) {
 				if(device.getDeleteDate()==null) {
 					boolean isParent = false;
 					   if(loggedUser.getAccountType().equals(4)) {
@@ -2083,11 +2142,68 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 //							}
 //
 //						}
+						if(vehicleInfo.get(0).getSpeed() != null) {
+							if(vehicleInfo.get(0).getSpeed().toString() != "") {
+								if(vehicleInfo.get(0).getSpeed().toString() != "0") {
+									double sp = Double.valueOf(vehicleInfo.get(0).getSpeed().toString());
+									int s = (int) sp;
+									vehicleInfo.get(0).setSpeed(String.valueOf(s));
+								}
+							}
+							else {
+								vehicleInfo.get(0).setSpeed("0");
+
+							}
+						}
+						else {
+							vehicleInfo.get(0).setSpeed("0");
+
+						}
+									
+								
 						
 					    Map<Object, Object> attrbuitesList =new HashMap<Object, Object>();
 						if(vehicleInfo.get(0).getAttributes() != null) {
 							JSONObject obj = new JSONObject(vehicleInfo.get(0).getAttributes().toString());
+							
+							if(obj.has("power")) {
+								if(obj.get("power") != null) {
+									if(obj.get("power") != "") {
+										double p = Double.valueOf(obj.get("power").toString());
+										double round = Math.round(p * 100.0 / 100.0);
+										obj.put("power",String.valueOf(round));
+
+
+									}
+									else {
+										obj.put("power", "0");
+									}
+								}
+								else {
+									obj.put("power", "0");
+								}
+							}
+							if(obj.has("battery")) {
+								if(obj.get("battery") != null) {
+									if(obj.get("battery") != "") {
+										double p = Double.valueOf(obj.get("battery").toString());
+										double round = Math.round(p * 100.0 / 100.0);
+										obj.put("battery",String.valueOf(round));
+
+
+									}
+									else {
+										obj.put("battery", "0");
+									}
+								}
+								else {
+									obj.put("battery", "0");
+								}
+							}
+							
+							
 							Iterator<String> keys = obj.keys();
+
 							while(keys.hasNext()) {
 							    String key = keys.next();
 							    attrbuitesList.put(key , obj.get(key).toString());
@@ -2156,14 +2272,14 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		}
 		else {
 			 User loggedUser = userService.findById(userId);
-			 if(loggedUser.equals(null)) {
+			 if(loggedUser == null) {
 				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This user is not found",null);
 					
 					logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
 					return ResponseEntity.status(404).body(getObjectResponse);
 			 }
 			 Device device = findById(deviceId);
-			 if(device.equals(null)) {
+			 if(device == null) {
 				
 				    getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",null);
 					
@@ -2204,26 +2320,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					logger.info("************************ editDevice ENDED ***************************");
 					return ResponseEntity.badRequest().body(getObjectResponse);
 			   }
-//			List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getDeviceLiveData(deviceId);
-//			  List<Integer> deviceIds = new ArrayList<>();
-//			    for (CustomDeviceLiveData customDeviceLiveData: allDevicesLiveData) {
-//			    	deviceIds.add(customDeviceLiveData.getId());
-//			   }
-//				 List<com.example.examplequerydslspringdatajpamaven.entity.Position>allPositionsLiveData=positionRepository.findAllBydeviceidIn(deviceIds);		 
-//				 		for(com.example.examplequerydslspringdatajpamaven.entity.Position allpositions: allPositionsLiveData) {
-//						 for (CustomDeviceLiveData customDeviceLiveData: allDevicesLiveData) {			
-//						 if(allpositions.getDeviceid().equals(customDeviceLiveData.getId())) {				 
-//						 customDeviceLiveData.setAddress(allpositions.getAddress());
-//						 customDeviceLiveData.setWeight(allpositions.getWeight());
-//						 customDeviceLiveData.setLongitude(allpositions.getLongitude());
-//						 customDeviceLiveData.setSpeed(allpositions.getSpeed());
-//						 customDeviceLiveData.setAttributes(allpositions.getAttributes());
-//						 customDeviceLiveData.setLatitude(allpositions.getLatitude());
-//						 customDeviceLiveData.setPower(allpositions.getPower());
-//						 }
-//					 }
-//				 }
-//			List<Map> data = new ArrayList<>();
+
 			List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getDeviceLiveData(deviceId);
 		    List<Map> data = new ArrayList<>();
 			if(allDevicesLiveData.size()>0) {
@@ -2422,7 +2519,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		}
 		else {
 			 User loggedUser = userService.findById(userId);
-			 if(loggedUser.equals(null)) {
+			 if(loggedUser == null) {
 				
 				    getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged user is not found",null);
 					
@@ -2430,7 +2527,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					return ResponseEntity.status(404).body(getObjectResponse);
 			 }
 			 Device device = findById(deviceId);
-			 if(device.equals(null)) {
+			 if(device == null) {
 				
 				    getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",null);
 					
@@ -2477,29 +2574,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			
 			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
 			return ResponseEntity.ok().body(getObjectResponse);
-//			List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getDeviceLiveData(deviceId);	
-//			  List<Integer> deviceIds = new ArrayList<>();
-//			    for (CustomDeviceLiveData customDeviceLiveData: allDevicesLiveData) {
-//			    	deviceIds.add(customDeviceLiveData.getId());
-//			   }
-//				 List<com.example.examplequerydslspringdatajpamaven.entity.Position>allPositionsLiveData=positionRepository.findAllBydeviceidIn(deviceIds);		 
-//				 		for(com.example.examplequerydslspringdatajpamaven.entity.Position allpositions: allPositionsLiveData) {
-//						 for (CustomDeviceLiveData customDeviceLiveData: allDevicesLiveData) {			
-//						 if(allpositions.getDeviceid().equals(customDeviceLiveData.getId())) {				 
-//						 customDeviceLiveData.setAddress(allpositions.getAddress());
-//						 customDeviceLiveData.setWeight(allpositions.getWeight());
-//						 customDeviceLiveData.setLongitude(allpositions.getLongitude());
-//						 customDeviceLiveData.setSpeed(allpositions.getSpeed());
-//						 customDeviceLiveData.setAttributes(allpositions.getAttributes());
-//						 customDeviceLiveData.setLatitude(allpositions.getLatitude());
-//						 customDeviceLiveData.setPower(allpositions.getPower());
-//						 }
-//					 }
-//				 }
-//			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevicesLiveData);
-//			
-//			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
-//			return ResponseEntity.ok().body(getObjectResponse);
+
 	
 		}
 	
@@ -2525,7 +2600,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		else {
 			User loggedUser = userService.findById(userId);
 			
-			if(loggedUser.equals(null)) {
+			if(loggedUser == null) {
 				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "loggedUser is not found",null);
 				
 				return ResponseEntity.status(404).body(getObjectResponse);
@@ -2543,20 +2618,20 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					return ResponseEntity.status(404).body(getObjectResponse);
 				}
 				Device device = findById(deviceId);
-				if(device.equals(null)) {
+				if(device == null) {
 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "device is not found",null);
 					
 					return ResponseEntity.status(404).body(getObjectResponse);
 				}else {
 					if(checkIfParent( device ,  loggedUser)) {
 					     User toUser = userService.findById(toUserId);
-					     if(toUser.equals(null)) {
+					     if(toUser == null) {
 					    	 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "user you want to assign to  is not found",null);
 								
 								return ResponseEntity.status(404).body(getObjectResponse);
 					     }else {
 					    	  if(toUser.getAccountType().equals(4)) {
-					    		  getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to assign device to this user",null);
+					    		  getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to assign device to this user type 4 assign to his parents",null);
 									
 									return ResponseEntity.status(404).body(getObjectResponse);
 					    	  }
@@ -2628,6 +2703,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	}
 	
    public Boolean checkIfParent(Device device , User loggedUser) {
+
 	   Set<User> deviceParent = device.getUser();
 	   if(deviceParent.isEmpty()) {
 		  
@@ -2675,7 +2751,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			{
 				return super.checkActive(TOKEN);
 			}
-			if(userId.equals(0) || deviceId.equals(0)) {
+			if(userId == 0 || deviceId == 0) {
 
 				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "userId and deviceId are required",null);
 				 return  ResponseEntity.badRequest().body(getObjectResponse);
@@ -2683,7 +2759,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			else {
 				User loggedUser = userService.findById(userId);
 
-				if(loggedUser.equals(null)) {
+				if(loggedUser == null) {
 
 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "loggedUser is not found",null);
 					
@@ -2692,7 +2768,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				else {
 
 					Device device = findById(deviceId);
-					if(device.equals(null)) {
+					if(device == null) {
 						getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "device is not found",null);
 						return ResponseEntity.status(404).body(getObjectResponse);
 					}
@@ -2729,19 +2805,18 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 							}
 							
 
-							List<DeviceCalibrationData> calibrationData = new ArrayList<DeviceCalibrationData>();
-                            calibrationData=deviceRepository.getCalibrationDataCCC(deviceId);
+                            String calibrationData=deviceRepository.getCalibrationDataCCC(deviceId);
 							List<Map> data=new ArrayList<Map>();
-							if(calibrationData.get(0) != null) {
+							if(calibrationData != null) {
 
-								 String str = calibrationData.get(0).toString(); 
+								 String str = calibrationData.toString(); 
 							     String arrOfStr[] = str.split(" "); 
 							     for (String a : arrOfStr) {
 							    	 JSONObject obj =new JSONObject(a);
 									 Map list   = new HashMap<>();
-									 list.put("s1",obj.getInt("s1"));
-									 list.put("s2",obj.getInt("s2"));
-									 list.put("w",obj.getInt("w"));
+									 list.put("s1",obj.get("s1"));
+									 list.put("s2",obj.get("s2"));
+									 list.put("w",obj.get("w"));
 							         data.add(list);
 
 							     }
@@ -2781,14 +2856,14 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			else {
 				User loggedUser = userService.findById(userId);
 				
-				if(loggedUser.equals(null)) {
+				if(loggedUser == null) {
 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "loggedUser is not found",null);
 					
 					return ResponseEntity.status(404).body(getObjectResponse);
 				}
 				else {
 					Device device = findById(deviceId);
-					if(device.equals(null)) {
+					if(device == null) {
 						getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "device is not found",null);
 						return ResponseEntity.status(404).body(getObjectResponse);
 					}
@@ -2824,7 +2899,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 							}
 							
 							
-							if(data.get("calibrationData").equals(null) || data.get("calibrationData").size()==0) {
+							if(data.get("calibrationData") == null) {
 								getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Caliberation data shouldn't be null",null);
 								return  ResponseEntity.badRequest().body(getObjectResponse);
 							}
@@ -2839,6 +2914,9 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 								else {
 									req+=" "+pushed.toString();
 								}
+							}
+							if(req.equals("")) {
+								   req = null;
 							}
 							device.setCalibrationData(req);
 							deviceRepository.save(device);
@@ -2878,14 +2956,14 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			else {
 				User loggedUser = userService.findById(userId);
 				
-				if(loggedUser.equals(null)) {
+				if(loggedUser == null) {
 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "loggedUser is not found",null);
 					
 					return ResponseEntity.status(404).body(getObjectResponse);
 				}
 				else {
 					Device device = findById(deviceId);
-					if(device.equals(null)) {
+					if(device == null) {
 						getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "device is not found",null);
 						return ResponseEntity.status(404).body(getObjectResponse);
 					}
@@ -2925,7 +3003,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 								return  ResponseEntity.badRequest().body(getObjectResponse);
 							}
 
-							if(data.get("fuel").equals(null)) {
+							if(data.get("fuel") == null) {
 								getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Fuel data shouldn't be null",null);
 								return  ResponseEntity.badRequest().body(getObjectResponse);
 							}
@@ -2975,7 +3053,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			else {
 				User loggedUser = userService.findById(userId);
 
-				if(loggedUser.equals(null)) {
+				if(loggedUser == null) {
 
 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "loggedUser is not found",null);
 					
@@ -2984,7 +3062,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				else {
 
 					Device device = findById(deviceId);
-					if(device.equals(null)) {
+					if(device == null) {
 						getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "device is not found",null);
 						return ResponseEntity.status(404).body(getObjectResponse);
 					}
@@ -3146,7 +3224,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		else {
 			User loggedUser = userService.findById(userId);
 
-			if(loggedUser.equals(null)) {
+			if(loggedUser == null) {
 
 				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "loggedUser is not found",null);
 				
@@ -3155,7 +3233,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			else {
 
 				Device device = findById(deviceId);
-				if(device.equals(null)) {
+				if(device == null) {
 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "device is not found",null);
 					return ResponseEntity.status(404).body(getObjectResponse);
 				}
@@ -3227,6 +3305,111 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			}
 		}
 	}
+	@Override
+	public ResponseEntity<?> getIcon(String TOKEN, Long userId, Long deviceId) {
+		// TODO Auto-generated method stub
+		if(TOKEN.equals("")) {
+			 List<Device> devices = null;
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(userId.equals(0) || deviceId.equals(0)) {
+
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "userId and deviceId are required",null);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		else {
+			User loggedUser = userService.findById(userId);
+
+			if(loggedUser == null) {
+
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "loggedUser is not found",null);
+				
+				return ResponseEntity.status(404).body(getObjectResponse);
+			}
+			else {
+
+				Device device = findById(deviceId);
+				if(device == null) {
+					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "device is not found",null);
+					return ResponseEntity.status(404).body(getObjectResponse);
+				}
+				else {
+					boolean isParent = false;
+					User parent = null;
+
+					 if(loggedUser.getAccountType().equals(4)) {
+						 Set<User>parentClients = loggedUser.getUsersOfUser();
+						 if(parentClients.isEmpty()) {
+							  getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allowed to get this device",null);
+								
+								logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+								return ResponseEntity.badRequest().body(getObjectResponse); 
+						 }else {
+							 for(User object : parentClients) {
+								 parent = object ;
+							 }
+							 loggedUser=parent;
+						 }
+							 
+						 
+					 }
+					
+					
+					
+					if(checkIfParent( device ,  loggedUser)) {
+						
+						String data = deviceRepository.getIcon(deviceId);
+						
+						List<Map> dataMap=new ArrayList<>();
+					    Map<Object, Object> list =new HashMap<Object, Object>();
+						DecodePhoto decodePhoto=new DecodePhoto();
+
+						List<Map> icons = decodePhoto.getAllIcons();
+						list.put("icons", icons);
+						if(data != null) {
+							
+							if(decodePhoto.checkIconDefault(data, "icon")) {
+								list.put("type","default");
+							}
+							else {
+								list.put("type","random");
+							}
+
+							
+							
+							list.put("icon",data);
+							dataMap.add(list);
+						}
+						else {
+							list.put("type","default");
+							list.put("icon","not_available.png");
+							dataMap.add(list);
+
+						}
+						
+						
+						
+						getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Success",dataMap);
+						return ResponseEntity.ok().body(getObjectResponse);
+								 
+
+						
+					}
+					else {
+						getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "userId not from parents of this device",null);
+						return  ResponseEntity.badRequest().body(getObjectResponse);	
+					}
+				}
+				
+			}
+		}
+	}
 
 	@Override
 	public ResponseEntity<?> addSensorSettings(String TOKEN, Long userId, Long deviceId, Map<String, Object> data) {
@@ -3248,14 +3431,14 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		else {
 			User loggedUser = userService.findById(userId);
 			
-			if(loggedUser.equals(null)) {
+			if(loggedUser == null) {
 				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "loggedUser is not found",null);
 				
 				return ResponseEntity.status(404).body(getObjectResponse);
 			}
 			else {
 				Device device = findById(deviceId);
-				if(device.equals(null)) {
+				if(device == null) {
 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "device is not found",null);
 					return ResponseEntity.status(404).body(getObjectResponse);
 				}
@@ -3295,7 +3478,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 							return  ResponseEntity.badRequest().body(getObjectResponse);
 						}
 
-						if(data.get("sensorSettings").equals(null)) {
+						if(data.get("sensorSettings") == null) {
 							getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Sensor Settings data shouldn't be null",null);
 							return  ResponseEntity.badRequest().body(getObjectResponse);
 						}
@@ -3347,7 +3530,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		}
 		else {
 			Device device = deviceRepository.findOne(deviceId);
-			if(device.equals(null)) {
+			if(device == null) {
 				List<DeviceSelect> devices = new ArrayList<DeviceSelect>();
 				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",devices);
 				logger.info("************************ getDeviceDataSelected ENDED ***************************");
@@ -3355,7 +3538,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			}
 			else
 			{
-				if(type.equals(null)) {
+				if(type == null) {
 					List<DeviceSelect> devices = new ArrayList<DeviceSelect>();
 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "type is Required",devices);
 					logger.info("************************ getDeviceDataSelected ENDED ***************************");
@@ -3397,4 +3580,103 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
          
         return timeUnit.convert(diffInMillies, TimeUnit.MILLISECONDS);
     }
+
+	@Override
+	public ResponseEntity<?> addIcon(String TOKEN, Long userId, Long deviceId, Map<String, Object> data) {
+		// TODO Auto-generated method stub
+		if(TOKEN.equals("")) {
+			 List<Device> devices = null;
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(userId.equals(0) || deviceId.equals(0)) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "userId and deviceId are required",null);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		else {
+			User loggedUser = userService.findById(userId);
+			
+			if(loggedUser == null) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "loggedUser is not found",null);
+				
+				return ResponseEntity.status(404).body(getObjectResponse);
+			}
+			else {
+				Device device = findById(deviceId);
+				if(device == null) {
+					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "device is not found",null);
+					return ResponseEntity.status(404).body(getObjectResponse);
+				}
+				else {
+					boolean isParent = false;
+					User parent = null;
+
+					 if(loggedUser.getAccountType().equals(4)) {
+						 Set<User>parentClients = loggedUser.getUsersOfUser();
+						 if(parentClients.isEmpty()) {
+							  getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allowed to get this device",null);
+								
+								logger.info("************************ addIcon ENDED ***************************");
+								return ResponseEntity.badRequest().body(getObjectResponse); 
+						 }else {
+							 for(User object : parentClients) {
+								 parent = object ;
+							 }
+							 loggedUser=parent;
+						 }
+							 
+						 
+					 }
+					
+					
+					if(checkIfParent( device ,  loggedUser)) {
+						
+
+						if(!data.containsKey("icon")) {
+							getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Icon shouldn't be null",null);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}
+
+						if(data.get("icon") == null) {
+							getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Icon shouldn't be null",null);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}
+						String icon = data.get("icon").toString();
+						DecodePhoto decodePhoto=new DecodePhoto();
+						if(icon !=null) {
+					    	if(icon !="") {
+					    		if(icon.startsWith("data:image")) {
+									decodePhoto.deleteIcon(device.getIcon(), "icon");
+						    		device.setIcon(decodePhoto.Base64_Image(icon,"icon"));
+					    		}
+					    		else {
+					    			if(decodePhoto.checkIconDefault(icon, "icon")) {
+										decodePhoto.deleteIcon(device.getIcon(), "icon");
+					    			}
+					    			device.setIcon(icon);
+					    		}
+					    	}
+
+						}
+
+						deviceRepository.save(device);
+						
+
+						getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Add successfully",null);
+						return ResponseEntity.ok().body(getObjectResponse);
+					}
+					else {
+						getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "userId not from parents of this device",null);
+						return  ResponseEntity.badRequest().body(getObjectResponse);	
+					}
+				}
+				
+			}
+		}
+	}
 }

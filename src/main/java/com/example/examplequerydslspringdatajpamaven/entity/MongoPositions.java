@@ -19,7 +19,7 @@ import com.opencsv.bean.CsvDate;
 public class MongoPositions {
 
 	@Id
-	private String _id;
+	private ObjectId _id;
 	
 	private String protocol;
 	
@@ -53,13 +53,13 @@ public class MongoPositions {
 	
 	private Integer is_offline;
 	
-	private float weight;
+	private Float weight;
 
 	
 	
 	
 	
-	public MongoPositions(String _id, String protocol, Date servertime, Date devicetime, Date fixtime, Integer valid,
+	public MongoPositions(ObjectId _id, String protocol, Date servertime, Date devicetime, Date fixtime, Integer valid,
 			Double latitude, Double longitude, float altitude, float speed, float course, String address,
 			String attributes, Double accuracy, String network, Integer is_sent, Integer is_offline, Float weight) {
 		super();
@@ -83,11 +83,11 @@ public class MongoPositions {
 		this.weight = weight;
 	}
 
-	public String get_id() {
+	public ObjectId get_id() {
 		return _id;
 	}
 
-	public void set_id(String _id) {
+	public void set_id(ObjectId _id) {
 		this._id = _id;
 	}
 
@@ -219,11 +219,11 @@ public class MongoPositions {
 		this.is_offline = is_offline;
 	}
 
-	public float getWeight() {
+	public Float getWeight() {
 		return weight;
 	}
 
-	public void setWeight(float weight) {
+	public void setWeight(Float weight) {
 		this.weight = weight;
 	}
 	

@@ -17,8 +17,8 @@ public interface PositionSqlRepository extends  JpaRepository<PositionSql, Long>
 	@Query(nativeQuery = true, name = "getPositionsList")
 	public List<CustomPositions> getSensorsList(@Param("deviceId")List<Long>  deviceId,@Param("start")String start,@Param("end")String end,@Param("offset")int offset);
 	
-	@Query(nativeQuery = true, name = "getPositionsListExport")
-	public List<CustomPositions> getSensorsListExport(@Param("deviceId")List<Long> deviceId,@Param("start")String start,@Param("end")String end);
+	@Query(nativeQuery = true, name = "getPositionsListScheduled")
+	public List<CustomPositions> getPositionsListScheduled(@Param("deviceId")List<Long> deviceId,@Param("start")String start,@Param("end")String end);
 
 	@Query(value = "SELECT count(CAST(tc_positions.id AS DATE)) FROM tc_positions " 
 			+ " INNER JOIN tc_devices ON tc_devices.id=tc_positions.deviceid "

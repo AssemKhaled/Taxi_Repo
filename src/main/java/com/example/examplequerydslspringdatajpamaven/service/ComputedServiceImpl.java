@@ -28,7 +28,7 @@ import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 @Component
 @Service
 public class ComputedServiceImpl extends RestServiceController implements ComputedService{
-	private static final Log logger = LogFactory.getLog(GroupsServiceImpl.class);
+	private static final Log logger = LogFactory.getLog(ComputedServiceImpl.class);
 
 	GetObjectResponse getObjectResponse;
 	
@@ -75,7 +75,7 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		User loggedUser = userService.findById(userId);
-		if(loggedUser.equals(null)) {
+		if(loggedUser == null) {
 			
 			getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "This user is not found",null);
 			logger.info("************************ createComputed ENDED ***************************");
@@ -115,7 +115,7 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 			Set<User> user=new HashSet<>() ;
 			User userCreater ;
 			userCreater=userService.findById(userId);
-			if(userCreater.equals(null))
+			if(userCreater == null)
 			{
 
 				getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "Assigning to not found user",null);
@@ -268,7 +268,7 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
        }
        User loggedUser = userService.findById(userId);
-       if(loggedUser.equals(null)) {
+       if(loggedUser == null) {
        	getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "loggedUser is not Found",attributes);
 			return  ResponseEntity.status(404).body(getObjectResponse);
        }
@@ -621,7 +621,7 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		User loggedUser = userService.findById(userId);
-		if(loggedUser.equals(null)) {
+		if(loggedUser == null) {
 			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This loggedUser is not found",null);
 			logger.info("************************ assignComputedToGroup ENDED ***************************");
 			return ResponseEntity.status(404).body(getObjectResponse);
@@ -645,7 +645,7 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 		}
 		else {
 			Group group = groupRepository.findOne(groupId);
-			if(group.equals(null)) {
+			if(group == null) {
 				
 				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This group is not found",null);
 				logger.info("************************ assignComputedToGroup ENDED ***************************");
@@ -688,7 +688,7 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 							logger.info("************************ assignComputedToGroup ENDED ***************************");
 							return ResponseEntity.badRequest().body(getObjectResponse);
 					   }
-					if(data.get("attributes").equals(null) || data.get("attributes").size() == 0) {
+					if(data.get("attributes") == null || data.get("attributes").size() == 0) {
 						Set<Attribute> attributes=new HashSet<>() ;
 						attributes= group.getAttributeGroup();
 				        if(attributes.isEmpty()) {
@@ -767,7 +767,7 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		User loggedUser = userService.findById(userId);
-		if(loggedUser.equals(null)) {
+		if(loggedUser == null) {
 			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This loggedUser is not found",null);
 			logger.info("************************ assignComputedToDevice ENDED ***************************");
 			return ResponseEntity.status(404).body(getObjectResponse);
@@ -792,7 +792,7 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 		else {
 			Device device = deviceRepository.findOne(deviceId);
 
-			if(device.equals(null)) {
+			if(device == null) {
 				
 				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",null);
 				logger.info("************************ assignComputedToDevice ENDED ***************************");
@@ -836,7 +836,7 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 							logger.info("************************ assignComputedToDevice ENDED ***************************");
 							return ResponseEntity.badRequest().body(getObjectResponse);
 					   }
-					if(data.get("attributes").equals(null) || data.get("attributes").size() == 0) {
+					if(data.get("attributes") == null || data.get("attributes").size() == 0) {
 						Set<Attribute> attributes=new HashSet<>() ;
 						attributes= device.getAttributeDevice();
 				        if(attributes.isEmpty()) {
@@ -928,7 +928,7 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 	   						for(User object : parentClient) {
 	   							parent = object;
 	   						}
-	   						if(!parent.equals(null)) {
+	   						if(parent != null) {
 
 					   			List<Long>usersIds= new ArrayList<>();
 			   					usersIds.add(parent.getId());

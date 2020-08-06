@@ -43,7 +43,7 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	
 //	private List<User> childernUsers = new ArrayList<>();
 	
-	private static final Log logger = LogFactory.getLog(DeviceServiceImpl.class);
+	private static final Log logger = LogFactory.getLog(UserServiceImpl.class);
 	
 	GetObjectResponse getObjectResponse;
 
@@ -76,7 +76,7 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	public User findById(Long userId) {
 		// TODO Auto-generated method stub
 		User user=userRepository.findOne(userId);
-		if(user.equals(null)) {
+		if(user == null) {
 			return null;
 		}
 		if(user.getDelete_date() != null) {
@@ -267,7 +267,7 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 						 userId=parentClient.getId();
 						 
 					 }
-				 }
+				}
 				else {
 					 List<User> parents=getAllParentsOfuser(user,user.getAccountType());
 					 boolean isParent = false; 

@@ -199,6 +199,21 @@ public class DeviceRestController {
 		return deviceService.addSensorSettings(TOKEN,userId,deviceId,data);
 	}
 	
+	@PostMapping(value = "/addIcon")
+	public ResponseEntity<?> addIcon( @RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN, 
+			                                        @RequestParam (value = "userId", defaultValue = "0") Long userId,
+												    @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+												    @RequestBody Map<String, Object> data){
+		return deviceService.addIcon(TOKEN,userId,deviceId,data);
+	}
+	
+	@GetMapping(value = "/getIcon")
+	public ResponseEntity<?> getIcon( @RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN, 
+			                                     @RequestParam (value = "userId", defaultValue = "0") Long userId,
+												 @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId){
+		return deviceService.getIcon(TOKEN,userId,deviceId);
+	}
+	
 	@GetMapping(value = "/getDeviceDataSelected")
 	public @ResponseBody ResponseEntity<?> getDeviceDataSelected(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 			                                               @RequestParam (value = "deviceId",defaultValue = "0") Long deviceId,

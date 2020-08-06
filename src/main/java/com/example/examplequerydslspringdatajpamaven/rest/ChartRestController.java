@@ -60,6 +60,14 @@ public class ChartRestController {
     	return  chartServiceImpl.getNotificationsChart(TOKEN,userId);
 
 	}
+	@RequestMapping(value = "/getMergeHoursIgnition", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getMergeHoursIgnition(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+															@RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		
+    	return  chartServiceImpl.getMergeHoursIgnition(TOKEN,userId);
+
+	}
+	
 	
 
 }

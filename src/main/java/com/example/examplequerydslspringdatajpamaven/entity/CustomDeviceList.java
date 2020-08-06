@@ -38,6 +38,53 @@ public class CustomDeviceList{
 	private String speed;
 	private String address;
 	private String attributes;
+	private String status;
+	private Boolean ignition;
+	private Integer sat;
+	private Double power;
+	private String driver_num;
+
+	
+	public String getDriver_num() {
+		return driver_num;
+	}
+
+	public void setDriver_num(String driver_num) {
+		this.driver_num = driver_num;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public Boolean getIgnition() {
+		return ignition;
+	}
+
+	public void setIgnition(Boolean ignition) {
+		this.ignition = ignition;
+	}
+
+	public Integer getSat() {
+		return sat;
+	}
+
+	public void setSat(Integer sat) {
+		this.sat = sat;
+	}
+
+	public Double getPower() {
+		return power;
+	}
+
+	public void setPower(Double power) {
+		this.power = power;
+	}
+
 	private Map<Object, Object>  positionAttributes;
 
 	public Map<Object, Object> getPositionAttributes() {
@@ -58,6 +105,24 @@ public class CustomDeviceList{
 		this.driverName = driverName;
 	    this.lastUpdate = lastUpdate;
 	    this.companyName = companyName;
+
+		
+	}
+	
+	public CustomDeviceList(int id ,String deviceName,String uniqueId , String sequenceNumber,String lastUpdate, String referenceKey , String driverName,String driver_num ,
+			String companyName, String geofenceName, String address, String attributes  ) {
+		this.id = id;
+		this.deviceName = deviceName;
+		this.uniqueId = uniqueId;
+		this.sequenceNumber = sequenceNumber;
+		this.geofenceName = geofenceName;
+		this.referenceKey = referenceKey;
+		this.driverName = driverName;
+	    this.lastUpdate = lastUpdate;
+	    this.companyName = companyName;
+	    this.address = address;
+	    this.attributes = attributes;
+	    this.driver_num = driver_num;
 
 		
 	}
@@ -88,8 +153,10 @@ public class CustomDeviceList{
 	public CustomDeviceList(int id, String deviceName,String uniqueId, String sequenceNumber, String driverName, Long driverId,
 			String driverPhoto,String driverUniqueId ,String plateType, String vehiclePlate, String ownerName, String ownerId, String userName, String brand, String model,
 			String madeYear, String color, String licenceExptDate, String carWeight,
-			String positionId, String latitude, String longitude, String speed, String address,String attributes) {
+			String positionId, String latitude, String longitude, String speed,
+			String address,String attributes, String geofenceName) {
 		super();
+		this.geofenceName=geofenceName;
 		this.deviceName = deviceName;
 		this.id=id;
 		this.uniqueId = uniqueId;

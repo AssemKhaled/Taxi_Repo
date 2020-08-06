@@ -298,19 +298,21 @@ public class ProfileServiceImpl extends RestServiceController implements Profile
 						String photo = data.get("photo").toString();
 						
 						if(!user.getPhoto().equals("")) {
-							if(!user.getPhoto().equals(null)) {
+							if(user.getPhoto() != null) {
 								if(!user.getPhoto().equals("not_available.png")) {
 									decodePhoto.deletePhoto(user.getPhoto(), "user");
 								}
 							}
 						}
-						if(photo.equals("")) {
+						
+						if(photo == "") {
 							
 							user.setPhoto("not_available.png");				
 						}
 						else {
-							
-							user.setPhoto(decodePhoto.Base64_Image(photo,"user"));
+							if(photo.startsWith("data:image")) {
+								user.setPhoto(decodePhoto.Base64_Image(photo,"user"));
+							}
 					    }
 						profileRepository.save(user);
 						users.add(user);

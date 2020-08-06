@@ -41,7 +41,7 @@ import com.example.examplequerydslspringdatajpamaven.tokens.TokenSecurity;
 @Component
 public class LoginServiceImpl extends RestServiceController implements LoginService  {
 	
-	private static final Log logger = LogFactory.getLog(DeviceServiceImpl.class);
+	private static final Log logger = LogFactory.getLog(LoginServiceImpl.class);
 
 	
 	

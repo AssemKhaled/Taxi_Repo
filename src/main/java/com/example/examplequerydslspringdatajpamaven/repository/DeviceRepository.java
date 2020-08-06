@@ -27,6 +27,10 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	
 	@Query(nativeQuery = true, name = "getDevicesList")
 	List<CustomDeviceList> getDevicesList(@Param("userIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
+
+	@Query(nativeQuery = true, name = "getDevicesListApp")
+	List<CustomDeviceList> getDevicesListApp(@Param("userIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
+	
 	
 	@Query (value = "select * from tc_devices d where d.delete_date is NULL and (d.name = :deviceName or d.uniqueid = :deviceUniqueId "
 			+ "or d.sequence_number = :deviceSequenceNumber or (d.plate_num = :devicePlateNum and d.left_letter = :deviceLeftLetter and"
@@ -98,15 +102,20 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 			+ " WHERE tc_user_device.userid IN(:userIds) and tc_devices.delete_date is null",nativeQuery = true )
 	public Integer getDevicesListSize(@Param("userIds")List<Long> userIds);
 	
-	@Query(nativeQuery = true, name = "getDeviceWorkingHoursExport")
-	public List<DeviceWorkingHours> getDeviceWorkingHoursExport(@Param("deviceId")List<Long> deviceId,@Param("start")String start,@Param("end")String end);
-	
 	@Query(nativeQuery = true, name = "getDeviceWorkingHours")
 	public List<DeviceWorkingHours> getDeviceWorkingHours(@Param("deviceId")List<Long> deviceId,@Param("offset")int offset,@Param("start")String start,@Param("end")String end);
+
+	@Query(nativeQuery = true, name = "getDeviceWorkingHoursScheduled")
+	public List<DeviceWorkingHours> getDeviceWorkingHoursScheduled(@Param("deviceId")List<Long> deviceId,@Param("start")String start,@Param("end")String end);
+
+	
+	@Query(nativeQuery = true, name = "getDeviceCustomSchduled")
+	public List<DeviceWorkingHours> getDeviceCustomScheduled(@Param("deviceId")List<Long> deviceId,@Param("start")String start,@Param("end")String end,@Param("custom")String custom,@Param("value")String value);
 
 	@Query(nativeQuery = true, name = "getDeviceCustom")
 	public List<DeviceWorkingHours> getDeviceCustom(@Param("deviceId")List<Long> deviceId,@Param("offset")int offset,@Param("start")String start,@Param("end")String end,@Param("custom")String custom,@Param("value")String value);
 
+	
 	@Query(value = "SELECT  count(*) FROM tc_positions " + 
 			" INNER JOIN tc_devices ON tc_devices.id=tc_positions.deviceid  WHERE deviceid IN(:deviceIds) " + 
 			" and tc_positions.devicetime " + 
@@ -127,13 +136,16 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 
 	
 	@Query(value = "SELECT tc_devices.calibrationData FROM tc_devices WHERE tc_devices.id=:deviceId AND tc_devices.delete_date IS NULL ",nativeQuery = true)
-	public List<DeviceCalibrationData> getCalibrationDataCCC(@Param("deviceId")Long deviceId);
+	public String getCalibrationDataCCC(@Param("deviceId")Long deviceId);
 	
 	@Query(value = "SELECT tc_devices.fuel FROM tc_devices WHERE tc_devices.id=:deviceId AND tc_devices.delete_date IS NULL ",nativeQuery = true)
 	public String getFuelData(@Param("deviceId")Long deviceId);
 	
 	@Query(value = "SELECT tc_devices.sensorSettings FROM tc_devices WHERE tc_devices.id=:deviceId AND tc_devices.delete_date IS NULL ",nativeQuery = true)
 	public String getSensorSettings(@Param("deviceId")Long deviceId);
+	
+	@Query(value = "SELECT tc_devices.icon FROM tc_devices WHERE tc_devices.id=:deviceId AND tc_devices.delete_date IS NULL ",nativeQuery = true)
+	public String getIcon(@Param("deviceId")Long deviceId);
 	
 	@Query(nativeQuery = true, name = "getBillingsList")
 	public List<BillingsList> billingInfo(@Param("userId")Long userId,@Param("start")String start,@Param("end")String end,@Param("offset")int offset,@Param("search")String search);
@@ -164,6 +176,9 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 			" WHERE tc_device_attribute.deviceid =:deviceId ",nativeQuery = true)
 	public List<DeviceSelect> getAttributesDeviceSelect(@Param("deviceId") Long deviceId);
 	
+	
+	@Query(value = "select * from tc_devices where tc_devices.id in ( :deviceIds) ", nativeQuery = true)
+	public List<Device> getDevicesByDevicesIds(@Param("deviceIds")List<Long> deviceIds);
 	
 }
 

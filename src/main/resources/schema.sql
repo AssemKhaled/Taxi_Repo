@@ -1,3 +1,15 @@
+CREATE TABLE IF NOT EXISTS `tc_schedule` (
+
+  `id` int(11) NOT NULL auto_increment, 
+  `expression` varchar(4000)  NULL,
+  `task` LONGTEXT  NULL,
+  `userId` int(11), 
+  `date` varchar(255)  NULL,
+  `date_type` varchar(255)  NULL,
+  `delete_date` varchar(255)  NULL,
+   PRIMARY KEY  (`id`)
+
+);
 
 CREATE TABLE IF NOT EXISTS `tc_user_roles` (
 
@@ -13,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `tc_permissions` (
 
   `id` int(11) NOT NULL auto_increment,   
   `delete_date` varchar(255)  NULL,
-  `functionality` varchar(255)  NULL,
+  `functionality` varchar(1080)  NULL,
   `name` LONGTEXT  NULL,
    PRIMARY KEY  (`id`)
 
@@ -98,6 +110,63 @@ set @stmt = case @col_exists
 when 0 then CONCAT(
 'alter table tc_devices'
 , ' ADD COLUMN `fuel` varchar(1080) NULL DEFAULT NULL'
+,';')
+else 'select ''column already exists, no op'''
+end;
+
+PREPARE stmt FROM @stmt;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+----------------------------------------------------------------
+set @col_exists = 0;
+SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME='tc_devices'
+AND column_name='icon'
+and table_schema = database()
+into @col_exists;
+
+set @stmt = case @col_exists
+when 0 then CONCAT(
+'alter table tc_devices'
+, ' ADD COLUMN `icon` varchar(1080) NULL DEFAULT NULL'
+,';')
+else 'select ''column already exists, no op'''
+end;
+
+PREPARE stmt FROM @stmt;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+----------------------------------------------------------------
+set @col_exists = 0;
+SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME='tc_devices'
+AND column_name='create_date'
+and table_schema = database()
+into @col_exists;
+
+set @stmt = case @col_exists
+when 0 then CONCAT(
+'alter table tc_devices'
+, ' ADD COLUMN `create_date` timestamp NULL DEFAULT NULL'
+,';')
+else 'select ''column already exists, no op'''
+end;
+
+PREPARE stmt FROM @stmt;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+----------------------------------------------------------------
+set @col_exists = 0;
+SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME='tc_devices'
+AND column_name='expired'
+and table_schema = database()
+into @col_exists;
+
+set @stmt = case @col_exists
+when 0 then CONCAT(
+'alter table tc_devices'
+, ' ADD COLUMN  `expired` INT(11) NULL DEFAULT 0 '
 ,';')
 else 'select ''column already exists, no op'''
 end;
@@ -212,7 +281,7 @@ into @col_exists;
 set @stmt = case @col_exists
 when 0 then CONCAT(
 'alter table tc_users'
-, ' ADD COLUMN `dateOfBirth` VARCHAR(255) NULL DEFAULT NULL'
+, ' ADD COLUMN `dateOfBirth` date NULL DEFAULT NULL'
 ,';')
 else 'select ''column already exists, no op'''
 end;
@@ -222,6 +291,10 @@ EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 ----------------------------------------------------------------
 
+ALTER TABLE `tc_devices` MODIFY `calibrationData` VARCHAR(1080);
+--ALTER TABLE `tc_permissions` MODIFY `functionality` VARCHAR(1080);
+
+----------------------------------------------------------------
 --ALTER TABLE `tc_users`
 --ADD COLUMN  `accountType` INT(11) NULL DEFAULT 0 ,
 --ADD COLUMN  `dateType` INT(11) NULL DEFAULT 0 ,
