@@ -42,7 +42,7 @@ public interface ReportService {
 	public ResponseEntity<?> getNumberDriverWorkingHours(String TOKEN,Long [] driverId,Long [] groupId,int offset,String start,String end,String search,Long userId);
 
 	
-	public ResponseEntity<?> getviewTrip(String TOKEN,Long deviceId,Long startPositionId,Long endPositionId);
+	public ResponseEntity<?> getviewTrip(String TOKEN,Long deviceId,String startTime,String endTime);
 
 	
 

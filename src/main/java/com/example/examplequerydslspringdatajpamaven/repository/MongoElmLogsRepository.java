@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.repository.Query;
 
 import com.example.examplequerydslspringdatajpamaven.entity.MongoElmLogs;
 
-public interface ElmLogsRepository extends MongoRepository<MongoElmLogs, String>{
+public interface MongoElmLogsRepository extends MongoRepository<MongoElmLogs, String>{
 	
 	public List<MongoElmLogs> findAllByUserIdIn(List<Long> userIds,Pageable pageable);
 	

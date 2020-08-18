@@ -292,6 +292,9 @@ DEALLOCATE PREPARE stmt;
 ----------------------------------------------------------------
 
 ALTER TABLE `tc_devices` MODIFY `calibrationData` VARCHAR(1080);
+--ALTER TABLE `tc_devices` DROP `positionid`;
+--ALTER TABLE `tc_devices` ADD COLUMN `positionid` VARCHAR(1080) NULL DEFAULT NULL;
+
 --ALTER TABLE `tc_permissions` MODIFY `functionality` VARCHAR(1080);
 
 ----------------------------------------------------------------

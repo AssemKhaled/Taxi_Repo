@@ -54,12 +54,16 @@ import com.example.examplequerydslspringdatajpamaven.entity.ElmLastLocations;
 import com.example.examplequerydslspringdatajpamaven.entity.ElmReturn;
 import com.example.examplequerydslspringdatajpamaven.entity.Group;
 import com.example.examplequerydslspringdatajpamaven.entity.LastLocationsList;
+import com.example.examplequerydslspringdatajpamaven.entity.MongoElmLastLocations;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoElmLogs;
+import com.example.examplequerydslspringdatajpamaven.entity.MongoPositionsElm;
 import com.example.examplequerydslspringdatajpamaven.entity.StopReport;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.DriverRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.ElmLastLocationsRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.ElmLogsRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.MongoElmLastLocationsRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.MongoElmLogsRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionsElmRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.PositionElmRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
@@ -93,7 +97,10 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	private String elm;
 	
 	@Autowired
-	private ElmLogsRepository elmLogsRepository;
+	MongoPositionsElmRepository mongoPositionsElmRepository;
+	
+	@Autowired
+	private MongoElmLogsRepository elmLogsRepository;
 	
 	@Autowired
 	private UserServiceImpl userService;
@@ -102,7 +109,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	private UserRepository userRepository;
 	
 	@Autowired
-	private ElmLastLocationsRepository elmLastLocationsRepository;
+	private MongoElmLastLocationsRepository elmLastLocationsRepository;
 	
 	@Autowired
 	private PositionElmRepository positionElmRepository;
@@ -339,7 +346,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
           // send Logs
 		  MongoElmLogs elmLogs = new MongoElmLogs(null,userId,user.getName(),null,null,null,null,time,type,requet,response);
-		  //elmLogsRepository.save(elmLogs);
+		  elmLogsRepository.save(elmLogs);
 		  
 		  data.add(elmReturn);
 
@@ -644,7 +651,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
           // send Logs
 		  MongoElmLogs elmLogs = new MongoElmLogs(null,userId,user.getName(),null,null,null,null,time,type,requet,response);
-		  //elmLogsRepository.save(elmLogs);
+		  elmLogsRepository.save(elmLogs);
 		  
 		  
 		  data.add(elmReturn);
@@ -943,7 +950,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 	          // send Logs
 			  MongoElmLogs elmLogs = new MongoElmLogs(null,userId,user.getName(),null,null,null,null,time,type,requet,response);
-			  //elmLogsRepository.save(elmLogs);
+			  elmLogsRepository.save(elmLogs);
 			  
 			  data.add(elmReturn);
 
@@ -1212,7 +1219,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 	          // send Logs
 			  MongoElmLogs elmLogs = new MongoElmLogs(null,parent.getId(),parent.getName(),null,null,deviceId,device.getName(),time,type,requet,response);
-			  //elmLogsRepository.save(elmLogs);
+			  elmLogsRepository.save(elmLogs);
 			  
 			  data.add(elmReturn);
 
@@ -1471,7 +1478,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
           // send Logs
 		  MongoElmLogs elmLogs = new MongoElmLogs(null,parent.getId(),parent.getName(),null,null,deviceId,device.getName(),time,type,requet,response);
-		  //elmLogsRepository.save(elmLogs);
+		  elmLogsRepository.save(elmLogs);
 		  
 		  
 		  data.add(elmReturn);
@@ -1736,7 +1743,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
           // send Logs
 		  MongoElmLogs elmLogs = new MongoElmLogs(null,parent.getId(),parent.getName(),null,null,deviceId,device.getName(),time,type,requet,response);
-		  //elmLogsRepository.save(elmLogs);
+		  elmLogsRepository.save(elmLogs);
 		  
 		  data.add(elmReturn);
 
@@ -2003,7 +2010,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
           // send Logs
 		  MongoElmLogs elmLogs = new MongoElmLogs(null,parent.getId(),parent.getName(),driverId,driver.getName(),null,null,time,type,requet,response);
-		  //elmLogsRepository.save(elmLogs);
+		  elmLogsRepository.save(elmLogs);
 		  
 		  data.add(elmReturn);
 
@@ -2253,7 +2260,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
           // send Logs
 		  MongoElmLogs elmLogs = new MongoElmLogs(null,parent.getId(),parent.getName(),null,null,deviceId,device.getName(),time,type,requet,response);
-		  //elmLogsRepository.save(elmLogs);
+		  elmLogsRepository.save(elmLogs);
 		  
 		  data.add(elmReturn);
 
@@ -2526,7 +2533,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
           // send Logs
 		  MongoElmLogs elmLogs = new MongoElmLogs(null,userId,user.getName(),null,null,null,null,time,type,requet,response);
-		  //elmLogsRepository.save(elmLogs);
+		  elmLogsRepository.save(elmLogs);
 		  
 		  data.add(elmReturn);
 
@@ -2766,7 +2773,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
           // send Logs
 		  MongoElmLogs elmLogs = new MongoElmLogs(null,parent.getId(),parent.getName(),driverId,driver.getName(),null,null,time,type,requet,response);
-		  //elmLogsRepository.save(elmLogs);
+		  elmLogsRepository.save(elmLogs);
 		  
 		  data.add(elmReturn);
 
@@ -3016,7 +3023,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
           // send Logs
 		  MongoElmLogs elmLogs = new MongoElmLogs(null,parent.getId(),parent.getName(),driverId,driver.getName(),null,null,time,type,requet,response);
-		  //elmLogsRepository.save(elmLogs);
+		  elmLogsRepository.save(elmLogs);
 		  
 		  data.add(elmReturn);
 
@@ -3276,7 +3283,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
           // send Logs
 		  MongoElmLogs elmLogs = new MongoElmLogs(null,parent.getId(),parent.getName(),driverId,driver.getName(),null,null,time,type,requet,response);
-		  //elmLogsRepository.save(elmLogs);
+		  elmLogsRepository.save(elmLogs);
 		  
 		  
 		  data.add(elmReturn);
@@ -3340,12 +3347,59 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		logger.info("************************ lastLocations STARTED ***************************");
 
 		 List<Map> dataArray = new ArrayList<>();
-		 List<Long> ids = new ArrayList<>();
+		 List<String> ids = new ArrayList<>();
+
+		 
+		 List<Long> deviceIds = new ArrayList<>();
 
 		List<LastLocationsList> locations = new ArrayList<LastLocationsList>();
-		List<ElmLastLocations> elm_connection_logs = new ArrayList<ElmLastLocations>();
+		List<LastLocationsList> locationsList = new ArrayList<LastLocationsList>();
+		List<MongoElmLastLocations> elm_connection_logs = new ArrayList<MongoElmLastLocations>();
+		List<MongoPositionsElm> positions_elm = new ArrayList<MongoPositionsElm>();
 
-		locations = positionElmRepository.getAllPositionsNotSent();
+		//locations = positionElmRepository.getAllPositionsNotSent();
+		
+		locationsList = deviceRepository.getAllDevicesIdsToSendLocation();
+		for(LastLocationsList loc:locationsList) {
+			deviceIds.add(loc.getDeviceid());
+		}
+
+		positions_elm = mongoPositionsElmRepository.findByDeviceIdIn(deviceIds,new PageRequest(0, 1000));
+		
+		for(MongoPositionsElm posElm:positions_elm) {
+			LastLocationsList location = new LastLocationsList();
+			for(LastLocationsList loc:locationsList) {
+				if(posElm.getDeviceid().toString().equals(loc.getDeviceid().toString())) {
+
+					location.setId(posElm.get_id().toString());
+					location.setLasttime(posElm.getServertime());
+					location.setDeviceid(posElm.getDeviceid());
+					location.setLatitude(posElm.getLatitude());
+					location.setLongitude(posElm.getLongitude());
+					location.setSpeed(posElm.getSpeed());
+					location.setAttributes(posElm.getAttributes());
+					location.setDevicetime(posElm.getDevicetime());
+					location.setDeviceRK(loc.getDeviceRK());
+					location.setDriver_RK(loc.getDriver_RK());
+					location.setDriverid(loc.getDriverid());
+					location.setDrivername(loc.getDrivername());
+					location.setWeight(posElm.getWeight());
+					location.setAddress(posElm.getAddress());
+					location.setIs_offline(posElm.getIs_offline());
+					location.setDevicename(loc.getDevicename());
+					location.setUserid(loc.getUserid());
+					location.setUsername(loc.getUsername());
+					location.setUserRK(loc.getUserRK());
+
+					
+					locations.add(location);
+				}
+			}
+	
+		}
+		
+		
+		
 		Map body = new HashMap();
 
 		 for(LastLocationsList location : locations) {
@@ -3397,7 +3451,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	                {
 						record.put("vehicleStatus", "TAMPER_WEIGHT");
 						set_status = (double) 1;
-						location.setWeight((double) 0);
+						location.setWeight((float) 0);
 	                }
 
 
@@ -3438,15 +3492,15 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	            String calcWeightPhp = "";
 				if( (location.getWeight() == null || location.getWeight() ==0 ) 
 						&& record.get("vehicleStatus") != "TAMPER_WEIGHT"  ) {
-					Double vehicle_initial_weight = positionElmRepository.getWeight(location.getDeviceid());
+					Float vehicle_initial_weight = positionElmRepository.getWeight(location.getDeviceid());
 					
-					Double min = vehicle_initial_weight;
-					Double max = vehicle_initial_weight+1000;
+					Float min = vehicle_initial_weight;
+					Float max = vehicle_initial_weight+1000;
 
 					Random r = new Random();
-				    Double  weight =  min + (max - min) * r.nextDouble();	
+					Float  weight =  min + (max - min) * r.nextFloat();	
 				    
-					Double roundOffWeight= Math.round(weight * 100.0) / 100.0;
+				    Float roundOffWeight= (float) (Math.round(weight * 100.0) / 100.0);
 				    location.setWeight(roundOffWeight);
 				    calcWeightPhp = "calc from php";
 
@@ -3496,7 +3550,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 
 				
-				ElmLastLocations connection_log = new ElmLastLocations();  
+				MongoElmLastLocations connection_log = new MongoElmLastLocations();  
 				
 				connection_log.setPositionid(location.getId());
 				connection_log.setElm_data(record.toString());
@@ -3513,6 +3567,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				connection_log.setReason(calcWeightPhp);
 				connection_log.setResponsetime(nowTime);
 				connection_log.setResponsetype(1);
+				
 				elm_connection_logs.add(connection_log);
 			
 				dataArray.add(record);
@@ -3521,7 +3576,9 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				location.setAttributes(obj.toString());
 
 		 }
-		 body.put("vehicleLocations", dataArray);
+		 
+
+		body.put("vehicleLocations", dataArray);
 		
 		  TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
 
@@ -3591,7 +3648,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
         if(resp.containsKey("resultCode")) {
         	
         	elmLastLocationsRepository.save(elm_connection_logs);
-    		positionElmRepository.deletePositions(ids);  
+        	mongoPositionsElmRepository.deleteByIdIn(ids);
 
         }
         
@@ -3599,9 +3656,6 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		logger.info("************************ lastLocations ENDED ***************************");
 		return  ResponseEntity.ok().body(getObjectResponse);
 	}
-
-
-
 
 	@Override
 	public ResponseEntity<?> getLogs(String TOKEN, Long loggedUserId,Long userId,Long driverId,Long deviceId, int offset, String search) {
@@ -3623,14 +3677,14 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			
 			User loggeduser = userService.findById(loggedUserId);
 			if(loggeduser == null ) {
-				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User is not Found",logs);
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged User is not Found",logs);
 				return  ResponseEntity.status(404).body(getObjectResponse);
 
 			}
 			else {
 				if(loggeduser.getAccountType()!= 1) {
 					if(!userRoleService.checkUserHasPermission(loggedUserId, "ELM", "list")) {
-						 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get Elm list",logs);
+						 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this logged User doesnot has permission to get Elm list",logs);
 						 logger.info("************************ getLogs ENDED ***************************");
 						return  ResponseEntity.badRequest().body(getObjectResponse);
 					}
@@ -3739,8 +3793,8 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 							}
 							
 							 offset = offset / 10;
-							 //logs = elmLogsRepository.findByUserId(userId, new PageRequest(offset, 10));
-							 //size = elmLogsRepository.countByUserId(userId);
+							 logs = elmLogsRepository.findByUserId(userId, new PageRequest(offset, 10));
+							 size = elmLogsRepository.countByUserId(userId);
 							
 						}
 						 
@@ -3816,8 +3870,8 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 								return  ResponseEntity.badRequest().body(getObjectResponse);
 							 }
 							 offset = offset / 10;
-							 //logs = elmLogsRepository.findByDriverId(driverId, new PageRequest(offset, 10));
-							 //size = elmLogsRepository.countByDriverId(driverId); 
+							 logs = elmLogsRepository.findByDriverId(driverId, new PageRequest(offset, 10));
+							 size = elmLogsRepository.countByDriverId(driverId); 
 							
 							
 						}
@@ -3893,8 +3947,8 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 								return  ResponseEntity.badRequest().body(getObjectResponse);
 							 }
 							 offset = offset / 10;
-							 //logs = elmLogsRepository.findByDeviceId(deviceId, new PageRequest(offset, 10));
-							 //size = elmLogsRepository.countByDeviceId(deviceId); 
+							 logs = elmLogsRepository.findByDeviceId(deviceId, new PageRequest(offset, 10));
+							 size = elmLogsRepository.countByDeviceId(deviceId); 
 							
 							 
 							
@@ -3905,55 +3959,10 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 						return  ResponseEntity.ok().body(getObjectResponse);
 					}
 					
-					
-					/*userService.resetChildernArray();
-				    if(loggeduser.getAccountType().equals(4)) {
-						 Set<User> parentClients = loggeduser.getUsersOfUser();
-						 if(parentClients.isEmpty()) {
-							
-							 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get geofences of this user",logs);
-							 logger.info("************************ getLogs ENDED ***************************");
-							return  ResponseEntity.status(404).body(getObjectResponse);
-						 }else {
-							 User parentClient = new User() ;
-							 for(User object : parentClients) {
-								 parentClient = object;
-							 }
-							 List<Long>usersIds= new ArrayList<>();
-							 usersIds.add(parentClient.getId());
-							 Integer size = 0;
-							 offset = offset / 10;
-							 logs = elmLogsRepository.findAllByUserIdIn(usersIds, new PageRequest(offset, 10));
-							 size = elmLogsRepository.countByUserIdIn(usersIds);
-							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",logs,size);
-							logger.info("************************ getLogs ENDED ***************************");
-							return  ResponseEntity.ok().body(getObjectResponse);
-
-						 }
-					 }
-				     List<User>childernUsers = userService.getActiveAndInactiveChildern(id);
-					 List<Long>usersIds= new ArrayList<>();
-					 if(childernUsers.isEmpty()) {
-						 usersIds.add(id);
-					 }
-					 else {
-						 usersIds.add(id);
-						 for(User object : childernUsers) {
-							 usersIds.add(object.getId());
-						 }
-					 }
-
-					 Integer size = 0;
-					 offset = offset / 10;
-					 logs = elmLogsRepository.findAllByUserIdIn(usersIds, new PageRequest(offset, 10));
-					size = elmLogsRepository.countByUserIdIn(usersIds);
-					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",logs,size);
-					logger.info("************************ getLogs ENDED ***************************");
-					return  ResponseEntity.ok().body(getObjectResponse);*/
 
 				}
 				else {
-					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User is not Found",logs);
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged User is not Found",logs);
 					return  ResponseEntity.status(404).body(getObjectResponse);
 
 				}
@@ -3963,7 +3972,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		}
 		else{
 			
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",logs);
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User ID is Required",logs);
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}

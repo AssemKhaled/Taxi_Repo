@@ -45,7 +45,7 @@ public interface AppService {
 	public ResponseEntity<?> getStopsReportApp(String TOKEN,Long deviceId,Long groupId,String type,String from,String to,int page,int start,int limit,Long userId);
 	public ResponseEntity<?> getTripsReportApp(String TOKEN,Long deviceId,Long groupId,String type,String from,String to,int page,int start,int limit,Long userId);
 	public ResponseEntity<?> getSummaryReportApp(String TOKEN,Long deviceId,Long groupId,String type,String from,String to,int page,int start,int limit,Long userId);
-	public ResponseEntity<?> viewTripApp(String TOKEN,Long deviceId,Long startPositionId,Long endPositionId);
+	public ResponseEntity<?> viewTripApp(String TOKEN,Long deviceId,String startTime,String endTime);
 
 }	
 

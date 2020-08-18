@@ -3,16 +3,19 @@ package com.example.examplequerydslspringdatajpamaven.entity;
 public class DriverWorkingHours {
 
 	private String deviceTime;
-	private Long positionId;
+	private String positionId;
 	private String attributes;
-	private Integer deviceId;
+	private Long deviceId;
 	private String driverName;
 	private String hours;
 	private String deviceName;
 
 	
+	public DriverWorkingHours() {
+		
+	}
 	
-	public DriverWorkingHours(String deviceTime, Long positionId, String attributes, Integer deviceId, String deviceName) {
+	public DriverWorkingHours(String deviceTime, String positionId, String attributes, Long deviceId, String deviceName) {
 		super();
 		this.deviceTime = deviceTime;
 		this.positionId = positionId;
@@ -37,10 +40,10 @@ public class DriverWorkingHours {
 	public void setDeviceTime(String deviceTime) {
 		this.deviceTime = deviceTime;
 	}
-	public Long getPositionId() {
+	public String getPositionId() {
 		return positionId;
 	}
-	public void setPositionId(Long positionId) {
+	public void setPositionId(String positionId) {
 		this.positionId = positionId;
 	}
 	public String getAttributes() {
@@ -49,10 +52,10 @@ public class DriverWorkingHours {
 	public void setAttributes(String attributes) {
 		this.attributes = attributes;
 	}
-	public Integer getDeviceId() {
+	public Long getDeviceId() {
 		return deviceId;
 	}
-	public void setDeviceId(Integer deviceId) {
+	public void setDeviceId(Long deviceId) {
 		this.deviceId = deviceId;
 	}
 	public String getDriverName() {

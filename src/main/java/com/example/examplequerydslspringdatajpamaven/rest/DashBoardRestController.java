@@ -61,22 +61,6 @@ public class DashBoardRestController {
 		return deviceService.getAllDeviceLiveDataMap(TOKEN,userId);
 	}
 
-	@GetMapping(path = "/getDeviceLiveData")
-	public ResponseEntity<?> getDevicesLiveData(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                    @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
-			                                    @RequestParam(value = "userId",defaultValue = "0") Long userId){
-		
-		return deviceService.getDeviceLiveData(TOKEN,deviceId,userId);
-	}
-	
-	@GetMapping(path = "/getDeviceLiveDataMap")
-	public ResponseEntity<?> getDevicesLiveDataMap(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                    @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
-			                                    @RequestParam(value = "userId",defaultValue = "0")Long userId){
-		
-		return deviceService.getDeviceLiveDataMap(TOKEN,deviceId,userId);
-	}
-	
 
 	@RequestMapping(value = "/getNotifications", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getNotifications(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,

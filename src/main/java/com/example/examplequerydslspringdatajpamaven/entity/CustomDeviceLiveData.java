@@ -378,6 +378,32 @@ public class CustomDeviceLiveData {
 			this.weight =0.0;
 		}
 	}
+	public CustomDeviceLiveData(int id ,String deviceName , String lastUpdate ,
+			String positionId, String leftLetter,String middleLetter,String rightLetter,String driverName,
+			String plate_num,String sequence_number,String owner_name) {
+		this.id = id ;
+		this.deviceName = deviceName ;
+		this.lastUpdate = lastUpdate;
+		this.positionId = positionId;
+		this.leftLetter= leftLetter;
+		this.rightLetter= rightLetter;
+		this.middleLetter= middleLetter;
+		this.driverName= driverName;
+		this.plate_num = plate_num;
+		this.sequence_number = sequence_number;
+		this.owner_name = owner_name;
+		
+	}
+	public CustomDeviceLiveData(int id ,String deviceName , String uniqueId,String lastUpdate ,String positionId,String photo) {
+		this.id = id ;
+		this.uniqueId = uniqueId ;
+		this.deviceName = deviceName ;
+		this.lastUpdate = lastUpdate;
+		this.positionId = positionId;
+		this.photo=photo;
+
+	   		
+	}
 	public CustomDeviceLiveData(int id ,String deviceName , String uniqueId,String lastUpdate ,String positionId,String photo
 			,String attributes , Float speed,Double latitude ,Double longitude,Boolean valid) {
 		this.id = id ;

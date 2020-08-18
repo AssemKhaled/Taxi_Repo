@@ -43,6 +43,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 import com.example.examplequerydslspringdatajpamaven.entity.Group;
+import com.example.examplequerydslspringdatajpamaven.entity.MongoPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.StopReport;
 import com.example.examplequerydslspringdatajpamaven.entity.SummaryReport;
 import com.example.examplequerydslspringdatajpamaven.entity.TripPositions;
@@ -54,6 +55,8 @@ import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository
 import com.example.examplequerydslspringdatajpamaven.repository.DriverRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.GeofenceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.GroupRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionRepo;
+import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionsRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.PositionSqlRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
@@ -78,7 +81,11 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	 @Value("${summaryUrl}")
 	 private String summaryUrl;
 	
-	 
+	@Autowired
+	private MongoPositionsRepository mongoPositionsRepository;
+	
+	@Autowired
+	private MongoPositionRepo mongoPositionsRepo;
 	 
 	 @Autowired
 	 private PositionSqlRepository positionSqlRepository;
@@ -256,6 +263,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				return ResponseEntity.status(404).body(getObjectResponse);
 	    }
 	    userServiceImpl.resetChildernArray();
+		 List<Long>usersIds= new ArrayList<>();
 	    if(loggedUser.getAccountType().equals(4)) {
 			 Set<User> parentClients = loggedUser.getUsersOfUser();
 			 if(parentClients.isEmpty()) {
@@ -265,122 +273,27 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				return  ResponseEntity.status(404).body(getObjectResponse);
 			 }else {
 				 User parentClient = new User() ;
-				 List<Long>usersIds= new ArrayList<>();
 
 				 for(User object : parentClients) {
 					 parentClient = object;
 					 usersIds.add(parentClient.getId());
 
 				 }
-				 List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getAllDevicesLiveDataMap(usersIds);
-			     if(allDevicesLiveData.size() > 0) {
-					for(int i=0;i<allDevicesLiveData.size();i++) {
-						
-						long minutes = 0;
-
-						if(allDevicesLiveData.get(i).getLastUpdate() != null) {
-							
-							SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
-							Date now = new Date();
-							String strDate = formatter.format(now);
-							try {
-								
-								Date dateLast = formatter.parse(allDevicesLiveData.get(i).getLastUpdate());
-								Date dateNow = formatter.parse(strDate);
-								
-								minutes = getDateDiff (dateLast, dateNow, TimeUnit.MINUTES);  
-								
-								
-							} catch (ParseException e) {
-								e.printStackTrace();
-							}
-							if(minutes < 3) {
-			                	allDevicesLiveData.get(i).setVehicleStatus("online");
-							}
-							if(minutes > 8) {
-			                	allDevicesLiveData.get(i).setVehicleStatus("unknown");
-							}
-							if(minutes < 8 && minutes > 3) {
-			                	allDevicesLiveData.get(i).setVehicleStatus("offline");
-							}
-						}
-						else {
-		                	allDevicesLiveData.get(i).setVehicleStatus("offline");
-
-						}
-						
-						
-						if(allDevicesLiveData.get(i).getAttributes() != null) {
-							JSONObject obj = new JSONObject(allDevicesLiveData.get(i).getAttributes().toString());
-
-							
-							
-							if(minutes > 8) {
-		                    	allDevicesLiveData.get(i).setStatus("In active");
-								
-							}
-							else {
-								if(obj.has("ignition")) {
-
-									if(obj.get("ignition").equals(true)) {
-										if(obj.has("motion")) {
-
-						                    if(obj.get("motion").equals(false)) {
-						                    	allDevicesLiveData.get(i).setStatus("Idle");
-											}
-						                    if(obj.get("motion").equals(true)) {
-						                    	allDevicesLiveData.get(i).setStatus("Running");
-											}
-										}
-									}
-				                    if(obj.get("ignition").equals(false)) {
-				                    	allDevicesLiveData.get(i).setStatus("Stopped");
-
-									}
-								}
-								
-							}
-							
-							if(obj.has("power")) {
-								allDevicesLiveData.get(i).setPower(obj.getDouble("power"));
-
-							}
-							if(obj.has("operator")) {
-								allDevicesLiveData.get(i).setOperator(obj.getDouble("operator"));
-
-							}
-							if(obj.has("ignition")) {
-								allDevicesLiveData.get(i).setIgnition(obj.getBoolean("ignition"));
-
-							}
-						}
-						else {
-		                	allDevicesLiveData.get(i).setStatus("No data");
-						}
-						
-					}
-				}
-			 
-				 
-				 
-				    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevicesLiveData);
-					
-					logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
-				return  ResponseEntity.ok().body(getObjectResponse);
-
 			 }
 		 }
-	    List<User>childernUsers = userServiceImpl.getAllChildernOfUser(userId);
-		 List<Long>usersIds= new ArrayList<>();
-		 if(childernUsers.isEmpty()) {
-			 usersIds.add(userId);
-		 }
-		 else {
-			 usersIds.add(userId);
-			 for(User object : childernUsers) {
-				 usersIds.add(object.getId());
+	    else {
+	    	List<User>childernUsers = userServiceImpl.getAllChildernOfUser(userId);
+			 if(childernUsers.isEmpty()) {
+				 usersIds.add(userId);
 			 }
-		 }
+			 else {
+				 usersIds.add(userId);
+				 for(User object : childernUsers) {
+					 usersIds.add(object.getId());
+				 }
+			 }
+	    }
+	     
 		List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getAllDevicesLiveDataMap(usersIds);
 		
 		if(allDevicesLiveData.size() > 0) {
@@ -420,8 +333,23 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 				
 				
-				if(allDevicesLiveData.get(i).getAttributes() != null) {
-					JSONObject obj = new JSONObject(allDevicesLiveData.get(i).getAttributes().toString());
+				if(allDevicesLiveData.get(i).getPositionId() != null) {
+
+					MongoPositions mongoPosition = mongoPositionsRepository.findById(allDevicesLiveData.get(i).getPositionId());
+					JSONObject obj = new JSONObject(mongoPosition.getAttributes());
+					allDevicesLiveData.get(i).setLatitude(mongoPosition.getLatitude());
+					allDevicesLiveData.get(i).setLongitude(mongoPosition.getLongitude());
+					allDevicesLiveData.get(i).setAttributes(mongoPosition.getAttributes());
+					allDevicesLiveData.get(i).setAddress(mongoPosition.getAddress());
+					allDevicesLiveData.get(i).setSpeed(mongoPosition.getSpeed());
+					if(mongoPosition.getValid() >= 1) {
+						allDevicesLiveData.get(i).setValid(true);
+
+					}
+					else {
+						allDevicesLiveData.get(i).setValid(false);
+
+					}
 					
 					if(minutes > 8) {
                    	allDevicesLiveData.get(i).setStatus("In active");
@@ -485,6 +413,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 	@Override
 	public ResponseEntity<?> vehicleInfoApp(String TOKEN, Long deviceId, Long userId) {
+		
 		logger.info("************************ vehicleInfo STARTED ***************************");
 
 		List<CustomDeviceList> vehicleInfo= new ArrayList<CustomDeviceList>();
@@ -500,19 +429,19 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		}
 		if(!deviceId.equals(0) && !userId.equals(0)) {
 			User loggedUser = userServiceImpl.findById(userId);
-			if(loggedUser == null) {
+			if(loggedUser == null ) {
 				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",vehicleInfo);
 				 return  ResponseEntity.status(404).body(getObjectResponse);
 			}
 			Device device = deviceServiceImpl.findById(deviceId);
-			if(device != null) {
+			if(device != null ) {
 				if(device.getDeleteDate()==null) {
 					boolean isParent = false;
 					   if(loggedUser.getAccountType().equals(4)) {
 						   Set<User>parentClient = loggedUser.getUsersOfUser();
 							if(parentClient.isEmpty()) {
-								getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this user ",null);
-								logger.info("************************ vehicleInfoApp ENDED ***************************");
+								getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
+								logger.info("************************ editDevice ENDED ***************************");
 								return ResponseEntity.badRequest().body(getObjectResponse);
 							}else {
 							  
@@ -523,7 +452,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 								Set<User> deviceParent = device.getUser();
 								if(deviceParent.isEmpty()) {
 									getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), " this device is not assigned to any user ,you are not allowed to edit this user ",null);
-									logger.info("************************ vehicleInfoApp ENDED ***************************");
+									logger.info("************************ editDevice ENDED ***************************");
 									return ResponseEntity.badRequest().body(getObjectResponse);
 								}else {
 									
@@ -538,22 +467,69 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 							}
 					   }
 					   if(!deviceServiceImpl.checkIfParent(device , loggedUser)&& ! isParent) {
-							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this device ",null);
-							logger.info("************************ vehicleInfoApp ENDED ***************************");
+							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to assign driver to this device ",null);
+							logger.info("************************ editDevice ENDED ***************************");
 							return ResponseEntity.badRequest().body(getObjectResponse);
 					   }
-					vehicleInfo = deviceRepository.vehicleInfo(deviceId);
+					vehicleInfo = deviceRepository.vehicleInfoData(deviceId);
 				    Map<Object, Object> sensorList =new HashMap<Object, Object>();
 
 					List<Map> data = new ArrayList<>();
 					if(vehicleInfo.size()>0) {
-						
-	
+						if(vehicleInfo.get(0).getPositionId() != null) {
+							MongoPositions mongoPosition = mongoPositionsRepository.findById(vehicleInfo.get(0).getPositionId());
+		                    vehicleInfo.get(0).setLatitude(mongoPosition.getLatitude());
+		                    vehicleInfo.get(0).setLongitude(mongoPosition.getLongitude());
+		                    vehicleInfo.get(0).setSpeed(mongoPosition.getSpeed());
+		                    vehicleInfo.get(0).setAddress(mongoPosition.getAddress());
+		                    vehicleInfo.get(0).setAttributes(mongoPosition.getAttributes());
+						}
+	                   
+
+	                    
 						
 					    Map<Object, Object> attrbuitesList =new HashMap<Object, Object>();
 						if(vehicleInfo.get(0).getAttributes() != null) {
 							JSONObject obj = new JSONObject(vehicleInfo.get(0).getAttributes().toString());
+							
+							if(obj.has("power")) {
+								if(obj.get("power") != null) {
+									if(obj.get("power") != "") {
+										double p = Double.valueOf(obj.get("power").toString());
+										double round = Math.round(p * 100.0 / 100.0);
+										obj.put("power",String.valueOf(round));
+
+
+									}
+									else {
+										obj.put("power", "0");
+									}
+								}
+								else {
+									obj.put("power", "0");
+								}
+							}
+							if(obj.has("battery")) {
+								if(obj.get("battery") != null) {
+									if(obj.get("battery") != "") {
+										double p = Double.valueOf(obj.get("battery").toString());
+										double round = Math.round(p * 100.0 / 100.0);
+										obj.put("battery",String.valueOf(round));
+
+
+									}
+									else {
+										obj.put("battery", "0");
+									}
+								}
+								else {
+									obj.put("battery", "0");
+								}
+							}
+							
+							
 							Iterator<String> keys = obj.keys();
+
 							while(keys.hasNext()) {
 							    String key = keys.next();
 							    attrbuitesList.put(key , obj.get(key).toString());
@@ -572,7 +548,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 						    
 					}
 				    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",vehicleInfo,sensorList);
-					logger.info("************************ vehicleInfoApp ENDED ***************************");
+					logger.info("************************ vehicleInfo ENDED ***************************");
 					return ResponseEntity.ok().body(getObjectResponse);
 
 				}
@@ -637,6 +613,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			}
 		}
 		userServiceImpl.resetChildernArray();
+		 List<Long>usersIds= new ArrayList<>();
 		 if(loggedUser.getAccountType().equals(4)) {
 			 Set<User> parentClients = loggedUser.getUsersOfUser();
 			 if(parentClients.isEmpty()) {
@@ -649,91 +626,24 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				 for(User object : parentClients) {
 					 parentClient = object;
 				 }
-				 List<Long>usersIds= new ArrayList<>();
 				 usersIds.add(parentClient.getId());
-				 List<CustomDeviceList> devices= deviceRepository.getDevicesListApp(usersIds,offset,search);
-				 Integer size=  deviceRepository.getDevicesListSize(usersIds);
-				 
-				 if(devices.size() > 0) {
-						for(int i=0;i<devices.size();i++) {
-							
-							long minutes = 0;
 
-							if(devices.get(i).getLastUpdate() != null) {
-								
-								SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
-								Date now = new Date();
-								String strDate = formatter.format(now);
-								try {
-									
-									Date dateLast = formatter.parse(devices.get(i).getLastUpdate());
-									Date dateNow = formatter.parse(strDate);
-									
-									minutes = getDateDiff (dateLast, dateNow, TimeUnit.MINUTES);  
-									
-									
-								} catch (ParseException e) {
-									e.printStackTrace();
-								}
-								if(minutes < 3) {
-									devices.get(i).setStatus("online");
-								}
-								if(minutes > 8) {
-									devices.get(i).setStatus("unknown");
-								}
-								if(minutes < 8 && minutes > 3) {
-									devices.get(i).setStatus("offline");
-								}
-							}
-							else {
-								devices.get(i).setStatus("offline");
-
-							}
-							
-							
-							if(devices.get(i).getAttributes() != null) {
-								JSONObject obj = new JSONObject(devices.get(i).getAttributes().toString());
-
-								
-								
-								if(obj.has("power")) {
-									devices.get(i).setPower(obj.getDouble("power"));
-
-								}
-								
-								if(obj.has("ignition")) {
-									devices.get(i).setIgnition(obj.getBoolean("ignition"));
-
-								}
-								
-								if(obj.has("sat")) {
-									devices.get(i).setSat(obj.getInt("sat"));
-
-								}
-							}
-								
-								
-						}
-					}
-				 
-				 
-				 getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",devices,size);
-				 logger.info("************************ getAllUserDevices ENDED ***************************");
-				return  ResponseEntity.ok().body(getObjectResponse);
+			 }
+		 }
+		 else {
+			 List<User>childernUsers = userServiceImpl.getAllChildernOfUser(userId);
+			 if(childernUsers.isEmpty()) {
+				 usersIds.add(userId);
+			 }
+			 else {
+				 usersIds.add(userId);
+				 for(User object : childernUsers) {
+					 usersIds.add(object.getId());
+				 }
 			 }
 		 }
 		 
-		 List<User>childernUsers = userServiceImpl.getAllChildernOfUser(userId);
-		 List<Long>usersIds= new ArrayList<>();
-		 if(childernUsers.isEmpty()) {
-			 usersIds.add(userId);
-		 }
-		 else {
-			 usersIds.add(userId);
-			 for(User object : childernUsers) {
-				 usersIds.add(object.getId());
-			 }
-		 }
+		
 		 
 		 List<CustomDeviceList> devices= deviceRepository.getDevicesListApp(usersIds,offset,search);
 		 Integer size=  deviceRepository.getDevicesListSize(usersIds);
@@ -775,7 +685,16 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				}
 				
 				
-				if(devices.get(i).getAttributes() != null) {
+				if(devices.get(i).getPositionId() != null) {
+					
+					MongoPositions mongoPosition = mongoPositionsRepository.findById(devices.get(i).getPositionId());
+					
+					devices.get(i).setAttributes(mongoPosition.getAttributes());
+					devices.get(i).setSpeed(mongoPosition.getSpeed());
+					devices.get(i).setLatitude(mongoPosition.getLatitude());
+					devices.get(i).setLongitude(mongoPosition.getLongitude());
+					devices.get(i).setAddress(mongoPosition.getAddress());
+					
 					JSONObject obj = new JSONObject(devices.get(i).getAttributes().toString());
 
 					
@@ -2241,7 +2160,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	}
 
 	@Override
-	public ResponseEntity<?> viewTripApp(String TOKEN, Long deviceId, Long startPositionId, Long endPositionId) {
+	public ResponseEntity<?> viewTripApp(String TOKEN, Long deviceId, String startTime , String endTime) {
 		
 		logger.info("************************ viewTripApp STARTED ***************************");
 
@@ -2260,7 +2179,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		Device device = deviceServiceImpl.findById(deviceId);
 		
 		if(device != null) {
-			positions = positionSqlRepository.getTripPositions(deviceId, startPositionId, endPositionId);
+			positions = mongoPositionsRepo.getTripPositions(deviceId, startTime, endTime);
 			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",positions,positions.size());
 			logger.info("************************ viewTripApp ENDED ***************************");
 			return  ResponseEntity.ok().body(getObjectResponse);

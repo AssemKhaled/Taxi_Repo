@@ -1,22 +1,12 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
-import java.util.Date;
-import java.util.Objects;
-
-import javax.jdo.annotations.Column;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.opencsv.bean.CsvBindByName;
-import com.opencsv.bean.CsvDate;
-
-@Document(collection = "tc_positions")
-public class MongoPositions {
+@Document(collection = "tc_positions_elm")
+public class MongoPositionsElm {
 
 	@Id
 	private ObjectId _id;
@@ -59,10 +49,11 @@ public class MongoPositions {
 
 	
 	
-	public MongoPositions() {
+	public MongoPositionsElm() {
 		
 	}
-	public MongoPositions(ObjectId _id, String protocol, Long deviceid, String servertime, String devicetime,
+	
+	public MongoPositionsElm(ObjectId _id, String protocol, Long deviceid, String servertime, String devicetime,
 			String fixtime, Integer valid, Double latitude, Double longitude, Float altitude, Float speed, Float course,
 			String address, String attributes, Double accuracy, String network, Integer is_sent, Integer is_offline,
 			Float weight) {
@@ -239,7 +230,6 @@ public class MongoPositions {
 	public void setWeight(Float weight) {
 		this.weight = weight;
 	}
-
 	
 	
 	

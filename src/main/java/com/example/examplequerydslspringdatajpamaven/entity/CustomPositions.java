@@ -1,12 +1,13 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
 public class CustomPositions {
-	private Long id;
+	private String id;
+	private Long deviceId;
 	private String deviceName;
 	private String driverName;
 	private String servertime;
 	private String attributes;
-	private String speed;
+	private Double speed;
 	private String weight;
 	private String sensor1;
 	private String sensor2;
@@ -39,28 +40,50 @@ public class CustomPositions {
 	public CustomPositions() {
 		
 	}
-	public CustomPositions(Long id, String deviceName, String attributes) {
+	public CustomPositions(String id, String deviceName, String attributes) {
 		this.id = id;
 		this.deviceName = deviceName;
 		this.attributes = attributes;
 	}
-	public CustomPositions(Long id, String deviceName,String driverName, String attributes) {
+	public CustomPositions(String id, String deviceName,String driverName, String attributes) {
 		this.id = id;
 		this.deviceName = deviceName;
 		this.driverName = driverName;
 		this.attributes = attributes;
 	}
-	public CustomPositions(Long id, String deviceName, String servertime, String attributes, String speed) {
+	public CustomPositions(String id, String deviceName, String servertime, String attributes, Double speed) {
 		this.id = id;
 		this.deviceName = deviceName;
 		this.servertime = servertime;
 		this.attributes = attributes;
 		this.speed = speed;
 	}
-	public Long getId() {
+	
+	
+	public CustomPositions(String id, Long deviceId, String deviceName, String driverName, String servertime,
+			String attributes, Double speed, String weight, String sensor1, String sensor2) {
+		super();
+		this.id = id;
+		this.deviceId = deviceId;
+		this.deviceName = deviceName;
+		this.driverName = driverName;
+		this.servertime = servertime;
+		this.attributes = attributes;
+		this.speed = speed;
+		this.weight = weight;
+		this.sensor1 = sensor1;
+		this.sensor2 = sensor2;
+	}
+	public Long getDeviceId() {
+		return deviceId;
+	}
+	public void setDeviceId(Long deviceId) {
+		this.deviceId = deviceId;
+	}
+	public String getId() {
 		return id;
 	}
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 	public String getDeviceName() {
@@ -81,10 +104,10 @@ public class CustomPositions {
 	public void setAttributes(String attributes) {
 		this.attributes = attributes;
 	}
-	public String getSpeed() {
+	public Double getSpeed() {
 		return speed;
 	}
-	public void setSpeed(String speed) {
+	public void setSpeed(Double speed) {
 		this.speed = speed;
 	}
 	

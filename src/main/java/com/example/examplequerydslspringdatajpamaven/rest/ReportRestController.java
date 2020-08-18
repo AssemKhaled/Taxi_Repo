@@ -308,9 +308,9 @@ public class ReportRestController {
 	@RequestMapping(value = "/viewTrip", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> viewTrip(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 													 @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
-													 @RequestParam (value = "startPositionId", defaultValue = "0") Long startPositionId,
-													 @RequestParam (value = "endPositionId", defaultValue = "0") Long endPositionId) {	
-    	return  reportServiceImpl.getviewTrip(TOKEN, deviceId,startPositionId, endPositionId);
+													 @RequestParam (value = "startTime", defaultValue = "0") String startTime,
+													 @RequestParam (value = "endTime", defaultValue = "0") String endTime) {	
+    	return  reportServiceImpl.getviewTrip(TOKEN, deviceId,startTime, endTime);
 
 	}
 

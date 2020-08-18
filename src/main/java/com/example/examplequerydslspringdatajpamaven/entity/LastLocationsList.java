@@ -3,21 +3,21 @@ package com.example.examplequerydslspringdatajpamaven.entity;
 public class LastLocationsList {
 
 
-	private Long id;
+	private String id;
 	private String lasttime;
 	private Long deviceid;
-	private String latitude;
-	private String longitude;
-	private Double speed;
+	private Double latitude;
+	private Double longitude;
+	private Float speed;
 	private String attributes;
 	private String devicetime;
 	private String deviceRK;
 	private String driver_RK;
 	private Long driverid;
 	private String drivername;
-	private Double weight;
+	private Float weight;
 	private String address;
-	private Double is_offline;
+	private Integer is_offline;
 	private String devicename;
 	private Long userid;
 	private String username;
@@ -30,9 +30,22 @@ public class LastLocationsList {
 		
 	}
 	
-	public LastLocationsList(Long id, String lasttime, Long deviceid, String latitude, String longitude, Double speed,
+	public LastLocationsList(Long deviceid, String deviceRK, String driver_RK, Long driverid, String drivername,
+		    String devicename, Long userid, String username,String userRK) {
+		this.deviceid = deviceid;
+		this.deviceRK = deviceRK;
+		this.driver_RK = driver_RK;
+		this.driverid = driverid;
+		this.drivername = drivername;
+		this.devicename = devicename;
+		this.userid = userid;
+		this.username = username;
+		this.userRK = userRK;
+	}
+	
+	public LastLocationsList(String id, String lasttime, Long deviceid, Double latitude, Double longitude, Float speed,
 			String attributes, String devicetime, String deviceRK, String driver_RK, Long driverid, String drivername,
-			Double weight, String address, Double is_offline, String devicename, Long userid, String username,
+			Float weight, String address, Integer is_offline, String devicename, Long userid, String username,
 			String userRK) {
 		super();
 		this.id = id;
@@ -55,10 +68,11 @@ public class LastLocationsList {
 		this.username = username;
 		this.userRK = userRK;
 	}
-	public Long getId() {
+	
+	public String getId() {
 		return id;
 	}
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 	public String getLasttime() {
@@ -73,22 +87,22 @@ public class LastLocationsList {
 	public void setDeviceid(Long deviceid) {
 		this.deviceid = deviceid;
 	}
-	public String getLatitude() {
+	public Double getLatitude() {
 		return latitude;
 	}
-	public void setLatitude(String latitude) {
+	public void setLatitude(Double latitude) {
 		this.latitude = latitude;
 	}
-	public String getLongitude() {
+	public Double getLongitude() {
 		return longitude;
 	}
-	public void setLongitude(String longitude) {
+	public void setLongitude(Double longitude) {
 		this.longitude = longitude;
 	}
-	public Double getSpeed() {
+	public Float getSpeed() {
 		return speed;
 	}
-	public void setSpeed(Double speed) {
+	public void setSpeed(Float speed) {
 		this.speed = speed;
 	}
 	public String getAttributes() {
@@ -127,10 +141,10 @@ public class LastLocationsList {
 	public void setDrivername(String drivername) {
 		this.drivername = drivername;
 	}
-	public Double getWeight() {
+	public Float getWeight() {
 		return weight;
 	}
-	public void setWeight(Double weight) {
+	public void setWeight(Float weight) {
 		this.weight = weight;
 	}
 	public String getAddress() {
@@ -139,10 +153,10 @@ public class LastLocationsList {
 	public void setAddress(String address) {
 		this.address = address;
 	}
-	public Double getIs_offline() {
+	public Integer getIs_offline() {
 		return is_offline;
 	}
-	public void setIs_offline(Double is_offline) {
+	public void setIs_offline(Integer is_offline) {
 		this.is_offline = is_offline;
 	}
 	public String getDevicename() {

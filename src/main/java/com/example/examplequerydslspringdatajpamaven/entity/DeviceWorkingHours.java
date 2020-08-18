@@ -10,14 +10,16 @@ public class DeviceWorkingHours {
 	private String deviceTime;
 	private String positionId;
 	private String attributes;
-	private Integer deviceId;
+	private Long deviceId;
 	private String deviceName;
 	private String hours;
 
 	
+	public DeviceWorkingHours() {
+		
+	}
 	
-	
-	public DeviceWorkingHours(String deviceTime, String positionId, String attributes, Integer deviceId, String deviceName) {
+	public DeviceWorkingHours(String deviceTime, String positionId, String attributes, Long deviceId, String deviceName) {
 		super();
 		this.deviceTime = deviceTime;
 		this.positionId = positionId;
@@ -43,10 +45,10 @@ public class DeviceWorkingHours {
 	public void setAttributes(String attributes) {
 		this.attributes = attributes;
 	}
-	public Integer getDeviceId() {
+	public Long getDeviceId() {
 		return deviceId;
 	}
-	public void setDeviceId(Integer deviceId) {
+	public void setDeviceId(Long deviceId) {
 		this.deviceId = deviceId;
 	}
 	public String getDeviceName() {

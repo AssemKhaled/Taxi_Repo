@@ -42,7 +42,7 @@ public interface PositionElmRepository  extends JpaRepository<PositionElm, Long>
 	List<LastLocationsList> getAllPositionsNotSent();
 	
 	@Query(value = "SELECT car_weight FROM tc_devices where id=:deviceId",nativeQuery = true )
-	public Double getWeight(@Param("deviceId")Long deviceId);
+	public Float getWeight(@Param("deviceId")Long deviceId);
 	
 
 	@Modifying

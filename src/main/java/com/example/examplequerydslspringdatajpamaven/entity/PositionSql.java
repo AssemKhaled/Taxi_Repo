@@ -90,26 +90,7 @@ import com.opencsv.bean.CsvDate;
 			     		" LEFT JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id "+
 			     		" where tc_user_device.userid IN ( :userIds) AND Date(tc_positions.servertime)=CURRENT_DATE() " ),	
 	
-	
-@NamedNativeQuery(name="getPositionsList", 
-     resultSetMapping="PositionsList", 
-     query=" SELECT tc_positions.id as id, tc_devices.name as deviceName , tc_positions.servertime as servertime , tc_positions.attributes as attributes , "
-     		+ " tc_positions.speed as speed "
-     		+ " FROM tc_positions "
-     		+ " INNER JOIN tc_devices ON tc_devices.id=tc_positions.deviceid "
-     		+ " WHERE deviceid IN(:deviceId) AND tc_positions.fixtime<=:end AND "
-     		+ " tc_positions.fixtime>=:start AND tc_devices.delete_date IS NULL"
-    		+ " ORDER BY tc_positions.servertime DESC LIMIT :offset, 10" ),
 
-@NamedNativeQuery(name="getPositionsListScheduled", 
-resultSetMapping="PositionsList", 
-query=" SELECT tc_positions.id as id, tc_devices.name as deviceName , tc_positions.servertime as servertime , tc_positions.attributes as attributes , "
- 		+ " tc_positions.speed as speed "
-		+ " FROM tc_positions "
-		+ " INNER JOIN tc_devices ON tc_devices.id=tc_positions.deviceid "
-		+ " WHERE deviceid IN(:deviceId) AND tc_positions.fixtime<=:end AND "
-		+ " tc_positions.fixtime>=:start AND tc_devices.delete_date IS NULL"
-		+ " ORDER BY tc_positions.servertime DESC ")
 })
 
 public class PositionSql {

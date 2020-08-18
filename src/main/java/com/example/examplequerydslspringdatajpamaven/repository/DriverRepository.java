@@ -83,26 +83,6 @@ public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslP
 			+ " WHERE tc_user_driver.userid IN(:userIds) and tc_drivers.delete_date is null", nativeQuery = true)
 	public Integer getAllDriversSize(@Param("userIds") List<Long> userIds);
 	
-	@Query(nativeQuery = true, name = "getDriverWorkingHours")
-	public List<DriverWorkingHours> getDriverWorkingHours(@Param("deviceId") List<Long> deviceId,@Param("offset")int offset,@Param("start")String start,@Param("end")String end);
-
-	@Query(nativeQuery = true, name = "getDriverWorkingHoursScheduled")
-	public List<DriverWorkingHours> getDriverWorkingHoursScheduled(@Param("deviceId") List<Long> deviceId,@Param("start")String start,@Param("end")String end);
-
-	
-	@Query(nativeQuery = true, name = "getNumberDriverWorkingHours")
-	public List<DriverWorkingHours> getNumberDriverWorkingHours(@Param("deviceId") List<Long> deviceId,@Param("start")String start,@Param("end")String end);
-
-	
-	@Query(value = "SELECT  count(*) FROM tc_positions  " + 
-			" INNER JOIN tc_devices ON tc_devices.id=tc_positions.deviceid  WHERE deviceid IN(:deviceId) " + 
-			" and tc_positions.devicetime " + 
-			" IN (SELECT devicetime " + 
-			" FROM (SELECT MAX(devicetime) as devicetime FROM tc_positions WHERE deviceid IN(:deviceId) " + 
-			" AND devicetime between :start and :end group by CAST(devicetime AS DATE) )as t1) " + 
-			" order by devicetime DESC",nativeQuery = true )
-	
-	public Integer getDriverWorkingHoursSize(@Param("deviceId") List<Long> deviceId,@Param("start")String start,@Param("end")String end);
 
 	@Query(value = "SELECT tc_drivers.id,tc_drivers.name FROM tc_drivers"
 			+ " INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id"

@@ -12,13 +12,22 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
+import java.util.Arrays;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOptions;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -40,6 +49,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.DriverWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.EventReport;
 import com.example.examplequerydslspringdatajpamaven.entity.EventReportByCurl;
 import com.example.examplequerydslspringdatajpamaven.entity.Group;
+import com.example.examplequerydslspringdatajpamaven.entity.MongoPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.Position;
 import com.example.examplequerydslspringdatajpamaven.entity.StopReport;
 import com.example.examplequerydslspringdatajpamaven.entity.SummaryReport;
@@ -50,6 +60,8 @@ import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository
 import com.example.examplequerydslspringdatajpamaven.repository.DriverRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.EventRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.GroupRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionRepo;
+import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionsRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.PositionRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.PositionSqlRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
@@ -102,12 +114,21 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	DriverServiceImpl driverServiceImpl;
 	
 	@Autowired
+	MongoPositionsRepository mongoPositionsRepository;
+	
+	@Autowired
 	UserServiceImpl userServiceImpl;
 	
 	private static final Log logger = LogFactory.getLog(ReportServiceImpl.class);
 	
 	GetObjectResponse getObjectResponse;
 
+	@Autowired
+	MongoTemplate mongoTemplate;
+	
+	@Autowired
+	MongoPositionRepo mongoPositionRepo;
+	
 	
 	@Override
 	public ResponseEntity<?> getEventsReport(String TOKEN,Long [] deviceIds,Long [] groupIds,int offset,String start,String end,String type,String search,Long userId) {
@@ -651,12 +672,19 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				logger.info("************************ getDeviceWorkingHours ENDED ***************************");
 	        	return  ResponseEntity.badRequest().body(getObjectResponse);
 	        }
-			
+
 			if(!TOKEN.equals("Schedule")) {
-				deviceHours = deviceRepository.getDeviceWorkingHours(allDevices,offset,start,end);
+				
+				deviceHours = mongoPositionRepo.getDeviceWorkingHours(allDevices,offset,start,end);			
+					
 				if(deviceHours.size()>0) {
-   				    size=deviceRepository.getDeviceWorkingHoursSize(allDevices,start, end);
+   				    size=mongoPositionRepo.getDeviceWorkingHoursSize(allDevices,start, end);
+
 					for(int i=0;i<deviceHours.size();i++) {
+						
+						Device device = deviceRepository.findOne(deviceHours.get(i).getDeviceId());
+						deviceHours.get(i).setDeviceName(device.getName());
+						
 						JSONObject obj = new JSONObject(deviceHours.get(i).getAttributes());
 						if(obj.has("todayHoursString")) {
 							deviceHours.get(i).setHours(obj.getString("todayHoursString"));
@@ -671,9 +699,14 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				}
 			}
 			else {
-				deviceHours = deviceRepository.getDeviceWorkingHoursScheduled(allDevices,start,end);
+				deviceHours = mongoPositionRepo.getDeviceWorkingHoursScheduled(allDevices,start,end);			
+
 				if(deviceHours.size()>0) {
 					for(int i=0;i<deviceHours.size();i++) {
+						
+						Device device = deviceRepository.findOne(deviceHours.get(i).getDeviceId());
+						deviceHours.get(i).setDeviceName(device.getName());
+						
 						JSONObject obj = new JSONObject(deviceHours.get(i).getAttributes());
 						if(obj.has("todayHoursString")) {
 							deviceHours.get(i).setHours(obj.getString("todayHoursString"));
@@ -953,12 +986,16 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			if(!TOKEN.equals("Schedule")) {
 				custom = "$."+custom;
 
-				deviceHours = deviceRepository.getDeviceCustom(allDevices,offset,start,end,custom,value);
+				//deviceHours = deviceRepository.getDeviceCustom(allDevices,offset,start,end,custom,value);
+				deviceHours = mongoPositionRepo.getDeviceCustom(allDevices, offset, start, end, custom, value);
 				if(deviceHours.size()>0) {
    				    size=deviceRepository.getDeviceCustomSize(allDevices,start, end,custom,value);
 					for(int i=0;i<deviceHours.size();i++) {
-						JSONObject obj = new JSONObject(deviceHours.get(i).getAttributes());
 						
+						Device device = deviceRepository.findOne(deviceHours.get(i).getDeviceId());
+						deviceHours.get(i).setDeviceName(device.getName());
+						
+						JSONObject obj = new JSONObject(deviceHours.get(i).getAttributes());
 						if(obj.has("todayHoursString")) {
 							deviceHours.get(i).setHours(obj.getString("todayHoursString"));
 						}
@@ -1245,9 +1282,12 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	       
 			
 			if(!TOKEN.equals("Schedule")) {
-				driverHours = driverRepository.getDriverWorkingHours(allDevices,offset,start,end);
+				
+				driverHours = mongoPositionRepo.getDriverWorkingHours(allDevices,offset,start,end);			
+
 				if(driverHours.size()>0) {
-   				    size=driverRepository.getDriverWorkingHoursSize(allDevices,start,end);
+   				    size=mongoPositionRepo.getDriverWorkingHoursSize(allDevices,start,end);
+
 					for(int i=0;i<driverHours.size();i++) {
 						for(int j=0;j<allDevicesList.size();j++) {
 							Long id1 = driverHours.get(i).getDeviceId().longValue();
@@ -1257,6 +1297,10 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								driverHours.get(i).setDriverName(allDevicesList.get(j).getName());
 							}
 						}
+						
+						Device device = deviceRepository.findOne(driverHours.get(i).getDeviceId());
+						driverHours.get(i).setDeviceName(device.getName());
+						
 						JSONObject obj = new JSONObject(driverHours.get(i).getAttributes());
 						if(obj.has("todayHoursString")) {
 							driverHours.get(i).setHours(obj.getString("todayHoursString"));
@@ -1272,17 +1316,22 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				
 			}
 			else {
-				driverHours = driverRepository.getDriverWorkingHoursScheduled(allDevices,start,end);
+				driverHours = mongoPositionRepo.getDriverWorkingHoursScheduled(allDevices,start,end);			
+
 				if(driverHours.size()>0) {
 					for(int i=0;i<driverHours.size();i++) {
 						for(int j=0;j<allDevicesList.size();j++) {
 							Long id1 = driverHours.get(i).getDeviceId().longValue();
 							Long id2 = allDevicesList.get(j).getId();
 
-							if(id1 == id2) {
+							if(id1.equals(id2)) {
 								driverHours.get(i).setDriverName(allDevicesList.get(j).getName());
 							}
 						}
+						
+						Device device = deviceRepository.findOne(driverHours.get(i).getDeviceId());
+						driverHours.get(i).setDeviceName(device.getName());
+						
 						JSONObject obj = new JSONObject(driverHours.get(i).getAttributes());
 						if(obj.has("todayHoursString")) {
 							driverHours.get(i).setHours(obj.getString("todayHoursString"));
@@ -3286,12 +3335,16 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 		if(!TOKEN.equals("Schedule")) {
 			search = "%"+search+"%";
-			positionsList = positionSqlRepository.getSensorsList(allDevices,start, end,offset);
+			positionsList = mongoPositionRepo.getSensorsList(allDevices, offset, start, end);
 			if(positionsList.size()>0) {
-				    size=positionSqlRepository.getSensorsListSize(allDevices,start, end);
+				    size=mongoPositionRepo.getSensorsListSize(allDevices,start, end);
+
 				for(int i=0;i<positionsList.size();i++) {
-					JSONObject obj = new JSONObject(positionsList.get(i).getAttributes());
 					
+					Device device = deviceRepository.findOne(positionsList.get(i).getDeviceId());
+					positionsList.get(i).setDeviceName(device.getName());
+					
+					JSONObject obj = new JSONObject(positionsList.get(i).getAttributes());
 					if(obj.has("weight")) {
 						positionsList.get(i).setWeight(obj.get("weight").toString());
 					}
@@ -3310,11 +3363,16 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			
 		}
 		else {
-			positionsList = positionSqlRepository.getPositionsListScheduled(allDevices,start, end);
+			positionsList = mongoPositionRepo.getPositionsListScheduled(allDevices,start, end);
+
 			if(positionsList.size()>0) {
+				
 				for(int i=0;i<positionsList.size();i++) {
-					JSONObject obj = new JSONObject(positionsList.get(i).getAttributes());
 					
+					Device device = deviceRepository.findOne(positionsList.get(i).getDeviceId());
+					positionsList.get(i).setDeviceName(device.getName());
+					
+					JSONObject obj = new JSONObject(positionsList.get(i).getAttributes());
 					if(obj.has("weight")) {
 						positionsList.get(i).setWeight(obj.get("weight").toString());
 					}
@@ -3324,6 +3382,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 					if(obj.has("adc2")) {
 						positionsList.get(i).setSensor2(obj.get("adc2").toString());
 					}
+
 					
 					
 				}
@@ -4914,7 +4973,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	
 	
 	@Override
-	public ResponseEntity<?> getviewTrip(String TOKEN, Long deviceId, Long startPositionId, Long endPositionId) {
+	public ResponseEntity<?> getviewTrip(String TOKEN, Long deviceId, String startTime, String endTime) {
 		logger.info("************************ getviewTrip STARTED ***************************");
 
 		List<TripPositions> positions = new ArrayList<TripPositions>();
@@ -4933,7 +4992,8 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		Device device = deviceServiceImpl.findById(deviceId);
 		
 		if(device != null) {
-			positions = positionSqlRepository.getTripPositions(deviceId, startPositionId, endPositionId);
+			positions = mongoPositionRepo.getTripPositions(deviceId, startTime, endTime);
+
 			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",positions,positions.size());
 			logger.info("************************ getviewTrip ENDED ***************************");
 			return  ResponseEntity.ok().body(getObjectResponse);
@@ -5183,8 +5243,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	        }
 	        
 			List<Map> dataAll = new ArrayList<Map>();
-	        driverHours = driverRepository.getNumberDriverWorkingHours(allDevices,start,end);
-
+	        driverHours = mongoPositionRepo.getDriverWorkingHoursScheduled(allDevices, start, end);
 			  if(driverHours.size()>0) {
 
 				  for(Long dev:allDevices) {
@@ -5215,9 +5274,10 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 							  
 						  }
 						  
-						  
-						  if(Long.valueOf( driverH.getDeviceId() ) == dev) {
-							  
+
+
+						  if( driverH.getDeviceId().toString().equals(dev.toString())) {
+
 							JSONObject obj = new JSONObject(driverH.getAttributes());
 							if(obj.has("todayHours")) {
 								time += Math.abs(  obj.getLong("todayHours")  );

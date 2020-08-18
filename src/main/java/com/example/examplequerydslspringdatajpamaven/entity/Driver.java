@@ -25,22 +25,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @SqlResultSetMappings({
-	@SqlResultSetMapping(
-	        name="DriverWorkingHours",
-	        classes={
-	           @ConstructorResult(
-	                targetClass=DriverWorkingHours.class,
-	                  columns={
-	                     @ColumnResult(name="deviceTime",type=String.class),
-	                     @ColumnResult(name="positionId",type=Long.class),
-	                     @ColumnResult(name="attributes",type=String.class),
-	                     @ColumnResult(name="deviceId",type=Integer.class),
-	                     @ColumnResult(name="deviceName",type=String.class)
-	                     
-	                }
-	           )
-	        }
-	),
+	
 	@SqlResultSetMapping(
 	        name="DriverList",
 	        classes={
@@ -86,45 +71,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 					+ " and ((tc_drivers.name Like LOWER(CONCAT('%',:search, '%'))) OR (tc_drivers.uniqueid Like LOWER(CONCAT('%',:search, '%'))) OR "
 					+ " (tc_drivers.mobile_num Like LOWER(CONCAT('%',:search, '%'))) OR (tc_drivers.birth_date Like LOWER(CONCAT('%',:search, '%')))) " + 
 					" LIMIT :offset,10"),
-	
-	
-	@NamedNativeQuery(name="getDriverWorkingHours", 
-	resultSetMapping="DriverWorkingHours", 
-	query="SELECT  CAST(tc_positions.devicetime AS DATE) as deviceTime ,tc_positions.id as positionId, " + 
-			" tc_positions.attributes as attributes,  tc_positions.deviceid as deviceId,tc_devices.name as deviceName  "
-			+ " FROM tc_positions  " + 
-			" INNER JOIN tc_devices ON tc_devices.id=tc_positions.deviceid  WHERE deviceid IN(:deviceId) "
-			+ " and tc_positions.devicetime " + 
-			" IN (SELECT devicetime" + 
-			" FROM (SELECT MAX(devicetime) as devicetime FROM tc_positions WHERE deviceid IN(:deviceId) " + 
-			" AND devicetime between :start and :end group by CAST(devicetime AS DATE) )as t1) " + 
-			" order by devicetime DESC  limit :offset,10 " ),
-	
-	@NamedNativeQuery(name="getDriverWorkingHoursScheduled", 
-	resultSetMapping="DriverWorkingHours", 
-	query="SELECT  CAST(tc_positions.devicetime AS DATE) as deviceTime ,tc_positions.id as positionId, " + 
-			" tc_positions.attributes as attributes,  tc_positions.deviceid as deviceId,tc_devices.name as deviceName  "
-			+ " FROM tc_positions  " + 
-			" INNER JOIN tc_devices ON tc_devices.id=tc_positions.deviceid  WHERE deviceid IN(:deviceId) "
-			+ " and tc_positions.devicetime " + 
-			" IN (SELECT devicetime" + 
-			" FROM (SELECT MAX(devicetime) as devicetime FROM tc_positions WHERE deviceid IN(:deviceId) " + 
-			" AND devicetime between :start and :end group by CAST(devicetime AS DATE) )as t1) " + 
-			" order by devicetime DESC " ),
-	
-	
-	@NamedNativeQuery(name="getNumberDriverWorkingHours", 
-	resultSetMapping="DriverWorkingHours", 
-	query="SELECT  CAST(tc_positions.devicetime AS DATE) as deviceTime ,tc_positions.id as positionId, " + 
-			" tc_positions.attributes as attributes,  tc_positions.deviceid as deviceId,tc_devices.name as deviceName  "
-			+ " FROM tc_positions  " + 
-			" INNER JOIN tc_devices ON tc_devices.id=tc_positions.deviceid  WHERE deviceid IN(:deviceId) "
-			+ " and tc_positions.devicetime " + 
-			" IN (SELECT devicetime" + 
-			" FROM (SELECT MAX(devicetime) as devicetime FROM tc_positions WHERE deviceid IN(:deviceId) " + 
-			" AND devicetime between :start and :end group by CAST(devicetime AS DATE) )as t1) " + 
-			" order by devicetime DESC " ),
-	
 
 	
 })
