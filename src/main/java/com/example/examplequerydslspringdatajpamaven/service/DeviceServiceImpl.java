@@ -407,8 +407,8 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				DecodePhoto decodePhoto=new DecodePhoto();
 	        	String oldPhoto=oldDevice.getPhoto();
 
-	        	if(!oldPhoto.equals("")) {
-					if(oldPhoto != null) {
+				if(oldPhoto != null) {
+		        	if(!oldPhoto.equals("")) {
 						if(!oldPhoto.equals("not_available.png")) {
 							decodePhoto.deletePhoto(oldPhoto, "vehicle");
 						}

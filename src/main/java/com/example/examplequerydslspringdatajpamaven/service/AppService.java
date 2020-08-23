@@ -1,6 +1,7 @@
 package com.example.examplequerydslspringdatajpamaven.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 
@@ -47,5 +48,15 @@ public interface AppService {
 	public ResponseEntity<?> getSummaryReportApp(String TOKEN,Long deviceId,Long groupId,String type,String from,String to,int page,int start,int limit,Long userId);
 	public ResponseEntity<?> viewTripApp(String TOKEN,Long deviceId,String startTime,String endTime);
 
+	public ResponseEntity<?> updateProfilePhotoApp(String TOKEN,Map<String, String> data,Long userId);
+	public ResponseEntity<?> getUserInfoApp(String TOKEN,Long userId);
+	public ResponseEntity<?> updateProfilePasswordApp(String TOKEN,Map<String, String> data,String check,Long userId);
+
+	public ResponseEntity<?> getStatusApp(String TOKEN,Long userId);
+	public ResponseEntity<?> getMergeHoursIgnitionApp(String TOKEN,Long userId);
+	public ResponseEntity<?> getDistanceFuelEngineApp(String TOKEN,Long userId);
+	public ResponseEntity<?> getNotificationsChartApp(String TOKEN,Long userId);
+	
+	
 }	
 

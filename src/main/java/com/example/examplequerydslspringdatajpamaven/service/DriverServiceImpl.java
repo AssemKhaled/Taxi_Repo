@@ -388,9 +388,8 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 								else {
 									DecodePhoto decodePhoto=new DecodePhoto();
 						        	String oldPhoto=driverCheck.getPhoto();
-
-						        	if(!oldPhoto.equals("")) {
-										if(oldPhoto != null) {
+									if(oldPhoto != null) {
+							        	if(!oldPhoto.equals("")) {
 											if(!oldPhoto.equals("not_available.png")) {
 												decodePhoto.deletePhoto(oldPhoto, "driver");
 											}

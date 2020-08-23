@@ -662,7 +662,7 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 
 	@Override
 	public ResponseEntity<?> getNotificationsChart(String TOKEN, Long userId) {
-logger.info("************************ getNotifications STARTED ***************************");
+		logger.info("************************ getNotifications STARTED ***************************");
 		
 		List<EventReport> notifications = new ArrayList<EventReport>();
 		if(TOKEN.equals("")) {

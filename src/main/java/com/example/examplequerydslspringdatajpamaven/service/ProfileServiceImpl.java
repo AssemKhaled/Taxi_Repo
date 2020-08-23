@@ -286,7 +286,7 @@ public class ProfileServiceImpl extends RestServiceController implements Profile
 			}
 			else {
 				if(user.getDelete_date() == null) {
-					if(data.get("photo") ==null) {
+					if(data.get("photo") == null) {
 						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Photo is Required",users);
 						return ResponseEntity.badRequest().body(getObjectResponse);
 
@@ -296,9 +296,8 @@ public class ProfileServiceImpl extends RestServiceController implements Profile
 						
 						DecodePhoto decodePhoto=new DecodePhoto();
 						String photo = data.get("photo").toString();
-						
-						if(!user.getPhoto().equals("")) {
-							if(user.getPhoto() != null) {
+						if(user.getPhoto() != null) {
+							if(!user.getPhoto().equals("")) {
 								if(!user.getPhoto().equals("not_available.png")) {
 									decodePhoto.deletePhoto(user.getPhoto(), "user");
 								}

@@ -1,5 +1,7 @@
 package com.example.examplequerydslspringdatajpamaven.rest;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -353,5 +355,63 @@ public class AppRestController {
 		
 	}
 	
+	@RequestMapping(value = "/updatePhotoApp", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<?> updatePhotoApp(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                           @RequestBody Map<String, String> data ,
+			                                           @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+
+    	return  appService.updateProfilePhotoApp(TOKEN,data,userId);
+
+	}
+	
+	@RequestMapping(value = "/getProfileInfoApp", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getProfileInfoApp(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                              @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		
+	
+    	return  appService.getUserInfoApp(TOKEN,userId);
+
+	}
+	
+	@RequestMapping(value = "/changePassowrdApp", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<?> changePassowrdApp(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                              @RequestBody Map<String, String> data ,
+			                                              @RequestParam (value = "check", defaultValue = "") String check,
+			                                              @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+
+		
+    	return appService.updateProfilePasswordApp(TOKEN,data,check,userId);
+
+	}
+	
+	@GetMapping(path ="/getStatusApp")
+	public ResponseEntity<?> getStatusApp(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                           @RequestParam (value = "userId", defaultValue = "0") Long userId){
+		
+		return appService.getStatusApp(TOKEN,userId);
+	}
+	
+	@RequestMapping(value = "/getMergeHoursIgnitionApp", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getMergeHoursIgnitionApp(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+															@RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		
+    	return  appService.getMergeHoursIgnitionApp(TOKEN,userId);
+
+	}
+	
+	@GetMapping(path ="/getDistanceFuelEngineApp")
+	public ResponseEntity<?> getDistanceFuelEngineApp(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                             @RequestParam (value = "userId", defaultValue = "0") Long userId){
+		
+		return appService.getDistanceFuelEngineApp(TOKEN,userId);
+	}
+	
+	@RequestMapping(value = "/getNotificationsChartApp", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getNotificationsChartApp(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+															@RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		
+    	return  appService.getNotificationsChartApp(TOKEN,userId);
+
+	}
 	
 }
