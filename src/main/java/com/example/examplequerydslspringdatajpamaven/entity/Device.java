@@ -409,28 +409,6 @@ query="SELECT tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.la
 
 
 
-@NamedNativeQuery(name="getDeviceCustom", 
-resultSetMapping="DeviceWorkingHours", 
-query="SELECT tc_positions.devicetime as deviceTime ,tc_positions.id as positionId, " + 
-		" tc_positions.attributes as attributes,  deviceid as deviceId,tc_devices.name as deviceName " + 
-		" FROM tc_positions  " + 
-		" INNER JOIN tc_devices ON tc_devices.id=tc_positions.deviceid  "+
-		" WHERE tc_positions.deviceid IN(:deviceId) and " + 
-		"  CAST(json_extract(tc_positions.attributes, :custom) AS character) =:value "+
-		" and tc_positions.devicetime between :start and :end "+
-		" order by devicetime DESC  limit :offset,10 " ),
-
-@NamedNativeQuery(name="getDeviceCustomSchduled", 
-resultSetMapping="DeviceWorkingHours", 
-query="SELECT tc_positions.devicetime as deviceTime ,tc_positions.id as positionId, " + 
-		" tc_positions.attributes as attributes,  deviceid as deviceId,tc_devices.name as deviceName " + 
-		" FROM tc_positions  " + 
-		" INNER JOIN tc_devices ON tc_devices.id=tc_positions.deviceid  "+
-		" WHERE tc_positions.deviceid IN(:deviceId) and " + 
-		"  CAST(json_extract(tc_positions.attributes, :custom) AS character) =:value "+
-		" and tc_positions.devicetime between :start and :end "+
-		" order by devicetime DESC " ),
-
 @NamedNativeQuery(name="vehicleInfo", 
 resultSetMapping="vehicleInfoData", 
 query=" SELECT tc_drivers.id as driverId,tc_drivers.uniqueid as driverUniqueId,tc_drivers.name as driverName,tc_drivers.photo as driverPhoto," + 

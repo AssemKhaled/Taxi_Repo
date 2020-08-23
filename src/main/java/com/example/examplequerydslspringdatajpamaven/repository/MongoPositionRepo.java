@@ -111,14 +111,130 @@ public class MongoPositionRepo {
 		BasicDBObject basicDBObject = new BasicDBObject();
 		
 	    Aggregation aggregation = newAggregation(
-	            match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)),
+	    		match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)), 
+	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
+					@Override
+					public DBObject toDbObject(AggregationOperationContext context) {
+	                    DBObject filterExpression = new BasicDBObject();
+	                    filterExpression.put("$strLenCP", "$attributes");
+
+						return filterExpression;
+					}
+				}).as("len"),
+	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
+					@Override
+					public DBObject toDbObject(AggregationOperationContext context) {
+						Object array[] = new Object[] { "$len", 2};
+	                    DBObject filterExpression = new BasicDBObject();
+	                    filterExpression.put("$subtract", array );
+						return filterExpression;
+					}
+				}).as("length"),
+	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
+					@Override
+					public DBObject toDbObject(AggregationOperationContext context) {
+						Object array[] = new Object[] { "$attributes", 1, "$length"};
+	                    DBObject filterExpression = new BasicDBObject();
+	                    filterExpression.put("$substr", array );
+						return filterExpression;
+					}
+				}).as("attribute"),
+	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
+					@Override
+					public DBObject toDbObject(AggregationOperationContext context) {
+						Object split[] = new Object[] { "$attribute", "," };
+					    ArrayList<Integer> array = new ArrayList<Integer>();
+						Object arrayThis[] = new Object[] {"$$this", ":"};
+
+						DBObject $let =  new BasicDBObject();
+						$let.put("vars",new BasicDBObject("splitted",new BasicDBObject("$split",arrayThis)));
+						
+						DBObject in =  new BasicDBObject();
+						Object arrayElemAtK[] = new Object[] {"$$splitted", 0};
+						Object arrayElemAtV[] = new Object[] {"$$splitted", 1};
+						in.put("k", new BasicDBObject("$arrayElemAt",arrayElemAtK));
+						in.put("v", new BasicDBObject("$arrayElemAt",arrayElemAtV));
+						
+						$let.put("in",in);
+
+
+						DBObject output =  new BasicDBObject("$let",$let);
+
+						Object arrayConcat[] = new Object[] {output};
+
+						Object concat[] = new Object[] {"$$value.elements",arrayConcat};
+
+	                    DBObject filterExpression = new BasicDBObject();
+	                    DBObject data = new BasicDBObject();
+	                    data.put("input", new BasicDBObject("$split",split));
+	                    data.put("initialValue", new BasicDBObject("elements", array));
+	                    data.put("in", new BasicDBObject("elements", new BasicDBObject("$concatArrays", concat)));
+
+	                    filterExpression.put("$reduce", data );
+
+	                    return filterExpression;
+					}
+				}).as("attribute"),
+	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
+					@Override
+					public DBObject toDbObject(AggregationOperationContext context) {
+						
+	                    DBObject filterExpression = new BasicDBObject();
+	                    DBObject data = new BasicDBObject();
+	                    DBObject filter = new BasicDBObject();
+	                    filter.put("input", "$attribute.elements");
+	                    filter.put("as", "el");
+	                    filter.put("cond", new BasicDBObject("$not","$el.key"));
+
+	                    data.put("input",new BasicDBObject("$filter",filter));
+	                    data.put("in","$$this.k");
+
+	                    filterExpression.put("$map", data );
+						return filterExpression;
+					}
+				}).as("keys").and(new AggregationExpression() {
+					@Override
+					public DBObject toDbObject(AggregationOperationContext context) {
+						
+	                    DBObject filterExpression = new BasicDBObject();
+	                    DBObject data = new BasicDBObject();
+	                    DBObject filter = new BasicDBObject();
+	                    filter.put("input", "$attribute.elements");
+	                    filter.put("as", "el");
+	                    filter.put("cond", new BasicDBObject("$not","$el.key"));
+
+	                    data.put("input",new BasicDBObject("$filter",filter));
+	                    data.put("in","$$this.v");
+
+	                    filterExpression.put("$map", data );
+						return filterExpression;
+					}
+				}).as("values"),
+	            project("deviceid","devicetime","attributes","values","keys").and(new AggregationExpression() {
+					@Override
+					public DBObject toDbObject(AggregationOperationContext context) {
+						Object array[] = new Object[] { "$keys", custom};
+	                    DBObject filterExpression = new BasicDBObject();
+	                    filterExpression.put("$indexOfArray", array );
+						return filterExpression;
+					}
+				}).as("index"),
+	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
+					@Override
+					public DBObject toDbObject(AggregationOperationContext context) {
+						Object array[] = new Object[] { "$values", "$index"};
+	                    DBObject filterExpression = new BasicDBObject();
+	                    filterExpression.put("$arrayElemAt", array );
+						return filterExpression;
+					}
+				}).as("output"),
+	            match(Criteria.where("output").lte(value)), 
 	            sort(Sort.Direction.DESC, "devicetime"),
 	            skip(offset),
 	            limit(10)
 	            
 	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
 
-	    
 	        AggregationResults<MongoPositions> groupResults
 	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
 
@@ -131,7 +247,6 @@ public class MongoPositionRepo {
 	            while (iterator.hasNext()) {
 	            	JSONObject object = (JSONObject) iterator.next();
 	            	DeviceWorkingHours device = new DeviceWorkingHours();
-	            	
 	            	
 	            	
 	            	if(object.has("attributes")) {
@@ -161,7 +276,322 @@ public class MongoPositionRepo {
         
 		return deviceHours;
 	}
+	public List<DeviceWorkingHours> getDeviceCustomScheduled(List<Long> allDevices,String start,String end,String custom,String value){
+
+		List<DeviceWorkingHours> deviceHours = new ArrayList<DeviceWorkingHours>();
+		
+		BasicDBObject basicDBObject = new BasicDBObject();
+		
+	    Aggregation aggregation = newAggregation(
+	    		match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)), 
+	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
+					@Override
+					public DBObject toDbObject(AggregationOperationContext context) {
+	                    DBObject filterExpression = new BasicDBObject();
+	                    filterExpression.put("$strLenCP", "$attributes");
+
+						return filterExpression;
+					}
+				}).as("len"),
+	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
+					@Override
+					public DBObject toDbObject(AggregationOperationContext context) {
+						Object array[] = new Object[] { "$len", 2};
+	                    DBObject filterExpression = new BasicDBObject();
+	                    filterExpression.put("$subtract", array );
+						return filterExpression;
+					}
+				}).as("length"),
+	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
+					@Override
+					public DBObject toDbObject(AggregationOperationContext context) {
+						Object array[] = new Object[] { "$attributes", 1, "$length"};
+	                    DBObject filterExpression = new BasicDBObject();
+	                    filterExpression.put("$substr", array );
+						return filterExpression;
+					}
+				}).as("attribute"),
+	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
+					@Override
+					public DBObject toDbObject(AggregationOperationContext context) {
+						Object split[] = new Object[] { "$attribute", "," };
+					    ArrayList<Integer> array = new ArrayList<Integer>();
+						Object arrayThis[] = new Object[] {"$$this", ":"};
+
+						DBObject $let =  new BasicDBObject();
+						$let.put("vars",new BasicDBObject("splitted",new BasicDBObject("$split",arrayThis)));
+						
+						DBObject in =  new BasicDBObject();
+						Object arrayElemAtK[] = new Object[] {"$$splitted", 0};
+						Object arrayElemAtV[] = new Object[] {"$$splitted", 1};
+						in.put("k", new BasicDBObject("$arrayElemAt",arrayElemAtK));
+						in.put("v", new BasicDBObject("$arrayElemAt",arrayElemAtV));
+						
+						$let.put("in",in);
+
+
+						DBObject output =  new BasicDBObject("$let",$let);
+
+						Object arrayConcat[] = new Object[] {output};
+
+						Object concat[] = new Object[] {"$$value.elements",arrayConcat};
+
+	                    DBObject filterExpression = new BasicDBObject();
+	                    DBObject data = new BasicDBObject();
+	                    data.put("input", new BasicDBObject("$split",split));
+	                    data.put("initialValue", new BasicDBObject("elements", array));
+	                    data.put("in", new BasicDBObject("elements", new BasicDBObject("$concatArrays", concat)));
+
+	                    filterExpression.put("$reduce", data );
+
+	                    return filterExpression;
+					}
+				}).as("attribute"),
+	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
+					@Override
+					public DBObject toDbObject(AggregationOperationContext context) {
+						
+	                    DBObject filterExpression = new BasicDBObject();
+	                    DBObject data = new BasicDBObject();
+	                    DBObject filter = new BasicDBObject();
+	                    filter.put("input", "$attribute.elements");
+	                    filter.put("as", "el");
+	                    filter.put("cond", new BasicDBObject("$not","$el.key"));
+
+	                    data.put("input",new BasicDBObject("$filter",filter));
+	                    data.put("in","$$this.k");
+
+	                    filterExpression.put("$map", data );
+						return filterExpression;
+					}
+				}).as("keys").and(new AggregationExpression() {
+					@Override
+					public DBObject toDbObject(AggregationOperationContext context) {
+						
+	                    DBObject filterExpression = new BasicDBObject();
+	                    DBObject data = new BasicDBObject();
+	                    DBObject filter = new BasicDBObject();
+	                    filter.put("input", "$attribute.elements");
+	                    filter.put("as", "el");
+	                    filter.put("cond", new BasicDBObject("$not","$el.key"));
+
+	                    data.put("input",new BasicDBObject("$filter",filter));
+	                    data.put("in","$$this.v");
+
+	                    filterExpression.put("$map", data );
+						return filterExpression;
+					}
+				}).as("values"),
+	            project("deviceid","devicetime","attributes","values","keys").and(new AggregationExpression() {
+					@Override
+					public DBObject toDbObject(AggregationOperationContext context) {
+						Object array[] = new Object[] { "$keys", custom};
+	                    DBObject filterExpression = new BasicDBObject();
+	                    filterExpression.put("$indexOfArray", array );
+						return filterExpression;
+					}
+				}).as("index"),
+	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
+					@Override
+					public DBObject toDbObject(AggregationOperationContext context) {
+						Object array[] = new Object[] { "$values", "$index"};
+	                    DBObject filterExpression = new BasicDBObject();
+	                    filterExpression.put("$arrayElemAt", array );
+						return filterExpression;
+					}
+				}).as("output"),
+	            match(Criteria.where("output").lte(value)), 
+	            sort(Sort.Direction.DESC, "devicetime")
+	            
+	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+
+	        AggregationResults<MongoPositions> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+
+
+	       if(groupResults.getRawResults().containsField("cursor")) {
+	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
+	            
+			    JSONArray list = (JSONArray) obj.get("firstBatch");
+	            Iterator<Object> iterator = list.iterator();
+	            while (iterator.hasNext()) {
+	            	JSONObject object = (JSONObject) iterator.next();
+	            	DeviceWorkingHours device = new DeviceWorkingHours();
+	            	
+	            	
+	            	if(object.has("attributes")) {
+	                	device.setAttributes(object.getString("attributes"));
 	
+	            	}
+	            	if(object.has("deviceid")) {
+	                	device.setDeviceId(object.getLong("deviceid"));
+	
+	            	}
+					if(object.has("devicetime")) {
+		            	device.setDeviceTime(object.getString("devicetime"));    		
+	                }
+					if(object.has("_id")) {
+		            	JSONObject objId = (JSONObject) object.get("_id");
+		            	if(objId.has("$oid")) {
+			            	device.setPositionId(objId.getString("$oid"));
+						}
+	
+					}
+					
+	            	
+	            	
+	            	deviceHours.add(device);
+	            }
+	        }
+        
+		return deviceHours;
+	}
+	public Integer getDeviceCustomSize(List<Long> allDevices,String start,String end,String custom,String value){
+
+		Integer size = 0;
+
+		BasicDBObject basicDBObject = new BasicDBObject();
+		
+	    Aggregation aggregation = newAggregation(
+	    		match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)), 
+	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
+					@Override
+					public DBObject toDbObject(AggregationOperationContext context) {
+	                    DBObject filterExpression = new BasicDBObject();
+	                    filterExpression.put("$strLenCP", "$attributes");
+
+						return filterExpression;
+					}
+				}).as("len"),
+	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
+					@Override
+					public DBObject toDbObject(AggregationOperationContext context) {
+						Object array[] = new Object[] { "$len", 2};
+	                    DBObject filterExpression = new BasicDBObject();
+	                    filterExpression.put("$subtract", array );
+						return filterExpression;
+					}
+				}).as("length"),
+	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
+					@Override
+					public DBObject toDbObject(AggregationOperationContext context) {
+						Object array[] = new Object[] { "$attributes", 1, "$length"};
+	                    DBObject filterExpression = new BasicDBObject();
+	                    filterExpression.put("$substr", array );
+						return filterExpression;
+					}
+				}).as("attribute"),
+	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
+					@Override
+					public DBObject toDbObject(AggregationOperationContext context) {
+						Object split[] = new Object[] { "$attribute", "," };
+					    ArrayList<Integer> array = new ArrayList<Integer>();
+						Object arrayThis[] = new Object[] {"$$this", ":"};
+
+						DBObject $let =  new BasicDBObject();
+						$let.put("vars",new BasicDBObject("splitted",new BasicDBObject("$split",arrayThis)));
+						
+						DBObject in =  new BasicDBObject();
+						Object arrayElemAtK[] = new Object[] {"$$splitted", 0};
+						Object arrayElemAtV[] = new Object[] {"$$splitted", 1};
+						in.put("k", new BasicDBObject("$arrayElemAt",arrayElemAtK));
+						in.put("v", new BasicDBObject("$arrayElemAt",arrayElemAtV));
+						
+						$let.put("in",in);
+
+
+						DBObject output =  new BasicDBObject("$let",$let);
+
+						Object arrayConcat[] = new Object[] {output};
+
+						Object concat[] = new Object[] {"$$value.elements",arrayConcat};
+
+	                    DBObject filterExpression = new BasicDBObject();
+	                    DBObject data = new BasicDBObject();
+	                    data.put("input", new BasicDBObject("$split",split));
+	                    data.put("initialValue", new BasicDBObject("elements", array));
+	                    data.put("in", new BasicDBObject("elements", new BasicDBObject("$concatArrays", concat)));
+
+	                    filterExpression.put("$reduce", data );
+
+	                    return filterExpression;
+					}
+				}).as("attribute"),
+	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
+					@Override
+					public DBObject toDbObject(AggregationOperationContext context) {
+						
+	                    DBObject filterExpression = new BasicDBObject();
+	                    DBObject data = new BasicDBObject();
+	                    DBObject filter = new BasicDBObject();
+	                    filter.put("input", "$attribute.elements");
+	                    filter.put("as", "el");
+	                    filter.put("cond", new BasicDBObject("$not","$el.key"));
+
+	                    data.put("input",new BasicDBObject("$filter",filter));
+	                    data.put("in","$$this.k");
+
+	                    filterExpression.put("$map", data );
+						return filterExpression;
+					}
+				}).as("keys").and(new AggregationExpression() {
+					@Override
+					public DBObject toDbObject(AggregationOperationContext context) {
+						
+	                    DBObject filterExpression = new BasicDBObject();
+	                    DBObject data = new BasicDBObject();
+	                    DBObject filter = new BasicDBObject();
+	                    filter.put("input", "$attribute.elements");
+	                    filter.put("as", "el");
+	                    filter.put("cond", new BasicDBObject("$not","$el.key"));
+
+	                    data.put("input",new BasicDBObject("$filter",filter));
+	                    data.put("in","$$this.v");
+
+	                    filterExpression.put("$map", data );
+						return filterExpression;
+					}
+				}).as("values"),
+	            project("deviceid","devicetime","attributes","values","keys").and(new AggregationExpression() {
+					@Override
+					public DBObject toDbObject(AggregationOperationContext context) {
+						Object array[] = new Object[] { "$keys", custom};
+	                    DBObject filterExpression = new BasicDBObject();
+	                    filterExpression.put("$indexOfArray", array );
+						return filterExpression;
+					}
+				}).as("index"),
+	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
+					@Override
+					public DBObject toDbObject(AggregationOperationContext context) {
+						Object array[] = new Object[] { "$values", "$index"};
+	                    DBObject filterExpression = new BasicDBObject();
+	                    filterExpression.put("$arrayElemAt", array );
+						return filterExpression;
+					}
+				}).as("output"),
+	            match(Criteria.where("output").lte(value)), 
+	            sort(Sort.Direction.DESC, "devicetime"),
+	            count().as("size")
+	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+
+	        AggregationResults<MongoPositions> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+
+
+	        if(groupResults.getRawResults().containsField("cursor")) {
+	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
+	            
+			    JSONArray list = (JSONArray) obj.get("firstBatch");
+
+            	JSONObject object = (JSONObject) list.get(0);
+
+            	size = object.getInt("size");
+	            
+
+	        }
+		return size;
+	}
 	public Integer getSensorsListSize(List<Long> allDevices,String start,String end){
 
 		Integer size = 0;

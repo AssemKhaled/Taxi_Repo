@@ -127,23 +127,6 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	public Integer getDevicesListSize(@Param("userIds")List<Long> userIds);
 	
 	
-	@Query(nativeQuery = true, name = "getDeviceCustomSchduled")
-	public List<DeviceWorkingHours> getDeviceCustomScheduled(@Param("deviceId")List<Long> deviceId,@Param("start")String start,@Param("end")String end,@Param("custom")String custom,@Param("value")String value);
-
-	@Query(nativeQuery = true, name = "getDeviceCustom")
-	public List<DeviceWorkingHours> getDeviceCustom(@Param("deviceId")List<Long> deviceId,@Param("offset")int offset,@Param("start")String start,@Param("end")String end,@Param("custom")String custom,@Param("value")String value);
-
-
-	@Query(value = "SELECT count(*) " + 
-			" FROM tc_positions  " + 
-			" INNER JOIN tc_devices ON tc_devices.id=tc_positions.deviceid  "
-			+ "WHERE tc_positions.deviceid IN(:deviceId) and " +
-			" CAST(json_extract(tc_positions.attributes, :custom) AS character) =:value "+
-			" and tc_positions.devicetime between :start and :end " + 
-			" order by tc_positions.devicetime DESC ",nativeQuery = true )
-	public Integer getDeviceCustomSize(@Param("deviceId")List<Long>  deviceId,@Param("start")String start,@Param("end")String end,@Param("custom")String custom,@Param("value")String value);
-
-	
 	@Query(value = "SELECT tc_devices.calibrationData FROM tc_devices WHERE tc_devices.id=:deviceId AND tc_devices.delete_date IS NULL ",nativeQuery = true)
 	public String getCalibrationDataCCC(@Param("deviceId")Long deviceId);
 	

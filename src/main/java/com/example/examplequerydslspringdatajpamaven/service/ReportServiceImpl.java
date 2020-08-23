@@ -984,27 +984,21 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	        }
 			
 			if(!TOKEN.equals("Schedule")) {
-				custom = "$."+custom;
+				String finalResult = custom;
+				custom = '"'+ custom+'"';
 
-				//deviceHours = deviceRepository.getDeviceCustom(allDevices,offset,start,end,custom,value);
 				deviceHours = mongoPositionRepo.getDeviceCustom(allDevices, offset, start, end, custom, value);
 				if(deviceHours.size()>0) {
-   				    size=deviceRepository.getDeviceCustomSize(allDevices,start, end,custom,value);
+					size=mongoPositionRepo.getDeviceCustomSize(allDevices,start, end,custom,value);
+
 					for(int i=0;i<deviceHours.size();i++) {
 						
 						Device device = deviceRepository.findOne(deviceHours.get(i).getDeviceId());
 						deviceHours.get(i).setDeviceName(device.getName());
 						
 						JSONObject obj = new JSONObject(deviceHours.get(i).getAttributes());
-						if(obj.has("todayHoursString")) {
-							deviceHours.get(i).setHours(obj.getString("todayHoursString"));
-						}
-						else {
-							deviceHours.get(i).setHours("0");
-
-						}
 						
-						deviceHours.get(i).setAttributes(custom.substring(2) +":"+value);
+						deviceHours.get(i).setAttributes(custom.substring(2) +":"+obj.get(finalResult));
 
 						
 					}
@@ -1012,21 +1006,19 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				}
 			}
 			else {
-				custom = "$."+custom;
-				deviceHours = deviceRepository.getDeviceCustomScheduled(allDevices,start,end,custom,value);
+				String finalResult = custom;
+				custom = '"'+ custom+'"';
+				deviceHours = mongoPositionRepo.getDeviceCustomScheduled(allDevices,start,end,custom,value);
 				if(deviceHours.size()>0) {
+					
 					for(int i=0;i<deviceHours.size();i++) {
+						
+						Device device = deviceRepository.findOne(deviceHours.get(i).getDeviceId());
+						deviceHours.get(i).setDeviceName(device.getName());
+						
 						JSONObject obj = new JSONObject(deviceHours.get(i).getAttributes());
 						
-						if(obj.has("todayHoursString")) {
-							deviceHours.get(i).setHours(obj.getString("todayHoursString"));
-						}
-						else {
-							deviceHours.get(i).setHours("0");
-
-						}
-						
-						deviceHours.get(i).setAttributes(custom.substring(2) +":"+value);
+						deviceHours.get(i).setAttributes(custom.substring(2) +":"+obj.get(finalResult));
 
 						
 					}
