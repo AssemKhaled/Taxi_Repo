@@ -201,7 +201,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		}
 		if(!loggedUser.getAccountType().equals(1)) {
 			if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "create")) {
-				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to create device",null);
+				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "This user doesn't have permission to create device",null);
 				 logger.info("************************ createDevice ENDED ***************************");
 				return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
@@ -210,7 +210,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		if( (device.getId() != null && device.getId() != 0) ) {
             List<Device> devices = null;
 			
-			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "Device Id not allowed in create new device",devices);
+			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "Device Id not allowed to create a new device",devices);
 			logger.info("************************ createDevice ENDED ***************************");
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
@@ -225,7 +225,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			
 			List<Device> devices = null;
 			
-			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "atrributes [name, trackerImei , sequence"
+			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "Attributes[name, trackerImei , sequence"
 					+ "Number , plate num , leftLetter , middleLetter,RightLetter ] are required",devices);
 			logger.info("************************ createDevice ENDED ***************************");
 			return ResponseEntity.badRequest().body(getObjectResponse);
@@ -239,7 +239,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			if(userCreater == null)
 			{
 
-				getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "Assigning to not found user",null);
+				getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "Assigning to not found the user",null);
 				logger.info("************************ createDevice ENDED ***************************");
 				return ResponseEntity.status(404).body(getObjectResponse);
 			}
@@ -248,7 +248,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				if(userCreater.getAccountType().equals(4)) {
 					Set<User>parentClient = userCreater.getUsersOfUser();
 					if(parentClient.isEmpty()) {
-						getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "this user cannot add user",null);
+						getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "This user cannot add a device",null);
 						logger.info("************************ createDevice ENDED ***************************");
 						return ResponseEntity.status(404).body(getObjectResponse);
 					}else {
@@ -329,7 +329,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		}
 		if(!loggedUser.getAccountType().equals(1)) {
 			if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "edit")) {
-				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to edit device",null);
+				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "This user doesn't have permission to edit device",null);
 				 logger.info("************************ editDevice ENDED ***************************");
 				return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
@@ -344,7 +344,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			|| device.getMiddleLetter() == null || device.getMiddleLetter().equals("")	) {
 			
 			
-			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "atrributes [id ,name, trackerImei , sequence" + 
+			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "Atrributes[id ,name, trackerImei , sequence" + 
 					"					Number , plate num , leftLetter , middleLetter,RightLetter ] are required",null);
 			logger.info("************************ editDevice ENDED ***************************");
 			return ResponseEntity.badRequest().body(getObjectResponse);
@@ -362,7 +362,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			if(loggedUser.getAccountType().equals(4)) {
 				Set<User>parentClient = loggedUser.getUsersOfUser();
 				if(parentClient.isEmpty()) {
-					getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
+					getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "You are not allowed to edit this device",null);
 					logger.info("************************ editDevice ENDED ***************************");
 					return ResponseEntity.badRequest().body(getObjectResponse);
 				}else {
@@ -373,7 +373,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					}
 					Set<User> deviceParent = oldDevice.getUser();
 					if(deviceParent.isEmpty()) {
-						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), " this device is not assigned to any user ,you are not allowed to edit this user ",null);
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "This device is not assigned to another user ,you are not allowed to edit this device",null);
 						logger.info("************************ editDevice ENDED ***************************");
 						return ResponseEntity.badRequest().body(getObjectResponse);
 					}else {
@@ -389,7 +389,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				}
 			}
 			if(!checkIfParent(oldDevice , loggedUser) && ! isParent) {
-				getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
+				getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "You are not allowed to edit this device",null);
 				logger.info("************************ editDevice ENDED ***************************");
 				return ResponseEntity.badRequest().body(getObjectResponse);
 			}
