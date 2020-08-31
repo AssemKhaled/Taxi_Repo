@@ -10,6 +10,9 @@ import javax.persistence.ColumnResult;
 
 import org.json.JSONObject;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class CustomDeviceLiveData {
 	
 	public CustomDeviceLiveData() {
@@ -24,7 +27,7 @@ public class CustomDeviceLiveData {
 	private Double operator;
 	private Double longitude;
 	private String address;
-	private String attributes;
+	private Object attributes;
 	private String crash;
 	private String batteryUnpluged;
 	private String PowerUnpluged;
@@ -57,7 +60,7 @@ public class CustomDeviceLiveData {
 
      
 
-	public CustomDeviceLiveData(Double weight, Double latitude, Double longitude, String address, String attributes,
+	public CustomDeviceLiveData(Double weight, Double latitude, Double longitude, String address, Object attributes,
 			Float speed) {
 		super();
 		this.weight = weight;
@@ -67,7 +70,7 @@ public class CustomDeviceLiveData {
 		this.attributes = attributes;
 		this.speed = speed;
 	}
-	public CustomDeviceLiveData(int id ,String deviceName , String lastUpdate , String address , String attributes ,  Double latitude ,
+	public CustomDeviceLiveData(int id ,String deviceName , String lastUpdate , String address , Object attributes ,  Double latitude ,
 			  Double longitude ,Float speed , String photo , String positionId) {
 		this.id = id ;
 		this.deviceName = deviceName ;
@@ -116,8 +119,20 @@ public class CustomDeviceLiveData {
  
 	    }
 		if(attributes != null) {
-			JSONObject jsonObject = new JSONObject(attributes);
-			if(jsonObject.has("power")) {
+			
+			
+		   ObjectMapper mapper = new ObjectMapper();
+     	   String json = null;
+     	   try {
+	 		   json = mapper.writeValueAsString(attributes);
+		   } catch (JsonProcessingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+         	JSONObject jsonObject = new JSONObject(json);
+
+         	if(jsonObject.has("power")) {
 				this.power =  jsonObject.getDouble("power");
 			}else {
 				this.power =0.0;
@@ -196,7 +211,7 @@ public class CustomDeviceLiveData {
 		
 		
 	}
-	public CustomDeviceLiveData(int id ,String deviceName , String lastUpdate , String address , String attributes ,  Double latitude ,
+	public CustomDeviceLiveData(int id ,String deviceName , String lastUpdate , String address , Object attributes ,  Double latitude ,
 			  Double longitude ,Float speed ,String positionId, String leftLetter,String middleLetter,String rightLetter,String driverName ) {
 		this.id = id ;
 		this.deviceName = deviceName ;
@@ -248,7 +263,18 @@ public class CustomDeviceLiveData {
 
 	    }
 		if(attributes != null) {
-			JSONObject jsonObject = new JSONObject(attributes);
+
+			ObjectMapper mapper = new ObjectMapper();
+     	   String json = null;
+     	   try {
+	 		   json = mapper.writeValueAsString(attributes);
+		   } catch (JsonProcessingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+         	JSONObject jsonObject = new JSONObject(json);
+
 			if(jsonObject.has("power")) {
 				this.power =  jsonObject.getDouble("power");
 			}else {
@@ -331,7 +357,7 @@ public class CustomDeviceLiveData {
 	
 	public CustomDeviceLiveData(int id ,String deviceName , String lastUpdate ,
 			String positionId, String leftLetter,String middleLetter,String rightLetter,String driverName,
-			Double latitude ,Double longitude,String attributes,String address,Float speed,String plate_num
+			Double latitude ,Double longitude,Object attributes,String address,Float speed,String plate_num
 			,String sequence_number,String owner_name,Boolean valid) {
 		this.id = id ;
 		this.deviceName = deviceName ;
@@ -351,7 +377,18 @@ public class CustomDeviceLiveData {
 		this.owner_name = owner_name;
 		this.valid = valid;
 		if(attributes != null) {
-			JSONObject jsonObject = new JSONObject(attributes);
+		   ObjectMapper mapper = new ObjectMapper();
+     	   String json = null;
+     	   try {
+	 		   json = mapper.writeValueAsString(attributes);
+		   } catch (JsonProcessingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+         	JSONObject jsonObject = new JSONObject(json);
+
+
 			if(jsonObject.has("todayHoursString")) {
 				this.todayHoursString = jsonObject.getString("todayHoursString");
 			}else
@@ -405,7 +442,7 @@ public class CustomDeviceLiveData {
 	   		
 	}
 	public CustomDeviceLiveData(int id ,String deviceName , String uniqueId,String lastUpdate ,String positionId,String photo
-			,String attributes , Float speed,Double latitude ,Double longitude,Boolean valid) {
+			,Object attributes , Float speed,Double latitude ,Double longitude,Boolean valid) {
 		this.id = id ;
 		this.uniqueId = uniqueId ;
 		this.deviceName = deviceName ;
@@ -478,11 +515,11 @@ public class CustomDeviceLiveData {
 		this.address = address;
 	}
 
-	public String getAttributes() {
+	public Object getAttributes() {
 		return attributes;
 	}
 
-	public void setAttributes(String attributes) {
+	public void setAttributes(Object attributes) {
 		this.attributes = attributes;
 	}
 

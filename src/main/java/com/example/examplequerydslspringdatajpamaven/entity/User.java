@@ -95,7 +95,10 @@ public class User {
 	
 	@Column(name = "parents")
 	private String parents;
-	
+		
+	@Column(name = "create_date")
+	private String create_date;
+
 	 @JsonIgnore
 	 @ManyToMany(
 	            fetch = FetchType.LAZY,
@@ -391,6 +394,12 @@ public class User {
 	}
 	public void setAttributes(Set<Attribute> attributes) {
 		this.attributes = attributes;
+	}
+	public String getCreate_date() {
+		return create_date;
+	}
+	public void setCreate_date(String create_date) {
+		this.create_date = create_date;
 	}
 	
 	

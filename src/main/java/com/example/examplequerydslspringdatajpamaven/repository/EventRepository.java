@@ -27,7 +27,6 @@ public interface EventRepository  extends JpaRepository<Event, Long>, QueryDslPr
 	
 	@Query (value = "SELECT count(tc_events.id) " + 
 			" FROM tc_events INNER JOIN tc_devices ON tc_devices.id=tc_events.deviceid " + 
-			" LEFT JOIN tc_positions ON tc_positions.id=tc_events.positionid " + 
 			" LEFT JOIN tc_geofences ON tc_geofences.id=tc_events.geofenceid " + 
 			" LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_events.deviceid " + 
 			" LEFT JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id " + 
@@ -38,7 +37,6 @@ public interface EventRepository  extends JpaRepository<Event, Long>, QueryDslPr
 	
 	@Query (value = "SELECT count(tc_events.id) " + 
 			" FROM tc_events INNER JOIN tc_devices ON tc_devices.id=tc_events.deviceid " + 
-			" LEFT JOIN tc_positions ON tc_positions.id=tc_events.positionid " + 
 			" LEFT JOIN tc_geofences ON tc_geofences.id=tc_events.geofenceid " + 
 			" LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_events.deviceid " + 
 			" LEFT JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id " + 

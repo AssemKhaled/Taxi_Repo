@@ -9,7 +9,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.MongoPositionsElm;
 
 public interface MongoPositionsElmRepository extends MongoRepository<MongoPositionsElm,String>{
 
-	@Query("{ 'deviceid' : { $in: ?0 }, 'is_sent': {$eq: null } }")
+	@Query("{ 'deviceid' : { $in: ?0 }}")
 	public List<MongoPositionsElm> findByDeviceIdIn(List<Long> deviceIds,Pageable pageable);
 	
 	@Query(value="{ '_id' : { $in: ?0 } }", delete = true)

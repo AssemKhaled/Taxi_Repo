@@ -35,9 +35,7 @@ import javax.persistence.Table;
 	  	                     @ColumnResult(name="driverName",type=String.class),
 	  	                     @ColumnResult(name="geofenceId",type=Long.class),
 	  	                     @ColumnResult(name="geofenceName",type=String.class),
-	  	                     @ColumnResult(name="positionId",type=Long.class),
-	  	                     @ColumnResult(name="latitude",type=Double.class),
-	  	                     @ColumnResult(name="longitude",type=Double.class),
+	  	                     @ColumnResult(name="positionId",type=String.class),
 
 
 	                     	                     }
@@ -138,9 +136,7 @@ import javax.persistence.Table;
 		     		+ " tc_devices.id as deviceId,tc_devices.name as deviceName,"
 		     		+ " tc_drivers.id as driverId,tc_drivers.name as driverName ,"
 		     		+ " tc_geofences.id as geofenceId,tc_geofences.name as geofenceName"
-		     		+ " ,tc_positions.latitude as latitude ,tc_positions.longitude as longitude"
 		     		+ " FROM tc_events INNER JOIN tc_devices ON tc_devices.id=tc_events.deviceid"
-		     		+ " LEFT JOIN tc_positions ON tc_positions.id=tc_events.positionid"		     
 		     		+ " LEFT JOIN tc_geofences ON tc_geofences.id=tc_events.geofenceid"
 		     		+ " LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_events.deviceid"
 		     		+ " LEFT JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id"
@@ -158,9 +154,7 @@ import javax.persistence.Table;
     		+ " tc_devices.id as deviceId,tc_devices.name as deviceName,"
     		+ " tc_drivers.id as driverId,tc_drivers.name as driverName ,"
     		+ " tc_geofences.id as geofenceId,tc_geofences.name as geofenceName"
-    		+ " ,tc_positions.latitude as latitude ,tc_positions.longitude as longitude"
     		+ " FROM tc_events INNER JOIN tc_devices ON tc_devices.id=tc_events.deviceid"
-    		+ " LEFT JOIN tc_positions ON tc_positions.id=tc_events.positionid"		     
     		+ " LEFT JOIN tc_geofences ON tc_geofences.id=tc_events.geofenceid"
     		+ " LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_events.deviceid"
     		+ " LEFT JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id"
@@ -177,9 +171,7 @@ import javax.persistence.Table;
     		+ " tc_devices.id as deviceId,tc_devices.name as deviceName,"
     		+ " tc_drivers.id as driverId,tc_drivers.name as driverName ,"
     		+ " tc_geofences.id as geofenceId,tc_geofences.name as geofenceName"
-     		+ " ,tc_positions.latitude as latitude ,tc_positions.longitude as longitude"
     		+ " FROM tc_events INNER JOIN tc_devices ON tc_devices.id=tc_events.deviceid"
-     		+ " LEFT JOIN tc_positions ON tc_positions.id=tc_events.positionid"		     
     		+ " LEFT JOIN tc_geofences ON tc_geofences.id=tc_events.geofenceid"
     		+ " LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_events.deviceid"
     		+ " LEFT JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id"

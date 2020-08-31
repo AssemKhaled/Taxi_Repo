@@ -19,9 +19,6 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-
-
-import com.example.examplequerydslspringdatajpamaven.entity.NewPosition;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
 
 import lombok.Data;

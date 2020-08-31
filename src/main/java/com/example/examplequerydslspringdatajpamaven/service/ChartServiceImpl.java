@@ -41,10 +41,12 @@ import com.example.examplequerydslspringdatajpamaven.entity.SummaryReport;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.EventRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionRepo;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionsRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.PositionSqlRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 @Component
@@ -56,14 +58,14 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 	@Autowired
 	private UserServiceImpl userService;
 	
+	@Autowired
+	MongoPositionRepo mongoPositionRepo;
+	
 	@Autowired 
 	DeviceRepository deviceRepository;
 	
 	@Autowired
 	EventRepository eventRepository;
-	
-	@Autowired 
-	PositionSqlRepository positionRepository;
 	
 	@Autowired
 	private DriverServiceImpl driverService;
@@ -144,8 +146,8 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 		List<Long> onlineDeviceIds = deviceRepository.getNumberOfOnlineDevicesList(usersIds);
 		List<Long> OutDeviceIds = deviceRepository.getNumberOfOutOfNetworkDevicesList(usersIds);
 		
-		Integer onlineDevices = mongoPositionsRepository.countByDeviceidIn(onlineDeviceIds);
-		Integer outOfNetworkDevices = mongoPositionsRepository.countByDeviceidIn(OutDeviceIds);
+		Integer onlineDevices = mongoPositionRepo.getDeviceIdDistincit(onlineDeviceIds);
+		Integer outOfNetworkDevices = mongoPositionRepo.getDeviceIdDistincit(OutDeviceIds);
 		
 		Integer totalDevices = deviceRepository.getTotalNumberOfUserDevices(usersIds);
 		Integer offlineDevices = totalDevices - onlineDevices - outOfNetworkDevices;
@@ -160,290 +162,6 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 		data.add(devicesStatus);
 		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",data);
 		logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
-		return ResponseEntity.ok().body(getObjectResponse);
-	}
-
-
-	@Override
-	public ResponseEntity<?> getIgnitionMotion(String TOKEN, Long userId) {
-		logger.info("************************ getIgnitionMotion STARTED ***************************");
-		if(TOKEN.equals("")) {
-			 List<Device> devices = null;
-			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
-			 return  ResponseEntity.badRequest().body(getObjectResponse);
-		}
-		
-		if(super.checkActive(TOKEN)!= null)
-		{
-			return super.checkActive(TOKEN);
-		}
-		
-		
-		if(userId.equals(0)) {
-			List<Device> devices = null;
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is required",devices);
-			logger.info("************************ getIgnitionMotion ENDED ***************************");
-			return ResponseEntity.badRequest().body(getObjectResponse);
-		}
-		User loggedUser = userService.findById(userId);
-		if(loggedUser == null) {
-			List<Device> devices = null;
-			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Logged user is not found",devices);
-			logger.info("************************ getIgnition ENDED ***************************");
-			return ResponseEntity.status(404).body(getObjectResponse);
-		}
-		userService.resetChildernArray();
-		 if(loggedUser.getAccountType().equals(4)) {
-			 Set<User> parentClients = loggedUser.getUsersOfUser();
-			 if(parentClients.isEmpty()) {
-				
-				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get devices of this user",null);
-				 logger.info("************************ getIgnition ENDED ***************************");
-				return  ResponseEntity.status(404).body(getObjectResponse);
-			 }else {
-				 User parentClient = new User() ;
-				 for(User object : parentClients) {
-					 parentClient = object;
-				 }
-				 List<Long>usersIds= new ArrayList<>();
-				 usersIds.add(parentClient.getId());
-				 
-				    List<CustomPositions> positionsList = new ArrayList<CustomPositions>();
-				    positionsList = positionRepository.getAttrbuites(usersIds); 
-					List<String> ignitionON= new ArrayList<String>();				  
-					List<String> ignitionOFF = new ArrayList<String>();				  
-					List<String> motionON= new ArrayList<String>();				  
-					List<String> motionOFF = new ArrayList<String>();	
-				    if(positionsList.size()>0) {
-						for(int i=0;i<positionsList.size();i++) {
-							JSONObject obj = new JSONObject(positionsList.get(i).getAttributes());
-							
-							if(obj.has("ignition")) {
-								if(obj.get("ignition").equals(true)) {
-									ignitionON.add(positionsList.get(i).getDeviceName());
-								}
-								else {
-									ignitionOFF.add(positionsList.get(i).getDeviceName());
-
-								}
-								if(obj.get("motion").equals(true)) {
-									motionON.add(positionsList.get(i).getDeviceName());
-								}
-								else {
-									motionOFF.add(positionsList.get(i).getDeviceName());
-
-								}
-							}
-							
-							
-						}
-					
-					}
-				    Map devicesList = new HashMap();
-				    devicesList.put("ignition_on", ignitionON.size());
-				    devicesList.put("ignition_off" ,ignitionOFF.size());
-				    devicesList.put("ignition_on_list", ignitionON);
-					devicesList.put("ignition_off_list", ignitionOFF);
-					
-					devicesList.put("motion_on", motionON.size());
-					devicesList.put("motion_off" ,motionOFF.size());
-					devicesList.put("motion_on_list", motionON);
-					devicesList.put("motion_off_list", motionOFF);
-					
-					
-					List<Map> data = new ArrayList<>();
-					data.add(devicesList);
-					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",data);
-				 logger.info("************************ getIgnitionMotion ENDED ***************************");
-				return  ResponseEntity.ok().body(getObjectResponse);
-			 }
-		 }
-		 List<User>childernUsers = userService.getAllChildernOfUser(userId);
-		 List<Long>usersIds= new ArrayList<>();
-		 if(childernUsers.isEmpty()) {
-			 usersIds.add(userId);
-		 }
-		 else {
-			 usersIds.add(userId);
-			 for(User object : childernUsers) {
-				 usersIds.add(object.getId());
-			 }
-		 }
-	    List<CustomPositions> positionsList = new ArrayList<CustomPositions>();
-	    positionsList = positionRepository.getAttrbuites(usersIds); 
-		List<String> ignitionON= new ArrayList<String>();				  
-		List<String> ignitionOFF = new ArrayList<String>();				  
-		List<String> motionON= new ArrayList<String>();				  
-		List<String> motionOFF = new ArrayList<String>();	
-	    if(positionsList.size()>0) {
-			for(int i=0;i<positionsList.size();i++) {
-				JSONObject obj = new JSONObject(positionsList.get(i).getAttributes());
-				
-				if(obj.has("ignition")) {
-					if(obj.get("ignition").equals(true)) {
-						ignitionON.add(positionsList.get(i).getDeviceName());
-					}
-					else {
-						ignitionOFF.add(positionsList.get(i).getDeviceName());
-
-					}
-					if(obj.get("motion").equals(true)) {
-						motionON.add(positionsList.get(i).getDeviceName());
-					}
-					else {
-						motionOFF.add(positionsList.get(i).getDeviceName());
-
-					}
-				}
-				
-				
-			}
-		
-		}
-	    Map devicesList = new HashMap();
-	    devicesList.put("ignition_on", ignitionON.size());
-	    devicesList.put("ignition_off" ,ignitionOFF.size());
-	    devicesList.put("ignition_on_list", ignitionON);
-		devicesList.put("ignition_off_list", ignitionOFF);
-		
-		devicesList.put("motion_on", motionON.size());
-		devicesList.put("motion_off" ,motionOFF.size());
-		devicesList.put("motion_on_list", motionON);
-		devicesList.put("motion_off_list", motionOFF);
-		
-		
-		List<Map> data = new ArrayList<>();
-		data.add(devicesList);
-		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",data);
-		logger.info("************************ getIgnitionMotion ENDED ***************************");
-		return ResponseEntity.ok().body(getObjectResponse);
-	}
-
-
-	@Override
-	public ResponseEntity<?> getDriverHours(String TOKEN, Long userId) {
-		logger.info("************************ getIgnitionMotion STARTED ***************************");
-		if(TOKEN.equals("")) {
-			 List<Device> devices = null;
-			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
-			 return  ResponseEntity.badRequest().body(getObjectResponse);
-		}
-		
-		if(super.checkActive(TOKEN)!= null)
-		{
-			return super.checkActive(TOKEN);
-		}
-		
-		
-		if(userId.equals(0)) {
-			List<Device> devices = null;
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is required",devices);
-			logger.info("************************ getIgnitionMotion ENDED ***************************");
-			return ResponseEntity.badRequest().body(getObjectResponse);
-		}
-		User loggedUser = userService.findById(userId);
-		if(loggedUser == null) {
-			List<Device> devices = null;
-			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Logged user is not found",devices);
-			logger.info("************************ getIgnition ENDED ***************************");
-			return ResponseEntity.status(404).body(getObjectResponse);
-		}
-		userService.resetChildernArray();
-		 List<Long>usersIds= new ArrayList<>();
-		 if(loggedUser.getAccountType().equals(4)) {
-			 Set<User> parentClients = loggedUser.getUsersOfUser();
-			 if(parentClients.isEmpty()) {
-				
-				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get devices of this user",null);
-				 logger.info("************************ getIgnition ENDED ***************************");
-				return  ResponseEntity.status(404).body(getObjectResponse);
-			 }else {
-				 User parentClient = new User() ;
-				 for(User object : parentClients) {
-					 parentClient = object;
-				 }
-				 usersIds.add(parentClient.getId());
-				 
-			 }
-		 }
-		 else {
-			 List<User>childernUsers = userService.getAllChildernOfUser(userId);
-			 if(childernUsers.isEmpty()) {
-				 usersIds.add(userId);
-			 }
-			 else {
-				 usersIds.add(userId);
-				 for(User object : childernUsers) {
-					 usersIds.add(object.getId());
-				 }
-			 }
-		 }
-		 
-	    List<CustomPositions> positionsList = new ArrayList<CustomPositions>();
-	    positionsList = positionRepository.getDriverHoursList(usersIds);
-		List<Map> data = new ArrayList<>();
-	    if(positionsList.size()>0) {
-			for(int i=0;i<positionsList.size();i++) {
-				JSONObject obj = new JSONObject(positionsList.get(i).getAttributes());
-				Map devicesList = new HashMap();
-				if(obj.has("todayHoursString")) {
-					SimpleDateFormat time = new SimpleDateFormat("HH:mm");
-					try {
-						Date date =  time.parse((String) obj.get("todayHoursString"));
-					    devicesList.put("hours", date.getHours());
-						
-					} catch (JSONException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (ParseException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-
-				}
-				else {
-				    devicesList.put("hours",0);
-
-				}
-			    devicesList.put("driverName", positionsList.get(i).getDriverName());
-			    devicesList.put("deviceName", positionsList.get(i).getDeviceName());
-
-			    if(data.size() == 10) {
-		    		Integer newData = Integer.parseInt( devicesList.get("hours").toString() );
-
-			    	for(int k=0;k<data.size();k++) {
-			    		Integer oldData = Integer.parseInt( data.get(k).get("hours").toString() );
-
-			    		if(newData > oldData) {
-
-			    			data.get(k).replace("hours", devicesList.get("hours"));
-			    			data.get(k).replace("driverName", devicesList.get("driverName"));
-			    			data.get(k).replace("deviceName", devicesList.get("deviceName"));
-			    			break;
-
-			    		}
-
-			    	
-
-			    	}
-
-			    }
-			    if(data.size() < 10) {
-					data.add(devicesList);
-			    }
-
-				
-			}
-			
-			
-		
-		}
-	    
-		
-		
-		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",data,data.size());
-		logger.info("************************ getIgnitionMotion ENDED ***************************");
 		return ResponseEntity.ok().body(getObjectResponse);
 	}
 
@@ -983,7 +701,19 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 
 	    if(positionsList.size()>0) {
 			for(int i=0;i<positionsList.size();i++) {
-				JSONObject obj = new JSONObject(positionsList.get(i).getAttributes());
+
+				
+			   ObjectMapper mapper = new ObjectMapper();
+         	   String json = null;
+         	   try {
+     		   json = mapper.writeValueAsString(positionsList.get(i).getAttributes());
+			   } catch (JsonProcessingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+             	JSONObject obj = new JSONObject(json);
+				
 				Map devicesList = new HashMap();
 				if(obj.has("todayHoursString")) {
 					SimpleDateFormat time = new SimpleDateFormat("HH:mm");

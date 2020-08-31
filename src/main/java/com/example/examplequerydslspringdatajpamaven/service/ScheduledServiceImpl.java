@@ -2035,7 +2035,7 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
                 }
                 else {
                 	row.createCell(2)
-                    .setCellValue(devicehour.getAttributes());
+                    .setCellValue(devicehour.getAttributes().toString());
                 }
 
         	}

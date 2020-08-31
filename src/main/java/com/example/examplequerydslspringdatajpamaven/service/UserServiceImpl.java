@@ -3,8 +3,10 @@ package com.example.examplequerydslspringdatajpamaven.service;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -621,7 +623,15 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 //	}
 	@Override
 	public ResponseEntity<?> createUser(String TOKEN,User user,Long userId) {
+		
+		
 		logger.info("************************createUser STARTED ***************************");
+		
+		Date now = new Date();
+		SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String nowTime = isoFormat.format(now);
+		
+		user.setCreate_date(nowTime);
 		
 		if(TOKEN.equals("")) {
 			 List<User> users = null;

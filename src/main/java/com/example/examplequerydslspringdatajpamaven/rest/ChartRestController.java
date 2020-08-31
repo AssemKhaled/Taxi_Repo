@@ -32,19 +32,6 @@ public class ChartRestController {
 		return chartServiceImpl.getStatus(TOKEN,userId);
 	}
 	
-	@GetMapping(path ="/getIgnitionMotion")
-	public ResponseEntity<?> getIgnitionMotion(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                             @RequestParam (value = "userId", defaultValue = "0") Long userId){
-		
-		return chartServiceImpl.getIgnitionMotion(TOKEN,userId);
-	}
-	
-	@GetMapping(path ="/getDriverHours")
-	public ResponseEntity<?> getDriverHours(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                             @RequestParam (value = "userId", defaultValue = "0") Long userId){
-		
-		return chartServiceImpl.getDriverHours(TOKEN,userId);
-	}
 	
 	@GetMapping(path ="/getDistanceFuelEngine")
 	public ResponseEntity<?> getDistanceFuelEngine(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,

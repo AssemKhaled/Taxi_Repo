@@ -4,7 +4,7 @@ public class DriverWorkingHours {
 
 	private String deviceTime;
 	private String positionId;
-	private String attributes;
+	private Object attributes;
 	private Long deviceId;
 	private String driverName;
 	private String hours;
@@ -15,7 +15,7 @@ public class DriverWorkingHours {
 		
 	}
 	
-	public DriverWorkingHours(String deviceTime, String positionId, String attributes, Long deviceId, String deviceName) {
+	public DriverWorkingHours(String deviceTime, String positionId, Object attributes, Long deviceId, String deviceName) {
 		super();
 		this.deviceTime = deviceTime;
 		this.positionId = positionId;
@@ -46,10 +46,10 @@ public class DriverWorkingHours {
 	public void setPositionId(String positionId) {
 		this.positionId = positionId;
 	}
-	public String getAttributes() {
+	public Object getAttributes() {
 		return attributes;
 	}
-	public void setAttributes(String attributes) {
+	public void setAttributes(Object attributes) {
 		this.attributes = attributes;
 	}
 	public Long getDeviceId() {

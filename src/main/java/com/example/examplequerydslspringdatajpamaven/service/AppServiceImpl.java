@@ -60,12 +60,13 @@ import com.example.examplequerydslspringdatajpamaven.repository.GeofenceReposito
 import com.example.examplequerydslspringdatajpamaven.repository.GroupRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionRepo;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionsRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.PositionSqlRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.ProfileRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 import com.example.examplequerydslspringdatajpamaven.tokens.TokenSecurity;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
 public class AppServiceImpl extends RestServiceController implements AppService{
@@ -89,6 +90,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	ProfileRepository profileRepository;
 	
 	@Autowired
+	MongoPositionRepo mongoPositionRepo;
+	
+	@Autowired
 	ProfileServiceImpl profileServiceImpl;
 
 	@Autowired
@@ -99,9 +103,6 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	
 	@Autowired
 	private MongoPositionRepo mongoPositionsRepo;
-	 
-	 @Autowired
-	 private PositionSqlRepository positionSqlRepository;
 	 
 	 @Autowired
 	 private GeofenceRepository geofenceRepository;
@@ -248,8 +249,8 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 	@Override
 	public ResponseEntity<?> getAllDeviceLiveDataMapApp(String TOKEN, Long userId) {
+
 		// TODO Auto-generated method stub
-		
 		if(TOKEN.equals("")) {
 			 List<Device> devices = null;
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
@@ -277,6 +278,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	    }
 	    userServiceImpl.resetChildernArray();
 		 List<Long>usersIds= new ArrayList<>();
+
 	    if(loggedUser.getAccountType().equals(4)) {
 			 Set<User> parentClients = loggedUser.getUsersOfUser();
 			 if(parentClients.isEmpty()) {
@@ -292,10 +294,12 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 					 usersIds.add(parentClient.getId());
 
 				 }
+				
+
 			 }
 		 }
 	    else {
-	    	List<User>childernUsers = userServiceImpl.getAllChildernOfUser(userId);
+	    	 List<User>childernUsers = userServiceImpl.getAllChildernOfUser(userId);
 			 if(childernUsers.isEmpty()) {
 				 usersIds.add(userId);
 			 }
@@ -306,8 +310,8 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				 }
 			 }
 	    }
-	     
-		List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getAllDevicesLiveDataMap(usersIds);
+	   
+		List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getAllDevicesDataMap(usersIds);
 		
 		if(allDevicesLiveData.size() > 0) {
 			for(int i=0;i<allDevicesLiveData.size();i++) {
@@ -340,71 +344,86 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 					}
 				}
 				else {
-               	allDevicesLiveData.get(i).setVehicleStatus("offline");
+                	allDevicesLiveData.get(i).setVehicleStatus("offline");
 
 				}
 
+				
 				
 				
 				if(allDevicesLiveData.get(i).getPositionId() != null) {
-
-					MongoPositions mongoPosition = mongoPositionsRepository.findById(allDevicesLiveData.get(i).getPositionId());
-					JSONObject obj = new JSONObject(mongoPosition.getAttributes());
-					allDevicesLiveData.get(i).setLatitude(mongoPosition.getLatitude());
-					allDevicesLiveData.get(i).setLongitude(mongoPosition.getLongitude());
-					allDevicesLiveData.get(i).setAttributes(mongoPosition.getAttributes());
-					allDevicesLiveData.get(i).setAddress(mongoPosition.getAddress());
-					allDevicesLiveData.get(i).setSpeed(mongoPosition.getSpeed());
-					if(mongoPosition.getValid() >= 1) {
-						allDevicesLiveData.get(i).setValid(true);
-
-					}
-					else {
-						allDevicesLiveData.get(i).setValid(false);
-
-					}
 					
-					if(minutes > 8) {
-                   	allDevicesLiveData.get(i).setStatus("In active");
-						
-					}
-					else {
-						if(obj.has("ignition")) {
-
-							if(obj.get("ignition").equals(true)) {
-								if(obj.has("motion")) {
-
-				                    if(obj.get("motion").equals(false)) {
-				                    	allDevicesLiveData.get(i).setStatus("Idle");
-									}
-				                    if(obj.get("motion").equals(true)) {
-				                    	allDevicesLiveData.get(i).setStatus("Running");
-									}
-								}
-							}
-		                    if(obj.get("ignition").equals(false)) {
-		                    	allDevicesLiveData.get(i).setStatus("Stopped");
-
-							}
+                    MongoPositions mongoPosition = mongoPositionsRepository.findById(allDevicesLiveData.get(i).getPositionId());
+					
+                   if(mongoPosition != null) {
+                	   
+                	   ObjectMapper mapper = new ObjectMapper();
+                	   String json = null;
+                	   try {
+                		   json = mapper.writeValueAsString(mongoPosition.getAttributes());
+					   } catch (JsonProcessingException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
-						
-					}
-					
-					if(obj.has("power")) {
-						allDevicesLiveData.get(i).setPower(obj.getDouble("power"));
 
-					}
-					if(obj.has("operator")) {
-						allDevicesLiveData.get(i).setOperator(obj.getDouble("operator"));
+                    	JSONObject obj = new JSONObject(json);
 
-					}
-					if(obj.has("ignition")) {
-						allDevicesLiveData.get(i).setIgnition(obj.getBoolean("ignition"));
+    					allDevicesLiveData.get(i).setLatitude(mongoPosition.getLatitude());
+    					allDevicesLiveData.get(i).setLongitude(mongoPosition.getLongitude());
+    					allDevicesLiveData.get(i).setAttributes(mongoPosition.getAttributes());
+    					allDevicesLiveData.get(i).setAddress(mongoPosition.getAddress());
+    					allDevicesLiveData.get(i).setSpeed(mongoPosition.getSpeed());
+    					if(mongoPosition.getValid()== true) {
+    						allDevicesLiveData.get(i).setValid(true);
 
-					}
+    					}
+    					else {
+    						allDevicesLiveData.get(i).setValid(false);
+
+    					}
+    					if(minutes > 8) {
+                        	allDevicesLiveData.get(i).setStatus("In active");
+    						
+    					}
+    					else {
+    						if(obj.has("ignition")) {
+
+    							if(obj.get("ignition").equals(true)) {
+    								if(obj.has("motion")) {
+
+    				                    if(obj.get("motion").equals(false)) {
+    				                    	allDevicesLiveData.get(i).setStatus("Idle");
+    									}
+    				                    if(obj.get("motion").equals(true)) {
+    				                    	allDevicesLiveData.get(i).setStatus("Running");
+    									}
+    								}
+    							}
+    		                    if(obj.get("ignition").equals(false)) {
+    		                    	allDevicesLiveData.get(i).setStatus("Stopped");
+
+    							}
+    						}
+    						
+    					}
+    					
+    					if(obj.has("power")) {
+    						allDevicesLiveData.get(i).setPower(obj.getDouble("power"));
+
+    					}
+    					if(obj.has("operator")) {
+    						allDevicesLiveData.get(i).setOperator(obj.getDouble("operator"));
+
+    					}
+    					if(obj.has("ignition")) {
+    						allDevicesLiveData.get(i).setIgnition(obj.getBoolean("ignition"));
+
+    					}
+                    }
+                    
 				}
 				else {
-               	allDevicesLiveData.get(i).setStatus("No data");
+                	allDevicesLiveData.get(i).setStatus("No data");
 				}
 				
 			}
@@ -491,11 +510,15 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 					if(vehicleInfo.size()>0) {
 						if(vehicleInfo.get(0).getPositionId() != null) {
 							MongoPositions mongoPosition = mongoPositionsRepository.findById(vehicleInfo.get(0).getPositionId());
-		                    vehicleInfo.get(0).setLatitude(mongoPosition.getLatitude());
-		                    vehicleInfo.get(0).setLongitude(mongoPosition.getLongitude());
-		                    vehicleInfo.get(0).setSpeed(mongoPosition.getSpeed());
-		                    vehicleInfo.get(0).setAddress(mongoPosition.getAddress());
-		                    vehicleInfo.get(0).setAttributes(mongoPosition.getAttributes());
+		                    
+							if( mongoPosition != null) {
+								vehicleInfo.get(0).setLatitude(mongoPosition.getLatitude());
+			                    vehicleInfo.get(0).setLongitude(mongoPosition.getLongitude());
+			                    vehicleInfo.get(0).setSpeed(mongoPosition.getSpeed());
+			                    vehicleInfo.get(0).setAddress(mongoPosition.getAddress());
+			                    vehicleInfo.get(0).setAttributes(mongoPosition.getAttributes());
+							}
+							
 						}
 	                   
 
@@ -503,8 +526,17 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 						
 					    Map<Object, Object> attrbuitesList =new HashMap<Object, Object>();
 						if(vehicleInfo.get(0).getAttributes() != null) {
-							JSONObject obj = new JSONObject(vehicleInfo.get(0).getAttributes().toString());
-							
+
+						   ObjectMapper mapper = new ObjectMapper();
+	                	   String json = null;
+	                	   try {
+	                		   json = mapper.writeValueAsString(vehicleInfo.get(0).getAttributes());
+						   } catch (JsonProcessingException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+
+	                    	JSONObject obj = new JSONObject(json);							
 							if(obj.has("power")) {
 								if(obj.get("power") != null) {
 									if(obj.get("power") != "") {
@@ -548,7 +580,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 							    attrbuitesList.put(key , obj.get(key).toString());
 							    vehicleInfo.get(0).setPositionAttributes(attrbuitesList);
 							}
-							 vehicleInfo.get(0).setAttributes(null);
+
 						}
 						if(device.getSensorSettings() != null) {
 							JSONObject obj = new JSONObject(device.getSensorSettings().toString());
@@ -702,30 +734,41 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 					
 					MongoPositions mongoPosition = mongoPositionsRepository.findById(devices.get(i).getPositionId());
 					
-					devices.get(i).setAttributes(mongoPosition.getAttributes());
-					devices.get(i).setSpeed(mongoPosition.getSpeed());
-					devices.get(i).setLatitude(mongoPosition.getLatitude());
-					devices.get(i).setLongitude(mongoPosition.getLongitude());
-					devices.get(i).setAddress(mongoPosition.getAddress());
-					
-					JSONObject obj = new JSONObject(devices.get(i).getAttributes().toString());
+					if(mongoPosition != null) {
+						devices.get(i).setAttributes(mongoPosition.getAttributes());
+						devices.get(i).setSpeed(mongoPosition.getSpeed());
+						devices.get(i).setLatitude(mongoPosition.getLatitude());
+						devices.get(i).setLongitude(mongoPosition.getLongitude());
+						devices.get(i).setAddress(mongoPosition.getAddress());
+						
 
-					
-					
-					if(obj.has("power")) {
-						devices.get(i).setPower(obj.getDouble("power"));
+					   ObjectMapper mapper = new ObjectMapper();
+                	   String json = null;
+                	   try {
+                		   json = mapper.writeValueAsString(devices.get(i).getAttributes());
+					   } catch (JsonProcessingException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 
+                    	JSONObject obj = new JSONObject(json);
+						
+						if(obj.has("power")) {
+							devices.get(i).setPower(obj.getDouble("power"));
+
+						}
+						
+						if(obj.has("ignition")) {
+							devices.get(i).setIgnition(obj.getBoolean("ignition"));
+
+						}
+						
+						if(obj.has("sat")) {
+							devices.get(i).setSat(obj.getInt("sat"));
+
+						}
 					}
 					
-					if(obj.has("ignition")) {
-						devices.get(i).setIgnition(obj.getBoolean("ignition"));
-
-					}
-					
-					if(obj.has("sat")) {
-						devices.get(i).setSat(obj.getInt("sat"));
-
-					}
 				}
 					
 					
@@ -2173,7 +2216,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	}
 
 	@Override
-	public ResponseEntity<?> viewTripApp(String TOKEN, Long deviceId, String startTime , String endTime) {
+	public ResponseEntity<?> viewTripApp(String TOKEN, Long deviceId, String from , String to) {
 		
 		logger.info("************************ viewTripApp STARTED ***************************");
 
@@ -2188,11 +2231,35 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			return super.checkActive(TOKEN);
 		}
 
+		Date dateFrom;
+		Date dateTo;
+
+		SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+		inputFormat.setLenient(false);
+		outputFormat.setLenient(false);
+
+	
+		try {
+			dateFrom = inputFormat.parse(from);
+			dateTo = inputFormat.parse(to);
+			
+			from = outputFormat.format(dateFrom);
+			to = outputFormat.format(dateTo);
+			
+
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",positions);
+			 logger.info("************************ getNumTripsReport ENDED ***************************");
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
 			    
 		Device device = deviceServiceImpl.findById(deviceId);
 		
 		if(device != null) {
-			positions = mongoPositionsRepo.getTripPositions(deviceId, startTime, endTime);
+			positions = mongoPositionsRepo.getTripPositions(deviceId, dateFrom, dateTo);
 			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",positions,positions.size());
 			logger.info("************************ viewTripApp ENDED ***************************");
 			return  ResponseEntity.ok().body(getObjectResponse);
@@ -4703,8 +4770,8 @@ logger.info("************************ createDevice STARTED *********************
 		List<Long> onlineDeviceIds = deviceRepository.getNumberOfOnlineDevicesList(usersIds);
 		List<Long> OutDeviceIds = deviceRepository.getNumberOfOutOfNetworkDevicesList(usersIds);
 		
-		Integer onlineDevices = mongoPositionsRepository.countByDeviceidIn(onlineDeviceIds);
-		Integer outOfNetworkDevices = mongoPositionsRepository.countByDeviceidIn(OutDeviceIds);
+		Integer onlineDevices = mongoPositionRepo.getDeviceIdDistincit(onlineDeviceIds);
+		Integer outOfNetworkDevices = mongoPositionRepo.getDeviceIdDistincit(OutDeviceIds);
 		
 		Integer totalDevices = deviceRepository.getTotalNumberOfUserDevices(usersIds);
 		Integer offlineDevices = totalDevices - onlineDevices - outOfNetworkDevices;
@@ -4805,7 +4872,19 @@ logger.info("************************ createDevice STARTED *********************
 
 	    if(positionsList.size()>0) {
 			for(int i=0;i<positionsList.size();i++) {
-				JSONObject obj = new JSONObject(positionsList.get(i).getAttributes());
+
+				
+			   ObjectMapper mapper = new ObjectMapper();
+         	   String json = null;
+         	   try {
+     		   json = mapper.writeValueAsString(positionsList.get(i).getAttributes());
+			   } catch (JsonProcessingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+             	JSONObject obj = new JSONObject(json);
+				
 				Map devicesList = new HashMap();
 				if(obj.has("todayHoursString")) {
 					SimpleDateFormat time = new SimpleDateFormat("HH:mm");

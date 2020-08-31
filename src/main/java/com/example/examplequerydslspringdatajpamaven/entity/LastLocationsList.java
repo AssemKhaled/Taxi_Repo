@@ -1,16 +1,18 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
+import java.util.Date;
+
 public class LastLocationsList {
 
 
 	private String id;
-	private String lasttime;
+	private Date lasttime;
 	private Long deviceid;
 	private Double latitude;
 	private Double longitude;
 	private Float speed;
-	private String attributes;
-	private String devicetime;
+	private Object attributes;
+	private Date devicetime;
 	private String deviceRK;
 	private String driver_RK;
 	private Long driverid;
@@ -43,8 +45,8 @@ public class LastLocationsList {
 		this.userRK = userRK;
 	}
 	
-	public LastLocationsList(String id, String lasttime, Long deviceid, Double latitude, Double longitude, Float speed,
-			String attributes, String devicetime, String deviceRK, String driver_RK, Long driverid, String drivername,
+	public LastLocationsList(String id, Date lasttime, Long deviceid, Double latitude, Double longitude, Float speed,
+			Object attributes, Date devicetime, String deviceRK, String driver_RK, Long driverid, String drivername,
 			Float weight, String address, Integer is_offline, String devicename, Long userid, String username,
 			String userRK) {
 		super();
@@ -75,10 +77,10 @@ public class LastLocationsList {
 	public void setId(String id) {
 		this.id = id;
 	}
-	public String getLasttime() {
+	public Date getLasttime() {
 		return lasttime;
 	}
-	public void setLasttime(String lasttime) {
+	public void setLasttime(Date lasttime) {
 		this.lasttime = lasttime;
 	}
 	public Long getDeviceid() {
@@ -105,16 +107,16 @@ public class LastLocationsList {
 	public void setSpeed(Float speed) {
 		this.speed = speed;
 	}
-	public String getAttributes() {
+	public Object getAttributes() {
 		return attributes;
 	}
-	public void setAttributes(String attributes) {
+	public void setAttributes(Object attributes) {
 		this.attributes = attributes;
 	}
-	public String getDevicetime() {
+	public Date getDevicetime() {
 		return devicetime;
 	}
-	public void setDevicetime(String devicetime) {
+	public void setDevicetime(Date devicetime) {
 		this.devicetime = devicetime;
 	}
 	public String getDeviceRK() {

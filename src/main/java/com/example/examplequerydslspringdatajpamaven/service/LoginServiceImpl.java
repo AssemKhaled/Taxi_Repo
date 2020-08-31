@@ -291,8 +291,10 @@ public class LoginServiceImpl extends RestServiceController implements LoginServ
 		
 
 	  }
-       List<BillingsList> billings= deviceRepository.billingInfo(userId, start, end,offset,search); 
-       Integer size= deviceRepository.getBillingInfotSize(userId, start, end); 
+       List<BillingsList> billings = null;
+       Integer size = 0;
+      // List<BillingsList> billings= deviceRepository.billingInfo(userId, start, end,offset,search); 
+      // Integer size= deviceRepository.getBillingInfotSize(userId, start, end); 
        getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",billings,size);
 	   logger.info("************************ getBilling END ***************************");
        return  ResponseEntity.ok().body(getObjectResponse);

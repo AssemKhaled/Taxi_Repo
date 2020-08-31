@@ -6,7 +6,7 @@ public class CustomPositions {
 	private String deviceName;
 	private String driverName;
 	private String servertime;
-	private String attributes;
+	private Object attributes;
 	private Double speed;
 	private String weight;
 	private String sensor1;
@@ -40,18 +40,18 @@ public class CustomPositions {
 	public CustomPositions() {
 		
 	}
-	public CustomPositions(String id, String deviceName, String attributes) {
+	public CustomPositions(String id, String deviceName, Object attributes) {
 		this.id = id;
 		this.deviceName = deviceName;
 		this.attributes = attributes;
 	}
-	public CustomPositions(String id, String deviceName,String driverName, String attributes) {
+	public CustomPositions(String id, String deviceName,String driverName, Object attributes) {
 		this.id = id;
 		this.deviceName = deviceName;
 		this.driverName = driverName;
 		this.attributes = attributes;
 	}
-	public CustomPositions(String id, String deviceName, String servertime, String attributes, Double speed) {
+	public CustomPositions(String id, String deviceName, String servertime, Object attributes, Double speed) {
 		this.id = id;
 		this.deviceName = deviceName;
 		this.servertime = servertime;
@@ -61,7 +61,7 @@ public class CustomPositions {
 	
 	
 	public CustomPositions(String id, Long deviceId, String deviceName, String driverName, String servertime,
-			String attributes, Double speed, String weight, String sensor1, String sensor2) {
+			Object attributes, Double speed, String weight, String sensor1, String sensor2) {
 		super();
 		this.id = id;
 		this.deviceId = deviceId;
@@ -98,10 +98,10 @@ public class CustomPositions {
 	public void setServertime(String servertime) {
 		this.servertime = servertime;
 	}
-	public String getAttributes() {
+	public Object getAttributes() {
 		return attributes;
 	}
-	public void setAttributes(String attributes) {
+	public void setAttributes(Object attributes) {
 		this.attributes = attributes;
 	}
 	public Double getSpeed() {

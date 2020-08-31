@@ -13,7 +13,7 @@ public class TripReport {
 	private String endLat;
 	private String endLon;
 	private String endOdometer;
-	private Long endPositionId;
+	private String endPositionId;
 	private String endTime;
 	private String maxSpeed;
 	private String spentFuel;
@@ -21,7 +21,7 @@ public class TripReport {
 	private String startLat;
 	private String startLon;
 	private String startOdometer;
-	private Long startPositionId;
+	private String startPositionId;
 	private String startTime;
 	
 	
@@ -31,8 +31,8 @@ public class TripReport {
 	}
 	public TripReport(String averageSpeed, Long deviceId, String deviceName, String distance, String driverName,
 			String driverUniqueId, String duration, String endAddress, String endLat, String endLon, String endOdometer,
-			Long endPositionId, String endTime, String maxSpeed, String spentFuel, String startAddress, String startLat,
-			String startLon, String startOdometer, Long startPositionId, String startTime) {
+			String endPositionId, String endTime, String maxSpeed, String spentFuel, String startAddress, String startLat,
+			String startLon, String startOdometer, String startPositionId, String startTime) {
 		super();
 		this.averageSpeed = averageSpeed;
 		this.deviceId = deviceId;
@@ -122,10 +122,10 @@ public class TripReport {
 	public void setEndOdometer(String endOdometer) {
 		this.endOdometer = endOdometer;
 	}
-	public Long getEndPositionId() {
+	public String getEndPositionId() {
 		return endPositionId;
 	}
-	public void setEndPositionId(Long endPositionId) {
+	public void setEndPositionId(String endPositionId) {
 		this.endPositionId = endPositionId;
 	}
 	public String getEndTime() {
@@ -170,10 +170,10 @@ public class TripReport {
 	public void setStartOdometer(String startOdometer) {
 		this.startOdometer = startOdometer;
 	}
-	public Long getStartPositionId() {
+	public String getStartPositionId() {
 		return startPositionId;
 	}
-	public void setStartPositionId(Long startPositionId) {
+	public void setStartPositionId(String startPositionId) {
 		this.startPositionId = startPositionId;
 	}
 	public String getStartTime() {

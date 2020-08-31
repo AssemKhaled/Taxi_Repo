@@ -374,7 +374,7 @@ query=" SELECT  tc_devices.id as id ,tc_devices.uniqueid as uniqueId ,tc_devices
 		" tc_devices.photo as photo  FROM tc_devices "
 		+ " INNER JOIN  tc_user_device ON tc_devices.id=tc_user_device.deviceid " 
 		+ " where tc_user_device.userid IN (:userIds) and tc_devices.delete_date is null "
-		+ "  AND ((tc_devices.name LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))))"
+		+ "  AND ( (tc_devices.name LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))))"
 		+ " GROUP BY tc_devices.id LIMIT :offset,10"),
 		
 @NamedNativeQuery(name="getDevicesLiveDataMap", 

@@ -37,7 +37,7 @@ public class CustomDeviceList{
 	private Double longitude;
 	private Float speed;
 	private String address;
-	private String attributes;
+	private Object attributes;
 	private String status;
 	private Boolean ignition;
 	private Integer sat;
@@ -85,13 +85,13 @@ public class CustomDeviceList{
 		this.power = power;
 	}
 
-	private Map<Object, Object>  positionAttributes;
+	private Object  positionAttributes;
 
-	public Map<Object, Object> getPositionAttributes() {
+	public Object getPositionAttributes() {
 		return positionAttributes;
 	}
 
-	public void setPositionAttributes(Map<Object, Object> positionAttributes) {
+	public void setPositionAttributes(Object positionAttributes) {
 		this.positionAttributes = positionAttributes;
 	}
 	public CustomDeviceList() {
@@ -184,7 +184,7 @@ public class CustomDeviceList{
 			String driverPhoto,String driverUniqueId ,String plateType, String vehiclePlate, String ownerName, String ownerId, String userName, String brand, String model,
 			String madeYear, String color, String licenceExptDate, String carWeight,
 			String positionId, Double latitude, Double longitude, Float speed,
-			String address,String attributes, String geofenceName) {
+			String address,Object attributes, String geofenceName) {
 		super();
 		this.geofenceName=geofenceName;
 		this.deviceName = deviceName;
@@ -472,11 +472,11 @@ public class CustomDeviceList{
 		this.address = address;
 	}
 
-	public String getAttributes() {
+	public Object getAttributes() {
 		return attributes;
 	}
 
-	public void setAttributes(String attributes) {
+	public void setAttributes(Object attributes) {
 		this.attributes = attributes;
 	}
 	

@@ -1,8 +1,11 @@
 package com.example.examplequerydslspringdatajpamaven.repository;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -56,16 +59,50 @@ public class MongoPositionRepo {
 	@Autowired
 	MongoTemplate mongoTemplate;
 	
-	public List<TripPositions> getTripPositions(Long deviceId,String start,String end){
+	public Integer getDeviceIdDistincit(List<Long> allDevices){
+
+		Integer size = 0;
+
+		
+		BasicDBObject basicDBObject = new BasicDBObject();
+		
+	    Aggregation aggregation = newAggregation(
+	    		match(Criteria.where("deviceid").in(allDevices)),
+	            group("deviceid"),
+	            count().as("size")
+	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+
+
+	        AggregationResults<MongoPositions> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+
+	        if(groupResults.getRawResults().containsField("cursor")) {
+	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
+			    JSONArray list = (JSONArray) obj.get("firstBatch");
+
+			    if(!list.isNull(0)) {
+			    	JSONObject object = (JSONObject) list.get(0);
+	            	size = object.getInt("size");
+			    }
+			    
+            	
+	            
+
+	        }
+		return size;
+	}
+	
+	
+	public List<TripPositions> getTripPositions(Long deviceId,Date start,Date end){
 	
         List<TripPositions> positions = new ArrayList<TripPositions>();
 		
 		BasicDBObject basicDBObject = new BasicDBObject();
 		
 	    Aggregation aggregation = newAggregation(
-	            match(Criteria.where("deviceid").in(deviceId).and("devicetime").gte(start).lte(end)),
-	            project("deviceid","devicetime","latitude","longitude"),
-	            sort(Sort.Direction.DESC, "devicetime")
+	            match(Criteria.where("deviceid").in(deviceId).and("servertime").gte(start).lte(end)),
+	            project("deviceid","servertime","latitude","longitude"),
+	            sort(Sort.Direction.DESC, "servertime")
 	            
 	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
 
@@ -104,132 +141,37 @@ public class MongoPositionRepo {
         
 		return positions;
 	}	
-	public List<DeviceWorkingHours> getDeviceCustom(List<Long> allDevices,int offset,String start,String end,String custom,String value){
+	public List<DeviceWorkingHours> getDeviceCustom(List<Long> allDevices,int offset,Date start,Date end,String custom,String value){
 
 		List<DeviceWorkingHours> deviceHours = new ArrayList<DeviceWorkingHours>();
 		
 		BasicDBObject basicDBObject = new BasicDBObject();
 		
+		Object v = null;
+		if(custom.equals("ignition") || custom.equals("motion")) {
+			v = Boolean.parseBoolean(value);
+		}
+		if(custom.equals("priority") || custom.equals("sat") || custom.equals("event") || custom.equals("rssi")
+			|| custom.equals("io69") || custom.equals("di1") || custom.equals("io24") || custom.equals("io68")
+			|| custom.equals("io11") || custom.equals("io14")) {
+			v = Integer.parseInt(value);
+		}
+		if(custom.equals("power") || custom.equals("battery")  ) {
+			v = Double.parseDouble(value);
+		}
+		if(custom.equals("adc1") || custom.equals("adc2") || custom.equals("distance") || 
+				custom.equals("totalDistance") || custom.equals("totalDistance") || 
+				custom.equals("hours") || custom.equals("todayHours") | custom.equals("weight")) {
+			v = Double.parseDouble(value);
+		}
+		if(custom.equals("todayHoursString") || custom.equals("battery unpluged")) {
+			v = value;
+		}
 	    Aggregation aggregation = newAggregation(
-	    		match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)), 
-	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-	                    DBObject filterExpression = new BasicDBObject();
-	                    filterExpression.put("$strLenCP", "$attributes");
-
-						return filterExpression;
-					}
-				}).as("len"),
-	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-						Object array[] = new Object[] { "$len", 2};
-	                    DBObject filterExpression = new BasicDBObject();
-	                    filterExpression.put("$subtract", array );
-						return filterExpression;
-					}
-				}).as("length"),
-	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-						Object array[] = new Object[] { "$attributes", 1, "$length"};
-	                    DBObject filterExpression = new BasicDBObject();
-	                    filterExpression.put("$substr", array );
-						return filterExpression;
-					}
-				}).as("attribute"),
-	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-						Object split[] = new Object[] { "$attribute", "," };
-					    ArrayList<Integer> array = new ArrayList<Integer>();
-						Object arrayThis[] = new Object[] {"$$this", ":"};
-
-						DBObject $let =  new BasicDBObject();
-						$let.put("vars",new BasicDBObject("splitted",new BasicDBObject("$split",arrayThis)));
-						
-						DBObject in =  new BasicDBObject();
-						Object arrayElemAtK[] = new Object[] {"$$splitted", 0};
-						Object arrayElemAtV[] = new Object[] {"$$splitted", 1};
-						in.put("k", new BasicDBObject("$arrayElemAt",arrayElemAtK));
-						in.put("v", new BasicDBObject("$arrayElemAt",arrayElemAtV));
-						
-						$let.put("in",in);
-
-
-						DBObject output =  new BasicDBObject("$let",$let);
-
-						Object arrayConcat[] = new Object[] {output};
-
-						Object concat[] = new Object[] {"$$value.elements",arrayConcat};
-
-	                    DBObject filterExpression = new BasicDBObject();
-	                    DBObject data = new BasicDBObject();
-	                    data.put("input", new BasicDBObject("$split",split));
-	                    data.put("initialValue", new BasicDBObject("elements", array));
-	                    data.put("in", new BasicDBObject("elements", new BasicDBObject("$concatArrays", concat)));
-
-	                    filterExpression.put("$reduce", data );
-
-	                    return filterExpression;
-					}
-				}).as("attribute"),
-	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-						
-	                    DBObject filterExpression = new BasicDBObject();
-	                    DBObject data = new BasicDBObject();
-	                    DBObject filter = new BasicDBObject();
-	                    filter.put("input", "$attribute.elements");
-	                    filter.put("as", "el");
-	                    filter.put("cond", new BasicDBObject("$not","$el.key"));
-
-	                    data.put("input",new BasicDBObject("$filter",filter));
-	                    data.put("in","$$this.k");
-
-	                    filterExpression.put("$map", data );
-						return filterExpression;
-					}
-				}).as("keys").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-						
-	                    DBObject filterExpression = new BasicDBObject();
-	                    DBObject data = new BasicDBObject();
-	                    DBObject filter = new BasicDBObject();
-	                    filter.put("input", "$attribute.elements");
-	                    filter.put("as", "el");
-	                    filter.put("cond", new BasicDBObject("$not","$el.key"));
-
-	                    data.put("input",new BasicDBObject("$filter",filter));
-	                    data.put("in","$$this.v");
-
-	                    filterExpression.put("$map", data );
-						return filterExpression;
-					}
-				}).as("values"),
-	            project("deviceid","devicetime","attributes","values","keys").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-						Object array[] = new Object[] { "$keys", custom};
-	                    DBObject filterExpression = new BasicDBObject();
-	                    filterExpression.put("$indexOfArray", array );
-						return filterExpression;
-					}
-				}).as("index"),
-	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-						Object array[] = new Object[] { "$values", "$index"};
-	                    DBObject filterExpression = new BasicDBObject();
-	                    filterExpression.put("$arrayElemAt", array );
-						return filterExpression;
-					}
-				}).as("output"),
-	            match(Criteria.where("output").lte(value)), 
-	            sort(Sort.Direction.DESC, "devicetime"),
+	    		match(Criteria.where("deviceid").in(allDevices).and("servertime").gte(start).lte(end)
+	    				.and("attributes."+custom).gte(v)),
+	            project("deviceid","attributes").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime"),
+	            sort(Sort.Direction.DESC, "servertime"),
 	            skip(offset),
 	            limit(10)
 	            
@@ -250,15 +192,15 @@ public class MongoPositionRepo {
 	            	
 	            	
 	            	if(object.has("attributes")) {
-	                	device.setAttributes(object.getString("attributes"));
+	                	device.setAttributes(object.get("attributes").toString());
 	
 	            	}
 	            	if(object.has("deviceid")) {
 	                	device.setDeviceId(object.getLong("deviceid"));
 	
 	            	}
-					if(object.has("devicetime")) {
-		            	device.setDeviceTime(object.getString("devicetime"));    		
+					if(object.has("servertime")) {
+		            	device.setDeviceTime(object.getString("servertime"));    		
 	                }
 					if(object.has("_id")) {
 		            	JSONObject objId = (JSONObject) object.get("_id");
@@ -276,132 +218,36 @@ public class MongoPositionRepo {
         
 		return deviceHours;
 	}
-	public List<DeviceWorkingHours> getDeviceCustomScheduled(List<Long> allDevices,String start,String end,String custom,String value){
+	public List<DeviceWorkingHours> getDeviceCustomScheduled(List<Long> allDevices,Date start,Date end,String custom,String value){
 
 		List<DeviceWorkingHours> deviceHours = new ArrayList<DeviceWorkingHours>();
 		
 		BasicDBObject basicDBObject = new BasicDBObject();
-		
+		Object v = null;
+		if(custom.equals("ignition") || custom.equals("motion")) {
+			v = Boolean.parseBoolean(value);
+		}
+		if(custom.equals("priority") || custom.equals("sat") || custom.equals("event") || custom.equals("rssi")
+			|| custom.equals("io69") || custom.equals("di1") || custom.equals("io24") || custom.equals("io68")
+			|| custom.equals("io11") || custom.equals("io14")) {
+			v = Integer.parseInt(value);
+		}
+		if(custom.equals("power") || custom.equals("battery")  ) {
+			v = Double.parseDouble(value);
+		}
+		if(custom.equals("adc1") || custom.equals("adc2") || custom.equals("distance") || 
+				custom.equals("totalDistance") || custom.equals("totalDistance") || 
+				custom.equals("hours") || custom.equals("todayHours") | custom.equals("weight")) {
+			v = Double.parseDouble(value);
+		}
+		if(custom.equals("todayHoursString") || custom.equals("battery unpluged")) {
+			v = value;
+		}
 	    Aggregation aggregation = newAggregation(
-	    		match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)), 
-	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-	                    DBObject filterExpression = new BasicDBObject();
-	                    filterExpression.put("$strLenCP", "$attributes");
-
-						return filterExpression;
-					}
-				}).as("len"),
-	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-						Object array[] = new Object[] { "$len", 2};
-	                    DBObject filterExpression = new BasicDBObject();
-	                    filterExpression.put("$subtract", array );
-						return filterExpression;
-					}
-				}).as("length"),
-	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-						Object array[] = new Object[] { "$attributes", 1, "$length"};
-	                    DBObject filterExpression = new BasicDBObject();
-	                    filterExpression.put("$substr", array );
-						return filterExpression;
-					}
-				}).as("attribute"),
-	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-						Object split[] = new Object[] { "$attribute", "," };
-					    ArrayList<Integer> array = new ArrayList<Integer>();
-						Object arrayThis[] = new Object[] {"$$this", ":"};
-
-						DBObject $let =  new BasicDBObject();
-						$let.put("vars",new BasicDBObject("splitted",new BasicDBObject("$split",arrayThis)));
-						
-						DBObject in =  new BasicDBObject();
-						Object arrayElemAtK[] = new Object[] {"$$splitted", 0};
-						Object arrayElemAtV[] = new Object[] {"$$splitted", 1};
-						in.put("k", new BasicDBObject("$arrayElemAt",arrayElemAtK));
-						in.put("v", new BasicDBObject("$arrayElemAt",arrayElemAtV));
-						
-						$let.put("in",in);
-
-
-						DBObject output =  new BasicDBObject("$let",$let);
-
-						Object arrayConcat[] = new Object[] {output};
-
-						Object concat[] = new Object[] {"$$value.elements",arrayConcat};
-
-	                    DBObject filterExpression = new BasicDBObject();
-	                    DBObject data = new BasicDBObject();
-	                    data.put("input", new BasicDBObject("$split",split));
-	                    data.put("initialValue", new BasicDBObject("elements", array));
-	                    data.put("in", new BasicDBObject("elements", new BasicDBObject("$concatArrays", concat)));
-
-	                    filterExpression.put("$reduce", data );
-
-	                    return filterExpression;
-					}
-				}).as("attribute"),
-	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-						
-	                    DBObject filterExpression = new BasicDBObject();
-	                    DBObject data = new BasicDBObject();
-	                    DBObject filter = new BasicDBObject();
-	                    filter.put("input", "$attribute.elements");
-	                    filter.put("as", "el");
-	                    filter.put("cond", new BasicDBObject("$not","$el.key"));
-
-	                    data.put("input",new BasicDBObject("$filter",filter));
-	                    data.put("in","$$this.k");
-
-	                    filterExpression.put("$map", data );
-						return filterExpression;
-					}
-				}).as("keys").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-						
-	                    DBObject filterExpression = new BasicDBObject();
-	                    DBObject data = new BasicDBObject();
-	                    DBObject filter = new BasicDBObject();
-	                    filter.put("input", "$attribute.elements");
-	                    filter.put("as", "el");
-	                    filter.put("cond", new BasicDBObject("$not","$el.key"));
-
-	                    data.put("input",new BasicDBObject("$filter",filter));
-	                    data.put("in","$$this.v");
-
-	                    filterExpression.put("$map", data );
-						return filterExpression;
-					}
-				}).as("values"),
-	            project("deviceid","devicetime","attributes","values","keys").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-						Object array[] = new Object[] { "$keys", custom};
-	                    DBObject filterExpression = new BasicDBObject();
-	                    filterExpression.put("$indexOfArray", array );
-						return filterExpression;
-					}
-				}).as("index"),
-	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-						Object array[] = new Object[] { "$values", "$index"};
-	                    DBObject filterExpression = new BasicDBObject();
-	                    filterExpression.put("$arrayElemAt", array );
-						return filterExpression;
-					}
-				}).as("output"),
-	            match(Criteria.where("output").lte(value)), 
-	            sort(Sort.Direction.DESC, "devicetime")
+	    		match(Criteria.where("deviceid").in(allDevices).and("servertime").gte(start).lte(end)
+	    				.and("attributes."+custom).gte(v)),
+	            project("deviceid","attributes").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime"),
+	    		sort(Sort.Direction.DESC, "servertime")
 	            
 	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
 
@@ -420,15 +266,15 @@ public class MongoPositionRepo {
 	            	
 	            	
 	            	if(object.has("attributes")) {
-	                	device.setAttributes(object.getString("attributes"));
+	                	device.setAttributes(object.get("attributes").toString());
 	
 	            	}
 	            	if(object.has("deviceid")) {
 	                	device.setDeviceId(object.getLong("deviceid"));
 	
 	            	}
-					if(object.has("devicetime")) {
-		            	device.setDeviceTime(object.getString("devicetime"));    		
+					if(object.has("servertime")) {
+		            	device.setDeviceTime(object.getString("servertime"));    		
 	                }
 					if(object.has("_id")) {
 		            	JSONObject objId = (JSONObject) object.get("_id");
@@ -446,132 +292,36 @@ public class MongoPositionRepo {
         
 		return deviceHours;
 	}
-	public Integer getDeviceCustomSize(List<Long> allDevices,String start,String end,String custom,String value){
+	public Integer getDeviceCustomSize(List<Long> allDevices,Date start,Date end,String custom,String value){
 
 		Integer size = 0;
 
 		BasicDBObject basicDBObject = new BasicDBObject();
-		
+		Object v = null;
+		if(custom.equals("ignition") || custom.equals("motion")) {
+			v = Boolean.parseBoolean(value);
+		}
+		if(custom.equals("priority") || custom.equals("sat") || custom.equals("event") || custom.equals("rssi")
+			|| custom.equals("io69") || custom.equals("di1") || custom.equals("io24") || custom.equals("io68")
+			|| custom.equals("io11") || custom.equals("io14")) {
+			v = Integer.parseInt(value);
+		}
+		if(custom.equals("power") || custom.equals("battery")  ) {
+			v = Double.parseDouble(value);
+		}
+		if(custom.equals("adc1") || custom.equals("adc2") || custom.equals("distance") || 
+				custom.equals("totalDistance") || custom.equals("totalDistance") || 
+				custom.equals("hours") || custom.equals("todayHours") | custom.equals("weight")) {
+			v = Double.parseDouble(value);
+		}
+		if(custom.equals("todayHoursString") || custom.equals("battery unpluged")) {
+			v = value;
+		}
 	    Aggregation aggregation = newAggregation(
-	    		match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)), 
-	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-	                    DBObject filterExpression = new BasicDBObject();
-	                    filterExpression.put("$strLenCP", "$attributes");
-
-						return filterExpression;
-					}
-				}).as("len"),
-	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-						Object array[] = new Object[] { "$len", 2};
-	                    DBObject filterExpression = new BasicDBObject();
-	                    filterExpression.put("$subtract", array );
-						return filterExpression;
-					}
-				}).as("length"),
-	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-						Object array[] = new Object[] { "$attributes", 1, "$length"};
-	                    DBObject filterExpression = new BasicDBObject();
-	                    filterExpression.put("$substr", array );
-						return filterExpression;
-					}
-				}).as("attribute"),
-	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-						Object split[] = new Object[] { "$attribute", "," };
-					    ArrayList<Integer> array = new ArrayList<Integer>();
-						Object arrayThis[] = new Object[] {"$$this", ":"};
-
-						DBObject $let =  new BasicDBObject();
-						$let.put("vars",new BasicDBObject("splitted",new BasicDBObject("$split",arrayThis)));
-						
-						DBObject in =  new BasicDBObject();
-						Object arrayElemAtK[] = new Object[] {"$$splitted", 0};
-						Object arrayElemAtV[] = new Object[] {"$$splitted", 1};
-						in.put("k", new BasicDBObject("$arrayElemAt",arrayElemAtK));
-						in.put("v", new BasicDBObject("$arrayElemAt",arrayElemAtV));
-						
-						$let.put("in",in);
-
-
-						DBObject output =  new BasicDBObject("$let",$let);
-
-						Object arrayConcat[] = new Object[] {output};
-
-						Object concat[] = new Object[] {"$$value.elements",arrayConcat};
-
-	                    DBObject filterExpression = new BasicDBObject();
-	                    DBObject data = new BasicDBObject();
-	                    data.put("input", new BasicDBObject("$split",split));
-	                    data.put("initialValue", new BasicDBObject("elements", array));
-	                    data.put("in", new BasicDBObject("elements", new BasicDBObject("$concatArrays", concat)));
-
-	                    filterExpression.put("$reduce", data );
-
-	                    return filterExpression;
-					}
-				}).as("attribute"),
-	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-						
-	                    DBObject filterExpression = new BasicDBObject();
-	                    DBObject data = new BasicDBObject();
-	                    DBObject filter = new BasicDBObject();
-	                    filter.put("input", "$attribute.elements");
-	                    filter.put("as", "el");
-	                    filter.put("cond", new BasicDBObject("$not","$el.key"));
-
-	                    data.put("input",new BasicDBObject("$filter",filter));
-	                    data.put("in","$$this.k");
-
-	                    filterExpression.put("$map", data );
-						return filterExpression;
-					}
-				}).as("keys").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-						
-	                    DBObject filterExpression = new BasicDBObject();
-	                    DBObject data = new BasicDBObject();
-	                    DBObject filter = new BasicDBObject();
-	                    filter.put("input", "$attribute.elements");
-	                    filter.put("as", "el");
-	                    filter.put("cond", new BasicDBObject("$not","$el.key"));
-
-	                    data.put("input",new BasicDBObject("$filter",filter));
-	                    data.put("in","$$this.v");
-
-	                    filterExpression.put("$map", data );
-						return filterExpression;
-					}
-				}).as("values"),
-	            project("deviceid","devicetime","attributes","values","keys").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-						Object array[] = new Object[] { "$keys", custom};
-	                    DBObject filterExpression = new BasicDBObject();
-	                    filterExpression.put("$indexOfArray", array );
-						return filterExpression;
-					}
-				}).as("index"),
-	            project("deviceid","devicetime","attributes").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-						Object array[] = new Object[] { "$values", "$index"};
-	                    DBObject filterExpression = new BasicDBObject();
-	                    filterExpression.put("$arrayElemAt", array );
-						return filterExpression;
-					}
-				}).as("output"),
-	            match(Criteria.where("output").lte(value)), 
-	            sort(Sort.Direction.DESC, "devicetime"),
+	    		match(Criteria.where("deviceid").in(allDevices).and("servertime").gte(start).lte(end)
+	    				.and("attributes."+custom).gte(v)),
+	            project("deviceid","attributes").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime"),
+	    		sort(Sort.Direction.DESC, "servertime"),
 	            count().as("size")
 	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
 
@@ -584,15 +334,16 @@ public class MongoPositionRepo {
 	            
 			    JSONArray list = (JSONArray) obj.get("firstBatch");
 
-            	JSONObject object = (JSONObject) list.get(0);
-
-            	size = object.getInt("size");
+			    if(!list.isNull(0)) {
+			    	JSONObject object = (JSONObject) list.get(0);
+	            	size = object.getInt("size");
+			    }
 	            
 
 	        }
 		return size;
 	}
-	public Integer getSensorsListSize(List<Long> allDevices,String start,String end){
+	public Integer getSensorsListSize(List<Long> allDevices,Date start,Date end){
 
 		Integer size = 0;
 
@@ -600,7 +351,8 @@ public class MongoPositionRepo {
 		BasicDBObject basicDBObject = new BasicDBObject();
 		
 	    Aggregation aggregation = newAggregation(
-	    		match(Criteria.where("deviceid").in(allDevices).and("fixtime").gte(start).lte(end)),
+	    		match(Criteria.where("deviceid").in(allDevices).and("servertime").gte(start).lte(end)),
+	            project("deviceid","attributes","speed").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime"),
 	            sort(Sort.Direction.DESC, "servertime"),
 	            count().as("size")
 	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
@@ -616,16 +368,17 @@ public class MongoPositionRepo {
 	            
 			    JSONArray list = (JSONArray) obj.get("firstBatch");
 
-            	JSONObject object = (JSONObject) list.get(0);
-
-            	size = object.getInt("size");
+			    if(!list.isNull(0)) {
+			    	JSONObject object = (JSONObject) list.get(0);
+	            	size = object.getInt("size");
+			    }
 	            
 
 	        }
 		return size;
 	}
 	
-	public List<CustomPositions> getSensorsList(List<Long> allDevices,int offset,String start,String end){
+	public List<CustomPositions> getSensorsList(List<Long> allDevices,int offset,Date start,Date end){
 
 		List<CustomPositions> positions = new ArrayList<CustomPositions>();
 
@@ -633,7 +386,8 @@ public class MongoPositionRepo {
 		BasicDBObject basicDBObject = new BasicDBObject();
 		
 	    Aggregation aggregation = newAggregation(
-	            match(Criteria.where("deviceid").in(allDevices).and("fixtime").gte(start).lte(end)),
+	            match(Criteria.where("deviceid").in(allDevices).and("servertime").gte(start).lte(end)),
+	            project("deviceid","attributes","speed").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime"),
 	            sort(Sort.Direction.DESC, "servertime"),
 	            skip(offset),
 	            limit(10)
@@ -657,7 +411,7 @@ public class MongoPositionRepo {
 	            	
 	            	
 	            	if(object.has("attributes")) {
-	                	device.setAttributes(object.getString("attributes"));
+	                	device.setAttributes(object.get("attributes").toString());
 	
 	            	}
 	            	if(object.has("deviceid")) {
@@ -687,7 +441,7 @@ public class MongoPositionRepo {
 		return positions;
 	}
 	
-	public List<CustomPositions> getPositionsListScheduled(List<Long> allDevices,String start,String end){
+	public List<CustomPositions> getPositionsListScheduled(List<Long> allDevices,Date start,Date end){
 
 		List<CustomPositions> positions = new ArrayList<CustomPositions>();
 
@@ -695,7 +449,8 @@ public class MongoPositionRepo {
 		BasicDBObject basicDBObject = new BasicDBObject();
 		
 	    Aggregation aggregation = newAggregation(
-	            match(Criteria.where("deviceid").in(allDevices).and("fixtime").gte(start).lte(end)),
+	            match(Criteria.where("deviceid").in(allDevices).and("servertime").gte(start).lte(end)),
+	            project("deviceid","attributes","speed").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime"),
 	            sort(Sort.Direction.DESC, "servertime")
 	            
 	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
@@ -717,7 +472,7 @@ public class MongoPositionRepo {
 	            	
 	            	
 	            	if(object.has("attributes")) {
-	                	device.setAttributes(object.getString("attributes"));
+	                	device.setAttributes(object.get("attributes").toString());
 	
 	            	}
 	            	if(object.has("deviceid")) {
@@ -748,34 +503,25 @@ public class MongoPositionRepo {
 	}
 	
 	
-	public List<DeviceWorkingHours> getDeviceWorkingHours(List<Long> allDevices,int offset,String start,String end){
+	public List<DeviceWorkingHours> getDeviceWorkingHours(List<Long> allDevices,int offset,Date start,Date end){
 
 		List<DeviceWorkingHours> deviceHours = new ArrayList<DeviceWorkingHours>();
 
-				
+
 		BasicDBObject basicDBObject = new BasicDBObject();
 		
 	    Aggregation aggregation = newAggregation(
-	            match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)), 
-	            project("deviceid","attributes").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-	                    DBObject filterExpression = new BasicDBObject();
-	                    filterExpression.put("$dateFromString", new BasicDBObject("dateString","$devicetime"));
-
-						return filterExpression;
-					}
-				}).as("devicetime"),
-	            project("deviceid","attributes").and("devicetime").dateAsFormattedString("%Y-%m-%d").as("devicetime"),
-	            group("deviceid","devicetime").last("$$ROOT").as("test"),
+	            match(Criteria.where("deviceid").in(allDevices).and("servertime").gte(start).lte(end)), 
+	            project("deviceid","attributes").and("servertime").dateAsFormattedString("%Y-%m-%d").as("servertime"),
+	            group("deviceid","servertime").last("$$ROOT").as("test"),
 	            replaceRoot("test"),
-	            sort(Sort.Direction.DESC, "devicetime"),
+	            sort(Sort.Direction.DESC, "servertime"),
 	            skip(offset),
 	            limit(10)
 	            
 	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
 
-	    
+
 	        AggregationResults<MongoPositions> groupResults
 	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
 
@@ -790,17 +536,18 @@ public class MongoPositionRepo {
 	            	DeviceWorkingHours device = new DeviceWorkingHours();
 	            	
 	            	
-	            	
+
 	            	if(object.has("attributes")) {
-	                	device.setAttributes(object.getString("attributes"));
-	
+                    	
+	                	device.setAttributes(object.get("attributes").toString());
+
 	            	}
 	            	if(object.has("deviceid")) {
 	                	device.setDeviceId(object.getLong("deviceid"));
 	
 	            	}
-					if(object.has("devicetime")) {
-		            	device.setDeviceTime(object.getString("devicetime"));    		
+					if(object.has("servertime")) {
+		            	device.setDeviceTime(object.getString("servertime"));    		
 	                }
 					if(object.has("_id")) {
 		            	JSONObject objId = (JSONObject) object.get("_id");
@@ -819,7 +566,7 @@ public class MongoPositionRepo {
 		return deviceHours;
 	}
 	
-	public List<DriverWorkingHours> getDriverWorkingHours(List<Long> allDevices,int offset,String start,String end){
+	public List<DriverWorkingHours> getDriverWorkingHours(List<Long> allDevices,int offset,Date start,Date end){
 
 		List<DriverWorkingHours> driverHours = new ArrayList<DriverWorkingHours>();
 
@@ -827,20 +574,11 @@ public class MongoPositionRepo {
 		BasicDBObject basicDBObject = new BasicDBObject();
 		
 	    Aggregation aggregation = newAggregation(
-	            match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)), 
-	            project("deviceid","attributes").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-	                    DBObject filterExpression = new BasicDBObject();
-	                    filterExpression.put("$dateFromString", new BasicDBObject("dateString","$devicetime"));
-
-						return filterExpression;
-					}
-				}).as("devicetime"),
-	            project("deviceid","attributes").and("devicetime").dateAsFormattedString("%Y-%m-%d").as("devicetime"),
-	            group("deviceid","devicetime").last("$$ROOT").as("test"),
+	            match(Criteria.where("deviceid").in(allDevices).and("servertime").gte(start).lte(end)),
+	            project("deviceid","attributes").and("servertime").dateAsFormattedString("%Y-%m-%d").as("servertime"),
+	            group("deviceid","servertime").last("$$ROOT").as("test"),
 	            replaceRoot("test"),
-	            sort(Sort.Direction.DESC, "devicetime"),
+	            sort(Sort.Direction.DESC, "servertime"),
 	            skip(offset),
 	            limit(10)
 	            
@@ -863,15 +601,15 @@ public class MongoPositionRepo {
 	            	
 	            	
 	            	if(object.has("attributes")) {
-	                	device.setAttributes(object.getString("attributes"));
+	                	device.setAttributes(object.get("attributes").toString());
 	
 	            	}
 	            	if(object.has("deviceid")) {
 	                	device.setDeviceId(object.getLong("deviceid"));
 	
 	            	}
-					if(object.has("devicetime")) {
-		            	device.setDeviceTime(object.getString("devicetime"));    		
+					if(object.has("servertime")) {
+		            	device.setDeviceTime(object.getString("servertime"));    		
 	                }
 					if(object.has("_id")) {
 		            	JSONObject objId = (JSONObject) object.get("_id");
@@ -890,7 +628,7 @@ public class MongoPositionRepo {
 		return driverHours;
 	}
 	
-	public List<DeviceWorkingHours> getDeviceWorkingHoursScheduled(List<Long> allDevices,String start,String end){
+	public List<DeviceWorkingHours> getDeviceWorkingHoursScheduled(List<Long> allDevices,Date start,Date end){
 
 		List<DeviceWorkingHours> deviceHours = new ArrayList<DeviceWorkingHours>();
 
@@ -898,20 +636,11 @@ public class MongoPositionRepo {
 		BasicDBObject basicDBObject = new BasicDBObject();
 		
 	    Aggregation aggregation = newAggregation(
-	            match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)), 
-	            project("deviceid","attributes").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-	                    DBObject filterExpression = new BasicDBObject();
-	                    filterExpression.put("$dateFromString", new BasicDBObject("dateString","$devicetime"));
-
-						return filterExpression;
-					}
-				}).as("devicetime"),
-	            project("deviceid","attributes").and("devicetime").dateAsFormattedString("%Y-%m-%d").as("devicetime"),
-	            group("deviceid","devicetime").last("$$ROOT").as("test"),
+	            match(Criteria.where("deviceid").in(allDevices).and("servertime").gte(start).lte(end)), 
+	            project("deviceid","attributes").and("servertime").dateAsFormattedString("%Y-%m-%d").as("servertime"),
+	            group("deviceid","servertime").last("$$ROOT").as("test"),
 	            replaceRoot("test"),
-	            sort(Sort.Direction.DESC, "devicetime")
+	            sort(Sort.Direction.DESC, "servertime")
 	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
 
 	    
@@ -931,15 +660,15 @@ public class MongoPositionRepo {
 	            	
 	            	
 	            	if(object.has("attributes")) {
-	                	device.setAttributes(object.getString("attributes"));
+	                	device.setAttributes(object.get("attributes").toString());
 	
 	            	}
 	            	if(object.has("deviceid")) {
 	                	device.setDeviceId(object.getLong("deviceid"));
 	
 	            	}
-					if(object.has("devicetime")) {
-		            	device.setDeviceTime(object.getString("devicetime"));    		
+					if(object.has("servertime")) {
+		            	device.setDeviceTime(object.getString("servertime"));    		
 	                }
 					if(object.has("_id")) {
 		            	JSONObject objId = (JSONObject) object.get("_id");
@@ -958,7 +687,7 @@ public class MongoPositionRepo {
 		return deviceHours;
 	}
 	
-	public List<DriverWorkingHours> getDriverWorkingHoursScheduled(List<Long> allDevices,String start,String end){
+	public List<DriverWorkingHours> getDriverWorkingHoursScheduled(List<Long> allDevices,Date start,Date end){
 
 		List<DriverWorkingHours> driverHours = new ArrayList<DriverWorkingHours>();
 
@@ -966,20 +695,11 @@ public class MongoPositionRepo {
 		BasicDBObject basicDBObject = new BasicDBObject();
 		
 	    Aggregation aggregation = newAggregation(
-	            match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)), 
-	            project("deviceid","attributes").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-	                    DBObject filterExpression = new BasicDBObject();
-	                    filterExpression.put("$dateFromString", new BasicDBObject("dateString","$devicetime"));
-
-						return filterExpression;
-					}
-				}).as("devicetime"),
-	            project("deviceid","attributes").and("devicetime").dateAsFormattedString("%Y-%m-%d").as("devicetime"),
-	            group("deviceid","devicetime").last("$$ROOT").as("test"),
+	            match(Criteria.where("deviceid").in(allDevices).and("servertime").gte(start).lte(end)),
+	            project("deviceid","attributes").and("servertime").dateAsFormattedString("%Y-%m-%d").as("servertime"),
+	            group("deviceid","servertime").last("$$ROOT").as("test"),
 	            replaceRoot("test"),
-	            sort(Sort.Direction.DESC, "devicetime")
+	            sort(Sort.Direction.DESC, "servertime")
 	            
 	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
 
@@ -998,15 +718,15 @@ public class MongoPositionRepo {
 	            	DriverWorkingHours device = new DriverWorkingHours();
 	            	
 	            	if(object.has("attributes")) {
-	                	device.setAttributes(object.getString("attributes"));
+	                	device.setAttributes(object.get("attributes").toString());
 	
 	            	}
 	            	if(object.has("deviceid")) {
 	                	device.setDeviceId(object.getLong("deviceid"));
 	
 	            	}
-					if(object.has("devicetime")) {
-		            	device.setDeviceTime(object.getString("devicetime"));    		
+					if(object.has("servertime")) {
+		            	device.setDeviceTime(object.getString("servertime"));    		
 	                }
 					if(object.has("_id")) {
 		            	JSONObject objId = (JSONObject) object.get("_id");
@@ -1026,7 +746,7 @@ public class MongoPositionRepo {
 	}
 	
 	
-	public Integer getDeviceWorkingHoursSize(List<Long> allDevices,String start,String end){
+	public Integer getDeviceWorkingHoursSize(List<Long> allDevices,Date start,Date end){
 
 		Integer size = 0;
 
@@ -1034,20 +754,11 @@ public class MongoPositionRepo {
 		BasicDBObject basicDBObject = new BasicDBObject();
 		
 	    Aggregation aggregation = newAggregation(
-	            match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)), 
-	            project("deviceid","attributes").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-	                    DBObject filterExpression = new BasicDBObject();
-	                    filterExpression.put("$dateFromString", new BasicDBObject("dateString","$devicetime"));
-
-						return filterExpression;
-					}
-				}).as("devicetime"),
-	            project("deviceid","attributes").and("devicetime").dateAsFormattedString("%Y-%m-%d").as("devicetime"),
-	            group("deviceid","devicetime").last("$$ROOT").as("test"),
+	            match(Criteria.where("deviceid").in(allDevices).and("servertime").gte(start).lte(end)), 
+	            project("deviceid","attributes").and("servertime").dateAsFormattedString("%Y-%m-%d").as("servertime"),
+	            group("deviceid","servertime").last("$$ROOT").as("test"),
 	            replaceRoot("test"),
-	            sort(Sort.Direction.DESC, "devicetime"),
+	            sort(Sort.Direction.DESC, "servertime"),
 	            count().as("size")
 	            
 	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
@@ -1063,15 +774,16 @@ public class MongoPositionRepo {
 	            
 			    JSONArray list = (JSONArray) obj.get("firstBatch");
 
-            	JSONObject object = (JSONObject) list.get(0);
-
-            	size = object.getInt("size");
+            	if(!list.isNull(0)) {
+			    	JSONObject object = (JSONObject) list.get(0);
+	            	size = object.getInt("size");
+			    }
 	            
 
 	        }
 		return size;
 	}
-	public Integer getDriverWorkingHoursSize(List<Long> allDevices,String start,String end){
+	public Integer getDriverWorkingHoursSize(List<Long> allDevices,Date start,Date end){
 
 		Integer size = 0;
 
@@ -1079,20 +791,11 @@ public class MongoPositionRepo {
 		BasicDBObject basicDBObject = new BasicDBObject();
 		
 	    Aggregation aggregation = newAggregation(
-	            match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)), 
-	            project("deviceid","attributes").and(new AggregationExpression() {
-					@Override
-					public DBObject toDbObject(AggregationOperationContext context) {
-	                    DBObject filterExpression = new BasicDBObject();
-	                    filterExpression.put("$dateFromString", new BasicDBObject("dateString","$devicetime"));
-
-						return filterExpression;
-					}
-				}).as("devicetime"),
-	            project("deviceid","attributes").and("devicetime").dateAsFormattedString("%Y-%m-%d").as("devicetime"),
-	            group("deviceid","devicetime").last("$$ROOT").as("test"),
+	            match(Criteria.where("deviceid").in(allDevices).and("servertime").gte(start).lte(end)),
+	            project("deviceid","attributes").and("servertime").dateAsFormattedString("%Y-%m-%d").as("servertime"),
+	            group("deviceid","servertime").last("$$ROOT").as("test"),
 	            replaceRoot("test"),
-	            sort(Sort.Direction.DESC, "devicetime"),
+	            sort(Sort.Direction.DESC, "servertime"),
 	            count().as("size")
 	            
 	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
@@ -1107,10 +810,11 @@ public class MongoPositionRepo {
 	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
 	            
 			    JSONArray list = (JSONArray) obj.get("firstBatch");
-
-            	JSONObject object = (JSONObject) list.get(0);
-
-            	size = object.getInt("size");
+			    
+			    if(!list.isNull(0)) {
+			    	JSONObject object = (JSONObject) list.get(0);
+	            	size = object.getInt("size");
+			    }
 	            
 
 	        }

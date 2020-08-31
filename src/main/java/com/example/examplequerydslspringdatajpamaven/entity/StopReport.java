@@ -15,7 +15,7 @@ public class StopReport {
 	private String latitude;
 	private String longitude;
 	private String maxSpeed;
-	private Long positionId;
+	private String positionId;
 	private String spentFuel;
 	private String startOdometer;
 	private String startTime;
@@ -28,7 +28,7 @@ public class StopReport {
 	}
 	public StopReport(String address, String averageSpeed, Long deviceId, String deviceName, String distance,
 			String duration, String endOdometer, String endTime, String engineHours, String latitude, String longitude,
-			String maxSpeed, Long positionId, String spentFuel, String startOdometer, String startTime) {
+			String maxSpeed, String positionId, String spentFuel, String startOdometer, String startTime) {
 		super();
 		this.address = address;
 		this.averageSpeed = averageSpeed;
@@ -119,10 +119,10 @@ public class StopReport {
 	public void setMaxSpeed(String maxSpeed) {
 		this.maxSpeed = maxSpeed;
 	}
-	public Long getPositionId() {
+	public String getPositionId() {
 		return positionId;
 	}
-	public void setPositionId(Long positionId) {
+	public void setPositionId(String positionId) {
 		this.positionId = positionId;
 	}
 	public String getSpentFuel() {

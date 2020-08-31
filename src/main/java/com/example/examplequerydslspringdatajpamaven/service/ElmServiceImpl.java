@@ -50,7 +50,6 @@ import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.SummaryReport;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
-import com.example.examplequerydslspringdatajpamaven.entity.ElmLastLocations;
 import com.example.examplequerydslspringdatajpamaven.entity.ElmReturn;
 import com.example.examplequerydslspringdatajpamaven.entity.Group;
 import com.example.examplequerydslspringdatajpamaven.entity.LastLocationsList;
@@ -60,11 +59,9 @@ import com.example.examplequerydslspringdatajpamaven.entity.MongoPositionsElm;
 import com.example.examplequerydslspringdatajpamaven.entity.StopReport;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.DriverRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.ElmLastLocationsRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoElmLastLocationsRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoElmLogsRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionsElmRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.PositionElmRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
@@ -110,9 +107,6 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	
 	@Autowired
 	private MongoElmLastLocationsRepository elmLastLocationsRepository;
-	
-	@Autowired
-	private PositionElmRepository positionElmRepository;
 	
 	@Autowired
 	private DeviceRepository deviceRepository;
@@ -3405,10 +3399,11 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		 for(LastLocationsList location : locations) {
 				Map record = new HashMap();
 				Double set_status =(double) 0;
-				JSONObject obj = null;
+				JSONObject obj =  new JSONObject();
 				if(location.getAttributes().toString().startsWith("{")) {
-					obj = new JSONObject(location.getAttributes().toString());	
+					obj = new JSONObject(location.getAttributes());	
 				}
+				
 				if(!obj.has("power")) {
 					obj.put("power",0);
 					
@@ -3492,7 +3487,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	            String calcWeightPhp = "";
 				if( (location.getWeight() == null || location.getWeight() ==0 ) 
 						&& record.get("vehicleStatus") != "TAMPER_WEIGHT"  ) {
-					Float vehicle_initial_weight = positionElmRepository.getWeight(location.getDeviceid());
+					Float vehicle_initial_weight = deviceRepository.getWeight(location.getDeviceid());
 					
 					Float min = vehicle_initial_weight;
 					Float max = vehicle_initial_weight+1000;
@@ -3516,22 +3511,14 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				Double roundOffWeight= Math.round((location.getSpeed()*2) * 100.0) / 100.0;
 				record.put("velocity", roundOffWeight);
 
-				String datetime = location.getLasttime();
-				String dt = location.getLasttime();
+				Date dt = location.getLasttime();
 
-				if(dt != null) {
-					 try {
-							SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'");
-							Date date =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(dt);
-							String d = outputFormat.format(date);
-							record.put("locationTime", d);
+				SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'");
+				String d = outputFormat.format(dt);
 
-						} catch (ParseException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}  
-				}
-			   
+				record.put("locationTime", d);
+
+				
 				if(location.getAddress() != null && location.getAddress() != "" ) {
 					record.put("address", location.getAddress());
 
@@ -3579,6 +3566,8 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		 
 
 		body.put("vehicleLocations", dataArray);
+		
+		
 		
 		  TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
 
@@ -3743,9 +3732,6 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 										 isParent =true;
 									 }
 									 
-									 if(parentClient.getId() == loggedUserId) {
-										 isParent =true;
-									 }
 									 
 									 List<User> parents=userServiceImpl.getAllParentsOfuser(parentClient,parentClient.getAccountType());
 									 
@@ -3782,12 +3768,12 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 										break;
 									 }
 								 }
-								 if(userId == loggedUserId) {
+								 if(loggedUserId.toString().equals(userId.toString())) {
 										isParent =true;
 
 								 }
 								 if(isParent == false) {
-									getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "as you are not the parent of this creater user you cannot allow to register in elm.",null);
+									getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "as you are not the parent of this creater user you cannot allow to get in elm Logs.",null);
 									return  ResponseEntity.badRequest().body(getObjectResponse);
 								 }
 							}
