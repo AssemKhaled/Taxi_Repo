@@ -41,6 +41,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.SummaryReport;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.EventRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.MongoEventsRepo;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionRepo;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionsRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
@@ -78,6 +79,9 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 	
 	@Autowired
 	DeviceServiceImpl deviceServiceImpl;
+	
+	@Autowired
+	MongoEventsRepo mongoEventsRepo;
 	
 	@Override
 	public ResponseEntity<?> getStatus(String TOKEN, Long userId) {
@@ -417,7 +421,7 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 				 else {
 					 usersIds.add(userId);
 
-					 /*List<User>childernUsers = userService.getAllChildernOfUser(userId);
+					 List<User>childernUsers = userService.getAllChildernOfUser(userId);
 					 if(childernUsers.isEmpty()) {
 						 usersIds.add(userId);
 					 }
@@ -426,11 +430,12 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 						 for(User object : childernUsers) {
 							 usersIds.add(object.getId());
 						 }
-					 }*/
+					 }
 				 }
 
+				    List<Long> allDevices = deviceRepository.getDevicesUsers(usersIds);
 
-					notifications= eventRepository.getNotificationsChart(usersIds);
+				    notifications = mongoEventsRepo.getAllNotificationsTodayChart(allDevices);
 					
 					List<Map> data = new ArrayList<>();
 

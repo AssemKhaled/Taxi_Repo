@@ -92,7 +92,47 @@ public class MongoPositionRepo {
 		return size;
 	}
 	
-	
+	public ArrayList<Map<Object,Object>> getLastPoints(int deviceId){
+    	ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
+    	
+        BasicDBObject basicDBObject = new BasicDBObject();
+		
+	    Aggregation aggregation = newAggregation(
+	            match(Criteria.where("deviceid").in(deviceId)),
+	            project("deviceid","servertime","latitude","longitude"),
+	            sort(Sort.Direction.DESC, "servertime"),
+	            limit(5)
+	            
+	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+
+	    
+	        AggregationResults<MongoPositions> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+    	
+	        
+
+
+	       if(groupResults.getRawResults().containsField("cursor")) {
+	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
+	            
+			    JSONArray list = (JSONArray) obj.get("firstBatch");
+	            Iterator<Object> iterator = list.iterator();
+	            while (iterator.hasNext()) {
+	            	JSONObject object = (JSONObject) iterator.next();
+	            	
+	            	Map<Object,Object> points = new HashMap<Object, Object>();
+	            	points.put("lat", object.getDouble("latitude"));
+	            	points.put("long", object.getDouble("longitude"));
+					
+
+	            	lastPoints.add(points);
+	            	
+	            }
+	        }
+
+
+    	return lastPoints;
+	}
 	public List<TripPositions> getTripPositions(Long deviceId,Date start,Date end){
 	
         List<TripPositions> positions = new ArrayList<TripPositions>();

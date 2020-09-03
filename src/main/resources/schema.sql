@@ -1,3 +1,15 @@
+CREATE TABLE IF NOT EXISTS `tc_points` (
+
+  `id` int(11) NOT NULL auto_increment, 
+  `name` varchar(512)  NULL,
+  `latitude` double  NULL,
+  `longitude` double  NULL,
+  `userId` int(11),
+  `photo` LONGTEXT  NULL,
+  `delete_date` varchar(255)  NULL,
+   PRIMARY KEY  (`id`)
+
+);
 CREATE TABLE IF NOT EXISTS `tc_schedule` (
 
   `id` int(11) NOT NULL auto_increment, 
@@ -6,6 +18,7 @@ CREATE TABLE IF NOT EXISTS `tc_schedule` (
   `userId` int(11), 
   `date` varchar(255)  NULL,
   `date_type` varchar(255)  NULL,
+  `email` varchar(255)  NULL,
   `delete_date` varchar(255)  NULL,
    PRIMARY KEY  (`id`)
 
@@ -309,7 +322,25 @@ PREPARE stmt FROM @stmt;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 ----------------------------------------------------------------
+set @col_exists = 0;
+SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME='tc_schedule'
+AND column_name='email'
+and table_schema = database()
+into @col_exists;
 
+set @stmt = case @col_exists
+when 0 then CONCAT(
+'alter table tc_schedule'
+, ' ADD COLUMN `email` varchar(255) NULL DEFAULT NULL '
+,';')
+else 'select ''column already exists, no op'''
+end;
+
+PREPARE stmt FROM @stmt;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+----------------------------------------------------------------
 ALTER TABLE `tc_devices` MODIFY `calibrationData` VARCHAR(1080);
 --ALTER TABLE `tc_devices` DROP `positionid`;
 --ALTER TABLE `tc_devices` ADD COLUMN `positionid` text NULL DEFAULT NULL;

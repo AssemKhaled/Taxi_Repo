@@ -1676,6 +1676,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 
     					}
     					if(minutes > 8) {
+	                    	
                         	allDevicesLiveData.get(i).setStatus("In active");
     						
     					}
@@ -1689,6 +1690,11 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
     				                    	allDevicesLiveData.get(i).setStatus("Idle");
     									}
     				                    if(obj.get("motion").equals(true)) {
+    				    			    	ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
+
+    				    			    	lastPoints = mongoPositionRepo.getLastPoints(allDevicesLiveData.get(i).getId());
+    				                    	allDevicesLiveData.get(i).setLastPoints(lastPoints);
+    				                    	
     				                    	allDevicesLiveData.get(i).setStatus("Running");
     									}
     								}
@@ -1717,6 +1723,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
                     
 				}
 				else {
+					
                 	allDevicesLiveData.get(i).setStatus("No data");
 				}
 				

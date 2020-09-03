@@ -172,6 +172,12 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 						return ResponseEntity.badRequest().body(getObjectResponse);
 
 					}
+					if(schedule.getEmail()==null || schedule.getEmail()=="") {
+
+						 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Email is required.",null);
+						 return  ResponseEntity.badRequest().body(getObjectResponse);
+					}
+					
 					if(schedule.getId()==null || schedule.getId()==0) {
 						if(user.getAccountType().equals(4)) {
 							 Set<User> parentClients = user.getUsersOfUser();
@@ -455,7 +461,7 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 		Long createdBy=schedule.getUserId();
 		Boolean isParent=false;
 
-		if(createdBy.equals(userId)) {
+		if(createdBy.toString().equals(userId.toString())) {
 			isParent=true;
 		}
 		List<User>childs = new ArrayList<User>();
@@ -489,7 +495,7 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 		if(!childs.isEmpty()) {
 			for(User object : childs) {
 				parentChilds = object;
-				if(parentChilds.getId().equals(createdBy)) {
+				if(parentChilds.getId().toString().equals(createdBy.toString())) {
 					isParent=true;
 					break;
 				}
@@ -719,7 +725,11 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not creater or parent of creater to get schedule",null);
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
-		
+		if(schedule.getEmail()==null || schedule.getEmail()=="") {
+
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Email is required.",null);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
 		if(schedule.getDate()== null || schedule.getDate_type()== null
 				   || schedule.getTask() == null || schedule.getDate()== "" || schedule.getDate_type()== ""
 				   || schedule.getTask() == "") {
@@ -773,7 +783,7 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 			
 			schedules.add(schedule);
 			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Updated Successfully",schedules);
-			logger.info("************************ editGeofence ENDED ***************************");
+			logger.info("************************ editScheduled ENDED ***************************");
 			return ResponseEntity.ok().body(getObjectResponse);
 
 				
@@ -806,8 +816,7 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 	    	
 	    	String email="";
 	    	Long userId = object.getUserId();
-	    	User user = userRepository.findOne(object.getUserId());
-	    	email = user.getEmail();
+	    	email = object.getEmail();
 
 	    	String dateType = object.getDate_type();
 	    	String from = "";

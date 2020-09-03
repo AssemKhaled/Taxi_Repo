@@ -117,6 +117,9 @@ public class DecodePhoto {
 		if(modleType.equals("icon")) {
 			path ="/var/www/html/sareb_photo/icons/"+fileName;
 		}
+		if(modleType.equals("point")) {
+			path ="/var/www/html/sareb_photo/points/"+fileName;
+		}
 		
 		int pos=photo.indexOf(",");
 		byte[] data=Base64.getDecoder().decode(photo.substring(pos+1));	

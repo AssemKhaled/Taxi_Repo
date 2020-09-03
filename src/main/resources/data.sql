@@ -73,6 +73,11 @@ WHERE NOT EXISTS (
     SELECT name FROM tc_permissions WHERE name = 'SCHEDULED'
 );
 
+INSERT INTO tc_permissions(name,functionality)
+SELECT * FROM (SELECT 'POINTS', '{"list":true,"create":true,"edit":true,"delete":true}') AS tmp
+WHERE NOT EXISTS (
+    SELECT name FROM tc_permissions WHERE name = 'POINTS'
+);
 
 INSERT INTO tc_permissions(name,functionality)
 SELECT * FROM (SELECT 'NOTIFICATION', '{"list":true,"create":true,"edit":true,"delete":true,"assignGroupToNotification":true,"assignDeviceToNotification":true}') AS tmp

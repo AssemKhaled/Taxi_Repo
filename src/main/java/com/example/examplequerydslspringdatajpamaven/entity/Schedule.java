@@ -31,6 +31,9 @@ public class Schedule {
 	@Column(name = "date_type")
 	private String date_type;
 	
+	@Column(name = "email")
+	private String email;
+	
 	@Column(name = "userId")
 	private Long userId;
 
@@ -88,6 +91,14 @@ public class Schedule {
 
 	public void setDate_type(String date_type) {
 		this.date_type = date_type;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 	
 	

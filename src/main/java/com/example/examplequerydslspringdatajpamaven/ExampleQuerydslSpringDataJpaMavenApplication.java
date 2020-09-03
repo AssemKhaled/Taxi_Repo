@@ -27,6 +27,7 @@ public class ExampleQuerydslSpringDataJpaMavenApplication  {
 		String driver = "/var/www/html/sareb_photo/driver_photos";
 		String vehicle = "/var/www/html/sareb_photo/vehicle_photos";
 		String icon = "/var/www/html/sareb_photo/icons";
+		String points = "/var/www/html/sareb_photo/points";
 		String defaultIcon = "/var/www/html/sareb_photo/icons/default";
 		String excelSheets = "/var/www/html/sareb_sheets";
 
@@ -85,6 +86,15 @@ public class ExampleQuerydslSpringDataJpaMavenApplication  {
 		} else {
 			defaultIconPhoto.mkdirs();
 			System.out.println("Directory Default Icon Photos doesn't exist!!");
+		}
+		
+		
+		File pointsFile = new File(points);
+		if (pointsFile.isDirectory()) {
+			System.out.println("File Points Photos is a Directory");
+		} else {
+			pointsFile.mkdirs();
+			System.out.println("Directory Points Photos doesn't exist!!");
 		}
 		
 		SpringApplication.run(ExampleQuerydslSpringDataJpaMavenApplication.class, args);

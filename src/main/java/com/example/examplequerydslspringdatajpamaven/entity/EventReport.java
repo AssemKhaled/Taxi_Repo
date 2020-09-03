@@ -3,10 +3,10 @@ package com.example.examplequerydslspringdatajpamaven.entity;
 
 public class EventReport {
 
-	private Long eventId;
+	private String eventId;
 	private String eventType;
 	private String serverTime;
-	private String attributes;
+	private Object attributes;
 	private Long deviceId;
 	private String deviceName;
 	private Long driverId;
@@ -18,9 +18,11 @@ public class EventReport {
 	private Double longitude;
 	
 	
-	
+	public EventReport() {
+		
+	}
 
-	public EventReport(Long eventId, String eventType, String serverTime, String attributes, Long deviceId,
+	public EventReport(String eventId, String eventType, String serverTime, Object attributes, Long deviceId,
 			String deviceName, Long driverId, String driverName, Long geofenceId, String geofenceName, String positionId,
 			Double latitude, Double longitude) {
 		super();
@@ -39,7 +41,7 @@ public class EventReport {
 		this.longitude = longitude;
 	}
 	
-	public EventReport(Long eventId, String eventType, String serverTime, String attributes, Long deviceId,String deviceName,
+	public EventReport(String eventId, String eventType, String serverTime, Object attributes, Long deviceId,String deviceName,
 			 Long driverId, String driverName, Long geofenceId, String geofenceName, String positionId	) {
 		this.eventId = eventId;
 		this.eventType = eventType;
@@ -53,7 +55,7 @@ public class EventReport {
 		this.geofenceName = geofenceName;
 		this.positionId = positionId;
 	}
-	public EventReport(Long eventId, String eventType, String serverTime, String attributes, Long deviceId,
+	public EventReport(String eventId, String eventType, String serverTime, Object attributes, Long deviceId,
 			String deviceName, Long driverId, String driverName) {
 		super();
 		this.eventId = eventId;
@@ -65,7 +67,7 @@ public class EventReport {
 		this.driverId = driverId;
 		this.driverName = driverName;
 	}
-	public EventReport(Long eventId,String eventType, String serverTime, String attributes,Long deviceId) {
+	public EventReport(String eventId,String eventType, String serverTime, Object attributes,Long deviceId) {
 		super();
 		this.eventId = eventId;
 		this.eventType = eventType;
@@ -74,7 +76,7 @@ public class EventReport {
 		this.deviceId = deviceId;
 
 	}
-	public EventReport(Long eventId,String eventType, String serverTime, String attributes) {
+	public EventReport(String eventId,String eventType, String serverTime, Object attributes) {
 		super();
 		this.eventId = eventId;
 		this.eventType = eventType;
@@ -83,10 +85,10 @@ public class EventReport {
 
 	}
 	
-	public Long getEventId() {
+	public String getEventId() {
 		return eventId;
 	}
-	public void setEventId(Long eventId) {
+	public void setEventId(String eventId) {
 		this.eventId = eventId;
 	}
 	public String getEventType() {
@@ -101,10 +103,10 @@ public class EventReport {
 	public void setServerTime(String serverTime) {
 		this.serverTime = serverTime;
 	}
-	public String getAttributes() {
+	public Object getAttributes() {
 		return attributes;
 	}
-	public void setAttributes(String attributes) {
+	public void setAttributes(Object attributes) {
 		this.attributes = attributes;
 	}
 	public Long getDeviceId() {

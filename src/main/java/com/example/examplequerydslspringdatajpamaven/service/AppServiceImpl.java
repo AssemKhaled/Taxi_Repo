@@ -63,6 +63,7 @@ import com.example.examplequerydslspringdatajpamaven.repository.DriverRepository
 import com.example.examplequerydslspringdatajpamaven.repository.EventRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.GeofenceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.GroupRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.MongoEventsRepo;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionRepo;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionsRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.ProfileRepository;
@@ -90,7 +91,10 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	 
 	 @Value("${summaryUrl}")
 	 private String summaryUrl;
-	
+
+	@Autowired
+	MongoEventsRepo mongoEventsRepo;
+		
 	@Autowired
 	ProfileRepository profileRepository;
 	
@@ -403,6 +407,12 @@ public class AppServiceImpl extends RestServiceController implements AppService{
     				                    	allDevicesLiveData.get(i).setStatus("Idle");
     									}
     				                    if(obj.get("motion").equals(true)) {
+    				                    	
+    				                    	ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
+
+    				    			    	lastPoints = mongoPositionRepo.getLastPoints(allDevicesLiveData.get(i).getId());
+    				                    	allDevicesLiveData.get(i).setLastPoints(lastPoints);
+    				                    	
     				                    	allDevicesLiveData.get(i).setStatus("Running");
     									}
     								}
@@ -1031,50 +1041,81 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			}
 		}
 
+		
+		Date dateFrom;
+		Date dateTo;
 		if(from.equals("0") || to.equals("0")) {
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",stopReport);
-			logger.info("************************ getStopsReport ENDED ***************************");
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",null);
+			logger.info("************************ getEventsReport ENDED ***************************");		
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
 		else {
 			SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+			SimpleDateFormat inputFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+			inputFormat1.setLenient(false);
 			inputFormat.setLenient(false);
 			outputFormat.setLenient(false);
 
-			Date dateFrom;
-			Date dateTo;
+			
 			try {
 				dateFrom = inputFormat.parse(from);
-				dateTo = inputFormat.parse(to);
-				
 				from = outputFormat.format(dateFrom);
+				
+
+			} catch (ParseException e2) {
+				// TODO Auto-generated catch block
+				try {
+					dateFrom = inputFormat1.parse(from);
+					from = outputFormat.format(dateFrom);
+
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
+			}
+			
+			try {
+				dateTo = inputFormat.parse(to);
 				to = outputFormat.format(dateTo);
 				
-				Date today=new Date();
 
-				if(dateFrom.getTime() > dateTo.getTime()) {
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",stopReport);
-					logger.info("************************ getStopsReport ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",stopReport);
-					logger.info("************************ getStopsReport ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				
-				
-
-
-			} catch (ParseException e) {
+			} catch (ParseException e2) {
 				// TODO Auto-generated catch block
-				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",stopReport);
-				logger.info("************************ getStopsReport ENDED ***************************");
-				return  ResponseEntity.badRequest().body(getObjectResponse);
+				try {
+					dateTo = inputFormat1.parse(to);
+					to = outputFormat.format(dateTo);
 
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
 			}
+			
+			
+			
+			
+			Date today=new Date();
+
+			if(dateFrom.getTime() > dateTo.getTime()) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			
 			
 			Integer size = 0;
 			
@@ -1330,50 +1371,80 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			}
 		}
 
+		Date dateFrom;
+		Date dateTo;
 		if(from.equals("0") || to.equals("0")) {
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",tripReport);
-			logger.info("************************ getTripsReport ENDED ***************************");
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",null);
+			logger.info("************************ getEventsReport ENDED ***************************");		
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
 		else {
 			SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+			SimpleDateFormat inputFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+			inputFormat1.setLenient(false);
 			inputFormat.setLenient(false);
 			outputFormat.setLenient(false);
 
-			Date dateFrom;
-			Date dateTo;
+			
 			try {
 				dateFrom = inputFormat.parse(from);
-				dateTo = inputFormat.parse(to);
-				
 				from = outputFormat.format(dateFrom);
+				
+
+			} catch (ParseException e2) {
+				// TODO Auto-generated catch block
+				try {
+					dateFrom = inputFormat1.parse(from);
+					from = outputFormat.format(dateFrom);
+
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
+			}
+			
+			try {
+				dateTo = inputFormat.parse(to);
 				to = outputFormat.format(dateTo);
 				
-				Date today=new Date();
 
-				if(dateFrom.getTime() > dateTo.getTime()) {
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",tripReport);
-					logger.info("************************ getTripsReport ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",tripReport);
-					logger.info("************************ getTripsReport ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				
-				
-
-
-			} catch (ParseException e) {
+			} catch (ParseException e2) {
 				// TODO Auto-generated catch block
-				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",tripReport);
-				logger.info("************************ getTripsReport ENDED ***************************");
-				return  ResponseEntity.badRequest().body(getObjectResponse);
+				try {
+					dateTo = inputFormat1.parse(to);
+					to = outputFormat.format(dateTo);
 
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
 			}
+			
+			
+			
+			
+			Date today=new Date();
+
+			if(dateFrom.getTime() > dateTo.getTime()) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			
 			
 			Integer size = 0;
 			
@@ -1734,50 +1805,80 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			}
 		}
 
+		Date dateFrom;
+		Date dateTo;
 		if(from.equals("0") || to.equals("0")) {
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",summaryReport);
-			 logger.info("************************ getSummaryReport ENDED ***************************");
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",null);
+			logger.info("************************ getEventsReport ENDED ***************************");		
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
 		else {
 			SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+			SimpleDateFormat inputFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+			inputFormat1.setLenient(false);
 			inputFormat.setLenient(false);
 			outputFormat.setLenient(false);
 
-			Date dateFrom;
-			Date dateTo;
+			
 			try {
 				dateFrom = inputFormat.parse(from);
-				dateTo = inputFormat.parse(to);
-				
 				from = outputFormat.format(dateFrom);
+				
+
+			} catch (ParseException e2) {
+				// TODO Auto-generated catch block
+				try {
+					dateFrom = inputFormat1.parse(from);
+					from = outputFormat.format(dateFrom);
+
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
+			}
+			
+			try {
+				dateTo = inputFormat.parse(to);
 				to = outputFormat.format(dateTo);
 				
-				Date today=new Date();
 
-				if(dateFrom.getTime() > dateTo.getTime()) {
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",summaryReport);
-					 logger.info("************************ getSummaryReport ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",summaryReport);
-					 logger.info("************************ getSummaryReport ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				
-				
-
-
-			} catch (ParseException e) {
+			} catch (ParseException e2) {
 				// TODO Auto-generated catch block
-				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",summaryReport);
-				 logger.info("************************ getSummaryReport ENDED ***************************");
-				return  ResponseEntity.badRequest().body(getObjectResponse);
+				try {
+					dateTo = inputFormat1.parse(to);
+					to = outputFormat.format(dateTo);
 
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
 			}
+			
+			
+			
+			
+			Date today=new Date();
+
+			if(dateFrom.getTime() > dateTo.getTime()) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			
 			
 			Integer size = 0;
 			
@@ -1917,29 +2018,57 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			return super.checkActive(TOKEN);
 		}
 
+
 		Date dateFrom;
 		Date dateTo;
 
 		SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-		SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		SimpleDateFormat inputFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+		inputFormat1.setLenient(false);
 		inputFormat.setLenient(false);
 		outputFormat.setLenient(false);
 
-	
+		
 		try {
 			dateFrom = inputFormat.parse(from);
-			dateTo = inputFormat.parse(to);
-			
 			from = outputFormat.format(dateFrom);
+			
+
+		} catch (ParseException e2) {
+			// TODO Auto-generated catch block
+			try {
+				dateFrom = inputFormat1.parse(from);
+				from = outputFormat.format(dateFrom);
+
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			
+		}
+		
+		try {
+			dateTo = inputFormat.parse(to);
 			to = outputFormat.format(dateTo);
 			
 
-		} catch (ParseException e) {
+		} catch (ParseException e2) {
 			// TODO Auto-generated catch block
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",positions);
-			 logger.info("************************ getNumTripsReport ENDED ***************************");
-			return  ResponseEntity.badRequest().body(getObjectResponse);
+			try {
+				dateTo = inputFormat1.parse(to);
+				to = outputFormat.format(dateTo);
 
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			
 		}
 			    
 		Device device = deviceServiceImpl.findById(deviceId);
@@ -4914,7 +5043,7 @@ logger.info("************************ getNotifications STARTED *****************
 				 else {
 					 usersIds.add(userId);
 
-					 /*List<User>childernUsers = userService.getAllChildernOfUser(userId);
+					 List<User>childernUsers = userServiceImpl.getAllChildernOfUser(userId);
 					 if(childernUsers.isEmpty()) {
 						 usersIds.add(userId);
 					 }
@@ -4923,11 +5052,12 @@ logger.info("************************ getNotifications STARTED *****************
 						 for(User object : childernUsers) {
 							 usersIds.add(object.getId());
 						 }
-					 }*/
+					 }
 				 }
 
+				    List<Long> allDevices = deviceRepository.getDevicesUsers(usersIds);
 
-					notifications= eventRepository.getNotificationsChart(usersIds);
+				    notifications = mongoEventsRepo.getAllNotificationsTodayChart(allDevices);
 					
 					List<Map> data = new ArrayList<>();
 
@@ -5117,6 +5247,7 @@ logger.info("************************ getNotifications STARTED *****************
 	public ResponseEntity<?> getEventsReportApp(String TOKEN, Long[] deviceIds, Long[] groupIds, int offset, String start,
 			String end, String type, String search, Long userId) {
 		
+	
 		logger.info("************************ getEventsReport STARTED ***************************");		
 		List<EventReport> eventReport = new ArrayList<EventReport>();
 		if(TOKEN.equals("")) {
@@ -5269,49 +5400,78 @@ logger.info("************************ getNotifications STARTED *****************
 			}
 		}
 
+		Date dateFrom;
+		Date dateTo;
 		if(start.equals("0") || end.equals("0")) {
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",eventReport);
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",null);
 			logger.info("************************ getEventsReport ENDED ***************************");		
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
 		else {
 			SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+			SimpleDateFormat inputFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+			inputFormat1.setLenient(false);
 			inputFormat.setLenient(false);
 			outputFormat.setLenient(false);
 
-			Date dateFrom;
-			Date dateTo;
+			
 			try {
 				dateFrom = inputFormat.parse(start);
-				dateTo = inputFormat.parse(end);
-				
 				start = outputFormat.format(dateFrom);
+				
+
+			} catch (ParseException e2) {
+				// TODO Auto-generated catch block
+				try {
+					dateFrom = inputFormat1.parse(start);
+					start = outputFormat.format(dateFrom);
+
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
+			}
+			
+			try {
+				dateTo = inputFormat.parse(end);
 				end = outputFormat.format(dateTo);
 				
-				Date today=new Date();
 
-				if(dateFrom.getTime() > dateTo.getTime()) {
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",eventReport);
-					logger.info("************************ getEventsReport ENDED ***************************");		
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",eventReport);
-					logger.info("************************ getEventsReport ENDED ***************************");		
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				
-				
-
-
-			} catch (ParseException e) {
+			} catch (ParseException e2) {
 				// TODO Auto-generated catch block
-				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",eventReport);
+				try {
+					dateTo = inputFormat1.parse(end);
+					end = outputFormat.format(dateTo);
+
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
+			}
+			
+			
+			
+			
+			Date today=new Date();
+
+			if(dateFrom.getTime() > dateTo.getTime()) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",null);
 				logger.info("************************ getEventsReport ENDED ***************************");		
 				return  ResponseEntity.badRequest().body(getObjectResponse);
-
+			}
+			if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
 			
 			search = "%"+search+"%";
@@ -5355,9 +5515,9 @@ logger.info("************************ getNotifications STARTED *****************
 			
 			if(type.equals("")) {
 				if(!TOKEN.equals("Schedule")) {
-					eventReport = eventRepository.getEvents(allDevices, offset, start, end,search);
+					eventReport = mongoEventsRepo.getEventsWithoutType(allDevices, offset, dateFrom, dateTo);
 					if(eventReport.size()>0) {
-						size=eventRepository.getEventsSize(allDevices,start, end);
+						size = mongoEventsRepo.getEventsWithoutTypeSize(allDevices, dateFrom, dateTo);
 						for(int i=0;i<eventReport.size();i++) {
 							
 							MongoPositions pos = mongoPositionsRepository.findById(eventReport.get(i).getPositionId());
@@ -5367,6 +5527,44 @@ logger.info("************************ getNotifications STARTED *****************
 								eventReport.get(i).setLongitude(pos.getLongitude());
 								
 							}
+							
+							Device device = deviceRepository.getOne(eventReport.get(i).getDeviceId());
+							eventReport.get(i).setDeviceName(device.getName());
+							Set<Driver> drivers = device.getDriver();
+							for(Driver driver : drivers) {
+								eventReport.get(i).setDriverId(driver.getId());
+								eventReport.get(i).setDriverName(driver.getName());
+							}
+							
+							if(eventReport.get(i).getEventType().equals("alarm")) {
+								JSONObject obj = new JSONObject(eventReport.get(i).getAttributes().toString());
+								eventReport.get(i).setEventType(obj.getString("alarm"));
+							}
+						}
+						
+					}
+				}
+				else {
+					eventReport = mongoEventsRepo.getEventsScheduled(allDevices, dateFrom, dateTo);
+					if(eventReport.size()>0) {
+						for(int i=0;i<eventReport.size();i++) {
+							
+							MongoPositions pos = mongoPositionsRepository.findById(eventReport.get(i).getPositionId());
+							
+							if(pos != null) {
+								eventReport.get(i).setLatitude(pos.getLatitude());
+								eventReport.get(i).setLongitude(pos.getLongitude());
+								
+							}
+							
+							Device device = deviceRepository.getOne(eventReport.get(i).getDeviceId());
+							eventReport.get(i).setDeviceName(device.getName());
+							Set<Driver> drivers = device.getDriver();
+							for(Driver driver : drivers) {
+								eventReport.get(i).setDriverId(driver.getId());
+								eventReport.get(i).setDriverName(driver.getName());
+							}
+							
 							if(eventReport.get(i).getEventType().equals("alarm")) {
 								JSONObject obj = new JSONObject(eventReport.get(i).getAttributes());
 								eventReport.get(i).setEventType(obj.getString("alarm"));
@@ -5379,9 +5577,9 @@ logger.info("************************ getNotifications STARTED *****************
 			}
 			else {
 				if(!TOKEN.equals("Schedule")) {
-					eventReport = eventRepository.getEventsSort(allDevices, offset, start, end,type,search);
+					eventReport = mongoEventsRepo.getEventsWithType(allDevices, offset, dateFrom, dateTo, type);
 					if(eventReport.size()>0) {
-						size=eventRepository.getEventsSize(allDevices,start, end);
+						size = mongoEventsRepo.getEventsWithTypeSize(allDevices, dateFrom, dateTo, type);
 						for(int i=0;i<eventReport.size();i++) {
 							MongoPositions pos = mongoPositionsRepository.findById(eventReport.get(i).getPositionId());
 							
@@ -5389,6 +5587,40 @@ logger.info("************************ getNotifications STARTED *****************
 								eventReport.get(i).setLatitude(pos.getLatitude());
 								eventReport.get(i).setLongitude(pos.getLongitude());
 								
+							}
+							Device device = deviceRepository.getOne(eventReport.get(i).getDeviceId());
+							eventReport.get(i).setDeviceName(device.getName());
+							Set<Driver> drivers = device.getDriver();
+							for(Driver driver : drivers) {
+								eventReport.get(i).setDriverId(driver.getId());
+								eventReport.get(i).setDriverName(driver.getName());
+							}
+							if(eventReport.get(i).getEventType().equals("alarm")) {
+								JSONObject obj = new JSONObject(eventReport.get(i).getAttributes());
+								eventReport.get(i).setEventType(obj.getString("alarm"));
+							}
+						}
+						
+					}
+				}
+				else {
+					eventReport = mongoEventsRepo.getEventsScheduled(allDevices, dateFrom, dateTo);
+					if(eventReport.size()>0) {
+						for(int i=0;i<eventReport.size();i++) {
+							
+							MongoPositions pos = mongoPositionsRepository.findById(eventReport.get(i).getPositionId());
+							
+							if(pos != null) {
+								eventReport.get(i).setLatitude(pos.getLatitude());
+								eventReport.get(i).setLongitude(pos.getLongitude());
+								
+							}
+							Device device = deviceRepository.getOne(eventReport.get(i).getDeviceId());
+							eventReport.get(i).setDeviceName(device.getName());
+							Set<Driver> drivers = device.getDriver();
+							for(Driver driver : drivers) {
+								eventReport.get(i).setDriverId(driver.getId());
+								eventReport.get(i).setDriverName(driver.getName());
 							}
 							if(eventReport.get(i).getEventType().equals("alarm")) {
 								JSONObject obj = new JSONObject(eventReport.get(i).getAttributes());
@@ -5403,8 +5635,9 @@ logger.info("************************ getNotifications STARTED *****************
 			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",eventReport,size);
 			logger.info("************************ getEventsReport ENDED ***************************");
 			return  ResponseEntity.ok().body(getObjectResponse);
-		}		  
-			
+		}	
+	  
+		
 	}
 
 	@Override
@@ -5562,49 +5795,80 @@ logger.info("************************ getNotifications STARTED *****************
 			}
 		}
 		
+		Date dateFrom;
+		Date dateTo;
 		if(start.equals("0") || end.equals("0")) {
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",deviceHours);
-			logger.info("************************ getDeviceWorkingHours ENDED ***************************");
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",null);
+			logger.info("************************ getEventsReport ENDED ***************************");		
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
 		else {
 			SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+			SimpleDateFormat inputFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+			inputFormat1.setLenient(false);
 			inputFormat.setLenient(false);
 			outputFormat.setLenient(false);
 
-			Date dateFrom;
-			Date dateTo;
+			
 			try {
 				dateFrom = inputFormat.parse(start);
-				dateTo = inputFormat.parse(end);
-				
 				start = outputFormat.format(dateFrom);
+				
+
+			} catch (ParseException e2) {
+				// TODO Auto-generated catch block
+				try {
+					dateFrom = inputFormat1.parse(start);
+					start = outputFormat.format(dateFrom);
+
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
+			}
+			
+			try {
+				dateTo = inputFormat.parse(end);
 				end = outputFormat.format(dateTo);
 				
-				Date today=new Date();
 
-				if(dateFrom.getTime() > dateTo.getTime()) {
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",deviceHours);
-					logger.info("************************ getDeviceWorkingHours ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",deviceHours);
-					logger.info("************************ getDeviceWorkingHours ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				
-				
-
-
-			} catch (ParseException e) {
+			} catch (ParseException e2) {
 				// TODO Auto-generated catch block
-				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",deviceHours);
-				return  ResponseEntity.badRequest().body(getObjectResponse);
+				try {
+					dateTo = inputFormat1.parse(end);
+					end = outputFormat.format(dateTo);
 
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
 			}
+			
+			
+			
+			
+			Date today=new Date();
+
+			if(dateFrom.getTime() > dateTo.getTime()) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			
 			
 			search = "%"+search+"%";
 			Integer size = 0;
@@ -5833,47 +6097,77 @@ logger.info("************************ getNotifications STARTED *****************
 		Date dateFrom;
 		Date dateTo;
 		if(start.equals("0") || end.equals("0")) {
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",deviceHours);
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",null);
+			logger.info("************************ getEventsReport ENDED ***************************");		
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
 		else {
 			SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+			SimpleDateFormat inputFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+			inputFormat1.setLenient(false);
 			inputFormat.setLenient(false);
 			outputFormat.setLenient(false);
 
-		
+			
 			try {
 				dateFrom = inputFormat.parse(start);
-				dateTo = inputFormat.parse(end);
-				
 				start = outputFormat.format(dateFrom);
+				
+
+			} catch (ParseException e2) {
+				// TODO Auto-generated catch block
+				try {
+					dateFrom = inputFormat1.parse(start);
+					start = outputFormat.format(dateFrom);
+
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
+			}
+			
+			try {
+				dateTo = inputFormat.parse(end);
 				end = outputFormat.format(dateTo);
 				
-				Date today=new Date();
 
-				if(dateFrom.getTime() > dateTo.getTime()) {
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",deviceHours);
-					 logger.info("************************ getCustomReport ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",deviceHours);
-					 logger.info("************************ getCustomReport ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				
-				
-
-
-			} catch (ParseException e) {
+			} catch (ParseException e2) {
 				// TODO Auto-generated catch block
-				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",deviceHours);
-				 logger.info("************************ getCustomReport ENDED ***************************");
-				return  ResponseEntity.badRequest().body(getObjectResponse);
+				try {
+					dateTo = inputFormat1.parse(end);
+					end = outputFormat.format(dateTo);
 
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
 			}
+			
+			
+			
+			
+			Date today=new Date();
+
+			if(dateFrom.getTime() > dateTo.getTime()) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			
 			
 			search = "%"+search+"%";
 			Integer size = 0;
@@ -6107,50 +6401,80 @@ logger.info("************************ getNotifications STARTED *****************
 		for(DriverSelect object : allDevicesList) {
 			allDevices.add(object.getId());
 		}
+		Date dateFrom;
+		Date dateTo;
 		if(start.equals("0") || end.equals("0")) {
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",driverHours);
-			 logger.info("************************ getDriverWorkingHours ENDED ***************************");
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",null);
+			logger.info("************************ getEventsReport ENDED ***************************");		
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
 		else {
 			SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+			SimpleDateFormat inputFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+			inputFormat1.setLenient(false);
 			inputFormat.setLenient(false);
 			outputFormat.setLenient(false);
 
-			Date dateFrom;
-			Date dateTo;
+			
 			try {
 				dateFrom = inputFormat.parse(start);
-				dateTo = inputFormat.parse(end);
-				
 				start = outputFormat.format(dateFrom);
+				
+
+			} catch (ParseException e2) {
+				// TODO Auto-generated catch block
+				try {
+					dateFrom = inputFormat1.parse(start);
+					start = outputFormat.format(dateFrom);
+
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
+			}
+			
+			try {
+				dateTo = inputFormat.parse(end);
 				end = outputFormat.format(dateTo);
 				
-				Date today=new Date();
 
-				if(dateFrom.getTime() > dateTo.getTime()) {
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",driverHours);
-					 logger.info("************************ getDriverWorkingHours ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",driverHours);
-					 logger.info("************************ getDriverWorkingHours ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				
-				
-
-
-			} catch (ParseException e) {
+			} catch (ParseException e2) {
 				// TODO Auto-generated catch block
-				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",driverHours);
-				 logger.info("************************ getDriverWorkingHours ENDED ***************************");
-				return  ResponseEntity.badRequest().body(getObjectResponse);
+				try {
+					dateTo = inputFormat1.parse(end);
+					end = outputFormat.format(dateTo);
 
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
 			}
+			
+			
+			
+			
+			Date today=new Date();
+
+			if(dateFrom.getTime() > dateTo.getTime()) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			
 			
 			search = "%"+search+"%";
 			Integer size = 0;
@@ -6449,50 +6773,81 @@ logger.info("************************ getNotifications STARTED *****************
 			}
 		}
 
+
+		Date dateFrom;
+		Date dateTo;
 		if(from.equals("0") || to.equals("0")) {
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",tripReport);
-			logger.info("************************ getDriveMoreThanReport ENDED ***************************");
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",null);
+			logger.info("************************ getEventsReport ENDED ***************************");		
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
 		else {
 			SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+			SimpleDateFormat inputFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+			inputFormat1.setLenient(false);
 			inputFormat.setLenient(false);
 			outputFormat.setLenient(false);
 
-			Date dateFrom;
-			Date dateTo;
+			
 			try {
 				dateFrom = inputFormat.parse(from);
-				dateTo = inputFormat.parse(to);
-				
 				from = outputFormat.format(dateFrom);
+				
+
+			} catch (ParseException e2) {
+				// TODO Auto-generated catch block
+				try {
+					dateFrom = inputFormat1.parse(from);
+					from = outputFormat.format(dateFrom);
+
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
+			}
+			
+			try {
+				dateTo = inputFormat.parse(to);
 				to = outputFormat.format(dateTo);
 				
-				Date today=new Date();
 
-				if(dateFrom.getTime() > dateTo.getTime()) {
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",tripReport);
-					logger.info("************************ getDriveMoreThanReport ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",tripReport);
-					logger.info("************************ getDriveMoreThanReport ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				
-				
-
-
-			} catch (ParseException e) {
+			} catch (ParseException e2) {
 				// TODO Auto-generated catch block
-				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",tripReport);
-				logger.info("************************ getDriveMoreThanReport ENDED ***************************");
-				return  ResponseEntity.badRequest().body(getObjectResponse);
+				try {
+					dateTo = inputFormat1.parse(to);
+					to = outputFormat.format(dateTo);
 
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
 			}
+			
+			
+			
+			
+			Date today=new Date();
+
+			if(dateFrom.getTime() > dateTo.getTime()) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			
 			
 			Integer size = 0;
 			
@@ -6793,50 +7148,80 @@ logger.info("************************ getNotifications STARTED *****************
 			}
 		}
 
+		Date dateFrom;
+		Date dateTo;
 		if(from.equals("0") || to.equals("0")) {
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",eventReport);
-			logger.info("************************ getEventsReportByType ENDED ***************************");
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",null);
+			logger.info("************************ getEventsReport ENDED ***************************");		
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
 		else {
 			SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+			SimpleDateFormat inputFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+			inputFormat1.setLenient(false);
 			inputFormat.setLenient(false);
 			outputFormat.setLenient(false);
 
-			Date dateFrom;
-			Date dateTo;
+			
 			try {
 				dateFrom = inputFormat.parse(from);
-				dateTo = inputFormat.parse(to);
-				
 				from = outputFormat.format(dateFrom);
+				
+
+			} catch (ParseException e2) {
+				// TODO Auto-generated catch block
+				try {
+					dateFrom = inputFormat1.parse(from);
+					from = outputFormat.format(dateFrom);
+
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
+			}
+			
+			try {
+				dateTo = inputFormat.parse(to);
 				to = outputFormat.format(dateTo);
 				
-				Date today=new Date();
 
-				if(dateFrom.getTime() > dateTo.getTime()) {
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",eventReport);
-					logger.info("************************ getEventsReportByType ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",eventReport);
-					logger.info("************************ getEventsReportByType ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				
-				
-
-
-			} catch (ParseException e) {
+			} catch (ParseException e2) {
 				// TODO Auto-generated catch block
-				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",eventReport);
-				logger.info("************************ getEventsReportByType ENDED ***************************");
-				return  ResponseEntity.badRequest().body(getObjectResponse);
+				try {
+					dateTo = inputFormat1.parse(to);
+					to = outputFormat.format(dateTo);
 
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
 			}
+			
+			
+			
+			
+			Date today=new Date();
+
+			if(dateFrom.getTime() > dateTo.getTime()) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			
 			
 			Integer size = 0;
 			
@@ -7061,50 +7446,78 @@ logger.info("************************ getNotifications STARTED *****************
 				}
 			}
 		}
-
 		Date dateFrom;
 		Date dateTo;
 		if(start.equals("0") || end.equals("0")) {
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",positionsList);
-			 logger.info("************************ getSensorsReport ENDED ***************************");
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",null);
+			logger.info("************************ getEventsReport ENDED ***************************");		
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
 		else {
 			SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+			SimpleDateFormat inputFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+			inputFormat1.setLenient(false);
 			inputFormat.setLenient(false);
 			outputFormat.setLenient(false);
 
+			
 			try {
 				dateFrom = inputFormat.parse(start);
-				dateTo = inputFormat.parse(end);
-				
 				start = outputFormat.format(dateFrom);
+				
+
+			} catch (ParseException e2) {
+				// TODO Auto-generated catch block
+				try {
+					dateFrom = inputFormat1.parse(start);
+					start = outputFormat.format(dateFrom);
+
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
+			}
+			
+			try {
+				dateTo = inputFormat.parse(end);
 				end = outputFormat.format(dateTo);
 				
-				Date today=new Date();
 
-				if(dateFrom.getTime() > dateTo.getTime()) {
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",positionsList);
-					 logger.info("************************ getSensorsReport ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",positionsList);
-					 logger.info("************************ getSensorsReport ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				
-				
-
-
-			} catch (ParseException e) {
+			} catch (ParseException e2) {
 				// TODO Auto-generated catch block
-				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",positionsList);
-				 logger.info("************************ getSensorsReport ENDED ***************************");
-				return  ResponseEntity.badRequest().body(getObjectResponse);
+				try {
+					dateTo = inputFormat1.parse(end);
+					end = outputFormat.format(dateTo);
 
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
+			}
+			
+			
+			
+			
+			Date today=new Date();
+
+			if(dateFrom.getTime() > dateTo.getTime()) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
 			
 			search = "%"+search+"%";
@@ -7397,51 +7810,79 @@ logger.info("************************ getNotifications STARTED *****************
 			}
 		}
 
+		Date dateFrom;
+		Date dateTo;
 		if(from.equals("0") || to.equals("0")) {
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",tripReport);
-			 logger.info("************************ getNumTripsReport ENDED ***************************");
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",null);
+			logger.info("************************ getEventsReport ENDED ***************************");		
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
 		else {
 			SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+			SimpleDateFormat inputFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+			inputFormat1.setLenient(false);
 			inputFormat.setLenient(false);
 			outputFormat.setLenient(false);
 
-			Date dateFrom;
-			Date dateTo;
+			
 			try {
 				dateFrom = inputFormat.parse(from);
-				dateTo = inputFormat.parse(to);
-				
 				from = outputFormat.format(dateFrom);
-				to = outputFormat.format(dateTo);
-				
-				Date today=new Date();
-
-				if(dateFrom.getTime() > dateTo.getTime()) {
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",tripReport);
-					 logger.info("************************ getNumTripsReport ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",tripReport);
-					 logger.info("************************ getNumTripsReport ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				
 				
 
-
-			} catch (ParseException e) {
+			} catch (ParseException e2) {
 				// TODO Auto-generated catch block
-				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",tripReport);
-				 logger.info("************************ getNumTripsReport ENDED ***************************");
-				return  ResponseEntity.badRequest().body(getObjectResponse);
+				try {
+					dateFrom = inputFormat1.parse(from);
+					from = outputFormat.format(dateFrom);
 
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
 			}
 			
+			try {
+				dateTo = inputFormat.parse(to);
+				to = outputFormat.format(dateTo);
+				
+
+			} catch (ParseException e2) {
+				// TODO Auto-generated catch block
+				try {
+					dateTo = inputFormat1.parse(to);
+					to = outputFormat.format(dateTo);
+
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
+			}
+			
+			
+			
+			
+			Date today=new Date();
+
+			if(dateFrom.getTime() > dateTo.getTime()) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
 			Integer size = 0;
 			
 			String appendString="";
@@ -7740,49 +8181,79 @@ logger.info("************************ getNotifications STARTED *****************
 			}
 		}
 
+
+		Date dateFrom;
+		Date dateTo;
 		if(from.equals("0") || to.equals("0")) {
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",stopReport);
-			 logger.info("************************ getNumStopsReport ENDED ***************************");
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",null);
+			logger.info("************************ getEventsReport ENDED ***************************");		
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
 		else {
 			SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+			SimpleDateFormat inputFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+			inputFormat1.setLenient(false);
 			inputFormat.setLenient(false);
 			outputFormat.setLenient(false);
 
-			Date dateFrom;
-			Date dateTo;
+			
 			try {
 				dateFrom = inputFormat.parse(from);
-				dateTo = inputFormat.parse(to);
-				
 				from = outputFormat.format(dateFrom);
+				
+
+			} catch (ParseException e2) {
+				// TODO Auto-generated catch block
+				try {
+					dateFrom = inputFormat1.parse(from);
+					from = outputFormat.format(dateFrom);
+
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
+			}
+			
+			try {
+				dateTo = inputFormat.parse(to);
 				to = outputFormat.format(dateTo);
 				
-				Date today=new Date();
 
-				if(dateFrom.getTime() > dateTo.getTime()) {
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",stopReport);
-					 logger.info("************************ getNumStopsReport ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",stopReport);
-					 logger.info("************************ getNumStopsReport ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				
-				
-
-
-			} catch (ParseException e) {
+			} catch (ParseException e2) {
 				// TODO Auto-generated catch block
-				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",stopReport);
-				 logger.info("************************ getNumStopsReport ENDED ***************************");
-				return  ResponseEntity.badRequest().body(getObjectResponse);
+				try {
+					dateTo = inputFormat1.parse(to);
+					to = outputFormat.format(dateTo);
 
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
+			}
+			
+			
+			
+			
+			Date today=new Date();
+
+			if(dateFrom.getTime() > dateTo.getTime()) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
 			
 			Integer size = 0;
@@ -8082,49 +8553,78 @@ logger.info("************************ getNotifications STARTED *****************
 			}
 		}
 
+		Date dateFrom;
+		Date dateTo;
 		if(from.equals("0") || to.equals("0")) {
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",tripReport);
-			 logger.info("************************ geTotalTripsReport ENDED ***************************");
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",null);
+			logger.info("************************ getEventsReport ENDED ***************************");		
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
 		else {
 			SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+			SimpleDateFormat inputFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+			inputFormat1.setLenient(false);
 			inputFormat.setLenient(false);
 			outputFormat.setLenient(false);
 
-			Date dateFrom;
-			Date dateTo;
+			
 			try {
 				dateFrom = inputFormat.parse(from);
-				dateTo = inputFormat.parse(to);
-				
 				from = outputFormat.format(dateFrom);
+				
+
+			} catch (ParseException e2) {
+				// TODO Auto-generated catch block
+				try {
+					dateFrom = inputFormat1.parse(from);
+					from = outputFormat.format(dateFrom);
+
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
+			}
+			
+			try {
+				dateTo = inputFormat.parse(to);
 				to = outputFormat.format(dateTo);
 				
-				Date today=new Date();
 
-				if(dateFrom.getTime() > dateTo.getTime()) {
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",tripReport);
-					 logger.info("************************ geTotalTripsReport ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",tripReport);
-					 logger.info("************************ geTotalTripsReport ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				
-				
-
-
-			} catch (ParseException e) {
+			} catch (ParseException e2) {
 				// TODO Auto-generated catch block
-				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",tripReport);
-				 logger.info("************************ geTotalTripsReport ENDED ***************************");
-				return  ResponseEntity.badRequest().body(getObjectResponse);
+				try {
+					dateTo = inputFormat1.parse(to);
+					to = outputFormat.format(dateTo);
 
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
+			}
+			
+			
+			
+			
+			Date today=new Date();
+
+			if(dateFrom.getTime() > dateTo.getTime()) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
 			
 			Integer size = 0;
@@ -8477,51 +8977,79 @@ logger.info("************************ getNotifications STARTED *****************
 			}
 		}
 
-		if(from.equals("0") || to.equals("0")) {
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",stopReport);
-			 logger.info("************************ getTotalStopsReport ENDED ***************************");
 
+		Date dateFrom;
+		Date dateTo;
+		if(from.equals("0") || to.equals("0")) {
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",null);
+			logger.info("************************ getEventsReport ENDED ***************************");		
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
 		else {
 			SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+			SimpleDateFormat inputFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+			inputFormat1.setLenient(false);
 			inputFormat.setLenient(false);
 			outputFormat.setLenient(false);
 
-			Date dateFrom;
-			Date dateTo;
+			
 			try {
 				dateFrom = inputFormat.parse(from);
-				dateTo = inputFormat.parse(to);
-				
 				from = outputFormat.format(dateFrom);
+				
+
+			} catch (ParseException e2) {
+				// TODO Auto-generated catch block
+				try {
+					dateFrom = inputFormat1.parse(from);
+					from = outputFormat.format(dateFrom);
+
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
+			}
+			
+			try {
+				dateTo = inputFormat.parse(to);
 				to = outputFormat.format(dateTo);
 				
-				Date today=new Date();
 
-				if(dateFrom.getTime() > dateTo.getTime()) {
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",stopReport);
-					 logger.info("************************ getTotalStopsReport ENDED ***************************");
-
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",stopReport);
-					 logger.info("************************ getTotalStopsReport ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				
-				
-
-
-			} catch (ParseException e) {
+			} catch (ParseException e2) {
 				// TODO Auto-generated catch block
-				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",stopReport);
-				 logger.info("************************ getTotalStopsReport ENDED ***************************");
-				return  ResponseEntity.badRequest().body(getObjectResponse);
+				try {
+					dateTo = inputFormat1.parse(to);
+					to = outputFormat.format(dateTo);
 
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
+			}
+			
+			
+			
+			
+			Date today=new Date();
+
+			if(dateFrom.getTime() > dateTo.getTime()) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
 			
 			Integer size = 0;
@@ -8834,53 +9362,80 @@ logger.info("************************ getNotifications STARTED *****************
 		for(DriverSelect object : allDevicesList) {
 			allDevices.add(object.getId());
 		}
+
 		Date dateFrom;
 		Date dateTo;
-		
 		if(start.equals("0") || end.equals("0")) {
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",driverHours);
-			logger.info("************************ getNumberDriverWorkingHours ENDED ***************************");
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",null);
+			logger.info("************************ getEventsReport ENDED ***************************");		
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
 		else {
 			SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+			SimpleDateFormat inputFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+			inputFormat1.setLenient(false);
 			inputFormat.setLenient(false);
 			outputFormat.setLenient(false);
 
 			
 			try {
 				dateFrom = inputFormat.parse(start);
-				dateTo = inputFormat.parse(end);
-				
 				start = outputFormat.format(dateFrom);
+				
+
+			} catch (ParseException e2) {
+				// TODO Auto-generated catch block
+				try {
+					dateFrom = inputFormat1.parse(start);
+					start = outputFormat.format(dateFrom);
+
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
+			}
+			
+			try {
+				dateTo = inputFormat.parse(end);
 				end = outputFormat.format(dateTo);
 				
-				Date today=new Date();
 
-				if(dateFrom.getTime() > dateTo.getTime()) {
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",driverHours);
-					logger.info("************************ getNumberDriverWorkingHours ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",driverHours);
-					logger.info("************************ getNumberDriverWorkingHours ENDED ***************************");
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				
-				
-
-
-			} catch (ParseException e) {
+			} catch (ParseException e2) {
 				// TODO Auto-generated catch block
-				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD",driverHours);
-				logger.info("************************ getNumberDriverWorkingHours ENDED ***************************");
-				return  ResponseEntity.badRequest().body(getObjectResponse);
+				try {
+					dateTo = inputFormat1.parse(end);
+					end = outputFormat.format(dateTo);
 
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
 			}
-		}		
+			
+		}	
+			
+			
+			Date today=new Date();
+
+			if(dateFrom.getTime() > dateTo.getTime()) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
 			search = "%"+search+"%";
 			Integer size = 0;
 			

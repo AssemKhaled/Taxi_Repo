@@ -3,11 +3,14 @@ package com.example.examplequerydslspringdatajpamaven.entity;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
 import java.util.TimeZone;
 
 import javax.persistence.ColumnResult;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -15,9 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CustomDeviceLiveData {
 	
-	public CustomDeviceLiveData() {
-		// TODO Auto-generated constructor stub
-	}
+
 	private int id;
 	private String deviceName;
 	private String uniqueId;
@@ -27,6 +28,7 @@ public class CustomDeviceLiveData {
 	private Double operator;
 	private Double longitude;
 	private String address;
+	private ArrayList<Map<Object,Object>> lastPoints;
 	private Object attributes;
 	private String crash;
 	private String batteryUnpluged;
@@ -58,8 +60,10 @@ public class CustomDeviceLiveData {
 	private String sequence_number;
 	private String owner_name;
 
-     
-
+	public CustomDeviceLiveData() {
+		// TODO Auto-generated constructor stub
+	}
+	
 	public CustomDeviceLiveData(Double weight, Double latitude, Double longitude, String address, Object attributes,
 			Float speed) {
 		super();
@@ -765,6 +769,12 @@ public class CustomDeviceLiveData {
 	}
 	public void setUniqueId(String uniqueId) {
 		this.uniqueId = uniqueId;
+	}
+	public ArrayList<Map<Object,Object>> getLastPoints() {
+		return lastPoints;
+	}
+	public void setLastPoints(ArrayList<Map<Object,Object>> lastPoints) {
+		this.lastPoints = lastPoints;
 	}
 	
 	
