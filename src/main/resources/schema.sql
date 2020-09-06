@@ -210,6 +210,63 @@ DEALLOCATE PREPARE stmt;
 set @col_exists = 0;
 SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
 WHERE TABLE_NAME='tc_devices'
+AND column_name='port'
+and table_schema = database()
+into @col_exists;
+
+set @stmt = case @col_exists
+when 0 then CONCAT(
+'alter table tc_devices'
+, ' ADD COLUMN `port` text NULL DEFAULT NULL'
+,';')
+else 'select ''column already exists, no op'''
+end;
+
+PREPARE stmt FROM @stmt;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+----------------------------------------------------------------
+set @col_exists = 0;
+SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME='tc_devices'
+AND column_name='protocol'
+and table_schema = database()
+into @col_exists;
+
+set @stmt = case @col_exists
+when 0 then CONCAT(
+'alter table tc_devices'
+, ' ADD COLUMN `protocol` text NULL DEFAULT NULL'
+,';')
+else 'select ''column already exists, no op'''
+end;
+
+PREPARE stmt FROM @stmt;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+----------------------------------------------------------------
+set @col_exists = 0;
+SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME='tc_devices'
+AND column_name='device_type'
+and table_schema = database()
+into @col_exists;
+
+set @stmt = case @col_exists
+when 0 then CONCAT(
+'alter table tc_devices'
+, ' ADD COLUMN `device_type` text NULL DEFAULT NULL'
+,';')
+else 'select ''column already exists, no op'''
+end;
+
+PREPARE stmt FROM @stmt;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+----------------------------------------------------------------
+set @col_exists = 0;
+SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME='tc_devices'
 AND column_name='sensorSettings'
 and table_schema = database()
 into @col_exists;

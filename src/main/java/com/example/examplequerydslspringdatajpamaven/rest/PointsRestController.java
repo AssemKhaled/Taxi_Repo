@@ -67,8 +67,8 @@ public class PointsRestController {
 	
 	@RequestMapping(value = "/editPoints", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<?> editPoints(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                            @RequestBody(required = false) Points points,
-			                                            @RequestParam (value = "userId", defaultValue = "0") Long id) {
+			                                          @RequestBody(required = false) Points points,
+			                                          @RequestParam (value = "userId", defaultValue = "0") Long id) {
 		
 		
 		return pointsServiceImpl.editPoints(TOKEN,points,id);

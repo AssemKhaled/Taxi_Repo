@@ -608,6 +608,15 @@ public class Device {
 	@Column(name = "icon")
 	private String icon;
 	
+	@Column(name = "protocol")
+	private String protocol;
+	
+	@Column(name = "port")
+	private String port;
+	
+	@Column(name = "device_type")
+	private String device_type;
+	
     /*@ManyToMany(fetch = FetchType.LAZY,
             cascade = {
                 CascadeType.PERSIST,
@@ -1233,6 +1242,30 @@ public class Device {
 
 	public void setCreate_date(String create_date) {
 		this.create_date = create_date;
+	}
+
+	public String getProtocol() {
+		return protocol;
+	}
+
+	public void setProtocol(String protocol) {
+		this.protocol = protocol;
+	}
+
+	public String getPort() {
+		return port;
+	}
+
+	public void setPort(String port) {
+		this.port = port;
+	}
+
+	public String getDevice_type() {
+		return device_type;
+	}
+
+	public void setDevice_type(String device_type) {
+		this.device_type = device_type;
 	}
 	
 	
