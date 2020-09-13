@@ -37,6 +37,14 @@ public class PointsRestController {
 		
 	}
 	
+	@GetMapping("/getPointsMap")
+	public ResponseEntity<?> getPointsMap(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+				                           @RequestParam (value = "userId",defaultValue = "0") Long userId) {
+	 
+		return pointsServiceImpl.getPointsMap(TOKEN,userId);
+		
+	}
+	
 	
 	@RequestMapping(value = "/getPointsById", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getPointsById(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,

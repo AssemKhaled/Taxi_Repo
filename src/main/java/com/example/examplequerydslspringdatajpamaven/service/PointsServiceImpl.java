@@ -617,4 +617,109 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 				
 			    
 	}
+
+	@Override
+	public ResponseEntity<?> getPointsMap(String TOKEN, Long id) {
+	 logger.info("************************ getPointsList STARTED ***************************");
+		
+		List<Points> points = new ArrayList<Points>();
+		
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",points);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(id != 0) {
+			
+			User user = userServiceImpl.findById(id);
+			if(user == null ) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User is not Found",points);
+				return  ResponseEntity.status(404).body(getObjectResponse);
+
+			}
+			else {
+				if(user.getAccountType()!= 1) {
+					if(!userRoleService.checkUserHasPermission(id, "POINTS", "list")) {
+						 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get POINTS list",null);
+						 logger.info("************************ getPointsList ENDED ***************************");
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+					}
+				}
+				if(user.getDelete_date() == null) {
+					 List<Long>usersIds= new ArrayList<>();
+
+					userServiceImpl.resetChildernArray();
+				    if(user.getAccountType().equals(4)) {
+						 Set<User> parentClients = user.getUsersOfUser();
+						 if(parentClients.isEmpty()) {
+							
+							 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get pointD of this user",null);
+							 logger.info("************************ getPointsList ENDED ***************************");
+							return  ResponseEntity.status(404).body(getObjectResponse);
+						 }else {
+							 User parentClient = new User() ;
+							 for(User object : parentClients) {
+								 parentClient = object;
+							 }
+							 usersIds.add(parentClient.getId());
+						 }
+					}
+					else {
+						List<User>childernUsers = userServiceImpl.getActiveAndInactiveChildern(id);
+						 if(childernUsers.isEmpty()) {
+							 usersIds.add(id);
+						 }
+						 else {
+							 usersIds.add(id);
+							 for(User object : childernUsers) {
+								 usersIds.add(object.getId());
+							 }
+						 }
+					}
+				    
+
+					
+					
+					 points = pointsRepository.getAllPointsMap(usersIds);
+					 List<Map> data = new ArrayList<>();
+					 if(points.size() >0) {
+						 for(Points point:points) {
+						     Map PointsList= new HashMap();
+						     
+							 PointsList.put("name", point.getName());
+							 PointsList.put("latitude", point.getLatitude());
+							 PointsList.put("longitude", point.getLongitude());
+							 PointsList.put("photo", point.getPhoto());
+
+							 data.add(PointsList);
+
+						 }
+						
+
+					 }
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",data);
+					logger.info("************************ getPointsList ENDED ***************************");
+					return  ResponseEntity.ok().body(getObjectResponse);
+
+				}
+				else {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User is not Found",points);
+					return  ResponseEntity.status(404).body(getObjectResponse);
+
+				}
+				
+			}
+
+		}
+		else{
+			
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",points);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
+	}
 }

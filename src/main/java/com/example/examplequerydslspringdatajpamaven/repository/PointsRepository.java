@@ -21,6 +21,10 @@ public interface PointsRepository  extends JpaRepository<Points, Long>, QueryDsl
 	public List<Points> getAllPoints(@Param("userIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
 	
 	
+	@Query(value = "SELECT tc_points.* FROM tc_points"
+			+ " WHERE tc_points.userId IN(:userIds) and tc_points.delete_date is null ", nativeQuery = true)
+	public List<Points> getAllPointsMap(@Param("userIds")List<Long> userIds);
+	
 	@Query(value = "SELECT count(*) FROM tc_points  " + 
 			"  WHERE tc_points.userId IN(:userIds) and tc_points.delete_date is null", nativeQuery = true)
 	public Integer getAllPointsSize(@Param("userIds")List<Long> userIds);

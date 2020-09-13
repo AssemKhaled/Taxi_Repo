@@ -5431,13 +5431,13 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			return super.checkActive(TOKEN);
 		}
 		
-		
 
 		Date dateFrom;
 		Date dateTo;
 
 		SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 		SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		SimpleDateFormat inputFormat2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS SSSS");
 		SimpleDateFormat inputFormat1 = new SimpleDateFormat("yyyy-MM-dd");
 		inputFormat1.setLenient(false);
 		inputFormat.setLenient(false);
@@ -5445,47 +5445,63 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 		
 		try {
-			dateFrom = inputFormat.parse(from);
+			dateFrom = inputFormat2.parse(from);
 			from = outputFormat.format(dateFrom);
 			
 
 		} catch (ParseException e2) {
-			// TODO Auto-generated catch block
 			try {
-				dateFrom = inputFormat1.parse(from);
+				dateFrom = inputFormat.parse(from);
 				from = outputFormat.format(dateFrom);
-
-			} catch (ParseException e) {
-				// TODO Auto-generated catch block
 				
-				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
-				logger.info("************************ getEventsReport ENDED ***************************");		
-				return  ResponseEntity.badRequest().body(getObjectResponse);
+
+			} catch (ParseException e3) {
+				// TODO Auto-generated catch block
+				try {
+					dateFrom = inputFormat1.parse(from);
+					from = outputFormat.format(dateFrom);
+
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z' or yyyy-MM-dd'T'HH:mm:ss.SSS SSSS",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
 			}
 			
 		}
 		
+		
 		try {
-			dateTo = inputFormat.parse(to);
+			dateTo = inputFormat2.parse(to);
 			to = outputFormat.format(dateTo);
 			
 
 		} catch (ParseException e2) {
-			// TODO Auto-generated catch block
 			try {
-				dateTo = inputFormat1.parse(to);
+				dateTo = inputFormat.parse(to);
 				to = outputFormat.format(dateTo);
+				
 
-			} catch (ParseException e) {
+			} catch (ParseException e3) {
 				// TODO Auto-generated catch block
-				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
-				logger.info("************************ getEventsReport ENDED ***************************");		
-				return  ResponseEntity.badRequest().body(getObjectResponse);
+				try {
+					dateTo = inputFormat1.parse(to);
+					to = outputFormat.format(dateTo);
+
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
 			}
 			
 		}
 		
-			    
 		Device device = deviceServiceImpl.findById(deviceId);
 		
 		if(device != null) {

@@ -33,6 +33,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceList;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceLiveData;
+import com.example.examplequerydslspringdatajpamaven.entity.CustomMapData;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceCalibrationData;
@@ -1605,7 +1606,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			 }
 	    }
 	   
-		List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getAllDevicesDataMap(usersIds);
+		List<CustomMapData> allDevicesLiveData=	deviceRepository.getAllDevicesDataMap(usersIds);
 		
 		if(allDevicesLiveData.size() > 0) {
 			for(int i=0;i<allDevicesLiveData.size();i++) {
@@ -1628,17 +1629,17 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 						e.printStackTrace();
 					}
 					if(minutes < 3) {
-	                	allDevicesLiveData.get(i).setVehicleStatus("online");
+	                	allDevicesLiveData.get(i).setVehicleStatus(1);
 					}
 					if(minutes > 8) {
-	                	allDevicesLiveData.get(i).setVehicleStatus("unknown");
+	                	allDevicesLiveData.get(i).setVehicleStatus(2);
 					}
 					if(minutes < 8 && minutes > 3) {
-	                	allDevicesLiveData.get(i).setVehicleStatus("offline");
+	                	allDevicesLiveData.get(i).setVehicleStatus(3);
 					}
 				}
 				else {
-                	allDevicesLiveData.get(i).setVehicleStatus("offline");
+                	allDevicesLiveData.get(i).setVehicleStatus(3);
 
 				}
 
@@ -1664,43 +1665,44 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 
     					allDevicesLiveData.get(i).setLatitude(mongoPosition.getLatitude());
     					allDevicesLiveData.get(i).setLongitude(mongoPosition.getLongitude());
-    					allDevicesLiveData.get(i).setAttributes(mongoPosition.getAttributes());
-    					allDevicesLiveData.get(i).setAddress(mongoPosition.getAddress());
     					allDevicesLiveData.get(i).setSpeed(mongoPosition.getSpeed());
+
     					if(mongoPosition.getValid()== true) {
-    						allDevicesLiveData.get(i).setValid(true);
+    						allDevicesLiveData.get(i).setValid(0);
 
     					}
     					else {
-    						allDevicesLiveData.get(i).setValid(false);
+    						allDevicesLiveData.get(i).setValid(1);
 
     					}
+    					
+                        
     					if(minutes > 8) {
 	                    	
-                        	allDevicesLiveData.get(i).setStatus("In active");
+                        	allDevicesLiveData.get(i).setStatus(4);
     						
     					}
     					else {
     						if(obj.has("ignition")) {
 
-    							if(obj.get("ignition").equals(true)) {
+    							if(obj.getBoolean("ignition")==true) {
     								if(obj.has("motion")) {
 
-    				                    if(obj.get("motion").equals(false)) {
-    				                    	allDevicesLiveData.get(i).setStatus("Idle");
+    				                    if(obj.getBoolean("motion")==false) {
+    				                    	allDevicesLiveData.get(i).setStatus(1);
     									}
-    				                    if(obj.get("motion").equals(true)) {
-    				    			    	ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
+    				                    if(obj.getBoolean("motion")==true) {
+    				    			    	/*ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
 
     				    			    	lastPoints = mongoPositionRepo.getLastPoints(allDevicesLiveData.get(i).getId());
-    				                    	allDevicesLiveData.get(i).setLastPoints(lastPoints);
+    				                    	allDevicesLiveData.get(i).setLastPoints(lastPoints);*/
     				                    	
-    				                    	allDevicesLiveData.get(i).setStatus("Running");
+    				                    	allDevicesLiveData.get(i).setStatus(2);
     									}
     								}
     							}
-    		                    if(obj.get("ignition").equals(false)) {
-    		                    	allDevicesLiveData.get(i).setStatus("Stopped");
+    		                    if(obj.getBoolean("ignition")==false) {
+    		                    	allDevicesLiveData.get(i).setStatus(3);
 
     							}
     						}
@@ -1716,7 +1718,14 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 
     					}
     					if(obj.has("ignition")) {
-    						allDevicesLiveData.get(i).setIgnition(obj.getBoolean("ignition"));
+    						if(obj.getBoolean("ignition") == true) {
+        						allDevicesLiveData.get(i).setIgnition(0);
+	
+    						}
+    						else {
+        						allDevicesLiveData.get(i).setIgnition(1);
+
+    						}
 
     					}
                     }
@@ -1724,7 +1733,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				}
 				else {
 					
-                	allDevicesLiveData.get(i).setStatus("No data");
+                	allDevicesLiveData.get(i).setStatus(5);
 				}
 				
 			}
@@ -1813,6 +1822,8 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			                    vehicleInfo.get(0).setSpeed(mongoPosition.getSpeed());
 			                    vehicleInfo.get(0).setAddress(mongoPosition.getAddress());
 			                    vehicleInfo.get(0).setAttributes(mongoPosition.getAttributes());
+			                    
+			                    
 							}
 							
 						}
@@ -1833,6 +1844,22 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 
 	                    	JSONObject obj = new JSONObject(json);
 							
+	                    	if(obj.has("ignition")) {
+    							if(obj.getBoolean("ignition")==true) {
+    								if(obj.has("motion")) {
+    				                    if(obj.getBoolean("motion")==true) {
+    				    			    	ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
+
+    				    			    	lastPoints = mongoPositionRepo.getLastPoints(deviceId);
+    				    			    	vehicleInfo.get(0).setLastPoints(lastPoints);
+    				                    
+    									}
+    								}
+    							}
+    		                    
+    						}
+	                    	
+	                    	
 							if(obj.has("power")) {
 								if(obj.get("power") != null) {
 									if(obj.get("power") != "") {
@@ -1868,14 +1895,6 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 								}
 							}
 							
-							
-							Iterator<String> keys = obj.keys();
-
-							while(keys.hasNext()) {
-							    String key = keys.next();
-							    attrbuitesList.put(key , obj.get(key).toString());
-							    vehicleInfo.get(0).setPositionAttributes(attrbuitesList);
-							}
 						}
 						if(device.getSensorSettings() != null) {
 							JSONObject obj = new JSONObject(device.getSensorSettings().toString());

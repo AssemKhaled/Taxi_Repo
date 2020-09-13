@@ -682,19 +682,9 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 		 }
 		 
 		List<String> positionIds = deviceRepository.getAllPositionsObjectIds(usersIds);
-		Date datee = new Date();
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd"); 
-		String currentDate=formatter.format(datee);
 		
-		String from = currentDate +" 00:00:01";
-		String to = currentDate +" 23:59:59";
 
-		
-		
-		List<MongoPositions> positionsList = mongoPositionsRepository.findByIdInToday(positionIds, from,to);
-		
-	    /*List<CustomPositions> positionsList = new ArrayList<CustomPositions>();
-	    positionsList = positionRepository.getDriverHoursList(usersIds);*/
+		List<CustomPositions> positionsList = mongoPositionRepo.getCharts(positionIds);
 		List<Map> data = new ArrayList<>();
 		
 		
@@ -705,20 +695,33 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 		List<Map> finalData = new ArrayList<>();
 
 	    if(positionsList.size()>0) {
+	    	
 			for(int i=0;i<positionsList.size();i++) {
 
-				
-			   ObjectMapper mapper = new ObjectMapper();
-         	   String json = null;
-         	   try {
-     		   json = mapper.writeValueAsString(positionsList.get(i).getAttributes());
-			   } catch (JsonProcessingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 
-             	JSONObject obj = new JSONObject(json);
+             	JSONObject obj = new JSONObject(positionsList.get(i).getAttributes().toString());
 				
+             	
+             	Device deviceToBind = deviceRepository.findOne(positionsList.get(i).getDeviceId());
+             	if(obj.has("ignition")) {
+					if(obj.getBoolean("ignition") == true) {
+						ignitionON.add(deviceToBind.getName());
+					}
+					else {
+						ignitionOFF.add(deviceToBind.getName());
+
+					}
+             	}
+             	if(obj.has("motion")) {
+					if(obj.getBoolean("motion") == true) {
+						motionON.add(deviceToBind.getName());
+					}
+					else {
+						motionOFF.add(deviceToBind.getName());
+
+					}
+				}
+             	
 				Map devicesList = new HashMap();
 				if(obj.has("todayHoursString")) {
 					SimpleDateFormat time = new SimpleDateFormat("HH:mm");
@@ -741,7 +744,6 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 
 				}
 
-				Device deviceToBind = deviceRepository.findOne(positionsList.get(i).getDeviceid());
 			    devicesList.put("deviceName", deviceToBind.getName());
 
 			    Set<Driver> drivers=new HashSet<>() ;
@@ -783,22 +785,7 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 			    						
 			    }
 
-			    if(obj.has("ignition")) {
-					if(obj.get("ignition").equals(true)) {
-						ignitionON.add(deviceToBind.getName());
-					}
-					else {
-						ignitionOFF.add(deviceToBind.getName());
-
-					}
-					if(obj.get("motion").equals(true)) {
-						motionON.add(deviceToBind.getName());
-					}
-					else {
-						motionOFF.add(deviceToBind.getName());
-
-					}
-				}
+			    
 				
 			}
 			
@@ -809,13 +796,13 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 	    Map dev = new HashMap();
 	    dev.put("ignition_on", ignitionON.size());
 	    dev.put("ignition_off" ,ignitionOFF.size());
-	    dev.put("ignition_on_list", ignitionON);
-	    dev.put("ignition_off_list", ignitionOFF);
+	    //dev.put("ignition_on_list", ignitionON);
+	    //dev.put("ignition_off_list", ignitionOFF);
 		
 	    dev.put("motion_on", motionON.size());
 		dev.put("motion_off" ,motionOFF.size());
-		dev.put("motion_on_list", motionON);
-		dev.put("motion_off_list", motionOFF);
+		//dev.put("motion_on_list", motionON);
+		//dev.put("motion_off_list", motionOFF);
 		
 		
 	    Map ig = new HashMap();

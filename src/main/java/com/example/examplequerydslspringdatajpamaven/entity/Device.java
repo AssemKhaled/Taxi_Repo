@@ -170,19 +170,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 	    	        name="DevicesDataMap",
 	    	        classes={
 	    	           @ConstructorResult(
-	    	                targetClass=CustomDeviceLiveData.class,
+	    	                targetClass=CustomMapData.class,
 	    	                  columns={
-	    	                     @ColumnResult(name="id",type=int.class),
+	    	                     @ColumnResult(name="id",type=Long.class),
 	    	                     @ColumnResult(name="deviceName",type=String.class),
 	    	                     @ColumnResult(name="lastUpdate",type=String.class),
 	    	                     @ColumnResult(name="positionId",type=String.class),
-	    	                     @ColumnResult(name="leftLetter",type=String.class),
-	    	                     @ColumnResult(name="middleLetter",type=String.class),
-	    	                     @ColumnResult(name="rightLetter",type=String.class),
-	    	                     @ColumnResult(name="driverName",type=String.class),
-	    	                     @ColumnResult(name="plate_num",type=String.class),
-	    	                     @ColumnResult(name="sequence_number",type=String.class),
-	    	                     @ColumnResult(name="owner_name",type=String.class),
 	    	                     }
 	    	           )
 	    	        }
@@ -396,16 +389,11 @@ query="SELECT tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.la
 @NamedNativeQuery(name="getDevicesDataMap", 
 resultSetMapping="DevicesDataMap", 
 query="SELECT tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.lastupdate as lastUpdate,"
-		+ "tc_devices.positionid as positionId  , tc_devices.left_letter as leftLetter , " + 
-		" tc_devices.middle_letter as middleLetter,tc_devices.right_letter as rightLetter ,tc_drivers.name driverName, "  
-		+ " tc_devices.plate_num as  plate_num , tc_devices.sequence_number as  sequence_number ,"
-		+ " tc_devices.owner_name as  owner_name "
+		+ "tc_devices.positionid as positionId "
 		+ " FROM tc_devices " + 
 		" INNER JOIN  tc_user_device ON tc_devices.id=tc_user_device.deviceid" + 
-		" LEFT JOIN tc_device_driver ON tc_device_driver.deviceid=tc_devices.id " + 
-		" LEFT JOIN tc_drivers ON tc_drivers.id=tc_device_driver.driverid " + 
 		" where tc_user_device.userid IN(:userIds) and tc_devices.delete_date is null"
-		+ " GROUP BY tc_devices.id,tc_drivers.id"),
+		+ " GROUP BY tc_devices.id"),
 
 
 

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import com.example.examplequerydslspringdatajpamaven.entity.BillingsList;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceList;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceLiveData;
+import com.example.examplequerydslspringdatajpamaven.entity.CustomMapData;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceCalibrationData;
@@ -96,7 +97,7 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
  	List<CustomDeviceLiveData> getAllDevicesLiveDataMap(@Param("userIds")List<Long> userIds);
 	
 	@Query(nativeQuery = true, name = "getDevicesDataMap")
- 	List<CustomDeviceLiveData> getAllDevicesDataMap(@Param("userIds")List<Long> userIds);
+ 	List<CustomMapData> getAllDevicesDataMap(@Param("userIds")List<Long> userIds);
 
 	@Query(nativeQuery = true, name = "vehicleInfo")
 	public List<CustomDeviceList> vehicleInfo(@Param("deviceId")Long deviceId);

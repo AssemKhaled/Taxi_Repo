@@ -1,5 +1,6 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 
@@ -43,7 +44,7 @@ public class CustomDeviceList{
 	private Integer sat;
 	private Double power;
 	private String driver_num;
-
+    private ArrayList<Map<Object,Object>> lastPoints;
 	
 	public String getDriver_num() {
 		return driver_num;
@@ -85,15 +86,6 @@ public class CustomDeviceList{
 		this.power = power;
 	}
 
-	private Object  positionAttributes;
-
-	public Object getPositionAttributes() {
-		return positionAttributes;
-	}
-
-	public void setPositionAttributes(Object positionAttributes) {
-		this.positionAttributes = positionAttributes;
-	}
 	public CustomDeviceList() {
 		
 	}
@@ -216,6 +208,56 @@ public class CustomDeviceList{
 
 	public int getId() {
 		return id;
+	}
+
+	public CustomDeviceList(int id, String deviceName, String uniqueId, String sequenceNumber, String lastUpdate,
+			String referenceKey, String driverName, String geofenceName, Long driverId, String driverPhoto,
+			String driverUniqueId, String plateType, String plateNum, String rightLetter, String middleLetter,
+			String leftLetter, String ownerName, String ownerId, String userName, String brand, String model,
+			String madeYear, String color, String licenceExptDate, String carWeight, String vehiclePlate,
+			String companyName, String positionId, Double latitude, Double longitude, Float speed, String address,
+			Object attributes, String status, Boolean ignition, Integer sat, Double power, String driver_num,
+			ArrayList<Map<Object, Object>> lastPoints) {
+		super();
+		this.id = id;
+		this.deviceName = deviceName;
+		this.uniqueId = uniqueId;
+		this.sequenceNumber = sequenceNumber;
+		this.lastUpdate = lastUpdate;
+		this.referenceKey = referenceKey;
+		this.driverName = driverName;
+		this.geofenceName = geofenceName;
+		this.driverId = driverId;
+		this.driverPhoto = driverPhoto;
+		this.driverUniqueId = driverUniqueId;
+		this.plateType = plateType;
+		this.plateNum = plateNum;
+		this.rightLetter = rightLetter;
+		this.middleLetter = middleLetter;
+		this.leftLetter = leftLetter;
+		this.ownerName = ownerName;
+		this.ownerId = ownerId;
+		this.userName = userName;
+		this.brand = brand;
+		this.model = model;
+		this.madeYear = madeYear;
+		this.color = color;
+		this.licenceExptDate = licenceExptDate;
+		this.carWeight = carWeight;
+		this.vehiclePlate = vehiclePlate;
+		this.companyName = companyName;
+		this.positionId = positionId;
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.speed = speed;
+		this.address = address;
+		this.attributes = attributes;
+		this.status = status;
+		this.ignition = ignition;
+		this.sat = sat;
+		this.power = power;
+		this.driver_num = driver_num;
+		this.lastPoints = lastPoints;
 	}
 
 	public void setId(int id) {
@@ -478,6 +520,14 @@ public class CustomDeviceList{
 
 	public void setAttributes(Object attributes) {
 		this.attributes = attributes;
+	}
+
+	public ArrayList<Map<Object, Object>> getLastPoints() {
+		return lastPoints;
+	}
+
+	public void setLastPoints(ArrayList<Map<Object, Object>> lastPoints) {
+		this.lastPoints = lastPoints;
 	}
 	
 	

@@ -5,6 +5,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.Points;
 
 public interface PointsService {
 
+	public ResponseEntity<?> getPointsMap(String TOKEN,Long id);
 	public ResponseEntity<?> getPointsList(String TOKEN,Long id,int offset,String search);
 	public ResponseEntity<?> getPointsById(String TOKEN,Long PointId,Long userId);
 	public ResponseEntity<?> deletePoints(String TOKEN,Long PointId,Long userId);

@@ -40,6 +40,7 @@ import com.example.examplequerydslspringdatajpamaven.Validator.JWKValidator;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceList;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceLiveData;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDriverList;
+import com.example.examplequerydslspringdatajpamaven.entity.CustomMapData;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceWorkingHours;
@@ -261,7 +262,6 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 	@Override
 	public ResponseEntity<?> getAllDeviceLiveDataMapApp(String TOKEN, Long userId) {
-
 		// TODO Auto-generated method stub
 		if(TOKEN.equals("")) {
 			 List<Device> devices = null;
@@ -323,7 +323,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			 }
 	    }
 	   
-		List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getAllDevicesDataMap(usersIds);
+		List<CustomMapData> allDevicesLiveData=	deviceRepository.getAllDevicesDataMap(usersIds);
 		
 		if(allDevicesLiveData.size() > 0) {
 			for(int i=0;i<allDevicesLiveData.size();i++) {
@@ -346,17 +346,17 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 						e.printStackTrace();
 					}
 					if(minutes < 3) {
-	                	allDevicesLiveData.get(i).setVehicleStatus("online");
+	                	allDevicesLiveData.get(i).setVehicleStatus(1);
 					}
 					if(minutes > 8) {
-	                	allDevicesLiveData.get(i).setVehicleStatus("unknown");
+	                	allDevicesLiveData.get(i).setVehicleStatus(2);
 					}
 					if(minutes < 8 && minutes > 3) {
-	                	allDevicesLiveData.get(i).setVehicleStatus("offline");
+	                	allDevicesLiveData.get(i).setVehicleStatus(3);
 					}
 				}
 				else {
-                	allDevicesLiveData.get(i).setVehicleStatus("offline");
+                	allDevicesLiveData.get(i).setVehicleStatus(3);
 
 				}
 
@@ -382,43 +382,44 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
     					allDevicesLiveData.get(i).setLatitude(mongoPosition.getLatitude());
     					allDevicesLiveData.get(i).setLongitude(mongoPosition.getLongitude());
-    					allDevicesLiveData.get(i).setAttributes(mongoPosition.getAttributes());
-    					allDevicesLiveData.get(i).setAddress(mongoPosition.getAddress());
     					allDevicesLiveData.get(i).setSpeed(mongoPosition.getSpeed());
+
     					if(mongoPosition.getValid()== true) {
-    						allDevicesLiveData.get(i).setValid(true);
+    						allDevicesLiveData.get(i).setValid(0);
 
     					}
     					else {
-    						allDevicesLiveData.get(i).setValid(false);
+    						allDevicesLiveData.get(i).setValid(1);
 
     					}
+    					
+                        
     					if(minutes > 8) {
-                        	allDevicesLiveData.get(i).setStatus("In active");
+	                    	
+                        	allDevicesLiveData.get(i).setStatus(4);
     						
     					}
     					else {
     						if(obj.has("ignition")) {
 
-    							if(obj.get("ignition").equals(true)) {
+    							if(obj.getBoolean("ignition")==true) {
     								if(obj.has("motion")) {
 
-    				                    if(obj.get("motion").equals(false)) {
-    				                    	allDevicesLiveData.get(i).setStatus("Idle");
+    				                    if(obj.getBoolean("motion")==false) {
+    				                    	allDevicesLiveData.get(i).setStatus(1);
     									}
-    				                    if(obj.get("motion").equals(true)) {
-    				                    	
-    				                    	ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
+    				                    if(obj.getBoolean("motion")==true) {
+    				    			    	/*ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
 
     				    			    	lastPoints = mongoPositionRepo.getLastPoints(allDevicesLiveData.get(i).getId());
-    				                    	allDevicesLiveData.get(i).setLastPoints(lastPoints);
+    				                    	allDevicesLiveData.get(i).setLastPoints(lastPoints);*/
     				                    	
-    				                    	allDevicesLiveData.get(i).setStatus("Running");
+    				                    	allDevicesLiveData.get(i).setStatus(2);
     									}
     								}
     							}
-    		                    if(obj.get("ignition").equals(false)) {
-    		                    	allDevicesLiveData.get(i).setStatus("Stopped");
+    		                    if(obj.getBoolean("ignition")==false) {
+    		                    	allDevicesLiveData.get(i).setStatus(3);
 
     							}
     						}
@@ -434,14 +435,22 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
     					}
     					if(obj.has("ignition")) {
-    						allDevicesLiveData.get(i).setIgnition(obj.getBoolean("ignition"));
+    						if(obj.getBoolean("ignition") == true) {
+        						allDevicesLiveData.get(i).setIgnition(0);
+	
+    						}
+    						else {
+        						allDevicesLiveData.get(i).setIgnition(1);
+
+    						}
 
     					}
                     }
                     
 				}
 				else {
-                	allDevicesLiveData.get(i).setStatus("No data");
+					
+                	allDevicesLiveData.get(i).setStatus(5);
 				}
 				
 			}
@@ -451,7 +460,6 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		
 		logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
 		return ResponseEntity.ok().body(getObjectResponse);
-
 
 	}
 	public static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) 
@@ -463,7 +471,6 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 	@Override
 	public ResponseEntity<?> vehicleInfoApp(String TOKEN, Long deviceId, Long userId) {
-		
 		logger.info("************************ vehicleInfo STARTED ***************************");
 
 		List<CustomDeviceList> vehicleInfo= new ArrayList<CustomDeviceList>();
@@ -527,14 +534,18 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 					List<Map> data = new ArrayList<>();
 					if(vehicleInfo.size()>0) {
 						if(vehicleInfo.get(0).getPositionId() != null) {
+							
+							
 							MongoPositions mongoPosition = mongoPositionsRepository.findById(vehicleInfo.get(0).getPositionId());
 		                    
-							if( mongoPosition != null) {
+							if(mongoPosition != null) {
 								vehicleInfo.get(0).setLatitude(mongoPosition.getLatitude());
 			                    vehicleInfo.get(0).setLongitude(mongoPosition.getLongitude());
 			                    vehicleInfo.get(0).setSpeed(mongoPosition.getSpeed());
 			                    vehicleInfo.get(0).setAddress(mongoPosition.getAddress());
 			                    vehicleInfo.get(0).setAttributes(mongoPosition.getAttributes());
+			                    
+			                    
 							}
 							
 						}
@@ -544,7 +555,6 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 						
 					    Map<Object, Object> attrbuitesList =new HashMap<Object, Object>();
 						if(vehicleInfo.get(0).getAttributes() != null) {
-
 						   ObjectMapper mapper = new ObjectMapper();
 	                	   String json = null;
 	                	   try {
@@ -554,7 +564,24 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 								e.printStackTrace();
 							}
 
-	                    	JSONObject obj = new JSONObject(json);							
+	                    	JSONObject obj = new JSONObject(json);
+							
+	                    	if(obj.has("ignition")) {
+    							if(obj.getBoolean("ignition")==true) {
+    								if(obj.has("motion")) {
+    				                    if(obj.getBoolean("motion")==true) {
+    				    			    	ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
+
+    				    			    	lastPoints = mongoPositionRepo.getLastPoints(deviceId);
+    				    			    	vehicleInfo.get(0).setLastPoints(lastPoints);
+    				                    
+    									}
+    								}
+    							}
+    		                    
+    						}
+	                    	
+	                    	
 							if(obj.has("power")) {
 								if(obj.get("power") != null) {
 									if(obj.get("power") != "") {
@@ -590,15 +617,6 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 								}
 							}
 							
-							
-							Iterator<String> keys = obj.keys();
-
-							while(keys.hasNext()) {
-							    String key = keys.next();
-							    attrbuitesList.put(key , obj.get(key).toString());
-							    vehicleInfo.get(0).setPositionAttributes(attrbuitesList);
-							}
-
 						}
 						if(device.getSensorSettings() != null) {
 							JSONObject obj = new JSONObject(device.getSensorSettings().toString());
@@ -635,6 +653,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			return ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
+		
 		
 	}
 
@@ -2005,11 +2024,12 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	@Override
 	public ResponseEntity<?> viewTripApp(String TOKEN, Long deviceId, String from , String to) {
 		
-		logger.info("************************ viewTripApp STARTED ***************************");
+		logger.info("************************ getviewTrip STARTED ***************************");
 
 		List<TripPositions> positions = new ArrayList<TripPositions>();
 		if(TOKEN.equals("")) {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",positions);
+				logger.info("************************ getviewTrip ENDED ***************************");
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		
@@ -2017,13 +2037,14 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		{
 			return super.checkActive(TOKEN);
 		}
-
+		
 
 		Date dateFrom;
 		Date dateTo;
 
 		SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 		SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		SimpleDateFormat inputFormat2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS SSSS");
 		SimpleDateFormat inputFormat1 = new SimpleDateFormat("yyyy-MM-dd");
 		inputFormat1.setLenient(false);
 		inputFormat.setLenient(false);
@@ -2031,59 +2052,79 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 		
 		try {
-			dateFrom = inputFormat.parse(from);
+			dateFrom = inputFormat2.parse(from);
 			from = outputFormat.format(dateFrom);
 			
 
 		} catch (ParseException e2) {
-			// TODO Auto-generated catch block
 			try {
-				dateFrom = inputFormat1.parse(from);
+				dateFrom = inputFormat.parse(from);
 				from = outputFormat.format(dateFrom);
-
-			} catch (ParseException e) {
-				// TODO Auto-generated catch block
 				
-				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
-				logger.info("************************ getEventsReport ENDED ***************************");		
-				return  ResponseEntity.badRequest().body(getObjectResponse);
+
+			} catch (ParseException e3) {
+				// TODO Auto-generated catch block
+				try {
+					dateFrom = inputFormat1.parse(from);
+					from = outputFormat.format(dateFrom);
+
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z' or yyyy-MM-dd'T'HH:mm:ss.SSS SSSS",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
 			}
 			
 		}
 		
+		
 		try {
-			dateTo = inputFormat.parse(to);
+			dateTo = inputFormat2.parse(to);
 			to = outputFormat.format(dateTo);
 			
 
 		} catch (ParseException e2) {
-			// TODO Auto-generated catch block
 			try {
-				dateTo = inputFormat1.parse(to);
+				dateTo = inputFormat.parse(to);
 				to = outputFormat.format(dateTo);
+				
 
-			} catch (ParseException e) {
+			} catch (ParseException e3) {
 				// TODO Auto-generated catch block
-				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
-				logger.info("************************ getEventsReport ENDED ***************************");		
-				return  ResponseEntity.badRequest().body(getObjectResponse);
+				try {
+					dateTo = inputFormat1.parse(to);
+					to = outputFormat.format(dateTo);
+
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
 			}
 			
 		}
-			    
+		
 		Device device = deviceServiceImpl.findById(deviceId);
 		
 		if(device != null) {
-			positions = mongoPositionsRepo.getTripPositions(deviceId, dateFrom, dateTo);
+			positions = mongoPositionRepo.getTripPositions(deviceId, dateFrom, dateTo);
+
 			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",positions,positions.size());
-			logger.info("************************ viewTripApp ENDED ***************************");
+			logger.info("************************ getviewTrip ENDED ***************************");
 			return  ResponseEntity.ok().body(getObjectResponse);
 		}
 		else {
 			getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Device ID is not found",positions);
+			logger.info("************************ getviewTrip ENDED ***************************");
 			return  ResponseEntity.status(404).body(getObjectResponse);
 
 		}
+		
 	}
 
 	@Override
@@ -4635,7 +4676,7 @@ logger.info("************************ createDevice STARTED *********************
 			logger.info("************************ getIgnition ENDED ***************************");
 			return ResponseEntity.status(404).body(getObjectResponse);
 		}
-		userServiceImpl.resetChildernArray();
+		 userServiceImpl.resetChildernArray();
 		 List<Long>usersIds= new ArrayList<>();
 		 if(loggedUser.getAccountType().equals(4)) {
 			 Set<User> parentClients = loggedUser.getUsersOfUser();
@@ -4667,18 +4708,9 @@ logger.info("************************ createDevice STARTED *********************
 		 }
 		 
 		List<String> positionIds = deviceRepository.getAllPositionsObjectIds(usersIds);
-		Date datee = new Date();
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd"); 
-		String currentDate=formatter.format(datee);
-		
-		String from = currentDate +" 00:00:01";
-		String to = currentDate +" 23:59:59";
-
-		
-		
-		List<MongoPositions> positionsList = mongoPositionsRepository.findByIdInToday(positionIds, from,to);
 		
 
+		List<CustomPositions> positionsList = mongoPositionRepo.getCharts(positionIds);
 		List<Map> data = new ArrayList<>();
 		
 		
@@ -4689,20 +4721,33 @@ logger.info("************************ createDevice STARTED *********************
 		List<Map> finalData = new ArrayList<>();
 
 	    if(positionsList.size()>0) {
+	    	
 			for(int i=0;i<positionsList.size();i++) {
 
-				
-			   ObjectMapper mapper = new ObjectMapper();
-         	   String json = null;
-         	   try {
-     		   json = mapper.writeValueAsString(positionsList.get(i).getAttributes());
-			   } catch (JsonProcessingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 
-             	JSONObject obj = new JSONObject(json);
+             	JSONObject obj = new JSONObject(positionsList.get(i).getAttributes().toString());
 				
+             	
+             	Device deviceToBind = deviceRepository.findOne(positionsList.get(i).getDeviceId());
+             	if(obj.has("ignition")) {
+					if(obj.getBoolean("ignition") == true) {
+						ignitionON.add(deviceToBind.getName());
+					}
+					else {
+						ignitionOFF.add(deviceToBind.getName());
+
+					}
+             	}
+             	if(obj.has("motion")) {
+					if(obj.getBoolean("motion") == true) {
+						motionON.add(deviceToBind.getName());
+					}
+					else {
+						motionOFF.add(deviceToBind.getName());
+
+					}
+				}
+             	
 				Map devicesList = new HashMap();
 				if(obj.has("todayHoursString")) {
 					SimpleDateFormat time = new SimpleDateFormat("HH:mm");
@@ -4725,7 +4770,6 @@ logger.info("************************ createDevice STARTED *********************
 
 				}
 
-				Device deviceToBind = deviceRepository.findOne(positionsList.get(i).getDeviceid());
 			    devicesList.put("deviceName", deviceToBind.getName());
 
 			    Set<Driver> drivers=new HashSet<>() ;
@@ -4767,22 +4811,7 @@ logger.info("************************ createDevice STARTED *********************
 			    						
 			    }
 
-			    if(obj.has("ignition")) {
-					if(obj.get("ignition").equals(true)) {
-						ignitionON.add(deviceToBind.getName());
-					}
-					else {
-						ignitionOFF.add(deviceToBind.getName());
-
-					}
-					if(obj.get("motion").equals(true)) {
-						motionON.add(deviceToBind.getName());
-					}
-					else {
-						motionOFF.add(deviceToBind.getName());
-
-					}
-				}
+			    
 				
 			}
 			
@@ -4793,13 +4822,13 @@ logger.info("************************ createDevice STARTED *********************
 	    Map dev = new HashMap();
 	    dev.put("ignition_on", ignitionON.size());
 	    dev.put("ignition_off" ,ignitionOFF.size());
-	    dev.put("ignition_on_list", ignitionON);
-	    dev.put("ignition_off_list", ignitionOFF);
+	    //dev.put("ignition_on_list", ignitionON);
+	    //dev.put("ignition_off_list", ignitionOFF);
 		
 	    dev.put("motion_on", motionON.size());
 		dev.put("motion_off" ,motionOFF.size());
-		dev.put("motion_on_list", motionON);
-		dev.put("motion_off_list", motionOFF);
+		//dev.put("motion_on_list", motionON);
+		//dev.put("motion_off_list", motionOFF);
 		
 		
 	    Map ig = new HashMap();

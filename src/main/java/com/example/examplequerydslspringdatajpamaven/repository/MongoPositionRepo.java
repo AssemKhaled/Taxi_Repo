@@ -33,6 +33,8 @@ import org.springframework.stereotype.Repository;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverWorkingHours;
+import com.example.examplequerydslspringdatajpamaven.entity.EventReport;
+import com.example.examplequerydslspringdatajpamaven.entity.MongoEvents;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.TripPositions;
 import com.mongodb.AggregationOutput;
@@ -92,7 +94,7 @@ public class MongoPositionRepo {
 		return size;
 	}
 	
-	public ArrayList<Map<Object,Object>> getLastPoints(int deviceId){
+	public ArrayList<Map<Object,Object>> getLastPoints(Long deviceId){
     	ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
     	
         BasicDBObject basicDBObject = new BasicDBObject();
@@ -146,6 +148,7 @@ public class MongoPositionRepo {
 	            
 	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
 
+	    System.out.println(aggregation);
 	    
 	        AggregationResults<MongoPositions> groupResults
 	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
@@ -541,7 +544,87 @@ public class MongoPositionRepo {
         
 		return positions;
 	}
+	public List<CustomPositions> getCharts(List<String> positionIds){
+
+		Date date = new Date();
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); 
+
+		String currentDate=formatter.format(date);
+		
+		String from = currentDate +" 00:00:01";
+		String to = currentDate +" 23:59:59";
+		
+		Date dateFrom = null;
+		Date dateTo = null;
+		try {
+			dateFrom = output.parse(from);
+			dateTo = output.parse(to);
+
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
+		List<CustomPositions> positions = new ArrayList<CustomPositions>();
+
+
+		BasicDBObject basicDBObject = new BasicDBObject();
+		List<ObjectId> ids = new ArrayList<ObjectId>();
+
+		for(String id:positionIds) {
+			if(id != null) {
+				ids.add(new ObjectId(id));
+			}
+		}
+		
+	    Aggregation aggregation = newAggregation(
+	            match(Criteria.where("_id").in(ids).and("servertime").gte(dateFrom).lte(dateTo)),
+	            project("deviceid","attributes").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime"),
+	            sort(Sort.Direction.DESC, "servertime")
+	            
+	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+
+
+
+	        AggregationResults<MongoPositions> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+
+	        if(groupResults.getRawResults().containsField("cursor")) {
+	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
+	            
+			    JSONArray list = (JSONArray) obj.get("firstBatch");
+	            Iterator<Object> iterator = list.iterator();
+	            while (iterator.hasNext()) {
+
+	            	JSONObject object = (JSONObject) iterator.next();
+	            	CustomPositions position = new CustomPositions();
+	            	
+                    if(object.has("attributes")) {
+                    	
+                    	position.setAttributes(object.get("attributes").toString());
+
+	            	}
+	            	if(object.has("deviceid")) {
+	            		position.setDeviceId(object.getLong("deviceid"));
 	
+	            	}
+					
+					if(object.has("_id")) {
+		            	JSONObject objId = (JSONObject) object.get("_id");
+		            	if(objId.has("$oid")) {
+		            		position.setId(objId.getString("$oid"));
+						}
+	
+					}
+					positions.add(position);
+
+	            }
+	        }
+	        
+		return positions;
+	}
 	
 	public List<DeviceWorkingHours> getDeviceWorkingHours(List<Long> allDevices,int offset,Date start,Date end){
 
