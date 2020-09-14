@@ -177,6 +177,8 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		String image = device.getPhoto();
 		device.setPhoto("not_available.png");
 
+		device.setExpired(0);
+		
 		if(TOKEN.equals("")) {
 			 List<Device> devices = null;
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
@@ -1668,11 +1670,11 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
     					allDevicesLiveData.get(i).setSpeed(mongoPosition.getSpeed());
 
     					if(mongoPosition.getValid()== true) {
-    						allDevicesLiveData.get(i).setValid(0);
+    						allDevicesLiveData.get(i).setValid(1);
 
     					}
     					else {
-    						allDevicesLiveData.get(i).setValid(1);
+    						allDevicesLiveData.get(i).setValid(0);
 
     					}
     					
@@ -1719,11 +1721,11 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
     					}
     					if(obj.has("ignition")) {
     						if(obj.getBoolean("ignition") == true) {
-        						allDevicesLiveData.get(i).setIgnition(0);
+        						allDevicesLiveData.get(i).setIgnition(1);
 	
     						}
     						else {
-        						allDevicesLiveData.get(i).setIgnition(1);
+        						allDevicesLiveData.get(i).setIgnition(0);
 
     						}
 

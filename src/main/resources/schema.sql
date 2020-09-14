@@ -134,6 +134,44 @@ DEALLOCATE PREPARE stmt;
 set @col_exists = 0;
 SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
 WHERE TABLE_NAME='tc_devices'
+AND column_name='representative'
+and table_schema = database()
+into @col_exists;
+
+set @stmt = case @col_exists
+when 0 then CONCAT(
+'alter table tc_devices'
+, ' ADD COLUMN `representative` LONGTEXT NULL DEFAULT NULL'
+,';')
+else 'select ''column already exists, no op'''
+end;
+
+PREPARE stmt FROM @stmt;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+----------------------------------------------------------------
+set @col_exists = 0;
+SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME='tc_devices'
+AND column_name='delete_from_elm'
+and table_schema = database()
+into @col_exists;
+
+set @stmt = case @col_exists
+when 0 then CONCAT(
+'alter table tc_devices'
+, ' ADD COLUMN `delete_from_elm` LONGTEXT NULL DEFAULT NULL'
+,';')
+else 'select ''column already exists, no op'''
+end;
+
+PREPARE stmt FROM @stmt;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+----------------------------------------------------------------
+set @col_exists = 0;
+SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME='tc_devices'
 AND column_name='icon'
 and table_schema = database()
 into @col_exists;
@@ -198,7 +236,7 @@ into @col_exists;
 set @stmt = case @col_exists
 when 0 then CONCAT(
 'alter table tc_devices'
-, ' ADD COLUMN  `expired` INT(11) NULL DEFAULT 0 '
+, ' ADD COLUMN  `expired` TINYINT(1) DEFAULT 0 NOT NULL '
 ,';')
 else 'select ''column already exists, no op'''
 end;
@@ -371,6 +409,63 @@ set @stmt = case @col_exists
 when 0 then CONCAT(
 'alter table tc_users'
 , ' ADD COLUMN `dateOfBirth` date NULL DEFAULT NULL'
+,';')
+else 'select ''column already exists, no op'''
+end;
+
+PREPARE stmt FROM @stmt;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+----------------------------------------------------------------
+set @col_exists = 0;
+SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME='tc_devices'
+AND column_name='regestration_to_elm_date'
+and table_schema = database()
+into @col_exists;
+
+set @stmt = case @col_exists
+when 0 then CONCAT(
+'alter table tc_devices'
+, ' ADD COLUMN `regestration_to_elm_date` date NULL DEFAULT NULL'
+,';')
+else 'select ''column already exists, no op'''
+end;
+
+PREPARE stmt FROM @stmt;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+----------------------------------------------------------------
+set @col_exists = 0;
+SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME='tc_devices'
+AND column_name='delete_from_elm_date'
+and table_schema = database()
+into @col_exists;
+
+set @stmt = case @col_exists
+when 0 then CONCAT(
+'alter table tc_devices'
+, ' ADD COLUMN `delete_from_elm_date` date NULL DEFAULT NULL'
+,';')
+else 'select ''column already exists, no op'''
+end;
+
+PREPARE stmt FROM @stmt;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+----------------------------------------------------------------
+set @col_exists = 0;
+SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME='tc_devices'
+AND column_name='update_date_in_elm'
+and table_schema = database()
+into @col_exists;
+
+set @stmt = case @col_exists
+when 0 then CONCAT(
+'alter table tc_devices'
+, ' ADD COLUMN `update_date_in_elm` date NULL DEFAULT NULL'
 ,';')
 else 'select ''column already exists, no op'''
 end;

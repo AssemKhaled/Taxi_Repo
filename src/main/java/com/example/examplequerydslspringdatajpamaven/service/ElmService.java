@@ -23,6 +23,7 @@ public interface ElmService {
 	public ResponseEntity<?> driverInquery(String TOKEN,Long driverId,Long userId);
 
 	public ResponseEntity<?> lastLocations();
+	public ResponseEntity<?> getExpiredVehicles();
 
 	public ResponseEntity<?> getLogs(String TOKEN,Long id,Long userId,Long driverId,Long deviceId,int offset,String search);
 	

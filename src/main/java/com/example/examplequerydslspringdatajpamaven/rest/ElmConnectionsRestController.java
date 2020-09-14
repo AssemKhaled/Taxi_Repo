@@ -143,9 +143,16 @@ public class ElmConnectionsRestController {
 	}
 	
 	@GetMapping(path ="/lastLocations")
-//	@Scheduled(fixedRate = 30000)
+	@Scheduled(fixedRate = 30000)
 	public ResponseEntity<?> lastLocations(){
 		
 		return elmServiceImpl.lastLocations();
+	}
+	
+	@GetMapping(path ="/getExpiredVehicles")
+//	@Scheduled(fixedRate = 30000)
+	public ResponseEntity<?> getExpiredVehicles(){
+		
+		return elmServiceImpl.getExpiredVehicles();
 	}
 }

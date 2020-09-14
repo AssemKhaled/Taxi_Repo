@@ -1,7 +1,6 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
-import java.sql.Date;
-
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import javax.jdo.annotations.Column;
@@ -28,6 +27,22 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @SqlResultSetMappings({
+	@SqlResultSetMapping(
+	        name="ExpiredVehiclesList",
+	        classes={
+	           @ConstructorResult(
+	                targetClass=ExpiredVehicles.class,
+	                  columns={
+
+	 	                     @ColumnResult(name="deviceId",type=Long.class),
+	 	                     @ColumnResult(name="userId",type=Long.class),
+	 	                     @ColumnResult(name="vehicle_referenceKey",type=String.class),
+	 	                     @ColumnResult(name="user_referenceKey",type=String.class)
+
+	                     }
+	           )
+	        }
+	),
 	@SqlResultSetMapping(
 	        name="DevicesSendList",
 	        classes={
@@ -436,6 +451,24 @@ query=  "SELECT tc_devices.id as deviceid,tc_devices.reference_key as deviceRK ,
 		" AND tc_users.is_deleted IS NULL " + 
 		" AND tc_devices.reference_key IS NOT NULL" ),
 
+@NamedNativeQuery(name="getExpiredVehicles", 
+resultSetMapping="ExpiredVehiclesList", 
+query=  "SELECT tc_devices.id as deviceId,tc_users.id as userId, " + 
+		" tc_devices.reference_key as vehicle_referenceKey ,tc_users.reference_key as user_referenceKey, " + 
+		" tc_devices.name as deviceName,tc_users.name as userName "+
+		" FROM tc_devices " + 
+		" INNER JOIN tc_user_device ON tc_user_device.deviceid=tc_devices.id " + 
+		" INNER JOIN tc_users ON tc_user_device.userid=tc_users.id " + 
+		" where tc_devices.is_deleted IS NULL " + 
+		" AND tc_devices.create_date Is NOT NULL " + 
+		" AND TIMESTAMPDIFF(month ,tc_devices.create_date,:currentDate) >= 11 " + 
+		" AND tc_devices.reference_key IS NOT NULL " + 
+		" AND tc_devices.expired IS False " + 
+		" AND ( ( TIMESTAMPDIFF(month ,tc_devices.update_date_in_elm,:currentDate) >= 11) " + 
+		" or (tc_devices.update_date_in_elm IS NULL) ) " + 
+		" ORDER BY tc_devices.create_date ASC LIMIT 1000 " ),
+
+
 @NamedNativeQuery(name="getVehicleInfoData", 
 resultSetMapping="vehicleInfo", 
 query=" SELECT tc_drivers.id as driverId,tc_drivers.uniqueid as driverUniqueId,tc_drivers.name as driverName,tc_drivers.photo as driverPhoto," + 
@@ -604,6 +637,22 @@ public class Device {
 	
 	@Column(name = "device_type")
 	private String device_type;
+	
+	@Column(name = "regestration_to_elm_date")
+	private Date regestration_to_elm_date;
+	
+	@Column(name = "representative")
+	private String representative;
+	
+	@Column(name = "delete_from_elm")
+	private String delete_from_elm;
+	
+	@Column(name = "delete_from_elm_date")
+	private Date delete_from_elm_date;
+	
+	@Column(name = "update_date_in_elm")
+	private Date update_date_in_elm;
+		
 	
     /*@ManyToMany(fetch = FetchType.LAZY,
             cascade = {
@@ -1254,6 +1303,46 @@ public class Device {
 
 	public void setDevice_type(String device_type) {
 		this.device_type = device_type;
+	}
+
+	public Date getRegestration_to_elm_date() {
+		return regestration_to_elm_date;
+	}
+
+	public void setRegestration_to_elm_date(Date regestration_to_elm_date) {
+		this.regestration_to_elm_date = regestration_to_elm_date;
+	}
+
+	public String getRepresentative() {
+		return representative;
+	}
+
+	public void setRepresentative(String representative) {
+		this.representative = representative;
+	}
+
+	public String getDelete_from_elm() {
+		return delete_from_elm;
+	}
+
+	public void setDelete_from_elm(String delete_from_elm) {
+		this.delete_from_elm = delete_from_elm;
+	}
+
+	public Date getDelete_from_elm_date() {
+		return delete_from_elm_date;
+	}
+
+	public void setDelete_from_elm_date(Date delete_from_elm_date) {
+		this.delete_from_elm_date = delete_from_elm_date;
+	}
+
+	public Date getUpdate_date_in_elm() {
+		return update_date_in_elm;
+	}
+
+	public void setUpdate_date_in_elm(Date update_date_in_elm) {
+		this.update_date_in_elm = update_date_in_elm;
 	}
 	
 	

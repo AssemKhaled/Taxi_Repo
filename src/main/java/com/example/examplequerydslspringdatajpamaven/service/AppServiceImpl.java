@@ -385,11 +385,11 @@ public class AppServiceImpl extends RestServiceController implements AppService{
     					allDevicesLiveData.get(i).setSpeed(mongoPosition.getSpeed());
 
     					if(mongoPosition.getValid()== true) {
-    						allDevicesLiveData.get(i).setValid(0);
+    						allDevicesLiveData.get(i).setValid(1);
 
     					}
     					else {
-    						allDevicesLiveData.get(i).setValid(1);
+    						allDevicesLiveData.get(i).setValid(0);
 
     					}
     					
@@ -436,11 +436,11 @@ public class AppServiceImpl extends RestServiceController implements AppService{
     					}
     					if(obj.has("ignition")) {
     						if(obj.getBoolean("ignition") == true) {
-        						allDevicesLiveData.get(i).setIgnition(0);
+        						allDevicesLiveData.get(i).setIgnition(1);
 	
     						}
     						else {
-        						allDevicesLiveData.get(i).setIgnition(1);
+        						allDevicesLiveData.get(i).setIgnition(0);
 
     						}
 

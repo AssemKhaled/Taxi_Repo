@@ -1,5 +1,6 @@
 package com.example.examplequerydslspringdatajpamaven.repository;
 
+import java.util.Date;
 import java.util.List;
 import javax.transaction.Transactional;
 
@@ -21,6 +22,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.DeviceCalibrationDat
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.EventReport;
+import com.example.examplequerydslspringdatajpamaven.entity.ExpiredVehicles;
 import com.example.examplequerydslspringdatajpamaven.entity.LastLocationsList;
 import com.example.examplequerydslspringdatajpamaven.entity.NewcustomerDivice;
 
@@ -160,6 +162,9 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	
 	@Query(nativeQuery = true, name = "getDevicesSendList")
 	public List<LastLocationsList> getAllDevicesIdsToSendLocation();
+	
+	@Query(nativeQuery = true, name = "getExpiredVehicles")
+	public List<ExpiredVehicles> getAllExpiredIds(@Param("currentDate")Date currentDate);
 	
 }
 

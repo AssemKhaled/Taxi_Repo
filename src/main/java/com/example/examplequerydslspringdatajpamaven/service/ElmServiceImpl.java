@@ -51,6 +51,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.SummaryReport;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.ElmReturn;
+import com.example.examplequerydslspringdatajpamaven.entity.ExpiredVehicles;
 import com.example.examplequerydslspringdatajpamaven.entity.Group;
 import com.example.examplequerydslspringdatajpamaven.entity.LastLocationsList;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoElmLastLocations;
@@ -132,7 +133,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 
 		Date date = new Date();
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String time = formatter.format(date);
 		String type = "Delete Company";
 		Map requet = new HashMap();
@@ -403,7 +404,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		logger.info("************************ companyRegistrtaion STARTED ***************************");
 
 		Date date = new Date();
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String time = formatter.format(date);
 		String type = "Register Company";
 		Map requet = new HashMap();
@@ -715,7 +716,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		logger.info("************************ companyUpdate STARTED ***************************");
 
 		Date date = new Date();
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String time = formatter.format(date);
 		String type = "Update Company";
 		Map requet = new HashMap();
@@ -1017,11 +1018,24 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		logger.info("************************ deviceUpdate STARTED ***************************");
 
 		Date date = new Date();
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String time = formatter.format(date);
 		String type = "Update Vehicle";
 		Map requet = new HashMap();
 		Map response = new HashMap();
+		
+		SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); 
+
+		String currentDate=formatter.format(date);
+		
+		Date dateRegUpdate = null;
+		try {
+			dateRegUpdate = output.parse(currentDate);
+
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		if(TOKEN.equals("")) {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
@@ -1240,7 +1254,9 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 					  device.setReject_reason(null);
 					  device.setUniqueId(dataObject.get("imeiNumber"));
 					  device.setSequence_number(dataObject.get("sequenceNumber"));
-
+					  device.setUpdate_date_in_elm(dateRegUpdate);
+					  device.setExpired(0);
+					  
 					  deviceRepository.save(device);
 					  
 					  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",data);
@@ -1274,11 +1290,25 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 		logger.info("************************ deviceDelete STARTED ***************************");
 		Date date = new Date();
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String time = formatter.format(date);
 		String type = "Delete Vehicle";
 		Map requet = new HashMap();
 		Map response = new HashMap();
+		
+		SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); 
+
+		String currentDate=formatter.format(date);
+		
+		Date dateRegDelete = null;
+		try {
+			dateRegDelete = output.parse(currentDate);
+
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		
 		if(TOKEN.equals("")) {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
@@ -1500,6 +1530,11 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				  
 				  device.setReject_reason(null);
 				  device.setReference_key(null);
+				  device.setDelete_from_elm_date(dateRegDelete);
+				  device.setUpdate_date_in_elm(dateRegDelete);
+				  device.setExpired(1);
+				  
+				  
 				  deviceRepository.save(device);
 				  
 				  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",data);
@@ -1531,11 +1566,25 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 
 		Date date = new Date();
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String time = formatter.format(date);
 		String type = "Register Vehicle";
 		Map requet = new HashMap();
 		Map response = new HashMap();
+		
+		
+		SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); 
+
+		String currentDate=formatter.format(date);
+		
+		Date dateReg = null;
+		try {
+			dateReg = output.parse(currentDate);
+
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		
 		if(TOKEN.equals("")) {
@@ -1762,8 +1811,13 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  else if(resp.containsKey("resultCode")) {
 			  if(resp.get("resultCode").toString() == "success") {
 				  JSONObject res = new JSONObject(resp.get("result").toString());	
+				  
 				  device.setReject_reason(null);
 				  device.setReference_key(res.getString("referenceKey"));
+				  device.setRegestration_to_elm_date(dateReg);
+				  device.setUpdate_date_in_elm(dateReg);
+				  device.setExpired(0);
+				 
 				  deviceRepository.save(device);
 				  
 				  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",data);
@@ -1773,8 +1827,13 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			  }
 			  else if(resp.get("resultCode").toString() == "duplicate") {
 					JSONObject res = new JSONObject(resp.get("result").toString() );	
+					
 					device.setReject_reason(null);
 					device.setReference_key(res.getString("referenceKey"));
+					device.setRegestration_to_elm_date(dateReg);
+					device.setUpdate_date_in_elm(dateReg);
+					device.setExpired(0);
+					
 					deviceRepository.save(device);
 
 					  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"duplicate",data);
@@ -1804,7 +1863,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		logger.info("************************ driverRegistrtaion STARTED ***************************");
 
 		Date date = new Date();
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String time = formatter.format(date);
 		String type = "Register Driver";
 		Map requet = new HashMap();
@@ -2070,7 +2129,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	public ResponseEntity<?> deviceInquery(String TOKEN, Long deviceId,Long userId) {
 		logger.info("************************ deviceInquery STARTED ***************************");
 		Date date = new Date();
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String time = formatter.format(date);
 		String type = "Verify Vehicle";
 		Map requet = new HashMap();
@@ -2306,7 +2365,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	public ResponseEntity<?> companyInquery(String TOKEN, Long userId,Long loggedUserId) {
 		logger.info("************************ companyInquery STARTED ***************************");
 		Date date = new Date();
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String time = formatter.format(date);
 		String type = "Verify Company";
 		Map requet = new HashMap();
@@ -2567,7 +2626,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	public ResponseEntity<?> driverDelete(String TOKEN, Long driverId,Long userId) {
 		logger.info("************************ driverDelete STARTED ***************************");
 		Date date = new Date();
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String time = formatter.format(date);
 		String type = "Delete Driver";
 		Map requet = new HashMap();
@@ -2827,7 +2886,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		logger.info("************************ driverInquery STARTED ***************************");
 
 		Date date = new Date();
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String time = formatter.format(date);
 		String type = "Verify Driver";
 		Map requet = new HashMap();
@@ -3070,7 +3129,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	public ResponseEntity<?> driverUpdate(String TOKEN, Map<String, String> dataObject, Long driverId, Long userId) {
 		logger.info("************************ driverUpdate STARTED ***************************");
 		Date date = new Date();
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String time = formatter.format(date);
 		String type = "Update Driver";
 		Map requet = new HashMap();
@@ -3962,6 +4021,150 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
+	}
+
+
+
+
+	@Override
+	public ResponseEntity<?> getExpiredVehicles() {
+		// TODO Auto-generated method stub
+		
+
+		List<ExpiredVehicles> devicList = new ArrayList<>();
+
+		Date date = new Date();
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); 
+		String currentDate=formatter.format(date);
+		String type = "Expired Vehicle";
+		Map requet = new HashMap();
+		Map response = new HashMap();
+		
+		Date dateCheck = null;
+		try {
+			dateCheck = output.parse(currentDate);
+
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 
+		devicList = deviceRepository.getAllExpiredIds(dateCheck);
+		
+		if(devicList.size()>0) {
+			for(ExpiredVehicles ExpiredDevice:devicList) {
+
+				Device device = deviceRepository.findOne(ExpiredDevice.getDeviceId());
+				
+				if(ExpiredDevice.getUser_referenceKey() != null && ExpiredDevice.getUser_referenceKey() != "" 
+						&& ExpiredDevice.getVehicle_referenceKey() != null && ExpiredDevice.getVehicle_referenceKey() != ""){
+					
+					
+				  String url = elm+"/operationCompany/"+ExpiredDevice.getUser_referenceKey()+"/vehicle/"+ExpiredDevice.getVehicle_referenceKey();
+
+				  Map bodyToMiddleWare = new HashMap();
+				  
+				  bodyToMiddleWare.put("dataObject", null);
+				  bodyToMiddleWare.put("url",url);
+				  bodyToMiddleWare.put("methodType","DELETE");
+				 		  
+				  requet = bodyToMiddleWare;
+				  TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+
+					SSLContext sslContext = null;
+					try {
+						sslContext = org.apache.http.ssl.SSLContexts.custom()
+						        .loadTrustMaterial(null, acceptingTrustStrategy)
+						        .build();
+					} catch (KeyManagementException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (NoSuchAlgorithmException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (KeyStoreException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
+
+					CloseableHttpClient httpClient = HttpClients.custom()
+					        .setSSLSocketFactory(csf)
+					        .build();
+
+					HttpComponentsClientHttpRequestFactory requestFactory =
+					        new HttpComponentsClientHttpRequestFactory();
+
+					requestFactory.setHttpClient(httpClient);
+
+					RestTemplate restTemplate = new RestTemplate(requestFactory);
+					
+					
+					  restTemplate.getMessageConverters()
+				        .add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
+					  
+				  HttpEntity<Object> entity = new HttpEntity<Object>(bodyToMiddleWare);
+
+				  ResponseEntity<ElmReturn> rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
+
+				  
+				  ElmReturn elmReturn = rateResponse.getBody();
+
+				  
+				  response.put("body", elmReturn.getBody());
+				  response.put("statusCode", elmReturn.getStatusCode());
+				  response.put("message", elmReturn.getMessage());
+
+		          // send Logs
+				  MongoElmLogs elmLogs = new MongoElmLogs(null,ExpiredDevice.getUserId(),ExpiredDevice.getUserName(),null,null,ExpiredDevice.getDeviceId(),ExpiredDevice.getDeviceName(),currentDate,type,requet,response);
+				  elmLogsRepository.save(elmLogs);
+				  
+				  
+				  
+				  Map resp = new HashMap();
+				  resp = elmReturn.getBody();
+				  
+		        if(resp.containsKey("errorCode")) {
+					  
+					  device.setReject_reason(resp.get("errorMsg").toString());
+					  deviceRepository.save(device);
+
+				  }
+				  else if(resp.containsKey("resultCode")) {
+					  if(resp.get("success").equals(true)) {
+						  
+						  device.setReject_reason(null);
+						  device.setReference_key(null);
+						  device.setDelete_from_elm_date(dateCheck);
+						  device.setUpdate_date_in_elm(dateCheck);
+						  device.setDelete_from_elm(resp.get("resultCode").toString());
+						  device.setExpired(1);
+						  
+						  
+						  deviceRepository.save(device);
+						  
+						
+					  }
+					  else {
+							device.setReject_reason(resp.get("resultCode").toString());
+							deviceRepository.save(device);
+
+					  }
+					  
+					 
+				  }
+					
+					
+				}
+			}
+		}
+		
+		
+		
+		getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "success",null);
+		return  ResponseEntity.badRequest().body(getObjectResponse);
 	}
 
 
