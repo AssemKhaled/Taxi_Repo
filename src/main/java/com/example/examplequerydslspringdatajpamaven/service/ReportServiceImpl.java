@@ -215,24 +215,28 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								logger.info("************************ getEventsReport ENDED ***************************");
 								return ResponseEntity.badRequest().body(getObjectResponse);
 							}
-							if(group.getType().equals("driver")) {
-							
-								allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
-							
-
-							}
-							else if(group.getType().equals("device")) {
-								
-								allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
-								
-								
-							}
-							else if(group.getType().equals("geofence")) {
-								
-								allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
+							if(group.getType() != null) {
+								if(group.getType().equals("driver")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
 								
 
+								}
+								else if(group.getType().equals("device")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
+									
+									
+								}
+								else if(group.getType().equals("geofence")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
+									
+
+								}
 							}
+
+							
 						}
 			    	}
 			    	
@@ -610,26 +614,30 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								logger.info("************************ getDeviceWorkingHours ENDED ***************************");
 								return ResponseEntity.badRequest().body(getObjectResponse);
 							}
-							if(group.getType().equals("driver")) {
-								
-								allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
-								
-								
-								
+							if(group.getType() != null) {
+								if(group.getType().equals("driver")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
+									
+									
+									
 
+								}
+								else if(group.getType().equals("device")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
+									
+									
+									
+								}
+								else if(group.getType().equals("geofence")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
+									
+								}
 							}
-							else if(group.getType().equals("device")) {
-								
-								allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
-								
-								
-								
-							}
-							else if(group.getType().equals("geofence")) {
-								
-								allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
-								
-							}
+
+							
 						}
 			    	}
 			    	
@@ -939,26 +947,30 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								 logger.info("************************ getCustomReport ENDED ***************************");
 								return ResponseEntity.badRequest().body(getObjectResponse);
 							}
-							if(group.getType().equals("driver")) {
-								
-								allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
-								
-								
-								
+							if(group.getType() != null) {
+								if(group.getType().equals("driver")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
+									
+									
+									
 
+								}
+								else if(group.getType().equals("device")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
+									
+									
+									
+								}
+								else if(group.getType().equals("geofence")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
+									
+								}
 							}
-							else if(group.getType().equals("device")) {
-								
-								allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
-								
-								
-								
-							}
-							else if(group.getType().equals("geofence")) {
-								
-								allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
-								
-							}
+
+							
 						}
 			    	}
 			    	
@@ -1263,18 +1275,22 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								 logger.info("************************ getDriverWorkingHours ENDED ***************************");
 								return ResponseEntity.badRequest().body(getObjectResponse);
 							}
-							if(group.getType().equals("driver")) {
-								allDrivers.addAll(groupRepository.getDriversFromGroup(groupId));
-
-							}
-							else if(group.getType().equals("device")) {
-								allDrivers.addAll(groupRepository.getDriverFromDevices(groupId));
+							if(group.getType() != null) {
 								
-							}
-							else if(group.getType().equals("geofence")) {
-								allDrivers.addAll(groupRepository.getDriversFromGeofence(groupId));
+								if(group.getType().equals("driver")) {
+									allDrivers.addAll(groupRepository.getDriversFromGroup(groupId));
 
+								}
+								else if(group.getType().equals("device")) {
+									allDrivers.addAll(groupRepository.getDriverFromDevices(groupId));
+									
+								}
+								else if(group.getType().equals("geofence")) {
+									allDrivers.addAll(groupRepository.getDriversFromGeofence(groupId));
+
+								}
 							}
+							
 						}
 			    	}
 			    	
@@ -1721,24 +1737,28 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								logger.info("************************ getStopsReport ENDED ***************************");
 								return ResponseEntity.badRequest().body(getObjectResponse);
 							}
-							if(group.getType().equals("driver")) {
-							
-								allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
-							
+                            if(group.getType() != null) {
+								
+                            	if(group.getType().equals("driver")) {
+        							
+    								allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
+    							
 
-							}
-							else if(group.getType().equals("device")) {
-								
-								allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
-								
-								
-							}
-							else if(group.getType().equals("geofence")) {
-								
-								allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
-								
+    							}
+    							else if(group.getType().equals("device")) {
+    								
+    								allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
+    								
+    								
+    							}
+    							else if(group.getType().equals("geofence")) {
+    								
+    								allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
+    								
 
+    							}
 							}
+							
 						}
 			    	}
 			    	
@@ -2047,24 +2067,28 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								logger.info("************************ getTripsReport ENDED ***************************");
 								return ResponseEntity.badRequest().body(getObjectResponse);
 							}
-							if(group.getType().equals("driver")) {
-							
-								allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
-							
+                            if(group.getType() != null) {
+                            	if(group.getType().equals("driver")) {
+        							
+    								allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
+    							
 
-							}
-							else if(group.getType().equals("device")) {
-								
-								allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
-								
-								
-							}
-							else if(group.getType().equals("geofence")) {
-								
-								allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
-								
+    							}
+    							else if(group.getType().equals("device")) {
+    								
+    								allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
+    								
+    								
+    							}
+    							else if(group.getType().equals("geofence")) {
+    								
+    								allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
+    								
 
-							}
+    							}
+                            }
+
+							
 						}
 			    	}
 			    	
@@ -2406,24 +2430,29 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								logger.info("************************ getDriveMoreThanReport ENDED ***************************");
 								return ResponseEntity.badRequest().body(getObjectResponse);
 							}
-							if(group.getType().equals("driver")) {
-							
-								allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
-							
+                            if(group.getType() != null) {
+                            	if(group.getType().equals("driver")) {
+        							
+    								allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
+    							
 
-							}
-							else if(group.getType().equals("device")) {
-								
-								allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
-								
-								
-							}
-							else if(group.getType().equals("geofence")) {
-								
-								allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
-								
+    							}
+    							else if(group.getType().equals("device")) {
+    								
+    								allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
+    								
+    								
+    							}
+    							else if(group.getType().equals("geofence")) {
+    								
+    								allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
+    								
 
-							}
+    							}
+                            }
+                            
+
+							
 						}
 			    	}
 			    	
@@ -2834,24 +2863,27 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								logger.info("************************ getEventsReportByType ENDED ***************************");
 								return ResponseEntity.badRequest().body(getObjectResponse);
 							}
-							if(group.getType().equals("driver")) {
-							
-								allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
-							
-
-							}
-							else if(group.getType().equals("device")) {
-								
-								allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
-								
-								
-							}
-							else if(group.getType().equals("geofence")) {
-								
-								allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
+							if(group.getType() != null) {
+								if(group.getType().equals("driver")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
 								
 
+								}
+								else if(group.getType().equals("device")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
+									
+									
+								}
+								else if(group.getType().equals("geofence")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
+									
+
+								}
 							}
+							
 						}
 			    	}
 			    	
@@ -3132,24 +3164,28 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								 logger.info("************************ getSummaryReport ENDED ***************************");
 								return ResponseEntity.badRequest().body(getObjectResponse);
 							}
-							if(group.getType().equals("driver")) {
-							
-								allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
-							
-
-							}
-							else if(group.getType().equals("device")) {
-								
-								allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
-								
-								
-							}
-							else if(group.getType().equals("geofence")) {
-								
-								allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
+							if(group.getType() != null) {
+								if(group.getType().equals("driver")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
 								
 
+								}
+								else if(group.getType().equals("device")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
+									
+									
+								}
+								else if(group.getType().equals("geofence")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
+									
+
+								}
 							}
+
+							
 						}
 			    	}
 			    	
@@ -3477,24 +3513,28 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								 logger.info("************************ getSensorsReport ENDED ***************************");
 								return ResponseEntity.badRequest().body(getObjectResponse);
 							}
-							if(group.getType().equals("driver")) {
-							
-								allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
-							
-
-							}
-							else if(group.getType().equals("device")) {
-								
-								allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
-								
-								
-							}
-							else if(group.getType().equals("geofence")) {
-								
-								allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
+							if(group.getType() != null) {
+								if(group.getType().equals("driver")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
 								
 
+								}
+								else if(group.getType().equals("device")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
+									
+									
+								}
+								else if(group.getType().equals("geofence")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
+									
+
+								}
 							}
+
+							
 						}
 			    	}
 			    	
@@ -3887,24 +3927,28 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								 logger.info("************************ getNumStopsReport ENDED ***************************");
 								return ResponseEntity.badRequest().body(getObjectResponse);
 							}
-							if(group.getType().equals("driver")) {
-							
-								allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
-							
-
-							}
-							else if(group.getType().equals("device")) {
-								
-								allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
-								
-								
-							}
-							else if(group.getType().equals("geofence")) {
-								
-								allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
+							if(group.getType() != null) {
+								if(group.getType().equals("driver")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
 								
 
+								}
+								else if(group.getType().equals("device")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
+									
+									
+								}
+								else if(group.getType().equals("geofence")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
+									
+
+								}
 							}
+
+							
 						}
 			    	}
 			    	
@@ -4262,24 +4306,27 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								 logger.info("************************ getTotalStopsReport ENDED ***************************");
 								return ResponseEntity.badRequest().body(getObjectResponse);
 							}
-							if(group.getType().equals("driver")) {
-							
-								allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
-							
-
-							}
-							else if(group.getType().equals("device")) {
-								
-								allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
-								
-								
-							}
-							else if(group.getType().equals("geofence")) {
-								
-								allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
+							if(group.getType() != null) {
+								if(group.getType().equals("driver")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
 								
 
+								}
+								else if(group.getType().equals("device")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
+									
+									
+								}
+								else if(group.getType().equals("geofence")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
+									
+
+								}
 							}
+							
 						}
 			    	}
 			    	
@@ -4705,24 +4752,28 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								 logger.info("************************ geTotalTripsReport ENDED ***************************");
 								return ResponseEntity.badRequest().body(getObjectResponse);
 							}
-							if(group.getType().equals("driver")) {
-							
-								allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
-							
-
-							}
-							else if(group.getType().equals("device")) {
-								
-								allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
-								
-								
-							}
-							else if(group.getType().equals("geofence")) {
-								
-								allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
+							if(group.getType() != null) {
+								if(group.getType().equals("driver")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
 								
 
+								}
+								else if(group.getType().equals("device")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
+									
+									
+								}
+								else if(group.getType().equals("geofence")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
+									
+
+								}
 							}
+
+							
 						}
 			    	}
 			    	
@@ -5128,23 +5179,25 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								 logger.info("************************ getNumTripsReport ENDED ***************************");
 								return ResponseEntity.badRequest().body(getObjectResponse);
 							}
-							if(group.getType().equals("driver")) {
-							
-								allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
-							
-
-							}
-							else if(group.getType().equals("device")) {
-								
-								allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
-								
-								
-							}
-							else if(group.getType().equals("geofence")) {
-								
-								allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
+							if(group.getType() != null) {
+								if(group.getType().equals("driver")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
 								
 
+								}
+								else if(group.getType().equals("device")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
+									
+									
+								}
+								else if(group.getType().equals("geofence")) {
+									
+									allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
+									
+
+								}
 							}
 						}
 			    	}
@@ -5602,18 +5655,22 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								logger.info("************************ getNumberDriverWorkingHours ENDED ***************************");
 								return ResponseEntity.badRequest().body(getObjectResponse);
 							}
-							if(group.getType().equals("driver")) {
-								allDrivers.addAll(groupRepository.getDriversFromGroup(groupId));
+							if(group.getType() != null) {
+								if(group.getType().equals("driver")) {
+									allDrivers.addAll(groupRepository.getDriversFromGroup(groupId));
 
-							}
-							else if(group.getType().equals("device")) {
-								allDrivers.addAll(groupRepository.getDriverFromDevices(groupId));
-								
-							}
-							else if(group.getType().equals("geofence")) {
-								allDrivers.addAll(groupRepository.getDriversFromGeofence(groupId));
+								}
+								else if(group.getType().equals("device")) {
+									allDrivers.addAll(groupRepository.getDriverFromDevices(groupId));
+									
+								}
+								else if(group.getType().equals("geofence")) {
+									allDrivers.addAll(groupRepository.getDriversFromGeofence(groupId));
 
+								}
 							}
+
+							
 						}
 			    	}
 			    	

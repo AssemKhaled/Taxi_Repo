@@ -1423,6 +1423,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	    if(size > 0) {
 			for(int i=0;i<allDevicesLiveData.size();i++) {
 				long minutes = 0;
+            	allDevicesLiveData.get(i).setVehicleStatus("offline");
 
 				if(allDevicesLiveData.get(i).getLastUpdate() != null) {
 					SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
@@ -1443,10 +1444,11 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
                     	allDevicesLiveData.get(i).setVehicleStatus("online");
 					}
 					if(minutes > 8) {
-                    	allDevicesLiveData.get(i).setVehicleStatus("unknown");
+                    	allDevicesLiveData.get(i).setVehicleStatus("offline");
 					}
 					if(minutes < 8 && minutes > 3) {
-                    	allDevicesLiveData.get(i).setVehicleStatus("offline");
+                    	allDevicesLiveData.get(i).setVehicleStatus("unknown");
+
 					}	
 				}
 				else {
@@ -1613,6 +1615,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		if(allDevicesLiveData.size() > 0) {
 			for(int i=0;i<allDevicesLiveData.size();i++) {
 				long minutes = 0;
+            	allDevicesLiveData.get(i).setVehicleStatus(3);
 
 				if(allDevicesLiveData.get(i).getLastUpdate() != null) {
 					
@@ -1629,15 +1632,15 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 						
 					} catch (ParseException e) {
 						e.printStackTrace();
-					}
+					}					
 					if(minutes < 3) {
 	                	allDevicesLiveData.get(i).setVehicleStatus(1);
 					}
 					if(minutes > 8) {
-	                	allDevicesLiveData.get(i).setVehicleStatus(2);
+	                	allDevicesLiveData.get(i).setVehicleStatus(3);
 					}
 					if(minutes < 8 && minutes > 3) {
-	                	allDevicesLiveData.get(i).setVehicleStatus(3);
+	                	allDevicesLiveData.get(i).setVehicleStatus(2);
 					}
 				}
 				else {

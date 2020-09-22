@@ -516,9 +516,10 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 		Long createdBy=point.getUserId();
 		Boolean isParent=false;
 
-		if(createdBy == userId) {
+		if(createdBy.toString().equals(userId.toString())) {
 			isParent=true;
 		}
+		
 		List<User>childs = new ArrayList<User>();
 		if(loggedUser.getAccountType().equals(4)) {
 			 List<User> parents=userServiceImpl.getAllParentsOfuser(loggedUser,loggedUser.getAccountType());
@@ -550,7 +551,7 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 		if(!childs.isEmpty()) {
 			for(User object : childs) {
 				parentChilds = object;
-				if(parentChilds.getId().equals(createdBy)) {
+				if(parentChilds.getId().toString().equals(createdBy.toString())) {
 					isParent=true;
 					break;
 				}

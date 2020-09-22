@@ -328,6 +328,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		if(allDevicesLiveData.size() > 0) {
 			for(int i=0;i<allDevicesLiveData.size();i++) {
 				long minutes = 0;
+            	allDevicesLiveData.get(i).setVehicleStatus(3);
 
 				if(allDevicesLiveData.get(i).getLastUpdate() != null) {
 					
@@ -349,10 +350,10 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	                	allDevicesLiveData.get(i).setVehicleStatus(1);
 					}
 					if(minutes > 8) {
-	                	allDevicesLiveData.get(i).setVehicleStatus(2);
+	                	allDevicesLiveData.get(i).setVehicleStatus(3);
 					}
 					if(minutes < 8 && minutes > 3) {
-	                	allDevicesLiveData.get(i).setVehicleStatus(3);
+	                	allDevicesLiveData.get(i).setVehicleStatus(2);
 					}
 				}
 				else {
