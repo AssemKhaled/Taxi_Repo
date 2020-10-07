@@ -177,10 +177,10 @@ public class DeviceRestController {
 		return deviceService.getFuelData(TOKEN,userId,deviceId);
 	}
 	@PostMapping(value = "/addDataToFuel")
-	public ResponseEntity<?> addDataToFuel( @RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN, 
-			                                        @RequestParam (value = "userId", defaultValue = "0") Long userId,
-												    @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
-												    @RequestBody Map<String, Object> data){
+	public ResponseEntity<?> addDataToFuel(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN, 
+			                               @RequestParam (value = "userId", defaultValue = "0") Long userId,
+										   @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+										   @RequestBody Map<String, Object> data){
 		return deviceService.addDataToFuel(TOKEN,userId,deviceId,data);
 	}
 	
@@ -191,6 +191,14 @@ public class DeviceRestController {
 		return deviceService.getSensorSettings(TOKEN,userId,deviceId);
 	}
 
+	@PostMapping(value = "/sendCommand")
+	public ResponseEntity<?> sendCommand( @RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN, 
+                                        @RequestParam (value = "userId", defaultValue = "0") Long userId,
+									    @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+									    @RequestBody Map<String, Object> data){
+		return deviceService.sendCommand(TOKEN,userId,deviceId,data);
+	}
+	
 	@PostMapping(value = "/addSensorSettings")
 	public ResponseEntity<?> addSensorSettings( @RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN, 
 			                                        @RequestParam (value = "userId", defaultValue = "0") Long userId,

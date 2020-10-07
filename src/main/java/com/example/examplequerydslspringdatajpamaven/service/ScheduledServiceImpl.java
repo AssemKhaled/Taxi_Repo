@@ -559,7 +559,7 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 		Long createdBy=schedule.getUserId();
 		Boolean isParent=false;
 
-		if(createdBy.equals(userId)) {
+		if(createdBy.toString().equals(userId.toString())) {
 			isParent=true;
 		}
 		List<User>childs = new ArrayList<User>();
@@ -593,7 +593,7 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 		if(!childs.isEmpty()) {
 			for(User object : childs) {
 				parentChilds = object;
-				if(parentChilds.getId().equals(createdBy)) {
+				if(parentChilds.getId().toString().equals(createdBy.toString())) {
 					isParent=true;
 					break;
 				}
@@ -681,7 +681,7 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 		Long createdBy=schedule.getUserId();
 		Boolean isParent=false;
 
-		if(createdBy == userId) {
+		if(createdBy.toString().equals(userId.toString())) {
 			isParent=true;
 		}
 		List<User>childs = new ArrayList<User>();
@@ -715,7 +715,7 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 		if(!childs.isEmpty()) {
 			for(User object : childs) {
 				parentChilds = object;
-				if(parentChilds.getId().equals(createdBy)) {
+				if(parentChilds.getId().toString().equals(createdBy.toString())) {
 					isParent=true;
 					break;
 				}

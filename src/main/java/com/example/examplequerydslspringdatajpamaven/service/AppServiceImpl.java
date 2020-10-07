@@ -332,7 +332,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 				if(allDevicesLiveData.get(i).getLastUpdate() != null) {
 					
-					SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+					SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 					Date now = new Date();
 					String strDate = formatter.format(now);
 					try {
@@ -735,10 +735,11 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			for(int i=0;i<devices.size();i++) {
 				
 				long minutes = 0;
+				devices.get(i).setStatus("offline");
 
 				if(devices.get(i).getLastUpdate() != null) {
-					
-					SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+
+					SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 					Date now = new Date();
 					String strDate = formatter.format(now);
 					try {

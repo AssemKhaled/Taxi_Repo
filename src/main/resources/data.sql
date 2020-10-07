@@ -19,7 +19,7 @@ WHERE NOT EXISTS (
 );
 
 INSERT INTO tc_permissions(name,functionality)
-SELECT * FROM (SELECT 'DEVICE', '{"list":true,"create":true,"edit":true,"delete":true,"assignDeviceToDriver":true,"assignGeofenceToDevice":true,"assignToUser":true,"deleteFromElm":true,"connectToElm":true,"verifyInElm":true,"updateInElm":true,"calibration":true,"GetSpentFuel":true,"GetSensorSetting":true}') AS tmp
+SELECT * FROM (SELECT 'DEVICE', '{"list":true,"create":true,"edit":true,"delete":true,"assignDeviceToDriver":true,"assignGeofenceToDevice":true,"assignToUser":true,"deleteFromElm":true,"connectToElm":true,"verifyInElm":true,"updateInElm":true,"calibration":true,"GetSpentFuel":true,"GetSensorSetting":true,"command":true}') AS tmp
 WHERE NOT EXISTS (
     SELECT name FROM tc_permissions WHERE name = 'DEVICE'
 );

@@ -57,7 +57,9 @@ public interface DeviceService {
 	public ResponseEntity<?> addDataToFuel(String TOKEN,Long userId,Long deviceId,Map<String, Object> data);
 	public ResponseEntity<?> addSensorSettings(String TOKEN,Long userId,Long deviceId,Map<String, Object> data);
 	public ResponseEntity<?> addIcon(String TOKEN,Long userId,Long deviceId,Map<String, Object> data);
+	public ResponseEntity<?> sendCommand(String TOKEN,Long userId,Long deviceId,Map<String, Object> data);
 
+	public String sendCommandToServer(Map<String, Object> objectData);
 	
 	public ResponseEntity<?> getDeviceDataSelected(String TOKEN,Long deviceId,String type);
 

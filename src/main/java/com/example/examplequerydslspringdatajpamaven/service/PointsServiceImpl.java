@@ -421,7 +421,7 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 						
 						
 						
-						pointsRepository.save(point);
+
 						
 						
 						DecodePhoto decodePhoto=new DecodePhoto();
@@ -433,7 +433,9 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 					    		}
 					    	}
 						}
-						
+
+						pointsRepository.save(point);
+
 						points.add(point);
 
 						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"sucsess",points);

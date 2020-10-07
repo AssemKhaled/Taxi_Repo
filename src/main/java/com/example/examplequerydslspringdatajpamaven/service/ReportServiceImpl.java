@@ -1579,7 +1579,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				 else {
 					 usersIds.add(userId);
 
-					 List<User>childernUsers = userServiceImpl.getActiveAndInactiveChildern(userId);
+					 /*List<User>childernUsers = userServiceImpl.getActiveAndInactiveChildern(userId);
 					 if(childernUsers.isEmpty()) {
 						 usersIds.add(userId);
 					 }
@@ -1588,7 +1588,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 						 for(User object : childernUsers) {
 							 usersIds.add(object.getId());
 						 }
-					 }
+					 }*/
 				 }
 				 
 					Date date = new Date();

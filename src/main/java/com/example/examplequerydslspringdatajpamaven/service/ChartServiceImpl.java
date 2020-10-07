@@ -421,7 +421,7 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 				 else {
 					 usersIds.add(userId);
 
-					 List<User>childernUsers = userService.getAllChildernOfUser(userId);
+					 /*List<User>childernUsers = userService.getAllChildernOfUser(userId);
 					 if(childernUsers.isEmpty()) {
 						 usersIds.add(userId);
 					 }
@@ -430,7 +430,7 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 						 for(User object : childernUsers) {
 							 usersIds.add(object.getId());
 						 }
-					 }
+					 }*/
 				 }
 
 				    List<Long> allDevices = deviceRepository.getDevicesUsers(usersIds);

@@ -1,22 +1,44 @@
 package com.example.examplequerydslspringdatajpamaven.service;
 
+import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 //import static org.mockito.Matchers.eq;
+import java.io.File;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
+import java.util.*;
+import com.fasterxml.jackson.databind.*;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.TimeZone;
+import javax.net.ssl.SSLContext;
+
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -26,11 +48,22 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
+
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceList;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceLiveData;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomMapData;
@@ -43,6 +76,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 import com.example.examplequerydslspringdatajpamaven.entity.Group;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.NewcustomerDivice;
+import com.example.examplequerydslspringdatajpamaven.entity.StopReport;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
@@ -85,6 +119,9 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	
 	@Autowired
 	private MongoPositionsRepository mongoPositionsRepository;
+	
+	@Value("${sendCommand}")
+	private String sendCommand;
 	
 	@Override
 	public ResponseEntity<?> getAllUserDevices(String TOKEN,Long userId , int offset, String search) {
@@ -1426,7 +1463,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
             	allDevicesLiveData.get(i).setVehicleStatus("offline");
 
 				if(allDevicesLiveData.get(i).getLastUpdate() != null) {
-					SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+					SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 					Date now = new Date();
 					String strDate = formatter.format(now);
 					try {
@@ -1619,7 +1656,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 
 				if(allDevicesLiveData.get(i).getLastUpdate() != null) {
 					
-					SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+					SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 					Date now = new Date();
 					String strDate = formatter.format(now);
 					try {
@@ -3038,5 +3075,198 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				
 			}
 		}
+	}
+
+	@Override
+	public ResponseEntity<?> sendCommand(String TOKEN, Long userId, Long deviceId, Map<String, Object> data) {
+		// TODO Auto-generated method stub
+		if(TOKEN.equals("")) {
+			 List<Device> devices = null;
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(userId.equals(0) || deviceId.equals(0)) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "userId and deviceId are required",null);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		else {
+			User loggedUser = userService.findById(userId);
+			
+			if(loggedUser == null) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "loggedUser is not found",null);
+				
+				return ResponseEntity.status(404).body(getObjectResponse);
+			}
+			else {
+				Device device = findById(deviceId);
+				if(device == null) {
+					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "device is not found",null);
+					return ResponseEntity.status(404).body(getObjectResponse);
+				}
+				else {
+					boolean isParent = false;
+					User parent = null;
+
+					 if(loggedUser.getAccountType().equals(4)) {
+						 Set<User>parentClients = loggedUser.getUsersOfUser();
+						 if(parentClients.isEmpty()) {
+							  getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allowed to get this device",null);
+								
+								logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+								return ResponseEntity.badRequest().body(getObjectResponse); 
+						 }else {
+							 for(User object : parentClients) {
+								 parent = object ;
+							 }
+							 loggedUser=parent;
+						 }
+							 
+						 
+					 }
+					
+					
+					if(checkIfParent( device ,  loggedUser)) {
+						if(!loggedUser.getAccountType().equals(1)) {
+							if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "command")) {
+								 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to edit command",null);
+								 logger.info("************************ sensorSettings ENDED ***************************");
+								return  ResponseEntity.badRequest().body(getObjectResponse);
+							}
+						}
+
+						if(!data.containsKey("command")) {
+							getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "command data shouldn't be null",null);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}
+
+						if(data.get("command") == null) {
+							getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "command data shouldn't be null",null);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}
+						
+						JSONObject obj = new JSONObject(data);
+						String command = obj.get("command").toString();
+
+
+						  Map<String, Object> objectData = new HashMap<String, Object>();
+							objectData.put("deviceId", deviceId);
+							objectData.put("id", 0);
+							objectData.put("description", "New…");
+							objectData.put("textChannel", false);
+							objectData.put("type", "custom");
+
+
+						if(command.equals("restart")) {
+							Map<String, Object> commandData = new HashMap<String, Object>();
+							commandData.put("data", "cpureset");
+							objectData.put("attributes", commandData);
+
+						}
+						
+						else if(command.equals("ignitionOff")) {
+							Map<String, Object> commandData = new HashMap<String, Object>();
+							commandData.put("data", "setdigout 11");
+							objectData.put("attributes", commandData);
+
+						}
+						else if(command.equals("ignitionOn")) {
+							Map<String, Object> commandData = new HashMap<String, Object>();
+							commandData.put("data", "setdigout 00");
+							objectData.put("attributes", commandData);
+
+						}
+						else {
+							getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "select command please.",null);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}
+						String output = sendCommandToServer(objectData);
+
+
+						getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), output ,null);
+						return ResponseEntity.ok().body(getObjectResponse);
+				
+						
+						
+					}
+					else {
+						getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "userId not from parents of this device",null);
+						return  ResponseEntity.badRequest().body(getObjectResponse);	
+					}
+				}
+				
+			}
+		}
+	}
+
+	@Override
+	public String sendCommandToServer(Map<String, Object> objectData) {
+		// TODO Auto-generated method stub
+		
+		String plainCreds = "admin@fuinco.com:admin";
+		byte[] plainCredsBytes = plainCreds.getBytes();
+		
+		byte[] base64CredsBytes = Base64.getEncoder().encode(plainCredsBytes);
+		String base64Creds = new String(base64CredsBytes);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", "Basic " + base64Creds);
+	    headers.setContentType(MediaType.APPLICATION_JSON);
+	    headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+
+		TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+
+		SSLContext sslContext = null;
+		try {
+			sslContext = org.apache.http.ssl.SSLContexts.custom()
+			        .loadTrustMaterial(null, acceptingTrustStrategy)
+			        .build();
+		} catch (KeyManagementException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (KeyStoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
+
+		CloseableHttpClient httpClient = HttpClients.custom()
+		        .setSSLSocketFactory(csf)
+		        .build();
+
+		HttpComponentsClientHttpRequestFactory requestFactory =
+		        new HttpComponentsClientHttpRequestFactory();
+
+		requestFactory.setHttpClient(httpClient);
+
+		RestTemplate restTemplate = new RestTemplate(requestFactory);
+		
+		
+		  restTemplate.getMessageConverters()
+	        .add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
+		  
+	  
+		// build the request
+		  HttpEntity<Map<String, Object>> request = new HttpEntity<>(objectData, headers);
+
+		  // send POST request
+		  ResponseEntity<String> response = restTemplate.postForEntity(sendCommand, request, String.class);
+
+		if (response.getStatusCode() == HttpStatus.ACCEPTED) {
+		    return "success";
+		} else {
+		    return "faild";
+		}
+
+		
+
 	}
 }
