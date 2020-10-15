@@ -68,7 +68,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 					+ " INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id " +
 					" LEFT JOIN tc_users ON tc_user_driver.userid = tc_users.id " + 
 					" WHERE tc_user_driver.userid IN(:userIds) and tc_drivers.delete_date is null " 
-					+ " and ((tc_drivers.name Like LOWER(CONCAT('%',:search, '%'))) OR (tc_drivers.uniqueid Like LOWER(CONCAT('%',:search, '%'))) OR "
+					+ " and ((tc_users.name Like LOWER(CONCAT('%',:search, '%'))) OR (tc_drivers.name Like LOWER(CONCAT('%',:search, '%'))) OR (tc_drivers.uniqueid Like LOWER(CONCAT('%',:search, '%'))) OR "
 					+ " (tc_drivers.mobile_num Like LOWER(CONCAT('%',:search, '%'))) OR (tc_drivers.birth_date Like LOWER(CONCAT('%',:search, '%')))) " + 
 					" LIMIT :offset,10"),
 

@@ -21,8 +21,12 @@ import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
+import com.example.examplequerydslspringdatajpamaven.entity.userClientDevice;
+import com.example.examplequerydslspringdatajpamaven.entity.userClientDriver;
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
 import com.example.examplequerydslspringdatajpamaven.repository.DriverRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.UserClientDeviceRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.UserClientDriverRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
@@ -45,6 +49,9 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 	UserRepository userRepository;
 	
 	GetObjectResponse getObjectResponse;
+	
+	@Autowired
+	UserClientDriverRepository userClientDriverRepository;
 	
 	@Override
 	public ResponseEntity<?> getAllDrivers(String TOKEN,Long id,int offset,String search) {
@@ -96,7 +103,7 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 						     
 							//drivers = driverRepository.getAllDrivers(usersIds,offset,search);
 						    customDrivers= driverRepository.getAllDriversCustom(usersIds,offset,search);
-						    Integer size= driverRepository.getAllDriversSize(usersIds);
+						    Integer size= driverRepository.getAllDriversSize(usersIds,search);
 							
 							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",customDrivers,size);
 							logger.info("************************ getAllDrivers ENDED ***************************");
@@ -117,7 +124,7 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 					//drivers = driverRepository.getAllDrivers(usersIds,offset,search);
 				    customDrivers= driverRepository.getAllDriversCustom(usersIds,offset,search);
 
-					Integer size= driverRepository.getAllDriversSize(usersIds);
+					Integer size= driverRepository.getAllDriversSize(usersIds,search);
 					
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",customDrivers,size);
 					logger.info("************************ getAllDrivers ENDED ***************************");
@@ -1081,7 +1088,197 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 	}
 	
 
-	
+	@Override
+	public ResponseEntity<?> assignClientDrivers(String TOKEN, Long loggedUserId, Long userId, Long[] driverIds) {
+		// TODO Auto-generated method stub
+		if(TOKEN.equals("")) {
+			
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(loggedUserId == 0) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User client = userServiceImpl.findById(loggedUserId);
+		if(client == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged user is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(client.getAccountType() != 3) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User should be type client to assign his users",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(userId == 0) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User user = userServiceImpl.findById(userId);
+		if(user == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(user.getAccountType() != 4) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User should be type user to assign him users",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		Set<User> UserParents = user.getUsersOfUser();
+		if(UserParents.isEmpty()) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+		else {
+			User Parent= null;
+			for(User object : UserParents) {
+				Parent = object ;
+				break;
+			}
+			if(!Parent.getId().toString().equals(loggedUserId.toString())) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
+				return ResponseEntity.status(404).body(getObjectResponse);
+			}
+			
+		}
+		
+        if(driverIds.length > 0 && driverIds[0] != 0) {
+			
+			
+			for(Long id:driverIds) {
+				if(id == 0) {
+					
+					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "assigned ID is Required",null);
+					return ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				Driver assignedDriver = getDriverById(id);
+				if(assignedDriver == null) {
+					
+					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "assigned Driver is not found",null);
+					return ResponseEntity.status(404).body(getObjectResponse);
+				}
+		        
+				
+			}
+			
+			userClientDriverRepository.deleteDriversByUserId(userId);
+			for(Long assignedId:driverIds) {
+				userClientDriver userDriver = new userClientDriver();
+				userDriver.setUserid(userId);
+				userDriver.setDriverid(assignedId);
+				userClientDriverRepository.save(userDriver);
+			}
+
+			
+
+
+			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Assigend Successfully",null);
+			return ResponseEntity.ok().body(getObjectResponse);
+
+		}
+		else {
+			List<userClientDriver> drivers = userClientDriverRepository.getDriversOfUser(userId);
+			
+			if(drivers.size() > 0) {
+
+				userClientDriverRepository.deleteDriversByUserId(userId);
+				getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Removed Successfully",null);
+				return ResponseEntity.ok().body(getObjectResponse);
+			}
+			else {
+
+				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "no drivers for this user to remove",null);
+				return ResponseEntity.badRequest().body(getObjectResponse);
+			}
+
+		}
+	}
+
+	@Override
+	public ResponseEntity<?> getClientDrivers(String TOKEN, Long loggedUserId, Long userId) {
+		// TODO Auto-generated method stub
+		
+		if(TOKEN.equals("")) {
+			
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(loggedUserId == 0) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User client = userServiceImpl.findById(loggedUserId);
+		if(client == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged user is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(client.getAccountType() != 3) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User should be type client to assign his users",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(userId == 0) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User user = userServiceImpl.findById(userId);
+		if(user == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(user.getAccountType() != 4) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User should be type user to assign him users",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		Set<User> UserParents = user.getUsersOfUser();
+		if(UserParents.isEmpty()) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+		else {
+			User Parent= null;
+			for(User object : UserParents) {
+				Parent = object ;
+				break;
+			}
+			if(!Parent.getId().toString().equals(loggedUserId.toString())) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
+				return ResponseEntity.status(404).body(getObjectResponse);
+			}
+			
+		}
+
+		List<DriverSelect> drivers = userClientDriverRepository.getDriversOfUserList(userId);
+
+		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Success",drivers);
+		logger.info("************************ assignClientUsers ENDED ***************************");
+		return ResponseEntity.ok().body(getObjectResponse);
+	}
 	
 	
 

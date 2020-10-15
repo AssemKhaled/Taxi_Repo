@@ -44,7 +44,18 @@ public class CustomDeviceList{
 	private Integer sat;
 	private Double power;
 	private String driver_num;
-    private ArrayList<Map<Object,Object>> lastPoints;
+	private Long companyId;
+
+	
+    public Long getCompanyId() {
+		return companyId;
+	}
+
+	public void setCompanyId(Long companyId) {
+		this.companyId = companyId;
+	}
+
+	private ArrayList<Map<Object,Object>> lastPoints;
 	
 	public String getDriver_num() {
 		return driver_num;
@@ -90,7 +101,7 @@ public class CustomDeviceList{
 		
 	}
 	
-	public CustomDeviceList(int id ,String deviceName,String uniqueId , String sequenceNumber,String lastUpdate, String referenceKey , String driverName ,String companyName, String geofenceName  ) {
+	public CustomDeviceList(int id ,String deviceName,String uniqueId , String sequenceNumber,String lastUpdate, String referenceKey , String driverName ,String companyName, Long companyId,String geofenceName   ) {
 		this.id = id;
 		this.deviceName = deviceName;
 		this.uniqueId = uniqueId;
@@ -100,6 +111,7 @@ public class CustomDeviceList{
 		this.driverName = driverName;
 	    this.lastUpdate = lastUpdate;
 	    this.companyName = companyName;
+	    this.companyId = companyId;
 
 		
 	}

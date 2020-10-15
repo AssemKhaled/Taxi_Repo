@@ -31,4 +31,8 @@ public interface DriverService {
 
 
 
+	public ResponseEntity<?> assignClientDrivers(String TOKEN,Long loggedUserId,Long userId,Long [] driverIds);
+
+	public ResponseEntity<?> getClientDrivers(String TOKEN,Long loggedUserId,Long userId);
+
 }

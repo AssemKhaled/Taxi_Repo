@@ -17,4 +17,8 @@ public interface NotificationService {
 
 	public ResponseEntity<?> getNotificationSelect(String TOKEN,Long userId);
 
+
+	public ResponseEntity<?> assignClientNotifications(String TOKEN,Long loggedUserId,Long userId,Long [] notificationIds);
+
+	public ResponseEntity<?> getClientNotifications(String TOKEN,Long loggedUserId,Long userId);
 }

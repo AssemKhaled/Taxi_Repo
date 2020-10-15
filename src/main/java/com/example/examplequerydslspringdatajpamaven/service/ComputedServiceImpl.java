@@ -16,12 +16,17 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import com.example.examplequerydslspringdatajpamaven.entity.Attribute;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
+import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Group;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
+import com.example.examplequerydslspringdatajpamaven.entity.userClientComputed;
+import com.example.examplequerydslspringdatajpamaven.entity.userClientDevice;
 import com.example.examplequerydslspringdatajpamaven.repository.ComputedRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.GroupRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.UserClientComputedRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.UserClientDeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 
@@ -52,6 +57,9 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 	
 	@Autowired 
 	DeviceServiceImpl deviceServiceImpl;
+	
+	@Autowired
+	UserClientComputedRepository userClientComputedRepository;
 	
 	@Override
 	public ResponseEntity<?> createComputed(String TOKEN, Attribute attribute, Long userId) {
@@ -983,6 +991,198 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 
 		}
 	
+	}
+	
+	@Override
+	public ResponseEntity<?> assignClientComputeds(String TOKEN, Long loggedUserId, Long userId, Long[] computedIds) {
+		// TODO Auto-generated method stub
+		if(TOKEN.equals("")) {
+			
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(loggedUserId == 0) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User client = userService.findById(loggedUserId);
+		if(client == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged user is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(client.getAccountType() != 3) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User should be type client to assign his users",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(userId == 0) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User user = userService.findById(userId);
+		if(user == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(user.getAccountType() != 4) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User should be type user to assign him users",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		Set<User> UserParents = user.getUsersOfUser();
+		if(UserParents.isEmpty()) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+		else {
+			User Parent= null;
+			for(User object : UserParents) {
+				Parent = object ;
+				break;
+			}
+			if(!Parent.getId().toString().equals(loggedUserId.toString())) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
+				return ResponseEntity.status(404).body(getObjectResponse);
+			}
+			
+		}
+		
+        if(computedIds.length > 0 && computedIds[0] != 0) {
+			
+			
+			for(Long id:computedIds) {
+				if(id == 0) {
+					
+					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "assigned ID is Required",null);
+					return ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				Attribute assignedComputed = computedRepository.findOne(id);
+				if(assignedComputed == null) {
+					
+					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "assigned Computed is not found",null);
+					return ResponseEntity.status(404).body(getObjectResponse);
+				}
+		        
+				
+			}
+			
+			userClientComputedRepository.deleteComputedsByUserId(userId);
+			for(Long assignedId:computedIds) {
+				userClientComputed userComputed = new userClientComputed();
+				userComputed.setUserid(userId);
+				userComputed.setComputedid(assignedId);
+				userClientComputedRepository.save(userComputed);
+			}
+
+			
+
+
+			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Assigend Successfully",null);
+			return ResponseEntity.ok().body(getObjectResponse);
+
+		}
+		else {
+			List<userClientComputed> computeds = userClientComputedRepository.getComputedsOfUser(userId);
+			
+			if(computeds.size() > 0) {
+
+				userClientComputedRepository.deleteComputedsByUserId(userId);
+				getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Removed Successfully",null);
+				return ResponseEntity.ok().body(getObjectResponse);
+			}
+			else {
+
+				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "no computeds for this user to remove",null);
+				return ResponseEntity.badRequest().body(getObjectResponse);
+			}
+
+		}
+	}
+
+	@Override
+	public ResponseEntity<?> getClientComputeds(String TOKEN, Long loggedUserId, Long userId) {
+		// TODO Auto-generated method stub
+		
+		if(TOKEN.equals("")) {
+			
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(loggedUserId == 0) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User client = userService.findById(loggedUserId);
+		if(client == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged user is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(client.getAccountType() != 3) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User should be type client to assign his users",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(userId == 0) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User user = userService.findById(userId);
+		if(user == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(user.getAccountType() != 4) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User should be type user to assign him users",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		Set<User> UserParents = user.getUsersOfUser();
+		if(UserParents.isEmpty()) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+		else {
+			User Parent= null;
+			for(User object : UserParents) {
+				Parent = object ;
+				break;
+			}
+			if(!Parent.getId().toString().equals(loggedUserId.toString())) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
+				return ResponseEntity.status(404).body(getObjectResponse);
+			}
+			
+		}
+
+		List<DriverSelect> computeds = userClientComputedRepository.getComputedsOfUserList(userId);
+
+		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Success",computeds);
+		logger.info("************************ assignClientUsers ENDED ***************************");
+		return ResponseEntity.ok().body(getObjectResponse);
 	}
 
 

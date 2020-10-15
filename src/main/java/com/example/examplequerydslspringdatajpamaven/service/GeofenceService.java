@@ -24,6 +24,9 @@ public interface GeofenceService {
 	public ResponseEntity<?> getGeofenceSelect(String TOKEN,Long userId);
 
 
+	public ResponseEntity<?> assignClientGeofences(String TOKEN,Long loggedUserId,Long userId,Long [] geofenceIds);
+
+	public ResponseEntity<?> getClientGeofences(String TOKEN,Long loggedUserId,Long userId);
 
 
 }

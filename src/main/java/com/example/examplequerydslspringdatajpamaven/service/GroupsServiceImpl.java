@@ -3,6 +3,7 @@ package com.example.examplequerydslspringdatajpamaven.service;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -24,9 +25,15 @@ import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 import com.example.examplequerydslspringdatajpamaven.entity.Group;
+import com.example.examplequerydslspringdatajpamaven.entity.Points;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
+import com.example.examplequerydslspringdatajpamaven.entity.userClientDevice;
+import com.example.examplequerydslspringdatajpamaven.entity.userClientGroup;
 import com.example.examplequerydslspringdatajpamaven.repository.GeofenceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.GroupRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.UserClientDeviceRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.UserClientGroupRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 
@@ -43,11 +50,17 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 	private UserServiceImpl userService;
 	
 	@Autowired
+	private UserRepository userRepository;
+	
+	@Autowired
 	private DriverServiceImpl driverService;
 	
 	
 	@Autowired
 	private DeviceServiceImpl deviceService;
+	
+	@Autowired
+	UserClientGroupRepository userClientGroupRepository;
 	
 	@Autowired
 	private GeofenceRepository geofenceRepository;
@@ -237,13 +250,54 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 							 List<Long>usersIds= new ArrayList<>();
 							 usersIds.add(parentClient.getId());
 							 groups = groupRepository.getAllGroups(usersIds,offset,search);
-							 Integer size=groupRepository.getAllGroupsSize(usersIds);
+							List<Map> data = new ArrayList<>();
+							Integer size=0;
+
+							
+							if(groups.size()>0) {
+								size=groupRepository.getAllGroupsSize(usersIds);
+
+								for(Group group:groups) {
+								     Map PointsList= new HashMap();
+								     
+									 PointsList.put("id", group.getId());
+									 PointsList.put("name", group.getName());
+									 PointsList.put("attributes", group.getAttributes());
+									 PointsList.put("groupid", group.getGroupid());
+									 PointsList.put("is_deleted", group.getIs_deleted());
+									 PointsList.put("type", group.getType());
+									 PointsList.put("companyName",null);
+									 PointsList.put("companyId",null);
+
+									 
+									 
+									 Set<User>groupParents = group.getUserGroup();
+										if(groupParents.isEmpty()) {
+											
+
+										}else {
+											for(User parentObject : groupParents) {
+												 PointsList.put("companyId",parentObject.getId());
+												 User us = userRepository.findOne(parentObject.getId());
+												 if(us != null) {
+													 PointsList.put("companyName", us.getName());
+
+												 }
+												break;
+												
+											}
+										}
+										data.add(PointsList);
+
+								}	 
+									
+							}
 							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",groups,size);
 							logger.info("************************ getAllUserGeofences ENDED ***************************");
 							return  ResponseEntity.ok().body(getObjectResponse);
 						 }
 					 }
-				    List<User>childernUsers = userService.getActiveAndInactiveChildern(id);
+				     List<User>childernUsers = userService.getActiveAndInactiveChildern(id);
 					 List<Long>usersIds= new ArrayList<>();
 					 if(childernUsers.isEmpty()) {
 						 usersIds.add(id);
@@ -258,8 +312,49 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 					
 					
 				    groups = groupRepository.getAllGroups(usersIds,offset,search);
-					Integer size=groupRepository.getAllGroupsSize(usersIds);
-					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",groups,size);
+					List<Map> data = new ArrayList<>();
+					Integer size=0;
+
+					
+					if(groups.size()>0) {
+						size=groupRepository.getAllGroupsSize(usersIds);
+
+						for(Group group:groups) {
+						     Map PointsList= new HashMap();
+						     
+							 PointsList.put("id", group.getId());
+							 PointsList.put("name", group.getName());
+							 PointsList.put("attributes", group.getAttributes());
+							 PointsList.put("groupid", group.getGroupid());
+							 PointsList.put("is_deleted", group.getIs_deleted());
+							 PointsList.put("type", group.getType());
+							 PointsList.put("companyName",null);
+							 PointsList.put("companyId",null);
+
+							 
+							 
+							 Set<User>groupParents = group.getUserGroup();
+								if(groupParents.isEmpty()) {
+									
+
+								}else {
+									for(User parentObject : groupParents) {
+										 PointsList.put("companyId",parentObject.getId());
+										 User us = userRepository.findOne(parentObject.getId());
+										 if(us != null) {
+											 PointsList.put("companyName", us.getName());
+
+										 }
+										break;
+										
+									}
+								}
+								data.add(PointsList);
+
+						}	 
+							
+					}
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",data,size);
 					logger.info("************************ getAllUserGeofences ENDED ***************************");
 					return  ResponseEntity.ok().body(getObjectResponse);
 
@@ -1303,6 +1398,198 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 
 		}
 	
+	}
+	
+	@Override
+	public ResponseEntity<?> assignClientGroups(String TOKEN, Long loggedUserId, Long userId, Long[] groupIds) {
+		// TODO Auto-generated method stub
+		if(TOKEN.equals("")) {
+			
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(loggedUserId == 0) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User client = userService.findById(loggedUserId);
+		if(client == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged user is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(client.getAccountType() != 3) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User should be type client to assign his users",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(userId == 0) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User user = userService.findById(userId);
+		if(user == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(user.getAccountType() != 4) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User should be type user to assign him users",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		Set<User> UserParents = user.getUsersOfUser();
+		if(UserParents.isEmpty()) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+		else {
+			User Parent= null;
+			for(User object : UserParents) {
+				Parent = object ;
+				break;
+			}
+			if(!Parent.getId().toString().equals(loggedUserId.toString())) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
+				return ResponseEntity.status(404).body(getObjectResponse);
+			}
+			
+		}
+		
+        if(groupIds.length > 0 && groupIds[0] != 0) {
+			
+			
+			for(Long id:groupIds) {
+				if(id == 0) {
+					
+					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "assigned ID is Required",null);
+					return ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				Group assignedGroup = groupRepository.findOne(id);
+				if(assignedGroup == null) {
+					
+					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "assigned Group is not found",null);
+					return ResponseEntity.status(404).body(getObjectResponse);
+				}
+		        
+				
+			}
+			
+			userClientGroupRepository.deleteGroupsByUserId(userId);
+			for(Long assignedId:groupIds) {
+				userClientGroup userGroup = new userClientGroup();
+				userGroup.setUserid(userId);
+				userGroup.setGroupid(assignedId);
+				userClientGroupRepository.save(userGroup);
+			}
+
+			
+
+
+			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Assigend Successfully",null);
+			return ResponseEntity.ok().body(getObjectResponse);
+
+		}
+		else {
+			List<userClientGroup> groups = userClientGroupRepository.getGroupsOfUser(userId);
+			
+			if(groups.size() > 0) {
+
+				userClientGroupRepository.deleteGroupsByUserId(userId);
+				getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Removed Successfully",null);
+				return ResponseEntity.ok().body(getObjectResponse);
+			}
+			else {
+
+				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "no groups for this user to remove",null);
+				return ResponseEntity.badRequest().body(getObjectResponse);
+			}
+
+		}
+	}
+
+	@Override
+	public ResponseEntity<?> getClientGroups(String TOKEN, Long loggedUserId, Long userId) {
+		// TODO Auto-generated method stub
+		
+		if(TOKEN.equals("")) {
+			
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(loggedUserId == 0) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User client = userService.findById(loggedUserId);
+		if(client == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged user is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(client.getAccountType() != 3) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User should be type client to assign his users",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(userId == 0) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User user = userService.findById(userId);
+		if(user == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(user.getAccountType() != 4) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User should be type user to assign him users",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		Set<User> UserParents = user.getUsersOfUser();
+		if(UserParents.isEmpty()) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+		else {
+			User Parent= null;
+			for(User object : UserParents) {
+				Parent = object ;
+				break;
+			}
+			if(!Parent.getId().toString().equals(loggedUserId.toString())) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
+				return ResponseEntity.status(404).body(getObjectResponse);
+			}
+			
+		}
+
+		List<DriverSelect> devices = userClientGroupRepository.getGroupsOfUserList(userId);
+
+		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Success",devices);
+		logger.info("************************ assignClientUsers ENDED ***************************");
+		return ResponseEntity.ok().body(getObjectResponse);
 	}
 	
 	

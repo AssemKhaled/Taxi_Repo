@@ -104,4 +104,20 @@ public class NotificationsRestController {
 
 		
 	}
+	
+	@GetMapping("/assignClientNotifications")
+	public ResponseEntity<?> assignClientNotifications(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+		                           			   @RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,
+											   @RequestParam (value = "userId", defaultValue = "0") Long userId,
+											   @RequestParam (value = "notificationIds", defaultValue = "0") Long [] notificationIds) {
+		return notificationServiceImpl.assignClientNotifications(TOKEN,loggedUserId,userId,notificationIds);
+	}
+	
+	@GetMapping("/getClientNotifications")
+	public ResponseEntity<?> getClientNotifications(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+		                           			@RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,
+											@RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		return notificationServiceImpl.getClientNotifications(TOKEN,loggedUserId,userId);
+	}
+	
 }

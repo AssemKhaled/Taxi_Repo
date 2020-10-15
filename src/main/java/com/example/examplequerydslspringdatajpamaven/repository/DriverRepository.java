@@ -79,9 +79,13 @@ public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslP
 	
 	public Integer getTotalNumberOfUserDrivers(@Param("userIds") List<Long> userIds);
 	
-	@Query(value = "SELECT count(*) FROM tc_drivers INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id"
-			+ " WHERE tc_user_driver.userid IN(:userIds) and tc_drivers.delete_date is null", nativeQuery = true)
-	public Integer getAllDriversSize(@Param("userIds") List<Long> userIds);
+	@Query(value = "SELECT count(*) FROM tc_drivers "
+			+ " INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id " +
+			" LEFT JOIN tc_users ON tc_user_driver.userid = tc_users.id " 
+			+ " WHERE tc_user_driver.userid IN(:userIds) and tc_drivers.delete_date is null" 
+			+ " and ((tc_users.name Like LOWER(CONCAT('%',:search, '%'))) OR (tc_drivers.name Like LOWER(CONCAT('%',:search, '%'))) OR (tc_drivers.uniqueid Like LOWER(CONCAT('%',:search, '%'))) OR "
+			+ " (tc_drivers.mobile_num Like LOWER(CONCAT('%',:search, '%'))) OR (tc_drivers.birth_date Like LOWER(CONCAT('%',:search, '%')))) " , nativeQuery = true)
+	public Integer getAllDriversSize(@Param("userIds") List<Long> userIds,@Param("search") String search);
 	
 
 	@Query(value = "SELECT tc_drivers.id,tc_drivers.name FROM tc_drivers"

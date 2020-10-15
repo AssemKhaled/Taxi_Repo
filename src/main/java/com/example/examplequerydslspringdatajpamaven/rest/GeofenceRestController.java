@@ -3,6 +3,7 @@ package com.example.examplequerydslspringdatajpamaven.rest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -91,6 +92,21 @@ public class GeofenceRestController {
     	return  geofenceServiceImpl.getGeofenceSelect(TOKEN,userId);
 
 		
+	}
+	
+	@GetMapping("/assignClientGeofence")
+	public ResponseEntity<?> assignClientGeofence(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+		                           			   @RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,
+											   @RequestParam (value = "userId", defaultValue = "0") Long userId,
+											   @RequestParam (value = "geofenceIds", defaultValue = "0") Long [] geofenceIds) {
+		return geofenceServiceImpl.assignClientGeofences(TOKEN,loggedUserId,userId,geofenceIds);
+	}
+	
+	@GetMapping("/getClientGeofences")
+	public ResponseEntity<?> getClientGeofences(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+		                           			@RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,
+											@RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		return geofenceServiceImpl.getClientGeofences(TOKEN,loggedUserId,userId);
 	}
 
 }

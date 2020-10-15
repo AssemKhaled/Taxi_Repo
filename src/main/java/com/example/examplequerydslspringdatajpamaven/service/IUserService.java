@@ -38,7 +38,9 @@ public interface IUserService {
 
 	public ResponseEntity<?> getUserSelectWithChild(String TOKEN,Long userId);
 
+	public ResponseEntity<?> assignClientUsers(String TOKEN,Long loggedUserId,Long userId,Long [] userIds);
 
+	public ResponseEntity<?> getClientUsers(String TOKEN,Long loggedUserId,Long userId);
 
 
 }

@@ -108,10 +108,18 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	public List<CustomDeviceList> vehicleInfoData(@Param("deviceId")Long deviceId);
 
 	
-	@Query(value = "SELECT count(*) FROM tc_devices "
-			+ " INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id "
-			+ " WHERE tc_user_device.userid IN(:userIds) and tc_devices.delete_date is null",nativeQuery = true )
-	public Integer getDevicesListSize(@Param("userIds")List<Long> userIds);
+	@Query(value = " SELECT count(*)"
+     		+ " FROM tc_devices LEFT JOIN  tc_device_driver ON tc_devices.id=tc_device_driver.deviceid"
+     		+ " LEFT JOIN  tc_drivers ON tc_drivers.id=tc_device_driver.driverid and tc_drivers.delete_date is null" 
+     		+ " LEFT JOIN  tc_device_geofence ON tc_devices.id=tc_device_geofence.deviceid" 
+     		+ " LEFT JOIN  tc_geofences ON tc_geofences.id=tc_device_geofence.geofenceid and tc_geofences.delete_date"
+     		+ " is null INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id "
+     		+ " LEFT JOIN tc_users ON tc_user_device.userid = tc_users.id" 
+     		+ " where tc_user_device.userid IN(:userIds) and tc_devices.delete_date is null"
+     		+ " AND ( tc_devices.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.uniqueid LIKE LOWER(CONCAT('%',:search, '%')) "
+     		+ " OR tc_devices.sequence_number LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))"
+     		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_users.name LIKE LOWER(CONCAT('%',:search, '%')) ) " ,nativeQuery = true )
+	public Integer getDevicesListSize(@Param("userIds")List<Long> userIds,@Param("search") String search);
 	
 	
 	@Query(value = "SELECT tc_devices.calibrationData FROM tc_devices WHERE tc_devices.id=:deviceId AND tc_devices.delete_date IS NULL ",nativeQuery = true)

@@ -1,3 +1,63 @@
+CREATE TABLE IF NOT EXISTS `tc_user_client_user` (
+  `id` int(11) NOT NULL auto_increment, 
+  `userid` int(11) NOT NULL,
+  `manageduserid` int(11) NOT NULL,
+   PRIMARY KEY  (`id`)
+);
+CREATE TABLE IF NOT EXISTS `tc_user_client_device` (
+  `id` int(11) NOT NULL auto_increment, 
+  `userid` int(11) NOT NULL,
+  `deviceid` int(11) NOT NULL,
+   PRIMARY KEY  (`id`)
+);
+CREATE TABLE IF NOT EXISTS `tc_user_client_driver` (
+  `id` int(11) NOT NULL auto_increment, 
+  `userid` int(11) NOT NULL,
+  `driverid` int(11) NOT NULL,
+   PRIMARY KEY  (`id`)
+);
+CREATE TABLE IF NOT EXISTS `tc_user_client_group` (
+  `id` int(11) NOT NULL auto_increment, 
+  `userid` int(11) NOT NULL,
+  `groupid` int(11) NOT NULL,
+   PRIMARY KEY  (`id`)
+);
+CREATE TABLE IF NOT EXISTS `tc_user_client_geofence` (
+  `id` int(11) NOT NULL auto_increment, 
+  `userid` int(11) NOT NULL,
+  `geofenceid` int(11) NOT NULL,
+   PRIMARY KEY  (`id`)
+);
+CREATE TABLE IF NOT EXISTS `tc_user_client_schedule` (
+  `id` int(11) NOT NULL auto_increment, 
+  `userid` int(11) NOT NULL,
+  `scheduleid` int(11) NOT NULL,
+   PRIMARY KEY  (`id`)
+);
+CREATE TABLE IF NOT EXISTS `tc_user_client_notification` (
+  `id` int(11) NOT NULL auto_increment, 
+  `userid` int(11) NOT NULL,
+  `notificationid` int(11) NOT NULL,
+   PRIMARY KEY  (`id`)
+);
+CREATE TABLE IF NOT EXISTS `tc_user_client_computed` (
+  `id` int(11) NOT NULL auto_increment, 
+  `userid` int(11) NOT NULL,
+  `computedid` int(11) NOT NULL,
+   PRIMARY KEY  (`id`)
+);
+CREATE TABLE IF NOT EXISTS `tc_user_client_role` (
+  `id` int(11) NOT NULL auto_increment, 
+  `userid` int(11) NOT NULL,
+  `roleid` int(11) NOT NULL,
+   PRIMARY KEY  (`id`)
+);
+CREATE TABLE IF NOT EXISTS `tc_user_client_point` (
+  `id` int(11) NOT NULL auto_increment, 
+  `userid` int(11) NOT NULL,
+  `pointid` int(11) NOT NULL,
+   PRIMARY KEY  (`id`)
+);
 CREATE TABLE IF NOT EXISTS `tc_points` (
 
   `id` int(11) NOT NULL auto_increment, 

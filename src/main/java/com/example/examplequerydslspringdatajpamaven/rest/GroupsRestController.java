@@ -129,5 +129,20 @@ public class GroupsRestController {
 
 		
 	}
+	
+	@GetMapping("/assignClientGroups")
+	public ResponseEntity<?> assignClientGroups(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+		                           			   @RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,
+											   @RequestParam (value = "userId", defaultValue = "0") Long userId,
+											   @RequestParam (value = "groupIds", defaultValue = "0") Long [] groupIds) {
+		return groupsServiceImpl.assignClientGroups(TOKEN,loggedUserId,userId,groupIds);
+	}
+	
+	@GetMapping("/getClientGroups")
+	public ResponseEntity<?> getClientGroups(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+		                           			@RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,
+											@RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		return groupsServiceImpl.getClientGroups(TOKEN,loggedUserId,userId);
+	}
 
 }

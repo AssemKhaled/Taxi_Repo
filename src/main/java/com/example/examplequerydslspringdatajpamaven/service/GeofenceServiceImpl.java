@@ -14,11 +14,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceList;
+import com.example.examplequerydslspringdatajpamaven.entity.Device;
+import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
+import com.example.examplequerydslspringdatajpamaven.entity.userClientDevice;
+import com.example.examplequerydslspringdatajpamaven.entity.userClientGeofence;
 import com.example.examplequerydslspringdatajpamaven.repository.GeofenceRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.UserClientDeviceRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.UserClientGeofenceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
@@ -41,6 +47,9 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 
 	@Autowired
 	UserServiceImpl userServiceImpl;
+	
+	@Autowired
+	UserClientGeofenceRepository userClientGeofenceRepository;	
 	
 	@Override
 	public ResponseEntity<?> getAllGeofences(String TOKEN,Long id,int offset,String search) {
@@ -827,6 +836,200 @@ logger.info("************************ getAllUserGeofences STARTED **************
 
 		}
 	
+	}
+	
+	
+
+	@Override
+	public ResponseEntity<?> assignClientGeofences(String TOKEN, Long loggedUserId, Long userId, Long[] geofenceIds) {
+		// TODO Auto-generated method stub
+		if(TOKEN.equals("")) {
+			
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(loggedUserId == 0) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User client = userServiceImpl.findById(loggedUserId);
+		if(client == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged user is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(client.getAccountType() != 3) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User should be type client to assign his users",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(userId == 0) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User user = userServiceImpl.findById(userId);
+		if(user == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(user.getAccountType() != 4) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User should be type user to assign him users",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		Set<User> UserParents = user.getUsersOfUser();
+		if(UserParents.isEmpty()) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+		else {
+			User Parent= null;
+			for(User object : UserParents) {
+				Parent = object ;
+				break;
+			}
+			if(!Parent.getId().toString().equals(loggedUserId.toString())) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
+				return ResponseEntity.status(404).body(getObjectResponse);
+			}
+			
+		}
+		
+        if(geofenceIds.length > 0 && geofenceIds[0] != 0) {
+			
+			
+			for(Long id:geofenceIds) {
+				if(id == 0) {
+					
+					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "assigned ID is Required",null);
+					return ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				Geofence assignedGeofence = getById(id);
+				if(assignedGeofence == null) {
+					
+					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "assigned Geofence is not found",null);
+					return ResponseEntity.status(404).body(getObjectResponse);
+				}
+		        
+				
+			}
+			
+			userClientGeofenceRepository.deleteGeofencesByUserId(userId);
+			for(Long assignedId:geofenceIds) {
+				userClientGeofence userGeofnece= new userClientGeofence();
+				userGeofnece.setUserid(userId);
+				userGeofnece.setGeofenceid(assignedId);
+				userClientGeofenceRepository.save(userGeofnece);
+			}
+
+			
+
+
+			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Assigend Successfully",null);
+			return ResponseEntity.ok().body(getObjectResponse);
+
+		}
+		else {
+			List<userClientGeofence> geofences = userClientGeofenceRepository.getGeofnecesOfUser(userId);
+			
+			if(geofences.size() > 0) {
+
+				userClientGeofenceRepository.deleteGeofencesByUserId(userId);
+				getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Removed Successfully",null);
+				return ResponseEntity.ok().body(getObjectResponse);
+			}
+			else {
+
+				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "no geofences for this user to remove",null);
+				return ResponseEntity.badRequest().body(getObjectResponse);
+			}
+
+		}
+	}
+
+	@Override
+	public ResponseEntity<?> getClientGeofences(String TOKEN, Long loggedUserId, Long userId) {
+		// TODO Auto-generated method stub
+		
+		if(TOKEN.equals("")) {
+			
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(loggedUserId == 0) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User client = userServiceImpl.findById(loggedUserId);
+		if(client == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged user is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(client.getAccountType() != 3) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User should be type client to assign his users",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(userId == 0) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User user = userServiceImpl.findById(userId);
+		if(user == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(user.getAccountType() != 4) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User should be type user to assign him users",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		Set<User> UserParents = user.getUsersOfUser();
+		if(UserParents.isEmpty()) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+		else {
+			User Parent= null;
+			for(User object : UserParents) {
+				Parent = object ;
+				break;
+			}
+			if(!Parent.getId().toString().equals(loggedUserId.toString())) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
+				return ResponseEntity.status(404).body(getObjectResponse);
+			}
+			
+		}
+
+		List<DriverSelect> geofences = userClientGeofenceRepository.getGeofencesOfUserList(userId);
+
+		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Success",geofences);
+		logger.info("************************ assignClientUsers ENDED ***************************");
+		return ResponseEntity.ok().body(getObjectResponse);
 	}
 
 }

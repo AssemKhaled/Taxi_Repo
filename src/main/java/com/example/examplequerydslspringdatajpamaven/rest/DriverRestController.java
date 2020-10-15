@@ -110,5 +110,20 @@ public class DriverRestController {
 		return driverServiceImpl.assignDriverToUser(TOKEN,userId,driverId,toUserId);
 	}
 	
+	@GetMapping("/assignClientDrivers")
+	public ResponseEntity<?> assignClientDrivers(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+		                           			   @RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,
+											   @RequestParam (value = "userId", defaultValue = "0") Long userId,
+											   @RequestParam (value = "driverIds", defaultValue = "0") Long [] driverIds) {
+		return driverServiceImpl.assignClientDrivers(TOKEN,loggedUserId,userId,driverIds);
+	}
+	
+	@GetMapping("/getClientDrivers")
+	public ResponseEntity<?> getClientDrivers(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+		                           			@RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,
+											@RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		return driverServiceImpl.getClientDrivers(TOKEN,loggedUserId,userId);
+	}
+	
 
 }

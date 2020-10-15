@@ -232,4 +232,19 @@ public class DeviceRestController {
 
 	}
 	
+	@GetMapping("/assignClientDevices")
+	public ResponseEntity<?> assignClientDevices(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+		                           			   @RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,
+											   @RequestParam (value = "userId", defaultValue = "0") Long userId,
+											   @RequestParam (value = "deviceIds", defaultValue = "0") Long [] deviceIds) {
+		return deviceService.assignClientDevices(TOKEN,loggedUserId,userId,deviceIds);
+	}
+	
+	@GetMapping("/getClientDevices")
+	public ResponseEntity<?> getClientDevices(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+		                           			@RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,
+											@RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		return deviceService.getClientDevices(TOKEN,loggedUserId,userId);
+	}
+	
 }

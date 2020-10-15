@@ -20,4 +20,7 @@ public interface ComputedService {
 	public ResponseEntity<?> getComputedSelect(String TOKEN,Long userId);
 
 
+
+	public ResponseEntity<?> assignClientComputeds(String TOKEN,Long loggedUserId,Long userId,Long [] ComputedIds);
+	public ResponseEntity<?> getClientComputeds(String TOKEN,Long loggedUserId,Long userId);
 }

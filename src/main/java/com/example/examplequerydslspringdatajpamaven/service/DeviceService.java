@@ -63,5 +63,11 @@ public interface DeviceService {
 	
 	public ResponseEntity<?> getDeviceDataSelected(String TOKEN,Long deviceId,String type);
 
+	
+
+
+	public ResponseEntity<?> assignClientDevices(String TOKEN,Long loggedUserId,Long userId,Long [] deviceIds);
+
+	public ResponseEntity<?> getClientDevices(String TOKEN,Long loggedUserId,Long userId);
 
 }

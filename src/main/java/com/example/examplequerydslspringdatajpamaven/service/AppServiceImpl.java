@@ -729,7 +729,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		
 		 
 		 List<CustomDeviceList> devices= deviceRepository.getDevicesListApp(usersIds,offset,search);
-		 Integer size=  deviceRepository.getDevicesListSize(usersIds);
+		 Integer size=  deviceRepository.getDevicesListSize(usersIds,search);
 		 
 		 if(devices.size() > 0) {
 			for(int i=0;i<devices.size();i++) {
@@ -866,7 +866,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 						     
 							//drivers = driverRepository.getAllDrivers(usersIds,offset,search);
 						    customDrivers= driverRepository.getAllDriversCustom(usersIds,offset,search);
-						    Integer size= driverRepository.getAllDriversSize(usersIds);
+						    Integer size= driverRepository.getAllDriversSize(usersIds,search);
 							
 							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",customDrivers,size);
 							logger.info("************************ getAllDriversApp ENDED ***************************");
@@ -887,7 +887,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 					//drivers = driverRepository.getAllDrivers(usersIds,offset,search);
 				    customDrivers= driverRepository.getAllDriversCustom(usersIds,offset,search);
 
-					Integer size= driverRepository.getAllDriversSize(usersIds);
+					Integer size= driverRepository.getAllDriversSize(usersIds,search);
 					
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",customDrivers,size);
 					logger.info("************************ getAllDriversApp ENDED ***************************");

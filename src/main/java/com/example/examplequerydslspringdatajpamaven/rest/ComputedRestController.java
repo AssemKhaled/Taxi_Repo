@@ -96,11 +96,25 @@ public class ComputedRestController {
 	
 	@RequestMapping(value = "/getComputedSelect", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getComputedSelect(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                               @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+			                                                 @RequestParam (value = "userId", defaultValue = "0") Long userId) {
 		
-	
-    	return  computedServiceImpl.getComputedSelect(TOKEN,userId);
 
+    	return  computedServiceImpl.getComputedSelect(TOKEN,userId);
 		
+	}
+	
+	@GetMapping("/assignClientComputeds")
+	public ResponseEntity<?> assignClientComputeds(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+		                           			   @RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,
+											   @RequestParam (value = "userId", defaultValue = "0") Long userId,
+											   @RequestParam (value = "computedIds", defaultValue = "0") Long [] computedIds) {
+		return computedServiceImpl.assignClientComputeds(TOKEN,loggedUserId,userId,computedIds);
+	}
+	
+	@GetMapping("/getClientComputeds")
+	public ResponseEntity<?> getClientComputeds(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+		                           			@RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,
+											@RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		return computedServiceImpl.getClientComputeds(TOKEN,loggedUserId,userId);
 	}
 }

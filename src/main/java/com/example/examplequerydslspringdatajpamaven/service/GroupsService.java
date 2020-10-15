@@ -23,4 +23,8 @@ public interface GroupsService {
 
 	public ResponseEntity<?> getGroupSelect(String TOKEN,Long userId);
 
+
+	public ResponseEntity<?> assignClientGroups(String TOKEN,Long loggedUserId,Long userId,Long [] groupIds);
+
+	public ResponseEntity<?> getClientGroups(String TOKEN,Long loggedUserId,Long userId);
 }
