@@ -75,7 +75,7 @@ public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredi
 	@Query(value = "SELECT * from tc_users where delete_date is null and (email = :email or "
 			+ "identity_num = :identityNum or commercial_num = :commercialNum or "
 			+ "company_phone = :companyPhone or manager_phone = :managerPhone or "
-			+ "manager_mobile = :managerMobile or phone = :phone) ", nativeQuery = true)
+			+ "manager_mobile = :managerMobile or (phone = :phone and (phone is not null and phone !='' )  ) ) ", nativeQuery = true)
 	public List<User> checkUserDuplication(@Param("email") String email, @Param("identityNum")String identityNum,
 			                               @Param("commercialNum")String commercialNum , @Param("companyPhone")String companyPhone,
 			                               @Param("managerPhone")String managerPhone , @Param("managerMobile")String managerMobile,
@@ -83,7 +83,7 @@ public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredi
 	
 	@Query(value = "SELECT * from tc_users where delete_date is null and (email = :email or "
 			+ "identity_num = :identityNum or "
-			+ "company_phone = :companyPhone or  phone = :phone) ", nativeQuery = true)
+			+ "company_phone = :companyPhone or  (phone = :phone and (phone is not null and phone !='' )  ) ) ", nativeQuery = true)
 	public List<User> checkUserDuplicationIndvidual(@Param("email") String email, @Param("identityNum")String identityNum, 
 			                                        @Param("companyPhone")String companyPhone,@Param("phone")String phone);
 	

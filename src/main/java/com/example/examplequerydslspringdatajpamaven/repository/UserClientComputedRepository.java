@@ -29,4 +29,23 @@ public interface UserClientComputedRepository extends JpaRepository<userClientCo
 			+ " INNER JOIN tc_user_client_computed ON tc_user_client_computed.computedid=tc_attributes.id "
 			+ "  where tc_user_client_computed.userid=:userId ", nativeQuery = true)
 	public List<DriverSelect> getComputedsOfUserList(@Param("userId") Long userId);
+	
+	@Query(value = "select tc_user_client_computed.computedid from tc_user_client_computed where tc_user_client_computed.userid=:userId", nativeQuery = true)
+	public List<Long> getComputedsIds(@Param("userId") Long userId);
+	
+	@Query(value = "select tc_user_client_computed.computedid from tc_user_client_computed "
+			+ " where tc_user_client_computed.userid=:userId and tc_user_client_computed.computedid=:computedId  ", nativeQuery = true)
+	public List<Long> getComputed(@Param("userId") Long userId,@Param("computedId") Long computedId);
+	
+	@Query(value = "select * from tc_user_client_computed where tc_user_client_computed.computedid IN (:computedIds) and tc_user_client_computed.userid !=:userId", nativeQuery = true)
+	public List<userClientComputed> getComputedsByCompIds(@Param("computedIds") Long[] computedIds,@Param("userId") Long userId);
+
+	@Transactional
+    @Modifying
+	@Query(value = "Delete from tc_user_client_computed where tc_user_client_computed.computedid=:attributeId", nativeQuery = true)
+	public void deleteAttributeById(@Param("attributeId") Long attributeId);
+	
+	@Query(value = "select tc_user_client_computed.computedid from tc_user_client_computed where tc_user_client_computed.computedid=:attributeId", nativeQuery = true)
+	public List<Long> getComputedsAttrbIds(@Param("attributeId") Long attributeId);
+	
 }

@@ -61,17 +61,28 @@ public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslP
 	@Query(nativeQuery = true, name = "getDriverList")
 	public List<CustomDriverList> getAllDriversCustom(@Param("userIds") List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
 	
+
+	@Query(nativeQuery = true, name = "getDriverListByIds")
+	public List<CustomDriverList> getAllDriversCustomByIds(@Param("driverIds") List<Long> driverIds,@Param("offset") int offset,@Param("search") String search);
 	
 	//added by maryam
-	@Query(value = "SELECT  * FROM tc_drivers A " + 
+	@Query(value = "SELECT  * FROM tc_drivers as A " + 
 			" INNER JOIN tc_user_driver ON tc_user_driver.driverid =A.id " + 
 			" WHERE tc_user_driver.userid IN (:userIds) AND delete_date IS NULL " + 
 			" And Not EXISTS " + 
-			" (SELECT *  FROM tc_drivers B " + 
+			" (SELECT *  FROM tc_drivers as B " + 
 			" INNER JOIN tc_user_driver ON tc_user_driver.driverid =B.id " + 
 			" INNER JOIN tc_device_driver ON tc_device_driver.driverid =B.id " + 
 			" WHERE A.id=B.id AND tc_user_driver.userid IN (:userIds) AND delete_date IS NULL )", nativeQuery = true)
 	public List<Driver> getUnassignedDrivers(@Param("userIds") List<Long> userIds);
+	
+	@Query(value = "SELECT  * FROM tc_drivers as A " + 
+			" Inner join tc_user_client_driver on tc_user_client_driver.driverid = A.id " + 
+			" where tc_user_client_driver.userid IN (:userIds) and A.delete_date is null " + 
+			" And Not EXISTS (select * from tc_drivers as B " + 
+			" Inner join tc_device_driver on tc_device_driver.driverid = B.id " + 
+			" where A.id=B.id AND B.delete_date IS NULL )", nativeQuery = true)
+	public List<Driver> getUnassignedDriversByIds(@Param("userIds") List<Long> userIds);
 	
 	@Query(value = "SELECT count(tc_drivers.id) FROM tc_drivers INNER JOIN tc_user_driver "
 			+ "ON tc_user_driver.driverid = tc_drivers.id AND "
@@ -87,11 +98,29 @@ public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslP
 			+ " (tc_drivers.mobile_num Like LOWER(CONCAT('%',:search, '%'))) OR (tc_drivers.birth_date Like LOWER(CONCAT('%',:search, '%')))) " , nativeQuery = true)
 	public Integer getAllDriversSize(@Param("userIds") List<Long> userIds,@Param("search") String search);
 	
+	@Query(value = "SELECT count(*) FROM tc_drivers "
+			+ " INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id " +
+			" LEFT JOIN tc_users ON tc_user_driver.userid = tc_users.id " 
+			+ " WHERE tc_drivers.id IN(:driverIds) and tc_drivers.delete_date is null" 
+			+ " and ((tc_users.name Like LOWER(CONCAT('%',:search, '%'))) OR (tc_drivers.name Like LOWER(CONCAT('%',:search, '%'))) OR (tc_drivers.uniqueid Like LOWER(CONCAT('%',:search, '%'))) OR "
+			+ " (tc_drivers.mobile_num Like LOWER(CONCAT('%',:search, '%'))) OR (tc_drivers.birth_date Like LOWER(CONCAT('%',:search, '%')))) " , nativeQuery = true)
+	public Integer getAllDriversSizeByIds(@Param("driverIds") List<Long> driverIds,@Param("search") String search);
+	
 
 	@Query(value = "SELECT tc_drivers.id,tc_drivers.name FROM tc_drivers"
 			+ " INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id"
 			+ " WHERE tc_user_driver.userid IN(:userIds) and tc_drivers.delete_date is null",nativeQuery = true)
 	public List<DriverSelect> getDriverSelect(@Param("userIds") List<Long> userIds);
+	
+	@Query(value = "SELECT tc_drivers.id,tc_drivers.name FROM tc_drivers"
+			+ " WHERE tc_drivers.id IN(:driverIds) and tc_drivers.delete_date is null",nativeQuery = true)
+	public List<DriverSelect> getDriverSelectByIds(@Param("driverIds") List<Long> driverIds);
+	
+	@Query(value = "SELECT tc_drivers.id,tc_drivers.name FROM tc_drivers"
+			+ " INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id"
+			+ " WHERE tc_user_driver.userid IN(:userId) and tc_drivers.delete_date is null "
+			+ " and tc_drivers.id Not IN(Select tc_user_client_driver.driverid from tc_user_client_driver) ",nativeQuery = true)
+	public List<DriverSelect> getDriverUnSelectOfClient(@Param("userId")Long userId);
 	
 	@Query(value = "Select tc_device_driver.deviceid,tc_drivers.name from tc_device_driver " + 
 			" INNER JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id " + 
@@ -104,5 +133,9 @@ public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslP
 			"	where deviceid=:deviceId",nativeQuery = true)
 	public Driver driverOfDevice(@Param("deviceId") Long deviceId);
 	
-	;
+	@Query(value = "select tc_drivers.id from tc_drivers "
+			+ " INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id "
+			+ " where tc_drivers.name=:name and tc_drivers.uniqueid=:uniqueid  "
+			+ " and tc_user_driver.userid=:userId and tc_drivers.delete_date IS NULL order by tc_drivers.id DESC limit 0,1 ", nativeQuery = true)
+	public Long getDriverIdByName(@Param("userId") Long id,@Param("name") String name,@Param("uniqueid") String uniqueid);
 }

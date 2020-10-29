@@ -45,4 +45,9 @@ public interface NotificationRepository extends  JpaRepository<Notification, Lon
 			+ " WHERE tc_user_notification.userid IN(:userIds) and tc_notifications.delete_date is null",nativeQuery = true)
 	public List<DriverSelect> getNotificationSelect(@Param("userIds") List<Long> userIds);
 	
+	@Query(value = "SELECT tc_notifications.id FROM tc_notifications"
+			+ " INNER JOIN tc_user_notification ON tc_user_notification.notificationid = tc_notifications.id"
+			+ " WHERE tc_user_notification.userid IN(:userId) and tc_notifications.delete_date is null",nativeQuery = true)
+	public List<Long> getNotificationIds(@Param("userId") Long userId);
+	
 }

@@ -19,4 +19,7 @@ public interface ScheduledService {
 	public void doReports(String Expression);
 	public boolean sendMail(String excelName,String email);
 	public Boolean createExcel(String reportType,List<?> entity,String excelName,String[] columns);
+	
+	public ResponseEntity<?> getScheduledSelect(String TOKEN,Long userId);
+
 }

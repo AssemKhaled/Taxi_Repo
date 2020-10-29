@@ -141,19 +141,6 @@ public class UserRestController {
 		
 	}
 	
-	@GetMapping("/assignClientUsers")
-	public ResponseEntity<?> assignClientUsers(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-		                           			   @RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,
-											   @RequestParam (value = "userId", defaultValue = "0") Long userId,
-											   @RequestParam (value = "userIds", defaultValue = "0") Long [] userIds) {
-		return userService.assignClientUsers(TOKEN,loggedUserId,userId,userIds);
-	}
-	
-	@GetMapping("/getClientUsers")
-	public ResponseEntity<?> getClientUsers(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-		                           			@RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,
-											@RequestParam (value = "userId", defaultValue = "0") Long userId) {
-		return userService.getClientUsers(TOKEN,loggedUserId,userId);
-	}
+
 	
 }

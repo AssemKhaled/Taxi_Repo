@@ -70,7 +70,7 @@ public class User {
 	private String reference_key;
 	
 	@Column(name = "is_deleted")
-	private Integer is_deleted;
+	private Integer is_deleted=null;
 	
 	@Column(name = "company_phone")
 	private String company_phone;

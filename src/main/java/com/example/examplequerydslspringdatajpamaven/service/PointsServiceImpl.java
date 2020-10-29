@@ -12,10 +12,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+
+import com.example.examplequerydslspringdatajpamaven.entity.Attribute;
+import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Points;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
+import com.example.examplequerydslspringdatajpamaven.entity.userClientComputed;
+import com.example.examplequerydslspringdatajpamaven.entity.userClientDevice;
+import com.example.examplequerydslspringdatajpamaven.entity.userClientPoint;
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
 import com.example.examplequerydslspringdatajpamaven.repository.PointsRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.UserClientPointRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
@@ -38,6 +45,10 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 	
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+    UserClientPointRepository userClientPointRepository;
+	
 	
 	@Override
 	public ResponseEntity<?> getPointsList(String TOKEN, Long id, int offset, String search) {
@@ -75,7 +86,7 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 
 					userServiceImpl.resetChildernArray();
 				    if(user.getAccountType().equals(4)) {
-						 Set<User> parentClients = user.getUsersOfUser();
+						 /*Set<User> parentClients = user.getUsersOfUser();
 						 if(parentClients.isEmpty()) {
 							
 							 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get pointD of this user",null);
@@ -87,7 +98,46 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 								 parentClient = object;
 							 }
 							 usersIds.add(parentClient.getId());
+						 }*/
+				    	 List<Long> pointIds = userClientPointRepository.getPointIds(id);
+						 Integer size = 0;
+						 List<Map> data = new ArrayList<>();
+						 if(pointIds.size()>0) {
+					    	
+					    	points = pointsRepository.getAllPointsByIds(pointIds,offset,search);
+
+							 if(points.size() >0) {
+								 size = pointsRepository.getAllPointsSizeByIds(pointIds,search);
+		
+								 for(Points point:points) {
+								     Map PointsList= new HashMap();
+		
+								     
+									 PointsList.put("id", point.getId());
+									 PointsList.put("name", point.getName());
+									 PointsList.put("latitude", point.getLatitude());
+									 PointsList.put("longitude", point.getLongitude());
+									 PointsList.put("delete_date", point.getDelete_date());
+									 PointsList.put("photo", point.getPhoto());
+									 PointsList.put("userId", point.getUserId());
+									 PointsList.put("userName", null);
+		
+									 User us = userRepository.findOne(point.getUserId());
+									 if(us != null) {
+										 PointsList.put("userName", us.getName());
+		
+									 }
+									 data.add(PointsList);
+		
+								 }
+								
+		
+							 }
+							
 						 }
+						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",data,size);
+						logger.info("************************ getPointsList ENDED ***************************");
+						return  ResponseEntity.ok().body(getObjectResponse);
 					}
 					else {
 						List<User>childernUsers = userServiceImpl.getActiveAndInactiveChildern(id);
@@ -100,44 +150,45 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 								 usersIds.add(object.getId());
 							 }
 						 }
-					}
-				    
-
-					
-					
-					 points = pointsRepository.getAllPoints(usersIds,offset,search);
-					 Integer size = 0;
-					 List<Map> data = new ArrayList<>();
-					 if(points.size() >0) {
-						 size = pointsRepository.getAllPointsSize(usersIds);
-
-						 for(Points point:points) {
-						     Map PointsList= new HashMap();
-
-						     
-							 PointsList.put("id", point.getId());
-							 PointsList.put("name", point.getName());
-							 PointsList.put("latitude", point.getLatitude());
-							 PointsList.put("longitude", point.getLongitude());
-							 PointsList.put("delete_date", point.getDelete_date());
-							 PointsList.put("photo", point.getPhoto());
-							 PointsList.put("userId", point.getUserId());
-							 PointsList.put("userName", null);
-
-							 User us = userRepository.findOne(point.getUserId());
-							 if(us != null) {
-								 PointsList.put("userName", us.getName());
-
-							 }
-							 data.add(PointsList);
-
-						 }
 						
-
-					 }
-					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",data,size);
-					logger.info("************************ getPointsList ENDED ***************************");
-					return  ResponseEntity.ok().body(getObjectResponse);
+					    
+	
+						
+						
+						 points = pointsRepository.getAllPoints(usersIds,offset,search);
+						 Integer size = 0;
+						 List<Map> data = new ArrayList<>();
+						 if(points.size() >0) {
+							 size = pointsRepository.getAllPointsSize(usersIds,search);
+	
+							 for(Points point:points) {
+							     Map PointsList= new HashMap();
+	
+							     
+								 PointsList.put("id", point.getId());
+								 PointsList.put("name", point.getName());
+								 PointsList.put("latitude", point.getLatitude());
+								 PointsList.put("longitude", point.getLongitude());
+								 PointsList.put("delete_date", point.getDelete_date());
+								 PointsList.put("photo", point.getPhoto());
+								 PointsList.put("userId", point.getUserId());
+								 PointsList.put("userName", null);
+	
+								 User us = userRepository.findOne(point.getUserId());
+								 if(us != null) {
+									 PointsList.put("userName", us.getName());
+	
+								 }
+								 data.add(PointsList);
+	
+							 }
+							
+	
+						 }
+						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",data,size);
+						logger.info("************************ getPointsList ENDED ***************************");
+						return  ResponseEntity.ok().body(getObjectResponse);
+					}
 
 				}
 				else {
@@ -238,6 +289,18 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 				}
 			}
 		}
+		
+		if(loggedUser.getAccountType().equals(4)) {
+			List<Long> points = userClientPointRepository.getPoint(userId,PointId);
+			if(points.isEmpty()) {
+					isParent = false;
+			}
+			else {
+					isParent = true;
+			}
+		}
+		
+		
 		if(isParent == false) {
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not creater or parent of creater to get Points",null);
 			return  ResponseEntity.badRequest().body(getObjectResponse);
@@ -335,6 +398,17 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 				}
 			}
 		}
+		
+		if(loggedUser.getAccountType().equals(4)) {
+			List<Long> points = userClientPointRepository.getPoint(userId,PointId);
+			if(points.isEmpty()) {
+					isParent = false;
+			}
+			else {
+					isParent = true;
+			}
+		}
+		
 		if(isParent == false) {
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not creater or parent of creater to get point",null);
 			return  ResponseEntity.badRequest().body(getObjectResponse);
@@ -350,6 +424,10 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 	     
 	    pointsRepository.save(point);
 	    
+	    List<Long> DataDelete = userClientPointRepository.getPointsToDelete(PointId);
+		 if(DataDelete.size()>0) {
+			 userClientPointRepository.deletePointsById(PointId);
+		 }
 	    
 		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",null);
 		return  ResponseEntity.ok().body(getObjectResponse);
@@ -399,13 +477,13 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 
 					
 					if(point.getId()==null || point.getId()==0) {
+						 User parent = null;
 						if(user.getAccountType().equals(4)) {
 							 Set<User> parentClients = user.getUsersOfUser();
 							 if(parentClients.isEmpty()) {
 								 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are account type 4 and not has parent",null);
 								 return  ResponseEntity.badRequest().body(getObjectResponse);
 							 }else {
-								 User parent = null;
 								 for(User object : parentClients) {
 									 parent = object;
 								 }
@@ -437,7 +515,20 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 						pointsRepository.save(point);
 
 						points.add(point);
+						
+						if(user.getAccountType().equals(4)) {
+				    		userClientPoint saveData = new userClientPoint();
 
+					        Long pointId = pointsRepository.getPointIdByName(parent.getId(),point.getName(),point.getLatitude(),point.getLongitude());
+				    		if(pointId != null) {
+					    		saveData.setUserid(userId);
+					    		saveData.setPointid(pointId);
+						        userClientPointRepository.save(saveData);
+				    		}
+				    		
+				    	}
+						
+						
 						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"sucsess",points);
 						logger.info("************************ createPoints ENDED ***************************");
 
@@ -559,6 +650,17 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 				}
 			}
 		}
+		
+		if(loggedUser.getAccountType().equals(4)) {
+			List<Long> pointsData = userClientPointRepository.getPoint(userId,point.getId());
+			if(pointsData.isEmpty()) {
+					isParent = false;
+			}
+			else {
+					isParent = true;
+			}
+		}
+		
 		if(isParent == false) {
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Not creater or parent of creater to get point",null);
 			return  ResponseEntity.badRequest().body(getObjectResponse);
@@ -657,7 +759,7 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 
 					userServiceImpl.resetChildernArray();
 				    if(user.getAccountType().equals(4)) {
-						 Set<User> parentClients = user.getUsersOfUser();
+						 /*Set<User> parentClients = user.getUsersOfUser();
 						 if(parentClients.isEmpty()) {
 							
 							 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get pointD of this user",null);
@@ -669,7 +771,33 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 								 parentClient = object;
 							 }
 							 usersIds.add(parentClient.getId());
-						 }
+						 }*/
+						List<Map> data = new ArrayList<>();
+				    	List<Long> pointIds = userClientPointRepository.getPointIds(id);
+
+				    	if(pointIds.size() > 0) {
+				    		points = pointsRepository.getAllPointsMapByIds(pointIds);
+
+							 if(points.size() >0) {
+								 for(Points point:points) {
+								     Map PointsList= new HashMap();
+								     
+									 PointsList.put("name", point.getName());
+									 PointsList.put("latitude", point.getLatitude());
+									 PointsList.put("longitude", point.getLongitude());
+									 PointsList.put("photo", point.getPhoto());
+		
+									 data.add(PointsList);
+		
+								 }
+								
+		
+							 }
+				    	}
+						
+				    	getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",data);
+						logger.info("************************ getPointsList ENDED ***************************");
+						return  ResponseEntity.ok().body(getObjectResponse);
 					}
 					else {
 						List<User>childernUsers = userServiceImpl.getActiveAndInactiveChildern(id);
@@ -682,32 +810,28 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 								 usersIds.add(object.getId());
 							 }
 						 }
-					}
-				    
-
 					
-					
-					 points = pointsRepository.getAllPointsMap(usersIds);
-					 List<Map> data = new ArrayList<>();
-					 if(points.size() >0) {
-						 for(Points point:points) {
-						     Map PointsList= new HashMap();
-						     
-							 PointsList.put("name", point.getName());
-							 PointsList.put("latitude", point.getLatitude());
-							 PointsList.put("longitude", point.getLongitude());
-							 PointsList.put("photo", point.getPhoto());
-
-							 data.add(PointsList);
-
+						 points = pointsRepository.getAllPointsMap(usersIds);
+						 List<Map> data = new ArrayList<>();
+						 if(points.size() >0) {
+							 for(Points point:points) {
+							     Map PointsList= new HashMap();
+							     
+								 PointsList.put("name", point.getName());
+								 PointsList.put("latitude", point.getLatitude());
+								 PointsList.put("longitude", point.getLongitude());
+								 PointsList.put("photo", point.getPhoto());
+	
+								 data.add(PointsList);
+	
+							 }
+							
+	
 						 }
-						
-
-					 }
-					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",data);
-					logger.info("************************ getPointsList ENDED ***************************");
-					return  ResponseEntity.ok().body(getObjectResponse);
-
+						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",data);
+						logger.info("************************ getPointsList ENDED ***************************");
+						return  ResponseEntity.ok().body(getObjectResponse);
+					}
 				}
 				else {
 					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User is not Found",points);
@@ -725,4 +849,353 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 
 		}
 	}
+
+	@Override
+	public ResponseEntity<?> getPointSelect(String TOKEN, Long userId) {
+		// TODO Auto-generated method stub
+
+		logger.info("************************ getNotificationSelect STARTED ***************************");
+		List<DriverSelect> drivers = new ArrayList<DriverSelect>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",drivers);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+	    if(userId != 0) {
+	    	User user = userServiceImpl.findById(userId);
+	    	userServiceImpl.resetChildernArray();
+
+	    	if(user != null) {
+	    		if(user.getDelete_date() == null) {
+	    			
+	    			if(user.getAccountType().equals(4)) {
+	   				 /*Set<User>parentClient = user.getUsersOfUser();
+	   					if(parentClient.isEmpty()) {
+	   						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
+	   						logger.info("************************ getNotificationSelect ENDED ***************************");
+	   						return ResponseEntity.badRequest().body(getObjectResponse);
+	   					}else {
+	   					  
+	   						User parent =null;
+	   						for(User object : parentClient) {
+	   							parent = object;
+	   						}
+	   						if(parent != null) {
+
+					   			List<Long>usersIds= new ArrayList<>();
+			   					usersIds.add(parent.getId());
+	   							drivers = pointsRepository.getPointSelect(usersIds);
+	   							
+	   						}
+	   						else {
+	   							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "No parent for this type 4",null);
+	   							return ResponseEntity.badRequest().body(getObjectResponse);
+	   						}
+	   						
+	   					}*/
+	    				 List<Long> pointIds = userClientPointRepository.getPointIds(userId);
+						 Integer size = 0;
+						 List<Map> data = new ArrayList<>();
+						 if(pointIds.size()>0) {
+							 drivers = pointsRepository.getPointSelectByIds(pointIds);
+							 
+						 }
+						 getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
+							logger.info("************************ getNotificationSelect ENDED ***************************");
+							return ResponseEntity.ok().body(getObjectResponse);
+	   			 }
+	    			 List<User>childernUsers = userServiceImpl.getAllChildernOfUser(userId);
+		   			 List<Long>usersIds= new ArrayList<>();
+		   			 if(childernUsers.isEmpty()) {
+		   				 usersIds.add(userId);
+		   			 }
+		   			 else {
+		   				 usersIds.add(userId);
+		   				 for(User object : childernUsers) {
+		   					 usersIds.add(object.getId());
+		   				 }
+		   			 }
+	    			
+	    			drivers = pointsRepository.getPointSelect(usersIds);
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
+					logger.info("************************ getNotificationSelect ENDED ***************************");
+					return ResponseEntity.ok().body(getObjectResponse);
+
+	    		}
+	    		else {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",drivers);
+					return ResponseEntity.status(404).body(getObjectResponse);
+
+	    		}
+	    	
+	    	}
+	    	else {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",drivers);
+				return ResponseEntity.status(404).body(getObjectResponse);
+
+	    	}
+			
+		}
+		else {
+			
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",drivers);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
+	
+	
+	}
+	@Override
+	public ResponseEntity<?> getPointUnSelectOfClient(String TOKEN, Long userId) {
+		// TODO Auto-generated method stub
+
+		logger.info("************************ getNotificationSelect STARTED ***************************");
+		List<DriverSelect> drivers = new ArrayList<DriverSelect>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",drivers);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+	    if(userId != 0) {
+	    	User user = userServiceImpl.findById(userId);
+	    	userServiceImpl.resetChildernArray();
+
+	    	if(user != null) {
+	    		if(user.getDelete_date() == null) {
+	    		
+	    			drivers = pointsRepository.getPointUnSelectOfClient(userId);
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
+					logger.info("************************ getNotificationSelect ENDED ***************************");
+					return ResponseEntity.ok().body(getObjectResponse);
+
+	    		}
+	    		else {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",drivers);
+					return ResponseEntity.status(404).body(getObjectResponse);
+
+	    		}
+	    	
+	    	}
+	    	else {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",drivers);
+				return ResponseEntity.status(404).body(getObjectResponse);
+
+	    	}
+			
+		}
+		else {
+			
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",drivers);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
+	
+	
+	}
+	@Override
+	public ResponseEntity<?> assignClientPoints(String TOKEN, Long loggedUserId, Long userId, Long[] pointIds) {
+		// TODO Auto-generated method stub
+		if(TOKEN.equals("")) {
+			
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(loggedUserId == 0) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User client = userServiceImpl.findById(loggedUserId);
+		if(client == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged user is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(client.getAccountType() != 3) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User should be type client to assign his users",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(userId == 0) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User user = userServiceImpl.findById(userId);
+		if(user == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(user.getAccountType() != 4) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User should be type user to assign him users",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		Set<User> UserParents = user.getUsersOfUser();
+		if(UserParents.isEmpty()) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+		else {
+			User Parent= null;
+			for(User object : UserParents) {
+				Parent = object ;
+				break;
+			}
+			if(!Parent.getId().toString().equals(loggedUserId.toString())) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
+				return ResponseEntity.status(404).body(getObjectResponse);
+			}
+			
+		}
+		
+        if(pointIds.length > 0 && pointIds[0] != 0) {
+			
+        	List<userClientPoint> checkData = userClientPointRepository.getPointByPoiIds(pointIds,userId);
+        	if(checkData.size()>0) {
+        		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "There is point assigned to another user before it should only share with one user",null);
+				return ResponseEntity.badRequest().body(getObjectResponse);
+        	}
+        	
+			for(Long id:pointIds) {
+				if(id == 0) {
+					
+					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "assigned ID is Required",null);
+					return ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				Points assignedPoint = pointsRepository.findOne(id);
+				if(assignedPoint == null) {
+					
+					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "assigned Point is not found",null);
+					return ResponseEntity.status(404).body(getObjectResponse);
+				}
+		        
+				
+			}
+			
+			userClientPointRepository.deletePointsByUserId(userId);
+			for(Long assignedId:pointIds) {
+				userClientPoint userPoint = new userClientPoint();
+				userPoint.setUserid(userId);
+				userPoint.setPointid(assignedId);
+				userClientPointRepository.save(userPoint);
+			}
+
+			
+
+
+			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Assigend Successfully",null);
+			return ResponseEntity.ok().body(getObjectResponse);
+
+		}
+		else {
+			List<userClientPoint> computeds = userClientPointRepository.getPointsOfUser(userId);
+			
+			if(computeds.size() > 0) {
+
+				userClientPointRepository.deletePointsByUserId(userId);
+				getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Removed Successfully",null);
+				return ResponseEntity.ok().body(getObjectResponse);
+			}
+			else {
+
+				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "no computeds for this user to remove",null);
+				return ResponseEntity.badRequest().body(getObjectResponse);
+			}
+
+		}
+	}
+
+	@Override
+	public ResponseEntity<?> getClientPoints(String TOKEN, Long loggedUserId, Long userId) {
+		// TODO Auto-generated method stub
+		
+		if(TOKEN.equals("")) {
+			
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(loggedUserId == 0) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User client = userServiceImpl.findById(loggedUserId);
+		if(client == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged user is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(client.getAccountType() != 3) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User should be type client to assign his users",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(userId == 0) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User user = userServiceImpl.findById(userId);
+		if(user == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(user.getAccountType() != 4) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User should be type user to assign him users",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		Set<User> UserParents = user.getUsersOfUser();
+		if(UserParents.isEmpty()) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+		else {
+			User Parent= null;
+			for(User object : UserParents) {
+				Parent = object ;
+				break;
+			}
+			if(!Parent.getId().toString().equals(loggedUserId.toString())) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
+				return ResponseEntity.status(404).body(getObjectResponse);
+			}
+			
+		}
+
+		List<DriverSelect> computeds = userClientPointRepository.getPointsOfUserList(userId);
+
+		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Success",computeds);
+		logger.info("************************ assignClientUsers ENDED ***************************");
+		return ResponseEntity.ok().body(getObjectResponse);
+	}
+
+
 }

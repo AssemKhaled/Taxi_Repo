@@ -94,6 +94,16 @@ public class GeofenceRestController {
 		
 	}
 	
+	@RequestMapping(value = "/getGeofenceUnSelectOfClient", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getGeofenceUnSelectOfClient(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                                 @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		
+	
+    	return  geofenceServiceImpl.getGeofenceUnSelectOfClient(TOKEN,userId);
+
+		
+	}
+	
 	@GetMapping("/assignClientGeofence")
 	public ResponseEntity<?> assignClientGeofence(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 		                           			   @RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,

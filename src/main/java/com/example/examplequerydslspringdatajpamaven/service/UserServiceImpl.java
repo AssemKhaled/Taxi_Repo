@@ -28,8 +28,6 @@ import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.entity.UserRole;
 import com.example.examplequerydslspringdatajpamaven.entity.UserSelect;
-import com.example.examplequerydslspringdatajpamaven.entity.userClientUser;
-import com.example.examplequerydslspringdatajpamaven.repository.UserClientUserRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRoleRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
@@ -41,9 +39,6 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 
 	@Autowired
 	private UserRepository userRepository;
-	
-	@Autowired
-	private UserClientUserRepository userClientUserRepository;
 	
 	@Autowired
 	private UserRoleRepository roleRepository;
@@ -1970,6 +1965,9 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 		}
 		else
 		{
+			user.setIs_deleted(null);
+			user.setDelete_date(null);
+			
 			userRepository.save(user);
 			List<User> users = null;
 			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users);
@@ -2643,251 +2641,6 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 
 	}
 
-	@Override
-	public ResponseEntity<?> assignClientUsers(String TOKEN,Long loggedUserId, Long userId, Long[] userIds) {
-		// TODO Auto-generated method stub
-		
-		if(TOKEN.equals("")) {
-			
-			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
-			 return  ResponseEntity.badRequest().body(getObjectResponse);
-		}
-		
-		if(super.checkActive(TOKEN)!= null)
-		{
-			return super.checkActive(TOKEN);
-		}
-		if(loggedUserId == 0) {
-			
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User ID is Required",null);
-			logger.info("************************ assignClientUsers STARTED ***************************");
-			return ResponseEntity.badRequest().body(getObjectResponse);
-		}
-		User client = findById(loggedUserId);
-		if(client == null) {
-			
-			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged user is not found",null);
-			logger.info("************************ assignClientUsers STARTED ***************************");
-			return ResponseEntity.status(404).body(getObjectResponse);
-		}
-        
-		if(client.getAccountType() != 3) {
-			
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User should be type client to assign his users",null);
-			logger.info("************************ assignClientUsers STARTED ***************************");
-			return ResponseEntity.badRequest().body(getObjectResponse);
-		}
-		
-		if(userId == 0) {
-			
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",null);
-			logger.info("************************ assignClientUsers STARTED ***************************");
-			return ResponseEntity.badRequest().body(getObjectResponse);
-		}
-		User user = findById(userId);
-		if(user == null) {
-			
-			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",null);
-			logger.info("************************ assignClientUsers STARTED ***************************");
-			return ResponseEntity.status(404).body(getObjectResponse);
-		}
-        
-		if(user.getAccountType() != 4) {
-			
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User should be type user to assign him users",null);
-			logger.info("************************ assignClientUsers STARTED ***************************");
-			return ResponseEntity.badRequest().body(getObjectResponse);
-		}
-		Set<User> UserParents = user.getUsersOfUser();
-		if(UserParents.isEmpty()) {
-			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
-			logger.info("************************ assignClientUsers STARTED ***************************");
-			return ResponseEntity.status(404).body(getObjectResponse);
-		}
-		else {
-			User Parent= null;
-			for(User object : UserParents) {
-				Parent = object ;
-				break;
-			}
-			if(!Parent.getId().toString().equals(loggedUserId.toString())) {
-				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
-				logger.info("************************ assignClientUsers STARTED ***************************");
-				return ResponseEntity.status(404).body(getObjectResponse);
-			}
-			
-		}
-
-		
-		if(userIds.length > 0 && userIds[0] != 0) {
-			
-			
-			for(Long id:userIds) {
-				if(id == 0) {
-					
-					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "assigned ID is Required",null);
-					logger.info("************************ assignClientUsers STARTED ***************************");
-					return ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				User assignedUser = findById(id);
-				if(assignedUser == null) {
-					
-					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "assigned User is not found",null);
-					logger.info("************************ assignClientUsers STARTED ***************************");
-					return ResponseEntity.status(404).body(getObjectResponse);
-				}
-		        
-				if(assignedUser.getAccountType() != 4) {
-					
-					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "assigned User should be type user to assign him users",null);
-					logger.info("************************ assignClientUsers STARTED ***************************");
-					return ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				
-				Set<User> Parents = assignedUser.getUsersOfUser();
-				if(Parents.isEmpty()) {
-					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this assigned user",null);
-					logger.info("************************ assignClientUsers STARTED ***************************");
-					return ResponseEntity.status(404).body(getObjectResponse);
-				}
-				else {
-					User Parent= null;
-					for(User object : Parents) {
-						Parent = object ;
-						break;
-					}
-					if(!Parent.getId().toString().equals(loggedUserId.toString())) {
-						getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this assigned user",null);
-						logger.info("************************ assignClientUsers STARTED ***************************");
-						return ResponseEntity.status(404).body(getObjectResponse);
-					}
-					
-				}
-				
-				
-				
-			}
-			
-			userClientUserRepository.deleteUsersByUserId(userId);
-			for(Long assignedId:userIds) {
-				userClientUser userClient = new userClientUser();
-				userClient.setUserid(userId);
-				userClient.setManageduserid(assignedId);
-				userClientUserRepository.save(userClient);
-			}
-
-			
-
-
-			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Assigend Successfully",null);
-			logger.info("************************ assignClientUsers ENDED ***************************");
-			return ResponseEntity.ok().body(getObjectResponse);
-
-		}
-		else {
-			List<userClientUser> users = userClientUserRepository.getUsersOfUser(userId);
-			
-			if(users.size() > 0) {
-
-				userClientUserRepository.deleteUsersByUserId(userId);
-				getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Removed Successfully",null);
-				logger.info("************************ assignClientUsers ENDED ***************************");
-				return ResponseEntity.ok().body(getObjectResponse);
-			}
-			else {
-
-				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "no users for this user to remove",null);
-				logger.info("************************ assignClientUsers ENDED ***************************");
-				return ResponseEntity.badRequest().body(getObjectResponse);
-			}
-
-		}
-
 	
-	}
-
-	@Override
-	public ResponseEntity<?> getClientUsers(String TOKEN, Long loggedUserId, Long userId) {
-		// TODO Auto-generated method stub
-		
-		if(TOKEN.equals("")) {
-			
-			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
-			 return  ResponseEntity.badRequest().body(getObjectResponse);
-		}
-		
-		if(super.checkActive(TOKEN)!= null)
-		{
-			return super.checkActive(TOKEN);
-		}
-		if(loggedUserId == 0) {
-			
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User ID is Required",null);
-			logger.info("************************ assignClientUsers STARTED ***************************");
-			return ResponseEntity.badRequest().body(getObjectResponse);
-		}
-		User client = findById(loggedUserId);
-		if(client == null) {
-			
-			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged user is not found",null);
-			logger.info("************************ assignClientUsers STARTED ***************************");
-			return ResponseEntity.status(404).body(getObjectResponse);
-		}
-       
-		if(client.getAccountType() != 3) {
-			
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User should be type client to assign his users",null);
-			logger.info("************************ assignClientUsers STARTED ***************************");
-			return ResponseEntity.badRequest().body(getObjectResponse);
-		}
-		
-		if(userId == 0) {
-			
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",null);
-			logger.info("************************ assignClientUsers STARTED ***************************");
-			return ResponseEntity.badRequest().body(getObjectResponse);
-		}
-		User user = findById(userId);
-		if(user == null) {
-			
-			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",null);
-			logger.info("************************ assignClientUsers STARTED ***************************");
-			return ResponseEntity.status(404).body(getObjectResponse);
-		}
-       
-		if(user.getAccountType() != 4) {
-			
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User should be type user to assign him users",null);
-			logger.info("************************ assignClientUsers STARTED ***************************");
-			return ResponseEntity.badRequest().body(getObjectResponse);
-		}
-		
-		Set<User> UserParents = user.getUsersOfUser();
-		if(UserParents.isEmpty()) {
-			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
-			logger.info("************************ assignClientUsers STARTED ***************************");
-			return ResponseEntity.status(404).body(getObjectResponse);
-		}
-		else {
-			User Parent= null;
-			for(User object : UserParents) {
-				Parent = object ;
-				break;
-			}
-			if(!Parent.getId().toString().equals(loggedUserId.toString())) {
-				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
-				logger.info("************************ assignClientUsers STARTED ***************************");
-				return ResponseEntity.status(404).body(getObjectResponse);
-			}
-			
-		}
-		
-		List<UserSelect> users = userClientUserRepository.getUsersOfUserList(userId);
-
-		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Success",users);
-		logger.info("************************ assignClientUsers ENDED ***************************");
-		return ResponseEntity.ok().body(getObjectResponse);
-
-	}
 	
 }

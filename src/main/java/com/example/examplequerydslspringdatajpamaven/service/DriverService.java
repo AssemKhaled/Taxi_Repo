@@ -9,6 +9,7 @@ public interface DriverService {
 	public ResponseEntity<?> getAllDrivers(String TOKEN,Long id,int offset,String search);
 	public Driver getDriverById(Long driverId);
 	public ResponseEntity<?> getDriverSelect(String TOKEN,Long userId);
+	public ResponseEntity<?> getDriverUnSelectOfClient(String TOKEN,Long userId);
 	public ResponseEntity<?> findById(String TOKEN,Long driverId,Long userId);
 	public ResponseEntity<?> deleteDriver(String Token,Long driverId, Long userId);
 	public List<Driver> checkDublicateDriverInAddEmail(Long userId,String name);

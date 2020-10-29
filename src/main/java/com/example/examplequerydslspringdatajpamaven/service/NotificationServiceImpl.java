@@ -24,12 +24,10 @@ import com.example.examplequerydslspringdatajpamaven.entity.Group;
 import com.example.examplequerydslspringdatajpamaven.entity.Notification;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.entity.userClientDevice;
-import com.example.examplequerydslspringdatajpamaven.entity.userClientNotification;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.GroupRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.NotificationRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserClientDeviceRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.UserClientNotificationRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 
@@ -43,8 +41,6 @@ public class NotificationServiceImpl extends RestServiceController implements No
 	@Autowired
 	private UserServiceImpl userService;
 	
-	@Autowired
-	UserClientNotificationRepository userClientNotificationRepository;
 	
 	@Autowired
 	private UserRoleService userRoleService;
@@ -140,18 +136,16 @@ public class NotificationServiceImpl extends RestServiceController implements No
 			else {
 				User parent = null;
 				if(userCreater.getAccountType().equals(4)) {
-					Set<User>parentClient = userCreater.getUsersOfUser();
-					if(parentClient.isEmpty()) {
-						getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "this user cannot add user",null);
-						logger.info("************************ createNotification ENDED ***************************");
-						return ResponseEntity.status(404).body(getObjectResponse);
-					}else {
+					parent = userCreater;
 					
-					 for(User object : parentClient) {
-						 parent = object ;
-					 }
-					 
+					
+					if(notification.isAlways() == true) {
+						Set<Device> devices = deviceRepository.getDevicesOfTypeUser(userId);
+				        notification.setDevices(devices);
+
 					}
+
+
 				}else {
 					parent = userCreater;
 				}
@@ -159,6 +153,9 @@ public class NotificationServiceImpl extends RestServiceController implements No
 				user.add(parent);	
 		        notification.setUserNotification(user);
 		        notificationRepository.save(notification);
+		        
+		        
+		        
 		        
 		    	getObjectResponse = new GetObjectResponse(HttpStatus.OK.value() , "success",notifications);
 				logger.info("************************ createNotification ENDED ***************************");
@@ -205,27 +202,18 @@ public class NotificationServiceImpl extends RestServiceController implements No
 					
 					userService.resetChildernArray();
 				    if(user.getAccountType().equals(4)) {
-						 Set<User> parentClients = user.getUsersOfUser();
-						 if(parentClients.isEmpty()) {
-							
-							 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get notifications of this user",null);
-							 logger.info("************************ getAllNotifications ENDED ***************************");
-							return  ResponseEntity.status(404).body(getObjectResponse);
-						 }else {
-							 User parentClient = new User() ;
-							 for(User object : parentClients) {
-								 parentClient = object;
-							 }
+						 
+							 
 							 List<Long>usersIds= new ArrayList<>();
-							 usersIds.add(parentClient.getId());
+							 usersIds.add(user.getId());
 							 notifications = notificationRepository.getAllNotifications(usersIds,offset,search);
 							 Integer size=notificationRepository.getAllNotificationsSize(usersIds);
 							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",notifications,size);
 							logger.info("************************ getAllNotifications ENDED ***************************");
 							return  ResponseEntity.ok().body(getObjectResponse);
-						 }
+						 
 					 }
-				    List<User>childernUsers = userService.getActiveAndInactiveChildern(id);
+				     List<User>childernUsers = userService.getActiveAndInactiveChildern(id);
 					 List<Long>usersIds= new ArrayList<>();
 					 if(childernUsers.isEmpty()) {
 						 usersIds.add(id);
@@ -291,32 +279,8 @@ public class NotificationServiceImpl extends RestServiceController implements No
 			Notification notification=notificationRepository.findOne(notificationId);
 
 			if(notification != null) {
-				boolean isParent = false;
-				if(loggedUser.getAccountType().equals(4)) {
-					Set<User> clientParents = loggedUser.getUsersOfUser();
-					if(clientParents.isEmpty()) {
-						getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this notification",null);
-						 return  ResponseEntity.badRequest().body(getObjectResponse);
-					}else {
-						User parent = null;
-						for(User object : clientParents) {
-							parent = object ;
-						}
-						Set<User>notificationParents = notification.getUserNotification();
-						if(notificationParents.isEmpty()) {
-							getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this notification",null);
-							 return  ResponseEntity.badRequest().body(getObjectResponse);
-						}else {
-							for(User parentObject : notificationParents) {
-								if(parentObject.getId().equals(parent.getId())) {
-									isParent = true;
-									break;
-								}
-							}
-						}
-					}
-				}
-					if(!checkIfParent(notification , loggedUser) && ! isParent) {
+				
+					if(!checkIfParent(notification , loggedUser)) {
 						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this notification ",null);
 						logger.info("************************ getNotificationById ENDED ***************************");
 						return ResponseEntity.badRequest().body(getObjectResponse);
@@ -414,31 +378,8 @@ public class NotificationServiceImpl extends RestServiceController implements No
 						
 
 						if(notificationCheck != null) {
-								boolean isParent = false;
 								
-								if(user.getAccountType() == 4) {
-									Set<User>parentClient = user.getUsersOfUser();
-									if(parentClient.isEmpty()) {
-										 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allowed to edit notification",notifications);
-										 return  ResponseEntity.badRequest().body(getObjectResponse);
-									}
-									User parent = null;
-									for(User object : parentClient) {
-										parent = object ;
-									}
-									Set<User>notificationParent = notificationCheck.getUserNotification();
-									if(notificationParent.isEmpty()) {
-										 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allowed to edit notification",notifications);
-										 return  ResponseEntity.badRequest().body(getObjectResponse);
-									}
-									for(User parentObject : notificationParent) {
-										if(parentObject.getId() == parent.getId()) {
-											isParent = true;
-											break;
-										}
-									}
-								}
-								if(!checkIfParent(notificationCheck , user) && ! isParent) {
+								if(!checkIfParent(notificationCheck , user)) {
 									getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this notification ",null);
 									logger.info("************************ editGeofnece ENDED ***************************");
 									return ResponseEntity.badRequest().body(getObjectResponse);
@@ -455,8 +396,12 @@ public class NotificationServiceImpl extends RestServiceController implements No
 
 			    					
 									Set<User> userCreater=new HashSet<>();
-			    					userCreater = notificationCheck.getUserNotification();			    					
+									Set<Device> devices=new HashSet<>();
+
+			    					userCreater = notificationCheck.getUserNotification();	
+			    					devices = notificationCheck.getDevices();
 									notification.setUserNotification(userCreater);
+									notification.setDevices(devices);
 									
 									notificationRepository.save(notification);
 									notifications.add(notification);
@@ -544,32 +489,8 @@ public class NotificationServiceImpl extends RestServiceController implements No
 			if(notification != null) {
 				
 				if(notification.getDelete_date()==null) {
-					 boolean isParent = false;
-					 if(user.getAccountType().equals(4)) {
-						 Set<User> parentClients = user.getUsersOfUser();
-						 if(parentClients.isEmpty()) {
-							 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to delete this notification",notifications);
-							 return  ResponseEntity.badRequest().body(getObjectResponse);
-						 }else {
-							 User parent = null;
-							 for(User object : parentClients) {
-								 parent = object;
-							 }
-							 Set<User>notificationParent = notification.getUserNotification();
-							 if(notificationParent.isEmpty()) {
-								 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to delete this notification",notifications);
-								 return  ResponseEntity.badRequest().body(getObjectResponse);
-							 }else {
-								 for(User parentObject : notificationParent) {
-									 if(parentObject.getId().equals(parent.getId())) {
-										 isParent = true;
-										 break;
-									 }
-								 }
-							 }
-						 }
-					 }
-					 if(!checkIfParent(notification , user) && ! isParent) {
+					
+					 if(!checkIfParent(notification , user)) {
 							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to delete this notification ",notifications);
 							logger.info("************************ deleteNotification ENDED ***************************");
 							return ResponseEntity.badRequest().body(getObjectResponse);
@@ -931,33 +852,16 @@ public class NotificationServiceImpl extends RestServiceController implements No
 	    		if(user.getDelete_date() == null) {
 	    			
 	    			if(user.getAccountType().equals(4)) {
-	   				 Set<User>parentClient = user.getUsersOfUser();
-	   					if(parentClient.isEmpty()) {
-	   						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
-	   						logger.info("************************ getNotificationSelect ENDED ***************************");
-	   						return ResponseEntity.badRequest().body(getObjectResponse);
-	   					}else {
-	   					  
-	   						User parent =null;
-	   						for(User object : parentClient) {
-	   							parent = object;
-	   						}
-	   						if(parent != null) {
+	   				
 
-					   			List<Long>usersIds= new ArrayList<>();
-			   					usersIds.add(parent.getId());
-	   							drivers = notificationRepository.getNotificationSelect(usersIds);
-	   							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
-	   							logger.info("************************ getNotificationSelect ENDED ***************************");
-	   							return ResponseEntity.ok().body(getObjectResponse);
-	   						}
-	   						else {
-	   							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "No parent for this type 4",null);
-	   							return ResponseEntity.badRequest().body(getObjectResponse);
-	   						}
+			   			List<Long>usersIds= new ArrayList<>();
+	   					usersIds.add(user.getId());
+						drivers = notificationRepository.getNotificationSelect(usersIds);
+						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
+						logger.info("************************ getNotificationSelect ENDED ***************************");
+						return ResponseEntity.ok().body(getObjectResponse);
 	   						
-	   					}
-	   			 }
+	   			    }
 	    			 List<User>childernUsers = userService.getAllChildernOfUser(userId);
 		   			 List<Long>usersIds= new ArrayList<>();
 		   			 if(childernUsers.isEmpty()) {
@@ -999,196 +903,4 @@ public class NotificationServiceImpl extends RestServiceController implements No
 	
 	}
 	
-	@Override
-	public ResponseEntity<?> assignClientNotifications(String TOKEN, Long loggedUserId, Long userId, Long[] notificationIds) {
-		// TODO Auto-generated method stub
-		if(TOKEN.equals("")) {
-			
-			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
-			 return  ResponseEntity.badRequest().body(getObjectResponse);
-		}
-		
-		if(super.checkActive(TOKEN)!= null)
-		{
-			return super.checkActive(TOKEN);
-		}
-		if(loggedUserId == 0) {
-			
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User ID is Required",null);
-			return ResponseEntity.badRequest().body(getObjectResponse);
-		}
-		User client = userService.findById(loggedUserId);
-		if(client == null) {
-			
-			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged user is not found",null);
-			return ResponseEntity.status(404).body(getObjectResponse);
-		}
-       
-		if(client.getAccountType() != 3) {
-			
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User should be type client to assign his users",null);
-			return ResponseEntity.badRequest().body(getObjectResponse);
-		}
-		
-		if(userId == 0) {
-			
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",null);
-			return ResponseEntity.badRequest().body(getObjectResponse);
-		}
-		User user = userService.findById(userId);
-		if(user == null) {
-			
-			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",null);
-			return ResponseEntity.status(404).body(getObjectResponse);
-		}
-       
-		if(user.getAccountType() != 4) {
-			
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User should be type user to assign him users",null);
-			return ResponseEntity.badRequest().body(getObjectResponse);
-		}
-		Set<User> UserParents = user.getUsersOfUser();
-		if(UserParents.isEmpty()) {
-			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
-			return ResponseEntity.status(404).body(getObjectResponse);
-		}
-		else {
-			User Parent= null;
-			for(User object : UserParents) {
-				Parent = object ;
-				break;
-			}
-			if(!Parent.getId().toString().equals(loggedUserId.toString())) {
-				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
-				return ResponseEntity.status(404).body(getObjectResponse);
-			}
-			
-		}
-		
-        if(notificationIds.length > 0 && notificationIds[0] != 0) {
-			
-			
-			for(Long id:notificationIds) {
-				if(id == 0) {
-					
-					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "assigned ID is Required",null);
-					return ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				Notification assignedNotification= notificationRepository.findOne(id);
-				if(assignedNotification == null) {
-					
-					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "assigned Notification is not found",null);
-					return ResponseEntity.status(404).body(getObjectResponse);
-				}
-		        
-				
-			}
-			
-			userClientNotificationRepository.deleteNotificationsByUserId(userId);
-			for(Long assignedId:notificationIds) {
-				userClientNotification userDevice = new userClientNotification();
-				userDevice.setUserid(userId);
-				userDevice.setNotificationid(assignedId);
-				userClientNotificationRepository.save(userDevice);
-			}
-
-			
-
-
-			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Assigend Successfully",null);
-			return ResponseEntity.ok().body(getObjectResponse);
-
-		}
-		else {
-			List<userClientNotification> notifications = userClientNotificationRepository.getNotificationsOfUser(userId);
-			
-			if(notifications.size() > 0) {
-
-				userClientNotificationRepository.deleteNotificationsByUserId(userId);
-				getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Removed Successfully",null);
-				return ResponseEntity.ok().body(getObjectResponse);
-			}
-			else {
-
-				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "no notifications for this user to remove",null);
-				return ResponseEntity.badRequest().body(getObjectResponse);
-			}
-
-		}
-	}
-
-	@Override
-	public ResponseEntity<?> getClientNotifications(String TOKEN, Long loggedUserId, Long userId) {
-		// TODO Auto-generated method stub
-		
-		if(TOKEN.equals("")) {
-			
-			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
-			 return  ResponseEntity.badRequest().body(getObjectResponse);
-		}
-		
-		if(super.checkActive(TOKEN)!= null)
-		{
-			return super.checkActive(TOKEN);
-		}
-		if(loggedUserId == 0) {
-			
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User ID is Required",null);
-			return ResponseEntity.badRequest().body(getObjectResponse);
-		}
-		User client = userService.findById(loggedUserId);
-		if(client == null) {
-			
-			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged user is not found",null);
-			return ResponseEntity.status(404).body(getObjectResponse);
-		}
-       
-		if(client.getAccountType() != 3) {
-			
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User should be type client to assign his users",null);
-			return ResponseEntity.badRequest().body(getObjectResponse);
-		}
-		
-		if(userId == 0) {
-			
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",null);
-			return ResponseEntity.badRequest().body(getObjectResponse);
-		}
-		User user = userService.findById(userId);
-		if(user == null) {
-			
-			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",null);
-			return ResponseEntity.status(404).body(getObjectResponse);
-		}
-       
-		if(user.getAccountType() != 4) {
-			
-			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User should be type user to assign him users",null);
-			return ResponseEntity.badRequest().body(getObjectResponse);
-		}
-		Set<User> UserParents = user.getUsersOfUser();
-		if(UserParents.isEmpty()) {
-			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
-			return ResponseEntity.status(404).body(getObjectResponse);
-		}
-		else {
-			User Parent= null;
-			for(User object : UserParents) {
-				Parent = object ;
-				break;
-			}
-			if(!Parent.getId().toString().equals(loggedUserId.toString())) {
-				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
-				return ResponseEntity.status(404).body(getObjectResponse);
-			}
-			
-		}
-
-		List<DriverSelect> notifications = userClientNotificationRepository.getNotificationsOfUserList(userId);
-
-		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Success",notifications);
-		logger.info("************************ assignClientUsers ENDED ***************************");
-		return ResponseEntity.ok().body(getObjectResponse);
-	}
-		
 }

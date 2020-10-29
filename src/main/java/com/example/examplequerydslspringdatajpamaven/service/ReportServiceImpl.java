@@ -65,6 +65,9 @@ import com.example.examplequerydslspringdatajpamaven.repository.MongoEventsRepo;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoEventsRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionRepo;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionsRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.UserClientDeviceRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.UserClientDriverRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.UserClientGroupRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -84,6 +87,9 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	 
 	 @Value("${summaryUrl}")
 	 private String summaryUrl;
+	
+	@Autowired
+	UserClientDeviceRepository userClientDeviceRepository;
 	
 	@Autowired
 	EventRepository eventRepository;
@@ -116,6 +122,12 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	
 	@Autowired
 	MongoEventsRepo mongoEventsRepo;
+	
+	@Autowired
+	UserClientGroupRepository userClientGroupRepository;
+	
+	@Autowired
+	UserClientDriverRepository userClientDriverRepository;
 	
 	private static final Log logger = LogFactory.getLog(ReportServiceImpl.class);
 	
@@ -209,9 +221,16 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 										}
 									}
 								}
+								List<Long> CheckData = userClientGroupRepository.getGroup(userId,groupId);
+								if(CheckData.isEmpty()) {
+										isParent = false;
+								}
+								else {
+										isParent = true;
+								}
 							}
 							if(!groupsServiceImpl.checkIfParent(group , loggedUser) && ! isParent) {
-								getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group ",null);
+								getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group",null);
 								logger.info("************************ getEventsReport ENDED ***************************");
 								return ResponseEntity.badRequest().body(getObjectResponse);
 							}
@@ -274,9 +293,16 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								}
 							}
 						}
+						List<Long> CheckData = userClientDeviceRepository.getDevice(userId,deviceId);
+						if(CheckData.isEmpty()) {
+								isParent = false;
+						}
+						else {
+								isParent = true;
+						}
 					}
 					if(!deviceServiceImpl.checkIfParent(device , loggedUser) && ! isParent) {
-						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",eventReport);
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this device",eventReport);
 						logger.info("************************ getEventsReport ENDED ***************************");
 						return ResponseEntity.badRequest().body(getObjectResponse);
 					}
@@ -608,6 +634,13 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 										}
 									}
 								}
+								List<Long> CheckData = userClientGroupRepository.getGroup(userId,groupId);
+								if(CheckData.isEmpty()) {
+										isParent = false;
+								}
+								else {
+										isParent = true;
+								}
 							}
 							if(!groupsServiceImpl.checkIfParent(group , loggedUser) && ! isParent) {
 								getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group ",deviceHours);
@@ -675,9 +708,16 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								}
 							}
 						}
+						List<Long> CheckData = userClientDeviceRepository.getDevice(userId,deviceId);
+						if(CheckData.isEmpty()) {
+								isParent = false;
+						}
+						else {
+								isParent = true;
+						}
 					}
 					if(!deviceServiceImpl.checkIfParent(device , loggedUser) && ! isParent) {
-						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",deviceHours);
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this device",deviceHours);
 						logger.info("************************ getDeviceWorkingHours ENDED ***************************");
 						return ResponseEntity.badRequest().body(getObjectResponse);
 					}
@@ -941,6 +981,13 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 										}
 									}
 								}
+								List<Long> CheckData = userClientGroupRepository.getGroup(userId,groupId);
+								if(CheckData.isEmpty()) {
+										isParent = false;
+								}
+								else {
+										isParent = true;
+								}
 							}
 							if(!groupsServiceImpl.checkIfParent(group , loggedUser) && ! isParent) {
 								getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group ",deviceHours);
@@ -1008,9 +1055,16 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								}
 							}
 						}
+						List<Long> CheckData = userClientDeviceRepository.getDevice(userId,deviceId);
+						if(CheckData.isEmpty()) {
+								isParent = false;
+						}
+						else {
+								isParent = true;
+						}
 					}
 					if(!deviceServiceImpl.checkIfParent(device , loggedUser) && ! isParent) {
-						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",deviceHours);
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this device",deviceHours);
 						 logger.info("************************ getCustomReport ENDED ***************************");
 						return ResponseEntity.badRequest().body(getObjectResponse);
 					}
@@ -1269,6 +1323,13 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 										}
 									}
 								}
+								List<Long> CheckData = userClientGroupRepository.getGroup(userId,groupId);
+								if(CheckData.isEmpty()) {
+										isParent = false;
+								}
+								else {
+										isParent = true;
+								}
 							}
 							if(!groupsServiceImpl.checkIfParent(group , loggedUser) && ! isParent) {
 								getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group ",driverHours);
@@ -1329,6 +1390,13 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 										}
 									}
 								}
+							}
+							List<Long> CheckData = userClientDriverRepository.getDriver(userId,driverId);
+							if(CheckData.isEmpty()) {
+									isParent = false;
+							}
+							else {
+									isParent = true;
 							}
 						}
 						if(!driverServiceImpl.checkIfParent(driver , loggedUser) && ! isParent) {
@@ -1562,7 +1630,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				 List<Long>usersIds= new ArrayList<>();
 
 				 if(user.getAccountType() == 4) {
-					 Set<User> parentClients = user.getUsersOfUser();
+					 /*Set<User> parentClients = user.getUsersOfUser();
 					 if(parentClients.isEmpty()) {
 						
 						 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get devices of this user",null);
@@ -1574,7 +1642,49 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 							 parentClient = object;
 						 }
 						 usersIds.add(parentClient.getId());
+					 }*/
+					 List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(userId);
+				     Integer size=0;
+					 if(deviceIds.size()>0) {
+					    Date date = new Date();
+						SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd"); 
+						String currentDate=formatter.format(date);
+						
+						String from = currentDate +" 00:00:01";
+						String to = currentDate +" 23:59:59";
+					
+						search = "%"+search+"%";
+
+						notifications = mongoEventsRepo.getNotificationsToday(deviceIds, offset);
+						if(notifications.size()>0) {
+							size= mongoEventsRepo.getNotificationsTodaySize(deviceIds);
+							for(int i=0;i<notifications.size();i++) {
+								
+								Device device = deviceRepository.getOne(notifications.get(i).getDeviceId());
+								notifications.get(i).setDeviceName(device.getName());
+								Set<Driver> drivers = device.getDriver();
+								for(Driver driver : drivers) {
+									notifications.get(i).setDriverId(driver.getId());
+									notifications.get(i).setDriverName(driver.getName());
+								}
+
+								if(notifications.get(i).getEventType().equals("alarm")) {
+									
+			                    	JSONObject obj = new JSONObject(notifications.get(i).getAttributes().toString());	
+									notifications.get(i).setEventType(obj.getString("alarm"));
+								}
+							}
+								
+						}
+
 					 }
+					
+				    
+
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",notifications,size);
+					logger.info("************************ getNotifications ENDED ***************************");
+					return  ResponseEntity.ok().body(getObjectResponse);
+
 				 }
 				 else {
 					 usersIds.add(userId);
@@ -1589,7 +1699,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 							 usersIds.add(object.getId());
 						 }
 					 }*/
-				 }
+				 
 				 
 					Date date = new Date();
 					SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd"); 
@@ -1629,7 +1739,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",notifications,size);
 					logger.info("************************ getNotifications ENDED ***************************");
 					return  ResponseEntity.ok().body(getObjectResponse);
-
+				 }
 				
 			}
 			else {
@@ -1731,6 +1841,13 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 										}
 									}
 								}
+								List<Long> CheckData = userClientGroupRepository.getGroup(userId,groupId);
+								if(CheckData.isEmpty()) {
+										isParent = false;
+								}
+								else {
+										isParent = true;
+								}
 							}
 							if(!groupsServiceImpl.checkIfParent(group , loggedUser) && ! isParent) {
 								getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group ",stopReport);
@@ -1796,9 +1913,16 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								}
 							}
 						}
+						List<Long> CheckData = userClientDeviceRepository.getDevice(userId,deviceId);
+						if(CheckData.isEmpty()) {
+								isParent = false;
+						}
+						else {
+								isParent = true;
+						}
 					}
 					if(!deviceServiceImpl.checkIfParent(device , loggedUser) && ! isParent) {
-						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",stopReport);
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this device",stopReport);
 						logger.info("************************ getStopsReport ENDED ***************************");
 						return ResponseEntity.badRequest().body(getObjectResponse);
 					}
@@ -2061,6 +2185,13 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 										}
 									}
 								}
+								List<Long> CheckData = userClientGroupRepository.getGroup(userId,groupId);
+								if(CheckData.isEmpty()) {
+										isParent = false;
+								}
+								else {
+										isParent = true;
+								}
 							}
 							if(!groupsServiceImpl.checkIfParent(group , loggedUser) && ! isParent) {
 								getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group ",tripReport);
@@ -2126,9 +2257,16 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								}
 							}
 						}
+						List<Long> CheckData = userClientDeviceRepository.getDevice(userId,deviceId);
+						if(CheckData.isEmpty()) {
+								isParent = false;
+						}
+						else {
+								isParent = true;
+						}
 					}
 					if(!deviceServiceImpl.checkIfParent(device , loggedUser) && ! isParent) {
-						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",tripReport);
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this device",tripReport);
 						logger.info("************************ getTripsReport ENDED ***************************");
 						return ResponseEntity.badRequest().body(getObjectResponse);
 					}
@@ -2424,6 +2562,13 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 										}
 									}
 								}
+								List<Long> CheckData = userClientGroupRepository.getGroup(userId,groupId);
+								if(CheckData.isEmpty()) {
+										isParent = false;
+								}
+								else {
+										isParent = true;
+								}
 							}
 							if(!groupsServiceImpl.checkIfParent(group , loggedUser) && ! isParent) {
 								getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group ",tripReport);
@@ -2493,6 +2638,13 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 									}
 								}
 							}
+							List<Long> CheckData = userClientDriverRepository.getDriver(userId,driverId);
+							if(CheckData.isEmpty()) {
+									isParent = false;
+							}
+							else {
+									isParent = true;
+							}
 						}
 						if(!driverServiceImpl.checkIfParent(driver , loggedUser) && ! isParent) {
 							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this driver",tripReport);
@@ -2546,9 +2698,16 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								}
 							}
 						}
+						List<Long> CheckData = userClientDeviceRepository.getDevice(userId,deviceId);
+						if(CheckData.isEmpty()) {
+								isParent = false;
+						}
+						else {
+								isParent = true;
+						}
 					}
 					if(!deviceServiceImpl.checkIfParent(device , loggedUser) && ! isParent) {
-						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",tripReport);
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this device",tripReport);
 						logger.info("************************ getDriveMoreThanReport ENDED ***************************");
 						return ResponseEntity.badRequest().body(getObjectResponse);
 					}
@@ -2857,6 +3016,13 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 										}
 									}
 								}
+								List<Long> CheckData = userClientGroupRepository.getGroup(userId,groupId);
+								if(CheckData.isEmpty()) {
+										isParent = false;
+								}
+								else {
+										isParent = true;
+								}
 							}
 							if(!groupsServiceImpl.checkIfParent(group , loggedUser) && ! isParent) {
 								getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group ",eventReport);
@@ -2921,9 +3087,16 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								}
 							}
 						}
+						List<Long> CheckData = userClientDeviceRepository.getDevice(userId,deviceId);
+						if(CheckData.isEmpty()) {
+								isParent = false;
+						}
+						else {
+								isParent = true;
+						}
 					}
 					if(!deviceServiceImpl.checkIfParent(device , loggedUser) && ! isParent) {
-						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",eventReport);
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this device",eventReport);
 						logger.info("************************ getEventsReportByType ENDED ***************************");
 						return ResponseEntity.badRequest().body(getObjectResponse);
 					}
@@ -3158,6 +3331,13 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 										}
 									}
 								}
+								List<Long> CheckData = userClientGroupRepository.getGroup(userId,groupId);
+								if(CheckData.isEmpty()) {
+										isParent = false;
+								}
+								else {
+										isParent = true;
+								}
 							}
 							if(!groupsServiceImpl.checkIfParent(group , loggedUser) && ! isParent) {
 								getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group ",summaryReport);
@@ -3223,9 +3403,16 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								}
 							}
 						}
+						List<Long> CheckData = userClientDeviceRepository.getDevice(userId,deviceId);
+						if(CheckData.isEmpty()) {
+								isParent = false;
+						}
+						else {
+								isParent = true;
+						}
 					}
 					if(!deviceServiceImpl.checkIfParent(device , loggedUser) && ! isParent) {
-						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",summaryReport);
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this device",summaryReport);
 						 logger.info("************************ getSummaryReport ENDED ***************************");
 						return ResponseEntity.badRequest().body(getObjectResponse);
 					}
@@ -3507,6 +3694,13 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 										}
 									}
 								}
+								List<Long> CheckData = userClientGroupRepository.getGroup(userId,groupId);
+								if(CheckData.isEmpty()) {
+										isParent = false;
+								}
+								else {
+										isParent = true;
+								}
 							}
 							if(!groupsServiceImpl.checkIfParent(group , loggedUser) && ! isParent) {
 								getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group ",positionsList);
@@ -3572,9 +3766,16 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								}
 							}
 						}
+						List<Long> CheckData = userClientDeviceRepository.getDevice(userId,deviceId);
+						if(CheckData.isEmpty()) {
+								isParent = false;
+						}
+						else {
+								isParent = true;
+						}
 					}
 					if(!deviceServiceImpl.checkIfParent(device , loggedUser) && ! isParent) {
-						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",positionsList);
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this device",positionsList);
 						 logger.info("************************ getSensorsReport ENDED ***************************");
 						return ResponseEntity.badRequest().body(getObjectResponse);
 					}
@@ -3921,6 +4122,13 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 										}
 									}
 								}
+								List<Long> CheckData = userClientGroupRepository.getGroup(userId,groupId);
+								if(CheckData.isEmpty()) {
+										isParent = false;
+								}
+								else {
+										isParent = true;
+								}
 							}
 							if(!groupsServiceImpl.checkIfParent(group , loggedUser) && ! isParent) {
 								getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group ",stopReport);
@@ -3989,6 +4197,13 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 									}
 								}
 							}
+							List<Long> CheckData = userClientDriverRepository.getDriver(userId,driverId);
+							if(CheckData.isEmpty()) {
+									isParent = false;
+							}
+							else {
+									isParent = true;
+							}
 						}
 						if(!driverServiceImpl.checkIfParent(driver , loggedUser) && ! isParent) {
 							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this driver",stopReport);
@@ -4042,9 +4257,16 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								}
 							}
 						}
+						List<Long> CheckData = userClientDeviceRepository.getDevice(userId,deviceId);
+						if(CheckData.isEmpty()) {
+								isParent = false;
+						}
+						else {
+								isParent = true;
+						}
 					}
 					if(!deviceServiceImpl.checkIfParent(device , loggedUser) && ! isParent) {
-						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",stopReport);
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this device",stopReport);
 						 logger.info("************************ getNumStopsReport ENDED ***************************");
 						return ResponseEntity.badRequest().body(getObjectResponse);
 					}
@@ -4300,6 +4522,13 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 										}
 									}
 								}
+								List<Long> CheckData = userClientGroupRepository.getGroup(userId,groupId);
+								if(CheckData.isEmpty()) {
+										isParent = false;
+								}
+								else {
+										isParent = true;
+								}
 							}
 							if(!groupsServiceImpl.checkIfParent(group , loggedUser) && ! isParent) {
 								getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group ",stopReport);
@@ -4367,6 +4596,13 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 									}
 								}
 							}
+							List<Long> CheckData = userClientDriverRepository.getDriver(userId,driverId);
+							if(CheckData.isEmpty()) {
+									isParent = false;
+							}
+							else {
+									isParent = true;
+							}
 						}
 						if(!driverServiceImpl.checkIfParent(driver , loggedUser) && ! isParent) {
 							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this driver",stopReport);
@@ -4420,9 +4656,16 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								}
 							}
 						}
+						List<Long> CheckData = userClientDeviceRepository.getDevice(userId,deviceId);
+						if(CheckData.isEmpty()) {
+								isParent = false;
+						}
+						else {
+								isParent = true;
+						}
 					}
 					if(!deviceServiceImpl.checkIfParent(device , loggedUser) && ! isParent) {
-						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",stopReport);
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this device",stopReport);
 						 logger.info("************************ getTotalStopsReport ENDED ***************************");
 						return ResponseEntity.badRequest().body(getObjectResponse);
 					}
@@ -4746,6 +4989,13 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 										}
 									}
 								}
+								List<Long> CheckData = userClientGroupRepository.getGroup(userId,groupId);
+								if(CheckData.isEmpty()) {
+										isParent = false;
+								}
+								else {
+										isParent = true;
+								}
 							}
 							if(!groupsServiceImpl.checkIfParent(group , loggedUser) && ! isParent) {
 								getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group ",tripReport);
@@ -4814,6 +5064,13 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 									}
 								}
 							}
+							List<Long> CheckData = userClientDriverRepository.getDriver(userId,driverId);
+							if(CheckData.isEmpty()) {
+									isParent = false;
+							}
+							else {
+									isParent = true;
+							}
 						}
 						if(!driverServiceImpl.checkIfParent(driver , loggedUser) && ! isParent) {
 							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this driver",tripReport);
@@ -4867,9 +5124,16 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								}
 							}
 						}
+						List<Long> CheckData = userClientDeviceRepository.getDevice(userId,deviceId);
+						if(CheckData.isEmpty()) {
+								isParent = false;
+						}
+						else {
+								isParent = true;
+						}
 					}
 					if(!deviceServiceImpl.checkIfParent(device , loggedUser) && ! isParent) {
-						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",tripReport);
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this device",tripReport);
 						 logger.info("************************ geTotalTripsReport ENDED ***************************");
 						return ResponseEntity.badRequest().body(getObjectResponse);
 					}
@@ -5173,6 +5437,13 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 										}
 									}
 								}
+								List<Long> CheckData = userClientGroupRepository.getGroup(userId,groupId);
+								if(CheckData.isEmpty()) {
+										isParent = false;
+								}
+								else {
+										isParent = true;
+								}
 							}
 							if(!groupsServiceImpl.checkIfParent(group , loggedUser) && ! isParent) {
 								getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group ",tripReport);
@@ -5239,6 +5510,13 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 									}
 								}
 							}
+							List<Long> CheckData = userClientDriverRepository.getDriver(userId,driverId);
+							if(CheckData.isEmpty()) {
+									isParent = false;
+							}
+							else {
+									isParent = true;
+							}
 						}
 						if(!driverServiceImpl.checkIfParent(driver , loggedUser) && ! isParent) {
 							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this driver",tripReport);
@@ -5292,9 +5570,16 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								}
 							}
 						}
+						List<Long> CheckData = userClientDeviceRepository.getDevice(userId,deviceId);
+						if(CheckData.isEmpty()) {
+								isParent = false;
+						}
+						else {
+								isParent = true;
+						}
 					}
 					if(!deviceServiceImpl.checkIfParent(device , loggedUser) && ! isParent) {
-						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",tripReport);
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this device",tripReport);
 						 logger.info("************************ getNumTripsReport ENDED ***************************");
 						return ResponseEntity.badRequest().body(getObjectResponse);
 					}
@@ -5649,6 +5934,13 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 										}
 									}
 								}
+								List<Long> CheckData = userClientGroupRepository.getGroup(userId,groupId);
+								if(CheckData.isEmpty()) {
+										isParent = false;
+								}
+								else {
+										isParent = true;
+								}
 							}
 							if(!groupsServiceImpl.checkIfParent(group , loggedUser) && ! isParent) {
 								getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group ",driverHours);
@@ -5709,6 +6001,13 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 										}
 									}
 								}
+							}
+							List<Long> CheckData = userClientDriverRepository.getDriver(userId,driverId);
+							if(CheckData.isEmpty()) {
+									isParent = false;
+							}
+							else {
+									isParent = true;
 							}
 						}
 						if(!driverServiceImpl.checkIfParent(driver , loggedUser) && ! isParent) {

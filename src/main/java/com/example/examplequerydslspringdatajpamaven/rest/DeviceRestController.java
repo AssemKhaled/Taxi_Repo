@@ -139,12 +139,23 @@ public class DeviceRestController {
 			return deviceService.getDeviceGeofences(TOKEN,deviceId);
 
 	}
+	
 	@RequestMapping(value = "/getDeviceSelect", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getDeviceSelect(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 			                                               @RequestParam (value = "userId", defaultValue = "0") Long userId) {
 		
 	
     	return  deviceService.getDeviceSelect(TOKEN,userId);
+
+		
+	}
+	
+	@RequestMapping(value = "/getDeviceUnSelectOfClient", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getDeviceUnSelect(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                                 @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		
+	
+    	return  deviceService.getDeviceUnSelect(TOKEN,userId);
 
 		
 	}

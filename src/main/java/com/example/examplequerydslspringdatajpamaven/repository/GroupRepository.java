@@ -21,10 +21,22 @@ public interface GroupRepository extends  JpaRepository<Group, Long>, QueryDslPr
 			+ " and ((tc_groups.name Like %:search%) )"
 			+ " LIMIT :offset,10", nativeQuery = true)
 	public List<Group> getAllGroups(@Param("userIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
+
+	@Query(value = "SELECT tc_groups.* FROM tc_groups "
+			+ " WHERE tc_groups.id IN(:groupIds)and tc_groups.is_deleted is null"
+			+ " and ((tc_groups.name Like %:search%) )"
+			+ " LIMIT :offset,10", nativeQuery = true)
+	public List<Group> getAllGroupsByIds(@Param("groupIds")List<Long> groupIds,@Param("offset") int offset,@Param("search") String search);
 	
 	@Query(value = "SELECT count(*) FROM tc_groups INNER JOIN tc_user_group ON tc_user_group.groupid = tc_groups.id"
-			+ " WHERE tc_user_group.userid IN(:userIds)and tc_groups.is_deleted is null", nativeQuery = true)
-	public Integer getAllGroupsSize(@Param("userIds")List<Long> userIds);
+			+ " WHERE tc_user_group.userid IN(:userIds)and tc_groups.is_deleted is null"
+			+ " and ((tc_groups.name Like %:search%) )", nativeQuery = true)
+	public Integer getAllGroupsSize(@Param("userIds")List<Long> userIds,@Param("search") String search);
+	
+	@Query(value = "SELECT count(*) FROM tc_groups "
+			+ " WHERE tc_groups.id IN(:groupIds)and tc_groups.is_deleted is null"
+			+ " and ((tc_groups.name Like %:search%) )", nativeQuery = true)
+	public Integer getAllGroupsSizeByIds(@Param("groupIds")List<Long> groupIds,@Param("search") String search);
 	
 	@Transactional
     @Modifying
@@ -78,6 +90,9 @@ public interface GroupRepository extends  JpaRepository<Group, Long>, QueryDslPr
 	@Query(value = "select tc_group_driver.driverid from tc_group_driver where tc_group_driver.groupid=:groupId ", nativeQuery = true)
 	public List<Long> getDriversFromGroup(@Param("groupId") Long groupId);
 	
+	@Query(value = "select tc_group_geofence.geofenceid from tc_group_geofence where tc_group_geofence.groupid=:groupId ", nativeQuery = true)
+	public List<Long> getGeofneceFromGroup(@Param("groupId") Long groupId);
+	
 	@Query(value = "select tc_device_driver.driverid from tc_device_driver " + 
 			" inner join tc_group_device on tc_group_device.deviceid = tc_device_driver.deviceid " + 
 			" where tc_group_device.groupid=:groupId ", nativeQuery = true)
@@ -115,9 +130,30 @@ public interface GroupRepository extends  JpaRepository<Group, Long>, QueryDslPr
 			" WHERE tc_group_attribute.groupid =:groupId ",nativeQuery = true)
 	public List<DeviceSelect> getGroupAttrbuitesSelect(@Param("groupId") Long groupId);
 	
+	@Query(value = "select tc_group_attribute.attributeid from tc_group_attribute where tc_group_attribute.groupid=:groupId ", nativeQuery = true)
+	public List<Long> getAttrbuiteFromGroup(@Param("groupId") Long groupId);
+	
+	@Query(value = "select tc_group_notification.notificationid from tc_group_notification where tc_group_notification.groupid=:groupId ", nativeQuery = true)
+	public List<Long> getNotifcationFromGroup(@Param("groupId") Long groupId);
+	
 	@Query(value = "SELECT tc_groups.id,tc_groups.name FROM tc_groups"
 			+ " INNER JOIN tc_user_group ON tc_user_group.groupid = tc_groups.id"
 			+ " WHERE tc_user_group.userid IN(:userIds) and tc_groups.is_deleted is null",nativeQuery = true)
 	public List<DriverSelect> getGroupSelect(@Param("userIds") List<Long> userIds);
+	
+	@Query(value = "SELECT tc_groups.id,tc_groups.name FROM tc_groups"
+			+ " WHERE tc_groups.id IN(:groupIds) and tc_groups.is_deleted is null",nativeQuery = true)
+	public List<DriverSelect> getGroupSelectByIds(@Param("groupIds") List<Long> groupIds);
+	
+	@Query(value = "SELECT tc_groups.id,tc_groups.name FROM tc_groups"
+			+ " INNER JOIN tc_user_group ON tc_user_group.groupid = tc_groups.id"
+			+ " WHERE tc_user_group.userid IN(:userId) and tc_groups.is_deleted is null "
+			+ " and tc_groups.id Not IN(Select tc_user_client_group.groupid from tc_user_client_group) " ,nativeQuery = true)
+	public List<DriverSelect> getGroupUnSelectOfClient(@Param("userId") Long userId);
+	
+	@Query(value = "SELECT tc_groups.id from tc_groups " + 
+			" inner join tc_user_group on tc_groups.id = tc_user_group.groupid " + 
+			" where tc_groups.name =:name and tc_groups.is_deleted is null and tc_user_group.userid=:userId order by tc_groups.id DESC limit 0,1" ,nativeQuery = true)
+	public Long getGroupIdByName(@Param("userId") Long userId,@Param("name") String name);
 	
 }

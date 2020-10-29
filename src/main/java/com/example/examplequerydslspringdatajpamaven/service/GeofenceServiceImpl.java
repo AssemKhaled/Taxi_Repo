@@ -89,7 +89,7 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 					
 				    userServiceImpl.resetChildernArray();
 				    if(user.getAccountType().equals(4)) {
-						 Set<User> parentClients = user.getUsersOfUser();
+						 /*Set<User> parentClients = user.getUsersOfUser();
 						 if(parentClients.isEmpty()) {
 							
 							 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get geofences of this user",null);
@@ -107,7 +107,18 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",geofences,size);
 							logger.info("************************ getAllUserGeofences ENDED ***************************");
 							return  ResponseEntity.ok().body(getObjectResponse);
+						 }*/
+				    	
+				    	List<Long> geofenceIds = userClientGeofenceRepository.getGeofneceIds(id);
+				    	Integer size = 0;
+						 if(geofenceIds.size()>0) {
+
+							 geofences = geofenceRepository.getAllGeofencesByIds(geofenceIds,offset,search);
+							 size=geofenceRepository.getAllGeofencesSizeByIds(geofenceIds,search);
 						 }
+						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",geofences,size);
+						logger.info("************************ getAllUserGeofences ENDED ***************************");
+						return  ResponseEntity.ok().body(getObjectResponse);
 					 }
 				    List<User>childernUsers = userServiceImpl.getActiveAndInactiveChildern(id);
 					 List<Long>usersIds= new ArrayList<>();
@@ -124,7 +135,7 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 					
 					
 				    geofences = geofenceRepository.getAllGeofences(usersIds,offset,search);
-					Integer size=geofenceRepository.getAllGeofencesSize(usersIds);
+					Integer size=geofenceRepository.getAllGeofencesSize(usersIds,search);
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",geofences,size);
 					logger.info("************************ getAllUserGeofences ENDED ***************************");
 					return  ResponseEntity.ok().body(getObjectResponse);
@@ -201,6 +212,13 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 									}
 								}
 							}
+						}
+						List<Long> geofencesData = userClientGeofenceRepository.getGeofence(userId,geofenceId);
+						if(geofencesData.isEmpty()) {
+								isParent = false;
+						}
+						else {
+								isParent = true;
 						}
 					}
 					if(!checkIfParent(geofence , loggedUser) && ! isParent) {
@@ -302,6 +320,13 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 								 }
 							 }
 						 }
+						List<Long> geofencesData = userClientGeofenceRepository.getGeofence(userId,geofenceId);
+						if(geofencesData.isEmpty()) {
+								isParent = false;
+						}
+						else {
+								isParent = true;
+						}
 					 }
 					 if(!checkIfParent(geofence , user) && ! isParent) {
 							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to delete this geofnece ",geofences);
@@ -311,6 +336,12 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 						geofenceRepository.deleteGeofence(geofenceId,currentDate);
 						geofenceRepository.deleteGeofenceId(geofenceId);
 						geofenceRepository.deleteGeofenceDeviceId(geofenceId);
+						
+						List<Long> DataDelete = userClientGeofenceRepository.getGeofToDelete(geofenceId);
+						if(DataDelete.size()>0) {
+							userClientGeofenceRepository.deleteGeofById(geofenceId);
+						}
+						
 						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Deleted Successfully",geofences);
 						logger.info("************************ deleteGeofence ENDED ***************************");
 						return  ResponseEntity.ok().body(getObjectResponse);
@@ -406,6 +437,7 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 						}
 						else {
 							Set<User> userDriver = new HashSet<>();
+							 User parent = null;
 							if(geofence.getId()==null || geofence.getId()==0) {
 								boolean isParent = false;
 								 if(user.getAccountType().equals(4)) {
@@ -414,7 +446,6 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 										 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to delete this geofnece",geofences);
 										 return  ResponseEntity.badRequest().body(getObjectResponse);
 									 }else {
-										 User parent = null;
 										 for(User object : parentClients) {
 											 parent = object;
 										 }
@@ -431,7 +462,19 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 								
 								geofence.setUserGeofence(userDriver);
 								geofenceRepository.save(geofence);
-								geofences.add(geofence);
+								geofences = null;
+								
+								if(user.getAccountType().equals(4)) {
+						    		userClientGeofence saveData = new userClientGeofence();
+							        
+							        Long GeoId = geofenceRepository.getGeofenceIdByName(parent.getId(),geofence.getName());
+						    		if(GeoId != null) {
+							    		saveData.setUserid(id);
+							    		saveData.setGeofenceid(GeoId);
+								        userClientGeofenceRepository.save(saveData);
+						    		}
+						    		
+						    	}
 								getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"sucsess",geofences);
 								logger.info("************************ addGeofence ENDED ***************************");
 
@@ -533,6 +576,13 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 											break;
 										}
 									}
+									List<Long> geofencesData = userClientGeofenceRepository.getGeofence(id,geofence.getId());
+									if(geofencesData.isEmpty()) {
+											isParent = false;
+									}
+									else {
+											isParent = true;
+									}
 								}
 								if(!checkIfParent(geofneceCheck , user) && ! isParent) {
 
@@ -573,7 +623,7 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 										geofence.setUserGeofence(userCreater);
 										
 										geofenceRepository.save(geofence);
-										geofences.add(geofence);
+										geofences = null;
 										getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Updated Successfully",geofences);
 										logger.info("************************ editGeofence ENDED ***************************");
 										return ResponseEntity.ok().body(getObjectResponse);
@@ -770,7 +820,7 @@ logger.info("************************ getAllUserGeofences STARTED **************
 	    		if(user.getDelete_date() == null) {
 	    			
 	    			if(user.getAccountType().equals(4)) {
-	   				 Set<User>parentClient = user.getUsersOfUser();
+	   				/* Set<User>parentClient = user.getUsersOfUser();
 	   					if(parentClient.isEmpty()) {
 	   						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
 	   						logger.info("************************ getGeofenceSelect ENDED ***************************");
@@ -795,7 +845,18 @@ logger.info("************************ getAllUserGeofences STARTED **************
 	   							return ResponseEntity.badRequest().body(getObjectResponse);
 	   						}
 	   						
-	   					}
+	   					}*/
+	    				
+	    				List<Long> geofenceIds = userClientGeofenceRepository.getGeofneceIds(userId);
+
+						if(geofenceIds.size()>0) {
+
+							drivers = geofenceRepository.getGeofenceSelectByIds(geofenceIds);
+
+						 }
+						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
+						logger.info("************************ getGeofenceSelect ENDED ***************************");
+						return ResponseEntity.ok().body(getObjectResponse);
 	   			 }
 	    			 List<User>childernUsers = userServiceImpl.getAllChildernOfUser(userId);
 		   			 List<Long>usersIds= new ArrayList<>();
@@ -814,6 +875,56 @@ logger.info("************************ getAllUserGeofences STARTED **************
 					logger.info("************************ getGeofenceSelect ENDED ***************************");
 					return ResponseEntity.ok().body(getObjectResponse);
 
+	    		}
+	    		else {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",drivers);
+					return ResponseEntity.status(404).body(getObjectResponse);
+
+	    		}
+	    	
+	    	}
+	    	else {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",drivers);
+				return ResponseEntity.status(404).body(getObjectResponse);
+
+	    	}
+			
+		}
+		else {
+			
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",drivers);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
+	
+	}
+	
+	@Override
+	public ResponseEntity<?> getGeofenceUnSelectOfClient(String TOKEN, Long userId) {
+		logger.info("************************ getGeofenceSelect STARTED ***************************");
+		List<DriverSelect> drivers = new ArrayList<DriverSelect>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",drivers);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+	    if(userId != 0) {
+	    	User user = userServiceImpl.findById(userId);
+	    	userServiceImpl.resetChildernArray();
+
+	    	if(user != null) {
+	    		if(user.getDelete_date() == null) {
+	    			
+	    			
+	    			drivers = geofenceRepository.getGeofenceUnSelectOfClient(userId);
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
+					logger.info("************************ getGeofenceSelect ENDED ***************************");
+					return ResponseEntity.ok().body(getObjectResponse);
+					
 	    		}
 	    		else {
 					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",drivers);
@@ -908,7 +1019,12 @@ logger.info("************************ getAllUserGeofences STARTED **************
 		
         if(geofenceIds.length > 0 && geofenceIds[0] != 0) {
 			
-			
+        	List<userClientGeofence> checkData = userClientGeofenceRepository.getGeofeneceByGeoIds(geofenceIds,userId);
+        	if(checkData.size()>0) {
+        		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "There is geofenece assigned to another user before it should only share with one user",null);
+				return ResponseEntity.badRequest().body(getObjectResponse);
+        	}
+        	
 			for(Long id:geofenceIds) {
 				if(id == 0) {
 					

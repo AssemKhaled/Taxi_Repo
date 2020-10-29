@@ -1,9 +1,3 @@
-CREATE TABLE IF NOT EXISTS `tc_user_client_user` (
-  `id` int(11) NOT NULL auto_increment, 
-  `userid` int(11) NOT NULL,
-  `manageduserid` int(11) NOT NULL,
-   PRIMARY KEY  (`id`)
-);
 CREATE TABLE IF NOT EXISTS `tc_user_client_device` (
   `id` int(11) NOT NULL auto_increment, 
   `userid` int(11) NOT NULL,
@@ -28,28 +22,10 @@ CREATE TABLE IF NOT EXISTS `tc_user_client_geofence` (
   `geofenceid` int(11) NOT NULL,
    PRIMARY KEY  (`id`)
 );
-CREATE TABLE IF NOT EXISTS `tc_user_client_schedule` (
-  `id` int(11) NOT NULL auto_increment, 
-  `userid` int(11) NOT NULL,
-  `scheduleid` int(11) NOT NULL,
-   PRIMARY KEY  (`id`)
-);
-CREATE TABLE IF NOT EXISTS `tc_user_client_notification` (
-  `id` int(11) NOT NULL auto_increment, 
-  `userid` int(11) NOT NULL,
-  `notificationid` int(11) NOT NULL,
-   PRIMARY KEY  (`id`)
-);
 CREATE TABLE IF NOT EXISTS `tc_user_client_computed` (
   `id` int(11) NOT NULL auto_increment, 
   `userid` int(11) NOT NULL,
   `computedid` int(11) NOT NULL,
-   PRIMARY KEY  (`id`)
-);
-CREATE TABLE IF NOT EXISTS `tc_user_client_role` (
-  `id` int(11) NOT NULL auto_increment, 
-  `userid` int(11) NOT NULL,
-  `roleid` int(11) NOT NULL,
    PRIMARY KEY  (`id`)
 );
 CREATE TABLE IF NOT EXISTS `tc_user_client_point` (
@@ -553,7 +529,7 @@ PREPARE stmt FROM @stmt;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 ----------------------------------------------------------------
-ALTER TABLE `tc_devices` MODIFY `calibrationData` VARCHAR(1080);
+--ALTER TABLE `tc_devices` MODIFY `calibrationData` VARCHAR(1080);
 --ALTER TABLE `tc_devices` DROP `positionid`;
 --ALTER TABLE `tc_devices` ADD COLUMN `positionid` text NULL DEFAULT NULL;
 

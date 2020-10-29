@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
+import com.example.examplequerydslspringdatajpamaven.entity.userClientDevice;
 import com.example.examplequerydslspringdatajpamaven.entity.userClientDriver;
 
 @Component
@@ -26,9 +27,27 @@ public interface UserClientDriverRepository extends JpaRepository<userClientDriv
 	@Query(value = "select * from tc_user_client_driver where tc_user_client_driver.userid=:userId", nativeQuery = true)
 	public List<userClientDriver> getDriversOfUser(@Param("userId") Long userId);
 	
+	@Query(value = "select tc_user_client_driver.driverId from tc_user_client_driver where tc_user_client_driver.userid=:userId", nativeQuery = true)
+	public List<Long> getDriverIds(@Param("userId") Long userId);
+	
 	@Query(value = "select tc_drivers.id as id , tc_drivers.name as name from tc_drivers "
 			+ " INNER JOIN tc_user_client_driver ON tc_user_client_driver.driverid=tc_drivers.id "
 			+ "  where tc_user_client_driver.userid=:userId ", nativeQuery = true)
 	public List<DriverSelect> getDriversOfUserList(@Param("userId") Long userId);
+	
+	@Query(value = "select tc_user_client_driver.driverid from tc_user_client_driver "
+			+ " where tc_user_client_driver.userid=:userId and tc_user_client_driver.driverid=:driverId  ", nativeQuery = true)
+	public List<Long> getDriver(@Param("userId") Long userId,@Param("driverId") Long driverId);
+
+	@Query(value = "select * from tc_user_client_driver where tc_user_client_driver.driverid IN (:driverIds) and tc_user_client_driver.userid !=:userId", nativeQuery = true)
+	public List<userClientDriver> getDriversByDriIds(@Param("driverIds") Long[] driverIds ,@Param("userId") Long userId);
+
+	@Transactional
+    @Modifying
+	@Query(value = "Delete from tc_user_client_driver where tc_user_client_driver.driverid=:driverId", nativeQuery = true)
+	public void deleteDriverById(@Param("driverId") Long driverId);
+	
+	@Query(value = "select tc_user_client_driver.driverid from tc_user_client_driver where tc_user_client_driver.driverid=:driverId", nativeQuery = true)
+	public List<Long> getDriversToDelete(@Param("driverId") Long driverId);
 }
 

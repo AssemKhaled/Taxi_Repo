@@ -34,6 +34,9 @@ import com.example.examplequerydslspringdatajpamaven.entity.CustomPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.EventReport;
+import com.example.examplequerydslspringdatajpamaven.entity.LastElmData;
+import com.example.examplequerydslspringdatajpamaven.entity.LastPositionData;
+import com.example.examplequerydslspringdatajpamaven.entity.MongoElmLastLocations;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoEvents;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.TripPositions;
@@ -942,5 +945,332 @@ public class MongoPositionRepo {
 
 	        }
 		return size;
+	}
+	
+	
+	public LastPositionData getLastPosition(Long deviceId){
+
+		LastPositionData position = new LastPositionData();
+
+				
+		BasicDBObject basicDBObject = new BasicDBObject();
+		
+	    Aggregation aggregation = newAggregation(
+	            match(Criteria.where("deviceid").in(deviceId)),
+	            project("speed","longitude","latitude","attributes").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime")
+	            .and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("devicetime").and("fixtime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("fixtime"),
+	            sort(Sort.Direction.DESC, "fixtime"),
+	            skip(0),
+	            limit(1)
+	            
+	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+
+	    
+	        AggregationResults<MongoPositions> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+
+	        
+	       if(groupResults.getRawResults().containsField("cursor")) {
+	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
+	            
+			    JSONArray list = (JSONArray) obj.get("firstBatch");
+	            Iterator<Object> iterator = list.iterator();
+	            while (iterator.hasNext()) {
+	            	JSONObject object = (JSONObject) iterator.next();
+	            	
+	            	if(object.has("servertime")) {
+	            		position.setServertime( object.getString("servertime"));
+	            		
+	            	}  
+                    if(object.has("devicetime")) {
+	            		position.setDevicetime(object.getString("devicetime"));
+
+	            		
+	            	}
+                    if(object.has("fixtime")) {
+	            		
+	            		position.setFixtime( object.getString("fixtime"));
+
+	            	}
+	            	if(object.has("attributes")) {
+	            		position.setAttributes(object.get("attributes").toString());
+	
+	            	}
+                    if(object.has("latitude")) {
+	            		
+	            		position.setLatitude(object.getDouble("latitude"));
+
+	            	}
+                    if(object.has("longitude")) {
+	            		
+	            		position.setLongitude(object.getDouble("longitude"));
+
+	            	}
+                    
+	            	if(object.has("speed")) {
+	            		position.setSpeed(object.getFloat("speed"));    		
+	                }
+					
+	            	
+	            	
+	            }
+	        }
+        
+		return position;
+	}
+	
+	public List<LastPositionData> getLastPositionSpeedZero(Long deviceId){
+
+		List<LastPositionData> positions = new ArrayList<LastPositionData>();
+
+				
+		BasicDBObject basicDBObject = new BasicDBObject();
+		
+	    Aggregation aggregation = newAggregation(
+	            match(Criteria.where("deviceid").in(deviceId).and("speed").in(0)),
+	            project("speed","longitude","latitude","attributes").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime")
+	            .and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("devicetime").and("fixtime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("fixtime"),
+	            sort(Sort.Direction.DESC, "fixtime"),
+	            skip(0),
+	            limit(10)
+	            
+	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+
+	    
+	        AggregationResults<MongoPositions> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+
+	        
+	       if(groupResults.getRawResults().containsField("cursor")) {
+	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
+	            
+			    JSONArray list = (JSONArray) obj.get("firstBatch");
+	            Iterator<Object> iterator = list.iterator();
+	            while (iterator.hasNext()) {
+	            	JSONObject object = (JSONObject) iterator.next();
+	            	LastPositionData position = new LastPositionData();
+	            	if(object.has("servertime")) {
+	            		position.setServertime( object.getString("servertime"));
+	            		
+	            	}  
+                    if(object.has("devicetime")) {
+	            		position.setDevicetime(object.getString("devicetime"));
+
+	            		
+	            	}
+                    if(object.has("fixtime")) {
+	            		
+	            		position.setFixtime( object.getString("fixtime"));
+
+	            	}
+	            	if(object.has("attributes")) {
+	            		position.setAttributes(object.get("attributes").toString());
+	
+	            	}
+                    if(object.has("latitude")) {
+	            		
+	            		position.setLatitude(object.getDouble("latitude"));
+
+	            	}
+                    if(object.has("longitude")) {
+	            		
+	            		position.setLongitude(object.getDouble("longitude"));
+
+	            	}
+                    
+	            	if(object.has("speed")) {
+	            		position.setSpeed(object.getFloat("speed"));    		
+	                }
+					
+	            	positions.add(position);
+	            	
+	            }
+	        }
+        
+		return positions;
+	}
+	
+	public List<LastPositionData> getLastPositionGreaterSpeedZero(Long deviceId){
+
+		List<LastPositionData> positions = new ArrayList<LastPositionData>();
+
+				
+		BasicDBObject basicDBObject = new BasicDBObject();
+		
+	    Aggregation aggregation = newAggregation(
+	            match(Criteria.where("deviceid").in(deviceId).and("speed").gt(0)),
+	            project("speed","longitude","latitude","attributes").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime")
+	            .and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("devicetime").and("fixtime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("fixtime"),
+	            sort(Sort.Direction.DESC, "fixtime"),
+	            skip(0),
+	            limit(10)
+	            
+	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+
+	    
+	        AggregationResults<MongoPositions> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+
+	        
+	       if(groupResults.getRawResults().containsField("cursor")) {
+	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
+	            
+			    JSONArray list = (JSONArray) obj.get("firstBatch");
+	            Iterator<Object> iterator = list.iterator();
+	            while (iterator.hasNext()) {
+	            	JSONObject object = (JSONObject) iterator.next();
+	            	LastPositionData position = new LastPositionData();
+	            	if(object.has("servertime")) {
+	            		position.setServertime( object.getString("servertime"));
+	            		
+	            	}  
+                    if(object.has("devicetime")) {
+	            		position.setDevicetime(object.getString("devicetime"));
+
+	            		
+	            	}
+                    if(object.has("fixtime")) {
+	            		
+	            		position.setFixtime( object.getString("fixtime"));
+
+	            	}
+	            	if(object.has("attributes")) {
+	            		position.setAttributes(object.get("attributes").toString());
+	
+	            	}
+                    if(object.has("latitude")) {
+	            		
+	            		position.setLatitude(object.getDouble("latitude"));
+
+	            	}
+                    if(object.has("longitude")) {
+	            		
+	            		position.setLongitude(object.getDouble("longitude"));
+
+	            	}
+                    
+	            	if(object.has("speed")) {
+	            		position.setSpeed(object.getFloat("speed"));    		
+	                }
+					
+	            	positions.add(position);
+	            	
+	            }
+	        }
+        
+		return positions;
+	}
+	
+	public List<LastElmData> getLastPositionVelocityZero(Long deviceId){
+
+		List<LastElmData> positions = new ArrayList<LastElmData>();
+
+				
+		BasicDBObject basicDBObject = new BasicDBObject();
+		
+	    Aggregation aggregation = newAggregation(
+	            match(Criteria.where("vehicleid").in(deviceId).and("elm_data.velocity").in(0)),
+	            project("sendtime","elm_data","vehiclename","drivername"),
+	            sort(Sort.Direction.DESC, "sendtime"),
+	            skip(0),
+	            limit(10)
+	            
+	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+
+	    
+	        AggregationResults<MongoElmLastLocations> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_elm_last_locations_tbl", MongoElmLastLocations.class);
+
+	        
+	       if(groupResults.getRawResults().containsField("cursor")) {
+	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
+	            
+			    JSONArray list = (JSONArray) obj.get("firstBatch");
+	            Iterator<Object> iterator = list.iterator();
+	            while (iterator.hasNext()) {
+	            	JSONObject object = (JSONObject) iterator.next();
+	            	LastElmData position = new LastElmData();
+	            	if(object.has("sendtime")) {
+	            		position.setSendtime( object.getString("sendtime"));
+	            		
+	            	}  
+                    if(object.has("elm_data")) {
+	            		position.setElm_data(object.get("elm_data").toString());
+
+	            		
+	            	}
+                    if(object.has("vehiclename")) {
+	            		
+	            		position.setVehiclename(object.getString("vehiclename"));
+
+	            	}
+	            	if(object.has("drivername")) {
+	            		position.setDrivername(object.getString("drivername"));
+	
+	            	}
+
+
+	            	positions.add(position);
+	            	
+	            }
+	        }
+        
+		return positions;
+	}
+	
+	public List<LastElmData> getLastPositionGreaterVelocityZero(Long deviceId){
+
+		List<LastElmData> positions = new ArrayList<LastElmData>();
+
+				
+		BasicDBObject basicDBObject = new BasicDBObject();
+		
+	    Aggregation aggregation = newAggregation(
+	            match(Criteria.where("vehicleid").in(deviceId).and("elm_data.velocity").gt(0)),
+	            project("sendtime","elm_data","vehiclename","drivername"),
+	            sort(Sort.Direction.DESC, "sendtime"),
+	            skip(0),
+	            limit(10)
+	            
+	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+
+	    
+	        AggregationResults<MongoElmLastLocations> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_elm_last_locations_tbl", MongoElmLastLocations.class);
+
+	        
+	       if(groupResults.getRawResults().containsField("cursor")) {
+	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
+	            
+			    JSONArray list = (JSONArray) obj.get("firstBatch");
+	            Iterator<Object> iterator = list.iterator();
+	            while (iterator.hasNext()) {
+	            	JSONObject object = (JSONObject) iterator.next();
+	            	LastElmData position = new LastElmData();
+	            	if(object.has("sendtime")) {
+	            		position.setSendtime( object.getString("sendtime"));
+	            		
+	            	}  
+                    if(object.has("elm_data")) {
+	            		position.setElm_data(object.get("elm_data").toString());
+
+	            		
+	            	}
+                    if(object.has("vehiclename")) {
+	            		
+	            		position.setVehiclename(object.getString("vehiclename"));
+
+	            	}
+	            	if(object.has("drivername")) {
+	            		position.setDrivername(object.getString("drivername"));
+	
+	            	}
+                    
+	            	positions.add(position);
+	            	
+	            }
+	        }
+        
+		return positions;
 	}
 }

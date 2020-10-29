@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import com.example.examplequerydslspringdatajpamaven.entity.Attribute;
+import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Schedule;
 
 @Service
@@ -33,5 +34,9 @@ public interface ScheduledRepository extends JpaRepository<Schedule, Long>, Quer
 	@Query(value = "SELECT tc_schedule.* FROM tc_schedule"
 			+ " WHERE tc_schedule.expression=:expression and tc_schedule.delete_date is null ", nativeQuery = true)
 	public List<Schedule> getAllScheduledHaveExpression(@Param("expression") String expression);
+	
+	@Query(value = "SELECT tc_schedule.id,tc_schedule.email FROM tc_schedule " 
+			+ " WHERE tc_schedule.userId IN(:userIds) and tc_schedule.delete_date is null",nativeQuery = true)
+	public List<DriverSelect> getScheduledSelect(@Param("userIds") List<Long> userIds);
 	
 }

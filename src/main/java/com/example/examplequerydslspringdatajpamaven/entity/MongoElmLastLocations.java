@@ -13,7 +13,7 @@ public class MongoElmLastLocations {
 
 	private String positionid;
 
-	private String elm_data;
+	private Object elm_data;
 	
 	private String sendtime;
 	
@@ -45,7 +45,7 @@ public class MongoElmLastLocations {
 		
 	}
 	
-	public MongoElmLastLocations(ObjectId _id, String positionid, String elm_data, String sendtime, String responsetime,
+	public MongoElmLastLocations(ObjectId _id, String positionid, Object elm_data, String sendtime, String responsetime,
 			Integer responsetype, Long vehicleid, String vehiclename, String vehicleReferenceKey, Long driverid,
 			String drivername, String driverReferenceKey, Long user_id, String username, String userReferenceKey,
 			String reason) {
@@ -84,11 +84,11 @@ public class MongoElmLastLocations {
 		this.positionid = positionid;
 	}
 
-	public String getElm_data() {
+	public Object getElm_data() {
 		return elm_data;
 	}
 
-	public void setElm_data(String elm_data) {
+	public void setElm_data(Object elm_data) {
 		this.elm_data = elm_data;
 	}
 

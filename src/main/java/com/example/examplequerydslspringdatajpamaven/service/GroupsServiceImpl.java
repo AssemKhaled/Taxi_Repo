@@ -31,7 +31,11 @@ import com.example.examplequerydslspringdatajpamaven.entity.userClientDevice;
 import com.example.examplequerydslspringdatajpamaven.entity.userClientGroup;
 import com.example.examplequerydslspringdatajpamaven.repository.GeofenceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.GroupRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.NotificationRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.UserClientComputedRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserClientDeviceRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.UserClientDriverRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.UserClientGeofenceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserClientGroupRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
@@ -51,6 +55,21 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 	
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	UserClientDriverRepository userClientDriverRepository;
+	
+	@Autowired
+	UserClientGeofenceRepository userClientGeofenceRepository;
+	
+	@Autowired
+	private NotificationRepository notificationRepository;
+	
+	@Autowired
+	UserClientComputedRepository userClientComputedRepository;
+	
+	@Autowired
+	UserClientDeviceRepository userClientDeviceRepository;
 	
 	@Autowired
 	private DriverServiceImpl driverService;
@@ -133,21 +152,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 					|| group.getType().equals("command") || group.getType().equals("maintenance")
 					|| group.getType().equals("notification") ) {
 				
-				List<Group> groupCheck=groupRepository.checkDublicateGroupInAdd(userId,group.getName());
-			    List<Integer> duplictionList =new ArrayList<Integer>();
-				if(!groupCheck.isEmpty()) {
-					for(int i=0;i<groupCheck.size();i++) {
-						if(groupCheck.get(i).getName().equalsIgnoreCase(group.getName())) {
-							duplictionList.add(1);						
-						}
-					}
-			    	getObjectResponse = new GetObjectResponse( 401, "This group was found before",duplictionList);
-					return ResponseEntity.ok().body(getObjectResponse);
-
-				}
-				
-				
-						
+										
 			
 				Set<User> user=new HashSet<>() ;
 				User userCreater ;
@@ -181,8 +186,34 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 					user.add(parent);	
 			        group.setUserGroup(user);
 				  	
+			        
+			        List<Group> groupCheck=groupRepository.checkDublicateGroupInAdd(parent.getId(),group.getName());
+				    List<Integer> duplictionList =new ArrayList<Integer>();
+					if(!groupCheck.isEmpty()) {
+						for(int i=0;i<groupCheck.size();i++) {
+							if(groupCheck.get(i).getName().equalsIgnoreCase(group.getName())) {
+								duplictionList.add(1);						
+							}
+						}
+				    	getObjectResponse = new GetObjectResponse( 401, "This group was found before",duplictionList);
+						return ResponseEntity.ok().body(getObjectResponse);
+
+					}
+			        
 			    	groupRepository.save(group);
 			    	List<Group> groups = null;
+			    	
+			    	if(userCreater.getAccountType().equals(4)) {
+			    		userClientGroup saveData = new userClientGroup();
+			    		Long GroupId = groupRepository.getGroupIdByName(parent.getId(),group.getName());
+			    		if(GroupId != null) {
+				    		saveData.setUserid(userId);
+				    		saveData.setGroupid(GroupId);
+					        userClientGroupRepository.save(saveData);
+			    		}
+			    		
+			    	}
+			    	
 			    	getObjectResponse = new GetObjectResponse(HttpStatus.OK.value() , "success",groups);
 					logger.info("************************ createDevice ENDED ***************************");
 					return ResponseEntity.ok().body(getObjectResponse);
@@ -236,7 +267,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 					
 					userService.resetChildernArray();
 				    if(user.getAccountType().equals(4)) {
-						 Set<User> parentClients = user.getUsersOfUser();
+						 /*Set<User> parentClients = user.getUsersOfUser();
 						 if(parentClients.isEmpty()) {
 							
 							 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get geofences of this user",null);
@@ -295,7 +326,58 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",groups,size);
 							logger.info("************************ getAllUserGeofences ENDED ***************************");
 							return  ResponseEntity.ok().body(getObjectResponse);
+						 }*/
+				    	
+				    	List<Long> groupIds = userClientGroupRepository.getGroupsIds(id);
+						Integer size=0;
+
+						 if(groupIds.size()>0) {
+							    groups = groupRepository.getAllGroupsByIds(groupIds,offset,search);
+								List<Map> data = new ArrayList<>();
+								
+								if(groups.size()>0) {
+									size=groupRepository.getAllGroupsSizeByIds(groupIds,search);
+									for(Group group:groups) {
+									     Map PointsList= new HashMap();
+									     
+										 PointsList.put("id", group.getId());
+										 PointsList.put("name", group.getName());
+										 PointsList.put("attributes", group.getAttributes());
+										 PointsList.put("groupid", group.getGroupid());
+										 PointsList.put("is_deleted", group.getIs_deleted());
+										 PointsList.put("type", group.getType());
+										 PointsList.put("companyName",null);
+										 PointsList.put("companyId",null);
+
+										 
+										 
+										 Set<User>groupParents = group.getUserGroup();
+											if(groupParents.isEmpty()) {
+												
+
+											}else {
+												for(User parentObject : groupParents) {
+													 PointsList.put("companyId",parentObject.getId());
+													 User us = userRepository.findOne(parentObject.getId());
+													 if(us != null) {
+														 PointsList.put("companyName", us.getName());
+
+													 }
+													break;
+													
+												}
+											}
+											data.add(PointsList);
+
+									}	 
+								}
+
+
 						 }
+						 
+						 getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",groups,size);
+						 logger.info("************************ getAllUserGeofences ENDED ***************************");
+						 return  ResponseEntity.ok().body(getObjectResponse);
 					 }
 				     List<User>childernUsers = userService.getActiveAndInactiveChildern(id);
 					 List<Long>usersIds= new ArrayList<>();
@@ -317,7 +399,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 
 					
 					if(groups.size()>0) {
-						size=groupRepository.getAllGroupsSize(usersIds);
+						size=groupRepository.getAllGroupsSize(usersIds,search);
 
 						for(Group group:groups) {
 						     Map PointsList= new HashMap();
@@ -430,6 +512,13 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 									}
 								}
 							}
+						}
+						List<Long> groupData = userClientGroupRepository.getGroup(userId,groupId);
+						if(groupData.isEmpty()) {
+								isParent = false;
+						}
+						else {
+								isParent = true;
 						}
 					}
 					if(!checkIfParent(group , loggedUser) && ! isParent) {
@@ -554,30 +643,15 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 									}
 								}
 								
-								List<Group> checkDublicateInEdit= groupRepository.checkDublicateGroupInEdit(group.getId(),id,group.getName());
-							    List<Integer> duplictionList =new ArrayList<Integer>();
-								if(!checkDublicateInEdit.isEmpty()) {
-			    					for(int i=0;i<checkDublicateInEdit.size();i++) {
-			    						if(checkDublicateInEdit.get(i).getName().equalsIgnoreCase(group.getName())) {
-											duplictionList.add(1);						
-		
-			    						}
-			    						
-			    						
-			    					}
-							    	getObjectResponse = new GetObjectResponse( 401, "This group was found before",duplictionList);
-									return ResponseEntity.ok().body(getObjectResponse);
-
-			    				}
-								boolean isParent = false;
 								
+								boolean isParent = false;
+								User parent = null;
 								if(user.getAccountType() == 4) {
 									Set<User>parentClient = user.getUsersOfUser();
 									if(parentClient.isEmpty()) {
 										 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allowed to edit group",groups);
 										 return  ResponseEntity.badRequest().body(getObjectResponse);
 									}
-									User parent = null;
 									for(User object : parentClient) {
 										parent = object ;
 									}
@@ -592,6 +666,19 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 											break;
 										}
 									}
+									List<Long> groupData = userClientGroupRepository.getGroup(id,group.getId());
+									if(groupData.isEmpty()) {
+											isParent = false;
+									}
+									else {
+											isParent = true;
+									}
+									
+									
+									
+								}
+								else {
+									parent = user;
 								}
 								if(!checkIfParent(groupCheck , user) && ! isParent) {
 									getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this group ",null);
@@ -606,6 +693,22 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 
 								}
 								else {
+									
+									List<Group> checkDublicateInEdit= groupRepository.checkDublicateGroupInEdit(group.getId(),parent.getId(),group.getName());
+								    List<Integer> duplictionList =new ArrayList<Integer>();
+									if(!checkDublicateInEdit.isEmpty()) {
+				    					for(int i=0;i<checkDublicateInEdit.size();i++) {
+				    						if(checkDublicateInEdit.get(i).getName().equalsIgnoreCase(group.getName())) {
+												duplictionList.add(1);						
+			
+				    						}
+				    						
+				    						
+				    					}
+								    	getObjectResponse = new GetObjectResponse( 401, "This group was found before",duplictionList);
+										return ResponseEntity.badRequest().body(getObjectResponse);
+
+				    				}
 									
 
 									Set<User> userCreater=new HashSet<>();
@@ -727,6 +830,13 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 								 }
 							 }
 						 }
+						List<Long> groupData = userClientGroupRepository.getGroup(userId,groupId);
+						if(groupData.isEmpty()) {
+								isParent = false;
+						}
+						else {
+								isParent = true;
+						}
 					 }
 					 if(!checkIfParent(group , user) && ! isParent) {
 							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to delete this group ",groups);
@@ -738,6 +848,12 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 						groupRepository.deleteGroupdriverId(groupId);
 						groupRepository.deleteGroupDeviceId(groupId);
 						groupRepository.deleteGroupgeoId(groupId);
+						
+						List<Long> DataDelete = userClientGroupRepository.getGroupsToDelete(groupId);
+						 if(DataDelete.size()>0) {
+							 userClientGroupRepository.deleteGroupById(groupId);
+						 }
+						
 						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Deleted Successfully",groups);
 						logger.info("************************ deleteGroup ENDED ***************************");
 						return  ResponseEntity.ok().body(getObjectResponse);
@@ -853,6 +969,13 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 										}
 									}
 								}
+							}
+							List<Long> groupData = userClientGroupRepository.getGroup(userId,groupId);
+							if(groupData.isEmpty()) {
+									isParent = false;
+							}
+							else {
+									isParent = true;
 							}
 					   }
 					   if(!checkIfParent(group , loggedUser)&& ! isParent) {
@@ -1006,6 +1129,13 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 										}
 									}
 								}
+							}
+							List<Long> groupData = userClientGroupRepository.getGroup(userId,groupId);
+							if(groupData.isEmpty()) {
+									isParent = false;
+							}
+							else {
+									isParent = true;
 							}
 					   }
 					   if(!checkIfParent(group , loggedUser)&& ! isParent) {
@@ -1161,6 +1291,13 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 										}
 									}
 								}
+							}
+							List<Long> groupData = userClientGroupRepository.getGroup(userId,groupId);
+							if(groupData.isEmpty()) {
+									isParent = false;
+							}
+							else {
+									isParent = true;
 							}
 					   }
 					   if(!checkIfParent(group , loggedUser)&& ! isParent) {
@@ -1332,7 +1469,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 	    		if(user.getDelete_date() == null) {
 	    			
 	    			if(user.getAccountType().equals(4)) {
-	   				 Set<User>parentClient = user.getUsersOfUser();
+	   				 /*Set<User>parentClient = user.getUsersOfUser();
 	   					if(parentClient.isEmpty()) {
 	   						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
 	   						logger.info("************************ getDriverSelect ENDED ***************************");
@@ -1357,7 +1494,17 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 	   							return ResponseEntity.badRequest().body(getObjectResponse);
 	   						}
 	   						
-	   					}
+	   					}*/
+
+				    	List<Long> groupIds = userClientGroupRepository.getGroupsIds(userId);
+
+						 if(groupIds.size()>0) {
+				    			drivers = groupRepository.getGroupSelectByIds(groupIds);
+
+						 }
+						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
+						logger.info("************************ getDriverSelect ENDED ***************************");
+						return ResponseEntity.ok().body(getObjectResponse);
 	   			 }
 	    			 List<User>childernUsers = userService.getAllChildernOfUser(userId);
 		   			 List<Long>usersIds= new ArrayList<>();
@@ -1399,6 +1546,58 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 		}
 	
 	}
+	
+	@Override
+	public ResponseEntity<?> getGroupUnSelectOfCient(String TOKEN, Long userId) {
+		logger.info("************************ getDriverSelect STARTED ***************************");
+		List<DriverSelect> drivers = new ArrayList<DriverSelect>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",drivers);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+	    if(userId != 0) {
+	    	User user = userService.findById(userId);
+	    	userService.resetChildernArray();
+
+	    	if(user != null) {
+	    		if(user.getDelete_date() == null) {
+	    			
+	    			
+	    			
+	    			drivers = groupRepository.getGroupUnSelectOfClient(userId);
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
+					logger.info("************************ getDriverSelect ENDED ***************************");
+					return ResponseEntity.ok().body(getObjectResponse);
+
+	    		}
+	    		else {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",drivers);
+					return ResponseEntity.status(404).body(getObjectResponse);
+
+	    		}
+	    	
+	    	}
+	    	else {
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",drivers);
+				return ResponseEntity.status(404).body(getObjectResponse);
+
+	    	}
+			
+		}
+		else {
+			
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",drivers);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
+	
+	}
+	
 	
 	@Override
 	public ResponseEntity<?> assignClientGroups(String TOKEN, Long loggedUserId, Long userId, Long[] groupIds) {
@@ -1468,7 +1667,14 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 		
         if(groupIds.length > 0 && groupIds[0] != 0) {
 			
-			
+        	List<userClientGroup> checkData = userClientGroupRepository.getGroupByGroIds(groupIds,userId);
+        	if(checkData.size()>0) {
+        		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "There is group assigned to another user before it should only share with one user",null);
+				return ResponseEntity.badRequest().body(getObjectResponse);
+        	}
+        	
+        	
+        	
 			for(Long id:groupIds) {
 				if(id == 0) {
 					
@@ -1480,6 +1686,75 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 					
 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "assigned Group is not found",null);
 					return ResponseEntity.status(404).body(getObjectResponse);
+				}
+				else {
+					if(assignedGroup.getType() != null) {
+						if(assignedGroup.getType().equals("device")) {
+							 List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(userId);
+							 List<Long> list = groupRepository.getDevicesFromGroup(id);
+
+							 if(!deviceIds.containsAll(list)) {
+
+								getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "group of devices you want to assign is contain ids not share with this user",null);
+								return ResponseEntity.status(404).body(getObjectResponse);
+							 }
+							 
+							 
+							
+						}
+						if(assignedGroup.getType().equals("driver")) {
+							 List<Long> driverIds = userClientDriverRepository.getDriverIds(userId);
+							 List<Long> list = groupRepository.getDriversFromGroup(id);
+
+							 if(!driverIds.containsAll(list)) {
+
+								getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "group of drivers you want to assign is contain ids not share with this user",null);
+								return ResponseEntity.status(404).body(getObjectResponse);
+							 }
+							 
+							 
+							
+						}
+						if(assignedGroup.getType().equals("geofence")) {
+							 List<Long> geofenceIds = userClientGeofenceRepository.getGeofneceIds(userId);
+							 List<Long> list = groupRepository.getGeofneceFromGroup(id);
+
+							 if(!geofenceIds.containsAll(list)) {
+
+								getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "group of geofences you want to assign is contain ids not share with this user",null);
+								return ResponseEntity.status(404).body(getObjectResponse);
+							 }
+							 
+							 
+							
+						}
+						
+						if(assignedGroup.getType().equals("attribute")) {
+							 List<Long> attributeIds = userClientComputedRepository.getComputedsIds(userId);
+							 List<Long> list = groupRepository.getAttrbuiteFromGroup(id);
+
+							 if(!attributeIds.containsAll(list)) {
+
+								getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "group of attribute you want to assign is contain ids not share with this user",null);
+								return ResponseEntity.status(404).body(getObjectResponse);
+							 }
+							 
+							 
+							
+						}
+						
+						if(assignedGroup.getType().equals("notification")) {
+							 List<Long> notificationIds = notificationRepository.getNotificationIds(userId);
+							 List<Long> list = groupRepository.getNotifcationFromGroup(id);
+
+							 if(!notificationIds.containsAll(list)) {
+
+								getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "group of notification you want to assign is contain ids not share with this user",null);
+								return ResponseEntity.status(404).body(getObjectResponse);
+							 }
+							 
+						}
+					}
 				}
 		        
 				

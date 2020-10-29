@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
+import com.example.examplequerydslspringdatajpamaven.entity.userClientComputed;
 import com.example.examplequerydslspringdatajpamaven.entity.userClientDevice;
 
 @Component
@@ -25,8 +26,26 @@ public interface UserClientDeviceRepository extends JpaRepository<userClientDevi
 	@Query(value = "select * from tc_user_client_device where tc_user_client_device.userid=:userId", nativeQuery = true)
 	public List<userClientDevice> getDevicesOfUser(@Param("userId") Long userId);
 	
+	@Query(value = "select tc_user_client_device.deviceid from tc_user_client_device where tc_user_client_device.userid=:userId", nativeQuery = true)
+	public List<Long> getDevicesIds(@Param("userId") Long userId);
+	
+	@Query(value = "select tc_user_client_device.deviceid from tc_user_client_device "
+			+ " where tc_user_client_device.userid=:userId and tc_user_client_device.deviceid=:deviceId  ", nativeQuery = true)
+	public List<Long> getDevice(@Param("userId") Long userId,@Param("deviceId") Long deviceId);
+	
 	@Query(value = "select tc_devices.id as id , tc_devices.name as name from tc_devices "
 			+ " INNER JOIN tc_user_client_device ON tc_user_client_device.deviceid=tc_devices.id "
 			+ "  where tc_user_client_device.userid=:userId ", nativeQuery = true)
 	public List<DeviceSelect> getDeviceOfUserList(@Param("userId") Long userId);
+	
+	@Query(value = "select * from tc_user_client_device where tc_user_client_device.deviceid IN (:deviceIds) and tc_user_client_device.userid !=:userId", nativeQuery = true)
+	public List<userClientDevice> getDevicesByDevIds(@Param("deviceIds") Long[] deviceIds ,@Param("userId") Long userId);
+
+	@Transactional
+    @Modifying
+	@Query(value = "Delete from tc_user_client_device where tc_user_client_device.deviceid=:deviceId", nativeQuery = true)
+	public void deleteDeviceById(@Param("deviceId") Long deviceId);
+	
+	@Query(value = "select tc_user_client_device.deviceid from tc_user_client_device where tc_user_client_device.deviceid=:deviceId", nativeQuery = true)
+	public List<Long> getDevicesToDelete(@Param("deviceId") Long deviceId);
 }

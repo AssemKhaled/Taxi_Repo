@@ -78,8 +78,38 @@ public class PointsRestController {
 			                                          @RequestBody(required = false) Points points,
 			                                          @RequestParam (value = "userId", defaultValue = "0") Long id) {
 		
-		
 		return pointsServiceImpl.editPoints(TOKEN,points,id);
 
+	}
+	
+	@RequestMapping(value = "/getPointSelect", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getPointSelect(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                               @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		
+    	return  pointsServiceImpl.getPointSelect(TOKEN,userId);
+
+	}
+	
+	@RequestMapping(value = "/getPointUnSelectOfClient", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getPointUnSelectOfClient(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                               @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		
+    	return  pointsServiceImpl.getPointUnSelectOfClient(TOKEN,userId);
+
+	}
+	
+	@GetMapping("/assignClientPoints")
+	public ResponseEntity<?> assignClientPoints(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+		                           			   @RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,
+											   @RequestParam (value = "userId", defaultValue = "0") Long userId,
+											   @RequestParam (value = "pointIds", defaultValue = "0") Long [] pointIds) {
+		return pointsServiceImpl.assignClientPoints(TOKEN,loggedUserId,userId,pointIds);
+	}
+	
+	@GetMapping("/getClientPoints")
+	public ResponseEntity<?> getClientPoints(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+		                           			@RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,
+											@RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		return pointsServiceImpl.getClientPoints(TOKEN,loggedUserId,userId);
 	}
 }

@@ -101,6 +101,16 @@ public class DriverRestController {
 
 		
 	}
+	
+	@RequestMapping(value = "/getDriverUnSelectOfClient", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getDriverUnSelectOfClient(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                                         @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		 
+	
+    	return  driverServiceImpl.getDriverUnSelectOfClient(TOKEN,userId);
+
+		
+	}
 
 	@GetMapping(value = "/assignDriverToUser")
 	public ResponseEntity<?> assignDeviceToUser( @RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,

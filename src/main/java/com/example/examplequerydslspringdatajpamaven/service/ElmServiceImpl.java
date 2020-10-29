@@ -53,7 +53,9 @@ import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.ElmReturn;
 import com.example.examplequerydslspringdatajpamaven.entity.ExpiredVehicles;
 import com.example.examplequerydslspringdatajpamaven.entity.Group;
+import com.example.examplequerydslspringdatajpamaven.entity.LastElmData;
 import com.example.examplequerydslspringdatajpamaven.entity.LastLocationsList;
+import com.example.examplequerydslspringdatajpamaven.entity.LastPositionData;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoElmLastLocations;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoElmLogs;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoPositionsElm;
@@ -62,10 +64,15 @@ import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository
 import com.example.examplequerydslspringdatajpamaven.repository.DriverRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoElmLastLocationsRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoElmLogsRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionRepo;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionsElmRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.UserClientDeviceRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.UserClientDriverRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
 public class ElmServiceImpl extends RestServiceController implements ElmService{
@@ -98,7 +105,16 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	MongoPositionsElmRepository mongoPositionsElmRepository;
 	
 	@Autowired
+	MongoPositionRepo mongoPositionRepo;
+	
+	@Autowired
 	private MongoElmLogsRepository elmLogsRepository;
+	
+	@Autowired
+	UserClientDeviceRepository userClientDeviceRepository;
+	
+	@Autowired
+	UserClientDriverRepository userClientDriverRepository;
 	
 	@Autowired
 	private UserServiceImpl userService;
@@ -329,9 +345,25 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			  
 		  HttpEntity<Object> entity = new HttpEntity<Object>(bodyToMiddleWare);
 
-		  ResponseEntity<ElmReturn> rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
 
+		  ResponseEntity<ElmReturn> rateResponse;
 		  List<ElmReturn> data = new ArrayList<ElmReturn>();
+
+		  try {
+			  rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
+          } catch (Exception e) {
+	        getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Can't Request To Elm Error in Elm Server",data);
+			logger.info("************************ companyRegistrtaion ENDED ***************************");
+			return  ResponseEntity.ok().body(getObjectResponse);
+	     }
+
+		 
+		 if(rateResponse.getStatusCode().OK == null) {
+			  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Not Requested To Elm",data);
+			  logger.info("************************ companyRegistrtaion ENDED ***************************");
+			  return  ResponseEntity.ok().body(getObjectResponse);
+		  }
+		  
 		  
 		  ElmReturn elmReturn = rateResponse.getBody();
 
@@ -345,11 +377,6 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  
 		  data.add(elmReturn);
 
-		 if(rateResponse.getStatusCode().OK == null) {
-			  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),elmReturn.getMessage(),data);
-			  logger.info("************************ companyDelete ENDED ***************************");
-			  return  ResponseEntity.ok().body(getObjectResponse);
-		  }
 		  
 		  Map resp = new HashMap();
 		  resp = elmReturn.getBody();
@@ -632,14 +659,27 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		        .add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
 			  
 		  HttpEntity<Object> entity = new HttpEntity<Object>(bodyToMiddleWare);
-
-		  ResponseEntity<ElmReturn> rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
-
+		  ResponseEntity<ElmReturn> rateResponse ;
 		  List<ElmReturn> data = new ArrayList<ElmReturn>();
-		  
+
+		 try {
+			 rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
+	     } catch (Exception e) {
+	        getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Can't Request To Elm Error in Elm Server",data);
+			logger.info("************************ companyRegistrtaion ENDED ***************************");
+			return  ResponseEntity.ok().body(getObjectResponse);
+	     }
+
+		 
+		 if(rateResponse.getStatusCode().OK == null) {
+			  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Not Requested To Elm",data);
+			  logger.info("************************ companyRegistrtaion ENDED ***************************");
+			  return  ResponseEntity.ok().body(getObjectResponse);
+		  }
+		 
+		 
 		  ElmReturn elmReturn = rateResponse.getBody();
 
-		  
 		  response.put("body", elmReturn.getBody());
 		  response.put("statusCode", elmReturn.getStatusCode());
 		  response.put("message", elmReturn.getMessage());
@@ -650,12 +690,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  
 		  
 		  data.add(elmReturn);
-
-		 if(rateResponse.getStatusCode().OK == null) {
-			  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),elmReturn.getMessage(),data);
-			  logger.info("************************ companyRegistrtaion ENDED ***************************");
-			  return  ResponseEntity.ok().body(getObjectResponse);
-		  }
+		 
 		  
 		  Map resp = new HashMap();
 		  resp = elmReturn.getBody();
@@ -670,10 +705,10 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			  return  ResponseEntity.ok().body(getObjectResponse);
 		  }
 		  else if(resp.containsKey("resultCode")) {
-			  if(resp.get("resultCode").toString() == "success") {
-					JSONObject res = new JSONObject(resp.get("result").toString());	
+			  if(resp.get("resultCode").toString().equals("success")) {
+					Map res = (Map) resp.get("result");	
 					user.setReject_reason(null);
-					user.setReference_key(res.getString("referenceKey"));
+					  user.setReference_key(res.get("referenceKey").toString());
 					  userRepository.save(user);
 					  
 					  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",data);
@@ -681,10 +716,10 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 					  return  ResponseEntity.ok().body(getObjectResponse);
 					
 			  }
-			  else if(resp.get("resultCode").toString() == "duplicate") {
-					JSONObject res = new JSONObject(resp.get("result").toString() );	
+			  else if(resp.get("resultCode").toString().equals("duplicate")) {
+					Map res = (Map) resp.get("result");	
 					user.setReject_reason(null);
-					  user.setReference_key(res.getString("referenceKey"));
+					  user.setReference_key(res.get("referenceKey").toString());
 					  userRepository.save(user);
 
 					  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"duplicate",data);
@@ -874,14 +909,14 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				return  ResponseEntity.badRequest().body(getObjectResponse);
 			 }
 			 if(!dataObject.containsKey("managerPhoneNumber")) {
-				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "identityNumber shouldn't be null",null);
+				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "managerPhoneNumber shouldn't be null",null);
 				return  ResponseEntity.badRequest().body(getObjectResponse);
 			 }
 			 if(!dataObject.containsKey("managerMobileNumber")) {
-				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "identityNumber shouldn't be null",null);
+				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "managerMobileNumber shouldn't be null",null);
 				return  ResponseEntity.badRequest().body(getObjectResponse);
 			 }
-				  
+				 
 			  body.put("identityNumber", dataObject.get("identityNumber"));
 			  body.put("commercialRecordNumber", dataObject.get("commercialRecordNumber"));
 			  body.put("managerName", dataObject.get("managerName"));
@@ -933,9 +968,23 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				  
 			  HttpEntity<Object> entity = new HttpEntity<Object>(bodyToMiddleWare);
 
-			  ResponseEntity<ElmReturn> rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
-
+			  ResponseEntity<ElmReturn> rateResponse;
 			  List<ElmReturn> data = new ArrayList<ElmReturn>();
+
+			  try {
+				  rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
+		     } catch (Exception e) {
+		        getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Can't Request To Elm Error in Elm Server",data);
+				logger.info("************************ companyRegistrtaion ENDED ***************************");
+				return  ResponseEntity.ok().body(getObjectResponse);
+		     }
+
+			 
+			 if(rateResponse.getStatusCode().OK == null) {
+				  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Not Requested To Elm",data);
+				  logger.info("************************ companyRegistrtaion ENDED ***************************");
+				  return  ResponseEntity.ok().body(getObjectResponse);
+			  }
 			  
 			  ElmReturn elmReturn = rateResponse.getBody();
 
@@ -949,11 +998,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			  
 			  data.add(elmReturn);
 
-			 if(rateResponse.getStatusCode().OK == null) {
-				  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),elmReturn.getMessage(),data);
-				  logger.info("************************ companyUpdate ENDED ***************************");
-				  return  ResponseEntity.ok().body(getObjectResponse);
-			  }
+			 
 			  
 			  Map resp = new HashMap();
 			  resp = elmReturn.getBody();
@@ -971,11 +1016,11 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				  if(resp.get("success").equals(true)) {
 					  user.setReject_reason(null);
 						  
-					  user.setIdentity_num(dataObject.get("identityNumber"));
-					  user.setCommercial_num(dataObject.get("commercialRecordNumber"));
-					  user.setManager_name(dataObject.get("managerName"));
-					  user.setManager_phone(dataObject.get("managerPhoneNumber"));
-					  user.setManager_mobile(dataObject.get("managerMobileNumber"));
+					  user.setIdentity_num(dataObject.get("identityNumber").toString());
+					  user.setCommercial_num(dataObject.get("commercialRecordNumber").toString());
+					  user.setManager_name(dataObject.get("managerName").toString());
+					  user.setManager_phone(dataObject.get("managerPhoneNumber").toString());
+					  user.setManager_mobile(dataObject.get("managerMobileNumber").toString());
 
 						  
 						  
@@ -1137,7 +1182,13 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 
 			 }
-				 
+			 List<Long> CheckData = userClientDeviceRepository.getDevice(userId,deviceId);
+			if(CheckData.isEmpty()) {
+					isParent = false;
+			}
+			else {
+					isParent = true;
+			}
 			 
 		 }
 		 else {
@@ -1215,9 +1266,28 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				  
 			  HttpEntity<Object> entity = new HttpEntity<Object>(bodyToMiddleWare);
 
-			  ResponseEntity<ElmReturn> rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
 
-			  List<ElmReturn> data = new ArrayList<ElmReturn>();
+
+			  ResponseEntity<ElmReturn> rateResponse;
+			  
+				 List<ElmReturn> data = new ArrayList<ElmReturn>();
+
+				  try {
+					  rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
+		          } catch (Exception e) {
+			        getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Can't Request To Elm Error in Elm Server",data);
+					logger.info("************************ companyRegistrtaion ENDED ***************************");
+					return  ResponseEntity.ok().body(getObjectResponse);
+			     }
+
+				 
+				 if(rateResponse.getStatusCode().OK == null) {
+					  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Not Requested To Elm",data);
+					  logger.info("************************ companyRegistrtaion ENDED ***************************");
+					  return  ResponseEntity.ok().body(getObjectResponse);
+				  }
+			  
+			  
 			  
 			  ElmReturn elmReturn = rateResponse.getBody();
 
@@ -1231,12 +1301,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			  
 			  data.add(elmReturn);
 
-			 if(rateResponse.getStatusCode().OK == null) {
-				  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),elmReturn.getMessage(),data);
-				  logger.info("************************ deviceUpdate ENDED ***************************");
-				  return  ResponseEntity.ok().body(getObjectResponse);
-			  }
-			  
+			 
 			  Map resp = new HashMap();
 			  resp = elmReturn.getBody();
 			 			  
@@ -1410,6 +1475,13 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 
 			 }
+			 List<Long> CheckData = userClientDeviceRepository.getDevice(userId,deviceId);
+			if(CheckData.isEmpty()) {
+					isParent = false;
+			}
+			else {
+					isParent = true;
+			}
 				 
 			 
 		 }
@@ -1489,9 +1561,25 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			  
 		  HttpEntity<Object> entity = new HttpEntity<Object>(bodyToMiddleWare);
 
-		  ResponseEntity<ElmReturn> rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
 
-		  List<ElmReturn> data = new ArrayList<ElmReturn>();
+		  ResponseEntity<ElmReturn> rateResponse;
+		  
+			 List<ElmReturn> data = new ArrayList<ElmReturn>();
+
+			  try {
+				  rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
+	          } catch (Exception e) {
+		        getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Can't Request To Elm Error in Elm Server",data);
+				logger.info("************************ companyRegistrtaion ENDED ***************************");
+				return  ResponseEntity.ok().body(getObjectResponse);
+		     }
+
+			 
+			 if(rateResponse.getStatusCode().OK == null) {
+				  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Not Requested To Elm",data);
+				  logger.info("************************ companyRegistrtaion ENDED ***************************");
+				  return  ResponseEntity.ok().body(getObjectResponse);
+			  }
 		  
 		  ElmReturn elmReturn = rateResponse.getBody();
 
@@ -1507,11 +1595,6 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  
 		  data.add(elmReturn);
 
-		 if(rateResponse.getStatusCode().OK == null) {
-			  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),elmReturn.getMessage(),data);
-			  logger.info("************************ companyRegistrtaion ENDED ***************************");
-			  return  ResponseEntity.ok().body(getObjectResponse);
-		  }
 		  
 		  Map resp = new HashMap();
 		  resp = elmReturn.getBody();
@@ -1688,6 +1771,13 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 
 			 }
+			List<Long> CheckData = userClientDeviceRepository.getDevice(userId,deviceId);
+			if(CheckData.isEmpty()) {
+					isParent = false;
+			}
+			else {
+					isParent = true;
+			}
 				 
 			 
 		 }
@@ -1718,13 +1808,12 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  device_data.put("imeiNumber", device.getUniqueId());
 
 		  vehiclePlate.put("number", device.getPlateNum());
-		  vehiclePlate.put("right_letter", device.getRight_letter());
+		  vehiclePlate.put("rightLetter", device.getRight_letter());
 		  vehiclePlate.put("middleLetter", device.getMiddle_letter());
-		  vehiclePlate.put("left_letter", device.getLeft_letter());
+		  vehiclePlate.put("leftLetter", device.getLeft_letter());
 		  
 		  device_data.put("vehiclePlate",vehiclePlate);
 
-		  
 
 		  
 		  String url = elmCompanies+"/"+parent.getReference_key()+"/vehicles";
@@ -1773,9 +1862,24 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			  
 		  HttpEntity<Object> entity = new HttpEntity<Object>(bodyToMiddleWare);
 
-		  ResponseEntity<ElmReturn> rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
+		  ResponseEntity<ElmReturn> rateResponse;
+ 
+		 List<ElmReturn> data = new ArrayList<ElmReturn>();
 
-		  List<ElmReturn> data = new ArrayList<ElmReturn>();
+		  try {
+			  rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
+          } catch (Exception e) {
+	        getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Can't Request To Elm Error in Elm Server",data);
+			logger.info("************************ companyRegistrtaion ENDED ***************************");
+			return  ResponseEntity.ok().body(getObjectResponse);
+	     }
+
+		
+		 if(rateResponse.getStatusCode().OK == null) {
+			  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Not Requested To Elm",data);
+			  logger.info("************************ companyRegistrtaion ENDED ***************************");
+			  return  ResponseEntity.ok().body(getObjectResponse);
+		  }
 		  
 		  ElmReturn elmReturn = rateResponse.getBody();
 
@@ -1790,12 +1894,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  
 		  data.add(elmReturn);
 
-		 if(rateResponse.getStatusCode().OK == null) {
-			  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),elmReturn.getMessage(),data);
-			  logger.info("************************ deviceRegistrtaion ENDED ***************************");
-			  return  ResponseEntity.ok().body(getObjectResponse);
-		  }
-		  
+		
 		  Map resp = new HashMap();
 		  resp = elmReturn.getBody();
 		  
@@ -1809,11 +1908,11 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			  return  ResponseEntity.ok().body(getObjectResponse);
 		  }
 		  else if(resp.containsKey("resultCode")) {
-			  if(resp.get("resultCode").toString() == "success") {
-				  JSONObject res = new JSONObject(resp.get("result").toString());	
+			  if(resp.get("resultCode").toString().equals("success")) {
+				  Map res = (Map) resp.get("result");	
 				  
 				  device.setReject_reason(null);
-				  device.setReference_key(res.getString("referenceKey"));
+				  device.setReference_key(res.get("referenceKey").toString());
 				  device.setRegestration_to_elm_date(dateReg);
 				  device.setUpdate_date_in_elm(dateReg);
 				  device.setExpired(0);
@@ -1825,20 +1924,20 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				  return  ResponseEntity.ok().body(getObjectResponse);
 				
 			  }
-			  else if(resp.get("resultCode").toString() == "duplicate") {
-					JSONObject res = new JSONObject(resp.get("result").toString() );	
+			  else if(resp.get("resultCode").toString().equals("duplicate")) {
+				  Map res = (Map) resp.get("result");	
 					
 					device.setReject_reason(null);
-					device.setReference_key(res.getString("referenceKey"));
+					device.setReference_key(res.get("referenceKey").toString());
 					device.setRegestration_to_elm_date(dateReg);
 					device.setUpdate_date_in_elm(dateReg);
 					device.setExpired(0);
 					
 					deviceRepository.save(device);
 
-					  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"duplicate",data);
-					  logger.info("************************ deviceRegistrtaion ENDED ***************************");
-					  return  ResponseEntity.ok().body(getObjectResponse);
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"duplicate",data);
+					logger.info("************************ deviceRegistrtaion ENDED ***************************");
+					return  ResponseEntity.ok().body(getObjectResponse);
 			  }
 			  else {
 
@@ -1971,6 +2070,13 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 
 			 }
+			 List<Long> CheckData = userClientDriverRepository.getDriver(userId,driverId);
+			if(CheckData.isEmpty()) {
+					isParent = false;
+			}
+			else {
+					isParent = true;
+			}
 				 
 			 
 		 }
@@ -2050,9 +2156,26 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			  
 		  HttpEntity<Object> entity = new HttpEntity<Object>(bodyToMiddleWare);
 
-		  ResponseEntity<ElmReturn> rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
+	
+		  
+		  ResponseEntity<ElmReturn> rateResponse;
+		  
+			 List<ElmReturn> data = new ArrayList<ElmReturn>();
 
-		  List<ElmReturn> data = new ArrayList<ElmReturn>();
+			  try {
+				  rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
+	          } catch (Exception e) {
+		        getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Can't Request To Elm Error in Elm Server",data);
+				logger.info("************************ companyRegistrtaion ENDED ***************************");
+				return  ResponseEntity.ok().body(getObjectResponse);
+		     }
+
+			
+			 if(rateResponse.getStatusCode().OK == null) {
+				  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Not Requested To Elm",data);
+				  logger.info("************************ companyRegistrtaion ENDED ***************************");
+				  return  ResponseEntity.ok().body(getObjectResponse);
+			  }
 		  
 		  ElmReturn elmReturn = rateResponse.getBody();
 
@@ -2067,11 +2190,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  
 		  data.add(elmReturn);
 
-		 if(rateResponse.getStatusCode().OK == null) {
-			  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),elmReturn.getMessage(),data);
-			  logger.info("************************ companyRegistrtaion ENDED ***************************");
-			  return  ResponseEntity.ok().body(getObjectResponse);
-		  }
+		 
 		  
 		  Map resp = new HashMap();
 		  resp = elmReturn.getBody();          
@@ -2086,10 +2205,10 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			  return  ResponseEntity.ok().body(getObjectResponse);
 		  }
 		  else if(resp.containsKey("resultCode")) {
-			  if(resp.get("resultCode").toString() == "success") {
-				  JSONObject res = new JSONObject(resp.get("result").toString());	
+			  if(resp.get("resultCode").toString().equals("success")) {
+				  Map res = (Map) resp.get("result");	
 				  driver.setReject_reason(null);
-				  driver.setReference_key(res.getString("referenceKey"));
+				  driver.setReference_key(res.get("referenceKey").toString());
 				  driverRepository.save(driver);
 				  
 				  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",data);
@@ -2097,10 +2216,10 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				  return  ResponseEntity.ok().body(getObjectResponse);
 				
 			  }
-			  else if(resp.get("resultCode").toString() == "duplicate") {
-					JSONObject res = new JSONObject(resp.get("result").toString() );	
+			  else if(resp.get("resultCode").toString().equals("duplicate")) {
+					Map res = (Map) resp.get("result");	
 					driver.setReject_reason(null);
-					driver.setReference_key(res.getString("referenceKey"));
+					driver.setReference_key(res.get("referenceKey").toString());
 					driverRepository.save(driver);
 
 					  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"duplicate",data);
@@ -2233,6 +2352,13 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 
 			 }
+			 List<Long> CheckData = userClientDeviceRepository.getDevice(userId,deviceId);
+				if(CheckData.isEmpty()) {
+						isParent = false;
+				}
+				else {
+						isParent = true;
+				}
 				 
 			 
 		 }
@@ -2301,9 +2427,23 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			  
 		  HttpEntity<Object> entity = new HttpEntity<Object>(bodyToMiddleWare);
 
-		  ResponseEntity<ElmReturn> rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
+		  ResponseEntity<ElmReturn> rateResponse;
+		  
+			 List<ElmReturn> data = new ArrayList<ElmReturn>();
 
-		  List<ElmReturn> data = new ArrayList<ElmReturn>();
+			  try {
+				  rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
+	          } catch (Exception e) {
+		        getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Can't Request To Elm Error in Elm Server",data);
+				logger.info("************************ companyRegistrtaion ENDED ***************************");
+				return  ResponseEntity.ok().body(getObjectResponse);
+		     }
+
+			 if(rateResponse.getStatusCode().OK == null) {
+				  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Not Requested To Elm",data);
+				  logger.info("************************ companyRegistrtaion ENDED ***************************");
+				  return  ResponseEntity.ok().body(getObjectResponse);
+			  }
 		  
 		  ElmReturn elmReturn = rateResponse.getBody();
 
@@ -2317,11 +2457,6 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  
 		  data.add(elmReturn);
 
-		 if(rateResponse.getStatusCode().OK == null) {
-			  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),elmReturn.getMessage(),data);
-			  logger.info("************************ deviceInquery ENDED ***************************");
-			  return  ResponseEntity.ok().body(getObjectResponse);
-		  }
 		  
 		  Map resp = new HashMap();
 		  resp = elmReturn.getBody();   		 
@@ -2570,13 +2705,25 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			  
 		  HttpEntity<Object> entity = new HttpEntity<Object>(bodyToMiddleWare);
 
-		  ResponseEntity<ElmReturn> rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
 
-		  
-		  
-		
-		  
+		  ResponseEntity<ElmReturn> rateResponse ;
 		  List<ElmReturn> data = new ArrayList<ElmReturn>();
+
+		 try {
+			 rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
+	     } catch (Exception e) {
+	        getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Can't Request To Elm Error in Elm Server",data);
+			logger.info("************************ companyRegistrtaion ENDED ***************************");
+			return  ResponseEntity.ok().body(getObjectResponse);
+	     }
+
+		 if(rateResponse.getStatusCode().OK == null) {
+			  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Not Requested To Elm",data);
+			  logger.info("************************ companyRegistrtaion ENDED ***************************");
+			  return  ResponseEntity.ok().body(getObjectResponse);
+		  }
+		  
+
 		  
 		  ElmReturn elmReturn = rateResponse.getBody();
 
@@ -2733,7 +2880,14 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 
 			 }
-				 
+				
+			 List<Long> CheckData = userClientDriverRepository.getDriver(userId,driverId);
+				if(CheckData.isEmpty()) {
+						isParent = false;
+				}
+				else {
+						isParent = true;
+				}
 			 
 		 }
 		 else {
@@ -2812,10 +2966,25 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			  
 		  HttpEntity<Object> entity = new HttpEntity<Object>(bodyToMiddleWare);
 
-		  ResponseEntity<ElmReturn> rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
+		  ResponseEntity<ElmReturn> rateResponse;
+		  
+			 List<ElmReturn> data = new ArrayList<ElmReturn>();
 
-		  List<ElmReturn> data = new ArrayList<ElmReturn>();
+			  try {
+				  rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
+	          } catch (Exception e) {
+		        getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Can't Request To Elm Error in Elm Server",data);
+				logger.info("************************ companyRegistrtaion ENDED ***************************");
+				return  ResponseEntity.ok().body(getObjectResponse);
+		     }
 
+			 
+			 if(rateResponse.getStatusCode().OK == null) {
+				  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Not Requested To Elm",data);
+				  logger.info("************************ companyRegistrtaion ENDED ***************************");
+				  return  ResponseEntity.ok().body(getObjectResponse);
+			  }
+		  
 		  		  
 		  ElmReturn elmReturn = rateResponse.getBody();
 
@@ -2832,11 +3001,6 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 		  
 		 
-		 if(rateResponse.getStatusCode().OK == null) {
-			  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),elmReturn.getMessage(),data);
-			  logger.info("************************ companyRegistrtaion ENDED ***************************");
-			  return  ResponseEntity.ok().body(getObjectResponse);
-		  }
 		  
 		  Map resp = new HashMap();
 		  resp = elmReturn.getBody();          
@@ -2995,6 +3159,14 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 
 			 }
+			 
+			 List<Long> CheckData = userClientDriverRepository.getDriver(userId,driverId);
+				if(CheckData.isEmpty()) {
+						isParent = false;
+				}
+				else {
+						isParent = true;
+				}
 				 
 			 
 		 }
@@ -3064,9 +3236,24 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			  
 		  HttpEntity<Object> entity = new HttpEntity<Object>(bodyToMiddleWare);
 
-		  ResponseEntity<ElmReturn> rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
+		  ResponseEntity<ElmReturn> rateResponse;
+		  
+			 List<ElmReturn> data = new ArrayList<ElmReturn>();
 
-		  List<ElmReturn> data = new ArrayList<ElmReturn>();
+			  try {
+				  rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
+	          } catch (Exception e) {
+		        getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Can't Request To Elm Error in Elm Server",data);
+				logger.info("************************ companyRegistrtaion ENDED ***************************");
+				return  ResponseEntity.ok().body(getObjectResponse);
+		     }
+
+			 if(rateResponse.getStatusCode().OK == null) {
+				  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Not Requested To Elm",data);
+				  logger.info("************************ companyRegistrtaion ENDED ***************************");
+				  return  ResponseEntity.ok().body(getObjectResponse);
+			  }
+		  
 		  
 		  ElmReturn elmReturn = rateResponse.getBody();
 
@@ -3080,12 +3267,6 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  
 		  data.add(elmReturn);
 
-		 if(rateResponse.getStatusCode().OK == null) {
-			  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),elmReturn.getMessage(),data);
-			  logger.info("************************ driverInquery ENDED ***************************");
-			  return  ResponseEntity.ok().body(getObjectResponse);
-		  }
-		  
 		  Map resp = new HashMap();
 		  resp = elmReturn.getBody();  
 		  
@@ -3236,7 +3417,13 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 
 			 }
-				 
+			 List<Long> CheckData = userClientDriverRepository.getDriver(userId,driverId);
+			if(CheckData.isEmpty()) {
+					isParent = false;
+			}
+			else {
+					isParent = true;
+			}
 			 
 		 }
 		 else {
@@ -3324,9 +3511,23 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			  
 		  HttpEntity<Object> entity = new HttpEntity<Object>(bodyToMiddleWare);
 
-		  ResponseEntity<ElmReturn> rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
+		  ResponseEntity<ElmReturn> rateResponse;
+		  
+			 List<ElmReturn> data = new ArrayList<ElmReturn>();
 
-		  List<ElmReturn> data = new ArrayList<ElmReturn>();
+			  try {
+				  rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
+	          } catch (Exception e) {
+		        getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Can't Request To Elm Error in Elm Server",data);
+				logger.info("************************ companyRegistrtaion ENDED ***************************");
+				return  ResponseEntity.ok().body(getObjectResponse);
+		     }
+
+			 if(rateResponse.getStatusCode().OK == null) {
+				  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Not Requested To Elm",data);
+				  logger.info("************************ companyRegistrtaion ENDED ***************************");
+				  return  ResponseEntity.ok().body(getObjectResponse);
+			  }
 		  
 		  ElmReturn elmReturn = rateResponse.getBody();
 
@@ -3341,11 +3542,6 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  
 		  data.add(elmReturn);
 
-		 if(rateResponse.getStatusCode().OK == null) {
-			  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),elmReturn.getMessage(),data);
-			  logger.info("************************ driverUpdate ENDED ***************************");
-			  return  ResponseEntity.ok().body(getObjectResponse);
-		  }
 		  
 		  Map resp = new HashMap();
 		  resp = elmReturn.getBody();          
@@ -3397,6 +3593,13 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		
 		// TODO Auto-generated method stub
 		
+		Date date = new Date();
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String time = formatter.format(date);
+		String type = "Location";
+		Map requet = new HashMap();
+		Map response = new HashMap();
+		
 		logger.info("************************ lastLocations STARTED ***************************");
 
 		 List<Map> dataArray = new ArrayList<>();
@@ -3417,13 +3620,12 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			deviceIds.add(loc.getDeviceid());
 		}
 
-		positions_elm = mongoPositionsElmRepository.findByDeviceIdIn(deviceIds,new PageRequest(0, 1000));
+		positions_elm = mongoPositionsElmRepository.findByDeviceIdIn(deviceIds,new PageRequest(0, 100));
 		
 		for(MongoPositionsElm posElm:positions_elm) {
 			LastLocationsList location = new LastLocationsList();
 			for(LastLocationsList loc:locationsList) {
 				if(posElm.getDeviceid().toString().equals(loc.getDeviceid().toString())) {
-
 					location.setId(posElm.get_id().toString());
 					location.setLasttime(posElm.getServertime());
 					location.setDeviceid(posElm.getDeviceid());
@@ -3446,6 +3648,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 					
 					locations.add(location);
+					break;
 				}
 			}
 	
@@ -3457,59 +3660,102 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 		 for(LastLocationsList location : locations) {
 				Map record = new HashMap();
-				Double set_status =(double) 0;
 				JSONObject obj =  new JSONObject();
+				Boolean set_status = false;
+				Map<Object,Object> objectMap = new HashMap<Object, Object>();
+
+
 				if(location.getAttributes().toString().startsWith("{")) {
-					obj = new JSONObject(location.getAttributes());	
+					//obj = new JSONObject(location.getAttributes());	
+					objectMap = (Map<Object, Object>) location.getAttributes();
+					ObjectMapper objectMapper = new ObjectMapper();
+
+			        try {
+			            String json = objectMapper.writeValueAsString(objectMap);
+						obj = new JSONObject(json);	
+
+			        } catch (JsonProcessingException e) {
+			            e.printStackTrace();
+			        }
 				}
 				
-				if(!obj.has("power")) {
-					obj.put("power",0);
-					
-				}
+		        
+
 				
-				if(!obj.has("operator")) {
-					obj.put("operator",1);
-					
-				}
-				else {
-					obj.remove("operator");
-					obj.put("operator",1);
-
-				}
-
-				if(location.getIs_offline() != null) {
-					if(location.getIs_offline() == 1) {
+				if(obj.has("power")) {
+					if( obj.getDouble("power") < 1 ) {
 						record.put("vehicleStatus", "DEVICE_NOT_WORKING");
-						set_status = (double) 1;
-
+						set_status = true;
 					}
-				}
-				if( obj.getDouble("power") < 1 ) {
-					record.put("vehicleStatus", "DEVICE_NOT_WORKING");
-					set_status = (double) 1;
+				
 				}
 				
-				if(obj.has("alarm") && set_status == 0) {
-
-					if(obj.getString("alarm").equals("crash")) {
-						record.put("vehicleStatus", "ACCIDENT");
-						set_status = (double) 1;
-					}
-				}
 				
-				if(obj.has("adc1") && obj.has("adc2")) {
+			   if(obj.has("adc1") && obj.has("adc2") && !set_status) {
 
 					Double avg = ( obj.getDouble("adc1") + obj.getDouble("adc2") ) /2 ;
-					if(set_status == 0 && avg == 0)
+					if(avg == 0)
 	                {
 						record.put("vehicleStatus", "TAMPER_WEIGHT");
-						set_status = (double) 1;
 						location.setWeight((float) 0);
+						set_status = true;
 	                }
 
 
 				}
+				
+			 if(obj.has("alarm") && !set_status) {
+
+				if(obj.has("alarm")) {
+					if(obj.getString("alarm").equals("crash")) {
+						record.put("vehicleStatus", "ACCIDENT");
+						set_status = true;
+					}
+				}
+				
+			}
+				if(obj.has("operator") && !set_status) {
+					if(obj.getDouble("operator") > 0) {
+						if(obj.has("ignition")) {
+							if(location.getSpeed() == 0 && obj.get("ignition").equals(true)) {
+								record.put("vehicleStatus", "PARKED_ENGINE_ON");
+								set_status = true;
+
+							}
+							else if(location.getSpeed() == 0 && obj.get("ignition").equals(false)){
+								record.put("vehicleStatus", "PARKED_ENGINE_OFF");
+								set_status = true;
+
+							}
+							else if(location.getSpeed() > 0 ){
+								record.put("vehicleStatus", "MOVING");
+								set_status = true;
+							}
+							else {
+								record.put("vehicleStatus", "PARKED_ENGINE_OFF");
+								set_status = true;
+
+							}
+						}
+						else {
+							record.put("vehicleStatus", "PARKED_ENGINE_OFF");
+							set_status = true;
+
+						}
+					}
+					else {
+						record.put("vehicleStatus", "DEVICE_NO_SIGNAL");
+						set_status = true;
+
+					}
+				}
+				
+				
+				if(!set_status) {
+					record.put("vehicleStatus", "DEVICE_NO_SIGNAL");
+				}
+				
+				
 				
 				if(obj.has("temp")) {
 					record.put("temperature", obj.get("temp"));
@@ -3519,30 +3765,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 					record.put("humidity", obj.get("hum"));
 				}
 				
-				if(obj.get("operator").equals(0) && set_status == 0) {
-					record.put("vehicleStatus", "DEVICE_NO_SIGNAL");
-					set_status = (double) 1;
-				}
-				else if(!obj.get("operator").equals(0) && set_status == 0 && 
-						location.getSpeed() == 0 && obj.get("ignition").equals(true) ) {
-					record.put("vehicleStatus", "PARKED_ENGINE_ON");
-					set_status = (double) 1;
-				}
-				else if(!obj.get("operator").equals(0) && set_status == 0 && 
-						location.getSpeed() == 0 && obj.get("ignition").equals(false) ) {
-					record.put("vehicleStatus", "PARKED_ENGINE_OFF");
-					set_status = (double) 1;
-				}
-				else if(!obj.get("operator").equals(0) && set_status == 0 && 
-						location.getSpeed() != 0) {
-					record.put("vehicleStatus", "MOVING");
-					set_status = (double) 1;
-				}
-				else if(set_status == 0 ) {
-					record.put("vehicleStatus", "PARKED_DEVICE_DISCONNECTED");
-					set_status = (double) 1;
-				}
-
+				
 	            String calcWeightPhp = "";
 				if( (location.getWeight() == null || location.getWeight() ==0 ) 
 						&& record.get("vehicleStatus") != "TAMPER_WEIGHT"  ) {
@@ -3567,12 +3790,13 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				record.put("latitude", location.getLatitude());
 				record.put("longitude", location.getLongitude());
 				
-				Double roundOffWeight= Math.round((location.getSpeed()*2) * 100.0) / 100.0;
-				record.put("velocity", roundOffWeight);
+				Double roundOffSpeed= Math.round((location.getSpeed()*2) * 100.0) / 100.0;
+				record.put("velocity", roundOffSpeed);
 
 				Date dt = location.getLasttime();
 
 				SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'");
+				
 				String d = outputFormat.format(dt);
 
 				record.put("locationTime", d);
@@ -3599,7 +3823,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				MongoElmLastLocations connection_log = new MongoElmLastLocations();  
 				
 				connection_log.setPositionid(location.getId());
-				connection_log.setElm_data(record.toString());
+				connection_log.setElm_data(record);
 				connection_log.setSendtime(nowTime);
 				connection_log.setVehicleid(location.getDeviceid());
 				connection_log.setVehiclename(location.getDevicename());
@@ -3625,8 +3849,6 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		 
 
 		body.put("vehicleLocations", dataArray);
-		
-		
 		
 		  TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
 
@@ -3691,12 +3913,22 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  Map resp = new HashMap();
 		  resp = elmReturn.getBody();  
 		  
-     	  
+		  requet = bodyToMiddleWare;
+		  ElmReturn elmReturnd = rateResponse.getBody();
+
+		  response.put("body", elmReturnd.getBody());
+		  response.put("statusCode", elmReturnd.getStatusCode());
+		  response.put("message", elmReturnd.getMessage());
+		  
+MongoElmLogs elmLogs = new MongoElmLogs(null,null,null,null,null,null,null,time,type,requet,response);
+elmLogsRepository.save(elmLogs);
+		  
 
         if(resp.containsKey("resultCode")) {
         	
-        	elmLastLocationsRepository.save(elm_connection_logs);
-        	mongoPositionsElmRepository.deleteByIdIn(ids);
+        	elmLastLocationsRepository.save(elm_connection_logs);  
+          	mongoPositionsElmRepository.deleteByIdIn(ids);
+
 
         }
         
@@ -3897,6 +4129,14 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 
 								 }
+								 
+								 List<Long> CheckData = userClientDriverRepository.getDriver(loggedUserId,driverId);
+									if(CheckData.isEmpty()) {
+											isParent = false;
+									}
+									else {
+											isParent = true;
+									}
 									 
 								 
 							 }
@@ -3974,7 +4214,13 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 
 								 }
-									 
+								 List<Long> CheckData = userClientDeviceRepository.getDevice(loggedUserId,deviceId);
+									if(CheckData.isEmpty()) {
+											isParent = false;
+									}
+									else {
+											isParent = true;
+									}
 								 
 							 }
 							 else {
@@ -4163,8 +4409,101 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		
 		
 		
-		getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "success",null);
-		return  ResponseEntity.badRequest().body(getObjectResponse);
+		
+		getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",null);
+		return  ResponseEntity.ok().body(getObjectResponse);
+	}
+
+
+
+
+	@Override
+	public ResponseEntity<?> checkBySequenceNumber(String sequenceNumber) {
+		// TODO Auto-generated method stub
+		
+		
+		if(sequenceNumber.equals("")) {
+			
+			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "No Sequence Number Selected",null);
+			return  ResponseEntity.ok().body(getObjectResponse);
+		}
+		
+		Device device = deviceRepository.getDeviceBySequenceNumber(sequenceNumber);
+		
+		if(device == null) {
+			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "No Data For This Sequence Number In DB",null);
+			return  ResponseEntity.ok().body(getObjectResponse);
+		}
+		
+		
+		 List<Map<Object,Object>> result = new ArrayList<Map<Object,Object>>();
+		 
+		 
+	     Map dataFinal= new HashMap();
+
+	     Map deviceData= new HashMap();
+	     deviceData.put("Name", device.getName());
+	     deviceData.put("Unique Id", device.getUniqueId());
+	     deviceData.put("Sequence Number", device.getSequence_number());
+	     
+	     List<Map> calibrationData=new ArrayList<Map>();
+	     deviceData.put("Calibration Data", calibrationData);
+
+		 if(device.getCalibrationData() != null) {
+
+			 String str = device.getCalibrationData().toString(); 
+		     String arrOfStr[] = str.split(" "); 
+		     for (String a : arrOfStr) {
+		    	 JSONObject obj =new JSONObject(a);
+				 Map list   = new HashMap<>();
+				 list.put("s1",obj.get("s1"));
+				 list.put("s2",obj.get("s2"));
+				 list.put("w",obj.get("w"));
+				 calibrationData.add(list);
+
+		     }
+		     deviceData.put("Calibration Data", calibrationData);
+			 
+		 }
+		 Map lineData   = new HashMap<>();
+	     deviceData.put("Line Data", lineData);
+	     
+	     if(device.getLineData() != null) {
+	    	 JSONObject obj= new JSONObject(device.getLineData().toString());
+			 lineData.put("slope",obj.get("slope"));
+			 lineData.put("factor",obj.get("factor"));
+
+		     deviceData.put("Line Data", lineData);
+
+	     }
+	     
+	     dataFinal.put("deviceData", deviceData);
+
+	     
+	     
+	     LastPositionData position = mongoPositionRepo.getLastPosition(device.getId());
+
+	     List<LastPositionData> positionsZeroSpeed = mongoPositionRepo.getLastPositionSpeedZero(device.getId());
+	     List<LastPositionData> positionsGreaterZeroSpeed = mongoPositionRepo.getLastPositionGreaterSpeedZero(device.getId());
+
+	     List<LastElmData> positionsZeroVelocity = mongoPositionRepo.getLastPositionVelocityZero(device.getId());
+	     List<LastElmData> positionsGreaterZeroVelocity = mongoPositionRepo.getLastPositionGreaterVelocityZero(device.getId());
+
+	     
+	     dataFinal.put("positionData", position);
+	     
+	     dataFinal.put("positionZeroSpeed", positionsZeroSpeed);
+	     dataFinal.put("positionsGreaterZeroSpeed", positionsGreaterZeroSpeed);
+	     
+	     dataFinal.put("positionsZeroVelocity", positionsZeroVelocity);
+	     dataFinal.put("positionsGreaterZeroVelocity", positionsGreaterZeroVelocity);
+
+	     result.add(dataFinal);
+
+		getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",result);
+		return  ResponseEntity.ok().body(getObjectResponse);
+		
+
 	}
 
 

@@ -130,6 +130,16 @@ public class GroupsRestController {
 		
 	}
 	
+	@RequestMapping(value = "/getGroupUnSelectOfCient", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getGroupUnSelectOfCient(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                               @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		
+	
+    	return  groupsServiceImpl.getGroupUnSelectOfCient(TOKEN,userId);
+
+		
+	}
+	
 	@GetMapping("/assignClientGroups")
 	public ResponseEntity<?> assignClientGroups(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 		                           			   @RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,

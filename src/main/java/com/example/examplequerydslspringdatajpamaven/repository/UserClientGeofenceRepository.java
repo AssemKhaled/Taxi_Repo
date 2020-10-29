@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
+import com.example.examplequerydslspringdatajpamaven.entity.userClientDevice;
 import com.example.examplequerydslspringdatajpamaven.entity.userClientGeofence;
 
 @Component
@@ -24,8 +25,29 @@ public interface UserClientGeofenceRepository extends JpaRepository<userClientGe
 	@Query(value = "select * from tc_user_client_geofence where tc_user_client_geofence.userid=:userId", nativeQuery = true)
 	public List<userClientGeofence> getGeofnecesOfUser(@Param("userId") Long userId);
 	
+	@Query(value = "select tc_user_client_geofence.geofenceid from tc_user_client_geofence where tc_user_client_geofence.userid=:userId", nativeQuery = true)
+	public List<Long> getGeofneceIds(@Param("userId") Long userId);
+	
 	@Query(value = "select tc_geofences.id as id , tc_geofences.name as name from tc_geofences "
 			+ " INNER JOIN tc_user_client_geofence ON tc_user_client_geofence.geofenceid=tc_geofences.id "
 			+ "  where tc_user_client_geofence.userid=:userId ", nativeQuery = true)
 	public List<DriverSelect> getGeofencesOfUserList(@Param("userId") Long userId);
+	
+	
+	@Query(value = "select tc_user_client_geofence.geofenceid from tc_user_client_geofence "
+			+ " where tc_user_client_geofence.userid=:userId and tc_user_client_geofence.geofenceid=:geofenceId  ", nativeQuery = true)
+	public List<Long> getGeofence(@Param("userId") Long userId,@Param("geofenceId") Long geofenceId);
+	
+	
+	@Query(value = "select * from tc_user_client_geofence where tc_user_client_geofence.geofenceid IN (:geofenceIds) and tc_user_client_geofence.userid !=:userId", nativeQuery = true)
+	public List<userClientGeofence> getGeofeneceByGeoIds(@Param("geofenceIds") Long[] geofenceIds ,@Param("userId") Long userId);
+
+	
+	@Transactional
+    @Modifying
+	@Query(value = "Delete from tc_user_client_geofence where tc_user_client_geofence.geofenceid=:geofenceId", nativeQuery = true)
+	public void deleteGeofById(@Param("geofenceId") Long geofenceId);
+	
+	@Query(value = "select tc_user_client_geofence.geofenceid from tc_user_client_geofence where tc_user_client_geofence.geofenceid=:geofenceId", nativeQuery = true)
+	public List<Long> getGeofToDelete(@Param("geofenceId") Long geofenceId);
 }

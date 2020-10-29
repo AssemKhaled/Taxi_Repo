@@ -2,6 +2,8 @@ package com.example.examplequerydslspringdatajpamaven.repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +34,20 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	@Query(nativeQuery = true, name = "getDevicesList")
 	List<CustomDeviceList> getDevicesList(@Param("userIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
 
+
+	@Query(nativeQuery = true, name = "getDevicesListByIds")
+	List<CustomDeviceList> getDevicesListByIds(@Param("deviceIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
+
+	@Query(value = "select * from tc_devices " + 
+			" inner join tc_user_client_device on tc_devices.id = tc_user_client_device.deviceid " + 
+			" where tc_user_client_device.userid=:userId and delete_date is null ", nativeQuery = true)
+	public Set<Device> getDevicesOfTypeUser(@Param("userId") Long userId);
+	
 	@Query(nativeQuery = true, name = "getDevicesListApp")
 	List<CustomDeviceList> getDevicesListApp(@Param("userIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
+	
+	@Query(nativeQuery = true, name = "getDevicesListAppByIds")
+	List<CustomDeviceList> getDevicesListAppByIds(@Param("deviceIds")List<Long> deviceIds,@Param("offset") int offset,@Param("search") String search);
 	
 	@Query(value = "SELECT car_weight FROM tc_devices where id=:deviceId",nativeQuery = true )
 	public Float getWeight(@Param("deviceId")Long deviceId);
@@ -56,11 +70,26 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 			+ " WHERE tc_user_device.userid IN (:userIds ) and tc_devices.delete_date is null",nativeQuery = true)
 	public List<DeviceSelect> getDeviceSelect(@Param("userIds")List<Long> userIds);
 	
+	@Query(value = "SELECT tc_devices.id,tc_devices.name FROM tc_devices"
+			+ " INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id"
+			+ " WHERE tc_user_device.userid IN (:userId ) and tc_devices.delete_date is null "
+			+ " and tc_devices.id Not IN(Select tc_user_client_device.deviceid from tc_user_client_device) ",nativeQuery = true)
+	public List<DeviceSelect> getDeviceUnSelectOfClient(@Param("userId")Long userId);
+	
+	@Query(value = "SELECT tc_devices.id,tc_devices.name FROM tc_devices"
+			+ " WHERE tc_devices.id IN (:deviceIds ) and tc_devices.delete_date is null",nativeQuery = true)
+	public List<DeviceSelect> getDeviceSelectByIds(@Param("deviceIds")List<Long> deviceIds);
+	
 
 	@Query(value = "SELECT tc_devices.id FROM tc_devices INNER JOIN tc_user_device ON tc_user_device.deviceid=tc_devices.id "
 			+ "where tc_devices.lastupdate>date_sub(now(), interval 0 minute)=false  AND tc_devices.lastupdate<date_sub(now(), interval 3 minute)=false "
 			+ " AND tc_user_device.userid IN (:userIds) and tc_devices.delete_date is null", nativeQuery = true)
 	public List<Long> getNumberOfOnlineDevicesList(@Param("userIds")List<Long> userIds);
+	
+	@Query(value = "SELECT tc_devices.id FROM tc_devices "
+			+ " where tc_devices.lastupdate>date_sub(now(), interval 0 minute)=false  AND tc_devices.lastupdate<date_sub(now(), interval 3 minute)=false "
+			+ " AND tc_devices.id IN (:deviceIds) and tc_devices.delete_date is null", nativeQuery = true)
+	public List<Long> getNumberOfOnlineDevicesListByIds(@Param("deviceIds")List<Long> deviceIds);
 	
 	
 	@Query(value = "SELECT tc_devices.id FROM tc_devices INNER JOIN tc_user_device ON tc_user_device.deviceid=tc_devices.id "
@@ -68,9 +97,18 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 			+ " AND tc_user_device.userid IN (:userIds) and tc_devices.delete_date is null", nativeQuery = true)
 	public List<Long> getNumberOfOutOfNetworkDevicesList(@Param("userIds")List<Long> userIds);
 	
+	@Query(value = "SELECT tc_devices.id FROM tc_devices "
+			+ "where tc_devices.lastupdate>date_sub(now(), interval 3 minute)=false  AND tc_devices.lastupdate<date_sub(now(), interval 8 minute)=false "
+			+ " AND tc_devices.id IN (:deviceIds) and tc_devices.delete_date is null", nativeQuery = true)
+	public List<Long> getNumberOfOutOfNetworkDevicesListByIds(@Param("deviceIds")List<Long> deviceIds);
+	
 	@Query(value = "SELECT count(tc_devices.id) FROM tc_devices INNER JOIN tc_user_device ON tc_devices.id = tc_user_device.deviceid " + 
 			"AND tc_user_device.userid IN (:userIds) WHERE tc_devices.delete_date is null ",nativeQuery = true )
 	public Integer getTotalNumberOfUserDevices(@Param("userIds")List<Long> userIds);
+	
+	@Query(value = "SELECT count(tc_devices.id) FROM tc_devices  " + 
+			" Where tc_devices.id IN (:deviceIds) and tc_devices.delete_date is null ",nativeQuery = true )
+	public Integer getTotalNumberOfUserDevicesByIds(@Param("deviceIds")List<Long> deviceIds);
 	
 	@Query(value = "SELECT tc_devices.id FROM tc_devices INNER JOIN tc_user_device ON tc_devices.id = tc_user_device.deviceid " + 
 			"AND tc_user_device.userid IN (:userIds) WHERE tc_devices.delete_date is null ",nativeQuery = true )
@@ -80,6 +118,12 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 			+ " INNER JOIN tc_user_device ON tc_devices.id = tc_user_device.deviceid " + 
 			"AND tc_user_device.userid IN (:userIds) WHERE tc_devices.delete_date is null ",nativeQuery = true )
 	public List<String> getAllPositionsObjectIds(@Param("userIds")List<Long> userIds);
+	
+	
+	@Query(value = "SELECT tc_devices.positionid FROM tc_devices " +
+			" where tc_devices.id IN (:deviceIds) and tc_devices.delete_date is null ",nativeQuery = true )
+	public List<String> getAllPositionsObjectIdsByIds(@Param("deviceIds")List<Long> deviceIds);
+	
 	//here
 	@Query(nativeQuery = true, name = "getDevicesLiveData")
 	//List<CustomDeviceLiveData> getAllDevicesLiveData(@Param("userIds")List<Long> userIds,@Param("offset") int offset);
@@ -88,10 +132,20 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	@Query(nativeQuery = true, name = "getDevicesData")
     List<CustomDeviceLiveData> getAllDevicesData(@Param("userIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
 
+	@Query(nativeQuery = true, name = "getDevicesDataByIds")
+    List<CustomDeviceLiveData> getAllDevicesDataByIds(@Param("deviceIds")List<Long> deviceIds,@Param("offset") int offset,@Param("search") String search);
+
+	
 	@Query(value = " SELECT  count(tc_devices.id) FROM tc_devices " + 
 			" INNER JOIN  tc_user_device ON tc_devices.id=tc_user_device.deviceid " + 
-			" where tc_user_device.userid IN (:userIds) and tc_devices.delete_date is null " ,nativeQuery = true )
-	public Integer getAllDevicesLiveDataSize(@Param("userIds")List<Long> userIds);
+			" where tc_user_device.userid IN (:userIds) and tc_devices.delete_date is null " 
+			+ "  AND ( (tc_devices.uniqueid LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_devices.name LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))))" ,nativeQuery = true )
+	public Integer getAllDevicesLiveDataSize(@Param("userIds")List<Long> userIds,@Param("search") String search);
+	
+	@Query(value = " SELECT  count(tc_devices.id) FROM tc_devices " + 
+			" where tc_devices.id IN (:deviceIds) and tc_devices.delete_date is null " 
+			+ "  AND ( (tc_devices.uniqueid LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_devices.name LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))))" ,nativeQuery = true )
+	public Integer getAllDevicesLiveDataSizeByIds(@Param("deviceIds")List<Long> deviceIds,@Param("search") String search);
 	
 	//here
 	@Query(nativeQuery = true, name = "getDevicesLiveDataMap")
@@ -100,6 +154,9 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	
 	@Query(nativeQuery = true, name = "getDevicesDataMap")
  	List<CustomMapData> getAllDevicesDataMap(@Param("userIds")List<Long> userIds);
+	
+	@Query(nativeQuery = true, name = "getDevicesDataMapByIds")
+ 	List<CustomMapData> getAllDevicesDataMapByIds(@Param("deviceIds")List<Long> deviceIds);
 
 	@Query(nativeQuery = true, name = "vehicleInfo")
 	public List<CustomDeviceList> vehicleInfo(@Param("deviceId")Long deviceId);
@@ -107,7 +164,6 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	@Query(nativeQuery = true, name = "getVehicleInfoData")
 	public List<CustomDeviceList> vehicleInfoData(@Param("deviceId")Long deviceId);
 
-	
 	@Query(value = " SELECT count(*)"
      		+ " FROM tc_devices LEFT JOIN  tc_device_driver ON tc_devices.id=tc_device_driver.deviceid"
      		+ " LEFT JOIN  tc_drivers ON tc_drivers.id=tc_device_driver.driverid and tc_drivers.delete_date is null" 
@@ -120,6 +176,20 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
      		+ " OR tc_devices.sequence_number LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))"
      		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_users.name LIKE LOWER(CONCAT('%',:search, '%')) ) " ,nativeQuery = true )
 	public Integer getDevicesListSize(@Param("userIds")List<Long> userIds,@Param("search") String search);
+	
+	
+	@Query(value = " SELECT count(*)"
+     		+ " FROM tc_devices LEFT JOIN  tc_device_driver ON tc_devices.id=tc_device_driver.deviceid"
+     		+ " LEFT JOIN  tc_drivers ON tc_drivers.id=tc_device_driver.driverid and tc_drivers.delete_date is null" 
+     		+ " LEFT JOIN  tc_device_geofence ON tc_devices.id=tc_device_geofence.deviceid" 
+     		+ " LEFT JOIN  tc_geofences ON tc_geofences.id=tc_device_geofence.geofenceid and tc_geofences.delete_date"
+     		+ " is null INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id "
+     		+ " LEFT JOIN tc_users ON tc_user_device.userid = tc_users.id" 
+     		+ " where tc_devices.id IN(:deviceIds) and tc_devices.delete_date is null"
+     		+ " AND ( tc_devices.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.uniqueid LIKE LOWER(CONCAT('%',:search, '%')) "
+     		+ " OR tc_devices.sequence_number LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))"
+     		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_users.name LIKE LOWER(CONCAT('%',:search, '%')) ) " ,nativeQuery = true )
+	public Integer getDevicesListSizeByIds(@Param("deviceIds")List<Long> deviceIds,@Param("search") String search);
 	
 	
 	@Query(value = "SELECT tc_devices.calibrationData FROM tc_devices WHERE tc_devices.id=:deviceId AND tc_devices.delete_date IS NULL ",nativeQuery = true)
@@ -174,5 +244,15 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	@Query(nativeQuery = true, name = "getExpiredVehicles")
 	public List<ExpiredVehicles> getAllExpiredIds(@Param("currentDate")Date currentDate);
 	
+	@Query(value = " SELECT tc_devices.id FROM tc_devices " + 
+			" INNER JOIN  tc_user_device ON tc_devices.id=tc_user_device.deviceid " + 
+			" where tc_user_device.userid IN (:userId) and tc_devices.delete_date is null "
+			+ " and tc_devices.name=:name and tc_devices.uniqueid=:uniqueid " ,nativeQuery = true )
+	public Long getDeviceIdByName(@Param("userId") Long userId,@Param("name") String name,@Param("uniqueid") String uniqueid);
+	
+	
+	@Query(value = "Select * From tc_devices Where tc_devices.sequence_number=:sequenceNumber"
+			+ " and tc_devices.delete_date is null limit 0,1", nativeQuery = true)
+	public Device getDeviceBySequenceNumber(@Param("sequenceNumber") String sequenceNumber);
 }
 

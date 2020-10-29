@@ -79,13 +79,14 @@ import com.example.examplequerydslspringdatajpamaven.entity.NewcustomerDivice;
 import com.example.examplequerydslspringdatajpamaven.entity.StopReport;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.entity.UserSelect;
+import com.example.examplequerydslspringdatajpamaven.entity.userClientComputed;
 import com.example.examplequerydslspringdatajpamaven.entity.userClientDevice;
-import com.example.examplequerydslspringdatajpamaven.entity.userClientUser;
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionRepo;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionsRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserClientDeviceRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.UserClientDriverRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -104,6 +105,9 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	@Autowired
 	MongoPositionRepo mongoPositionRepo;
 	
+	@Autowired
+	UserClientDriverRepository userClientDriverRepository;
+
 	@Autowired
 	UserClientDeviceRepository userClientDeviceRepository;
 	
@@ -169,8 +173,10 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		}
 		 userService.resetChildernArray();
 		 List<Long>usersIds= new ArrayList<>();
+		 Integer size=0;
+		 List<CustomDeviceList> devices = new ArrayList<CustomDeviceList>();
 		 if(loggedUser.getAccountType().equals(4)) {
-			 Set<User> parentClients = loggedUser.getUsersOfUser();
+			 /*Set<User> parentClients = loggedUser.getUsersOfUser();
 			 if(parentClients.isEmpty()) {
 				
 				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get devices of this user",null);
@@ -183,7 +189,16 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				 }
 				 usersIds.add(parentClient.getId());
 
+			 }*/
+			 List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(userId);
+			 
+			 if(deviceIds.size()>0) {
+
+				 devices= deviceRepository.getDevicesListByIds(deviceIds,offset,search);
+				 size=  deviceRepository.getDevicesListSizeByIds(deviceIds,search);
 			 }
+
+			 
 		 }
 		 else {
 			 List<User>childernUsers = userService.getAllChildernOfUser(userId);
@@ -196,15 +211,17 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					 usersIds.add(object.getId());
 				 }
 			 }
-		 }
+		 
 		 
 		
 		 
-		 List<CustomDeviceList> devices= deviceRepository.getDevicesList(usersIds,offset,search);
-		 Integer size=  deviceRepository.getDevicesListSize(usersIds,search);
+			 devices= deviceRepository.getDevicesList(usersIds,offset,search);
+			 size=  deviceRepository.getDevicesListSize(usersIds,search);
+
+		}
 		 getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",devices,size);
 		 logger.info("************************ getAllUserDevices ENDED ***************************");
-		return  ResponseEntity.ok().body(getObjectResponse);
+		 return  ResponseEntity.ok().body(getObjectResponse);
 	}
 
 	@Override
@@ -331,9 +348,24 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				    	}
 					}
 			    	
+			    	device.setIs_deleted(null);
+			    	device.setDelete_date(null);
 			    	
 			    	deviceRepository.save(device);
 			    	List<Device> devices = null;
+			    	
+			    	if(userCreater.getAccountType().equals(4)) {
+			    		userClientDevice saveData = new userClientDevice();
+				        
+				        Long devId = deviceRepository.getDeviceIdByName(parent.getId(),device.getName(),device.getUniqueId());
+			    		if(devId != null) {
+				    		saveData.setUserid(userId);
+				    		saveData.setDeviceid(devId);
+					        userClientDeviceRepository.save(saveData);
+			    		}
+			    		
+			    	}
+			    	
 			    	getObjectResponse = new GetObjectResponse(HttpStatus.OK.value() , "success",devices);
 					logger.info("************************ createDevice ENDED ***************************");
 					return ResponseEntity.ok().body(getObjectResponse);
@@ -434,6 +466,14 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 						}
 					}
 				}
+				
+				List<Long> devices = userClientDeviceRepository.getDevice(userId,device.getId());
+				if(devices.isEmpty()) {
+						isParent = false;
+				}
+				else {
+						isParent = true;
+				}
 			}
 			if(!checkIfParent(oldDevice , loggedUser) && ! isParent) {
 				getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "You are not allowed to edit this device",null);
@@ -480,9 +520,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			    }
 				
 				
-				
-				
-				
+			
 		    	deviceRepository.save(device);
 		    	List<Device> devices = null;
 		    	getObjectResponse = new GetObjectResponse(HttpStatus.OK.value() , "success",devices);
@@ -639,6 +677,13 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 							}
 						}
 					}
+					List<Long> devices = userClientDeviceRepository.getDevice(userId,deviceId);
+					if(devices.isEmpty()) {
+							isParent = false;
+					}
+					else {
+							isParent = true;
+					}
 			 }
 			 if(!checkIfParent(device , creater)&& ! isParent) {
 					getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to delete this user ",null);
@@ -663,9 +708,20 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	         oldUser= user;
 	         user.removeAll(oldUser);
 	         device.setUser(user);
+	         
+	         
+	         
 			 deviceRepository.save(device);
 		     
 		     List<Device> devices = null;
+		     
+		     List<Long> DataDelete = userClientDeviceRepository.getDevicesToDelete(deviceId);
+			 if(DataDelete.size()>0) {
+				 userClientDeviceRepository.deleteDeviceById(deviceId);
+			 }
+		     
+		     
+		     
 			 getObjectResponse = new GetObjectResponse( HttpStatus.OK.value(), "success",devices);
 		     logger.info("************************ deleteDevice ENDED ***************************");
 		     return ResponseEntity.ok().body(getObjectResponse);
@@ -762,6 +818,13 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 							}
 						}
 					}
+					List<Long> devices = userClientDeviceRepository.getDevice(userId,deviceId);
+					if(devices.isEmpty()) {
+							isParent = false;
+					}
+					else {
+							isParent = true;
+					}
 			   }
 			   if(!checkIfParent(device , loggedUser)&& ! isParent) {
 					getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this user ",null);
@@ -857,6 +920,13 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 									}
 								}
 							}
+						}
+						List<Long> devices = userClientDeviceRepository.getDevice(userId,deviceId);
+						if(devices.isEmpty()) {
+								isParent = false;
+						}
+						else {
+								isParent = true;
 						}
 				   }
 				   if(!checkIfParent(device , loggedUser)&& ! isParent) {
@@ -988,6 +1058,50 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 //					return ResponseEntity.ok().body(getObjectResponse);
 					return ResponseEntity.status(404).body(getObjectResponse);
 			 }
+			 else {
+			   boolean isParent = false;
+			   if(loggedUser.getAccountType().equals(4)) {
+				   Set<User>parentClient = loggedUser.getUsersOfUser();
+					if(parentClient.isEmpty()) {
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
+						logger.info("************************ editDevice ENDED ***************************");
+						return ResponseEntity.badRequest().body(getObjectResponse);
+					}else {
+					  
+						User parent =null;
+						for(User object : parentClient) {
+							parent = object;
+						}
+						Set<User> deviceParent = device.getUser();
+						if(deviceParent.isEmpty()) {
+							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), " this device is not assigned to any user ,you are not allowed to edit this user ",null);
+							logger.info("************************ editDevice ENDED ***************************");
+							return ResponseEntity.badRequest().body(getObjectResponse);
+						}else {
+							
+							for(User deviceUser : deviceParent) {
+								if(deviceUser.getId().equals(parent.getId())) {
+									
+									isParent = true;
+									break;
+								}
+							}
+						}
+					}
+					List<Long> devices = userClientDeviceRepository.getDevice(userId,deviceId);
+					if(devices.isEmpty()) {
+							isParent = false;
+					}
+					else {
+							isParent = true;
+					}
+			   }
+			   if(!checkIfParent(device , loggedUser)&& ! isParent) {
+					getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to assign driver to this device ",null);
+					logger.info("************************ editDevice ENDED ***************************");
+					return ResponseEntity.badRequest().body(getObjectResponse);
+			   }
+			}
 			if(geoIds.length == 0) {
 				//if device has geofences remove it 
                 Set<Geofence> geofences = device.getGeofence();
@@ -1037,7 +1151,6 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	}
 
 	@Override
-
 	public ResponseEntity<?> testgetDeviceById() {
 		// TODO Auto-generateds method stub
 		Device device ;
@@ -1048,7 +1161,8 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		 getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "login successfully",devices);
 		return  ResponseEntity.ok().body(getObjectResponse) ;
 	}
-
+	
+	@Override
 	public  ResponseEntity<?> getDeviceSelect(String TOKEN,Long userId) {
 
 		logger.info("************************ getDeviceSelect STARTED ***************************");
@@ -1071,68 +1185,69 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	    		getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",devices);
 				return ResponseEntity.status(404).body(getObjectResponse);
 	    	}
+	    	if(user != null) {
+	    		if(user.getDelete_date() != null) {
+	    			getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",devices);
+					return ResponseEntity.status(404).body(getObjectResponse);
+	    		}
+	    	}
 	    	if(user.getAccountType().equals(4)) {
-				 Set<User>parentClient = user.getUsersOfUser();
-					if(parentClient.isEmpty()) {
-						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
-						logger.info("************************ editDevice ENDED ***************************");
-						return ResponseEntity.badRequest().body(getObjectResponse);
-					}else {
-					  
-						User parent =null;
-						for(User object : parentClient) {
-							parent = object;
-						}
-						if(parent != null) {
-				   			List<Long>usersIds= new ArrayList<>();
-		   					usersIds.add(parent.getId());
-
-							devices = deviceRepository.getDeviceSelect(usersIds);
-							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
-							logger.info("************************ getDeviceSelect ENDED ***************************");
-							return ResponseEntity.ok().body(getObjectResponse);
-						}
-						else {
-							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "No parent for this type 4",null);
-							return ResponseEntity.badRequest().body(getObjectResponse);
-						}
-						
+			    /*Set<User>parentClient = user.getUsersOfUser();
+				if(parentClient.isEmpty()) {
+					getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
+					logger.info("************************ editDevice ENDED ***************************");
+					return ResponseEntity.badRequest().body(getObjectResponse);
+				}else {
+				  
+					User parent =null;
+					for(User object : parentClient) {
+						parent = object;
 					}
+					if(parent != null) {
+			   			List<Long>usersIds= new ArrayList<>();
+	   					usersIds.add(parent.getId());
+
+						devices = deviceRepository.getDeviceSelect(usersIds);
+						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
+						logger.info("************************ getDeviceSelect ENDED ***************************");
+						return ResponseEntity.ok().body(getObjectResponse);
+					}
+					else {
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "No parent for this type 4",null);
+						return ResponseEntity.badRequest().body(getObjectResponse);
+					}
+					
+				}*/
+	    		 List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(userId);
+				 
+				 if(deviceIds.size()>0) {
+						devices = deviceRepository.getDeviceSelectByIds(deviceIds);
+
+				 }
+				 getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
+				 logger.info("************************ getDeviceSelect ENDED ***************************");
+				 return ResponseEntity.ok().body(getObjectResponse);
 			 }
 	    	
 	    	
-	    	if(user != null) {
-	    		if(user.getDelete_date() == null) {
-	    			
-	    		 List<User>childernUsers = userService.getAllChildernOfUser(userId);
-	   			 List<Long>usersIds= new ArrayList<>();
-	   			 if(childernUsers.isEmpty()) {
-	   				 usersIds.add(userId);
-	   			 }
-	   			 else {
-	   				 usersIds.add(userId);
-	   				 for(User object : childernUsers) {
-	   					 usersIds.add(object.getId());
-	   				 }
-	   			 }
-	    			devices = deviceRepository.getDeviceSelect(usersIds);
-					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
-					logger.info("************************ getDeviceSelect ENDED ***************************");
-					return ResponseEntity.ok().body(getObjectResponse);
-
-	    		}
-	    		else {
-					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",devices);
-					return ResponseEntity.status(404).body(getObjectResponse);
-
-	    		}
 	    	
-	    	}
-	    	else {
-				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",devices);
-				return ResponseEntity.status(404).body(getObjectResponse);
+	    			
+    		 List<User>childernUsers = userService.getAllChildernOfUser(userId);
+   			 List<Long>usersIds= new ArrayList<>();
+   			 if(childernUsers.isEmpty()) {
+   				 usersIds.add(userId);
+   			 }
+   			 else {
+   				 usersIds.add(userId);
+   				 for(User object : childernUsers) {
+   					 usersIds.add(object.getId());
+   				 }
+   			 }
+			devices = deviceRepository.getDeviceSelect(usersIds);
+			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
+			logger.info("************************ getDeviceSelect ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
 
-	    	}
 			
 		}
 		else {
@@ -1177,7 +1292,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				return ResponseEntity.status(404).body(getObjectResponse);
 			}
 			else
-			{
+			{				
 
 				Set<Driver> drivers=new HashSet<>() ;
 				drivers = device.getDriver();
@@ -1289,11 +1404,11 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
 			return ResponseEntity.status(404).body(getObjectResponse);
 		}
-		userService.resetChildernArray();
+		 userService.resetChildernArray();
 		 List<Long>usersIds= new ArrayList<>();
 
 		 if(loggedUser.getAccountType().equals(4)) {
-			 Set<User> parentClients = loggedUser.getUsersOfUser();
+			 /*Set<User> parentClients = loggedUser.getUsersOfUser();
 			 if(parentClients.isEmpty()) {
 				
 				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get devices of this user",null);
@@ -1306,7 +1421,94 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				 }
 				 usersIds.add(parentClient.getId());
 				 
+			 }*/
+			 List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(userId);
+
+			Integer ignitionON = 0;
+			Integer ignitionOFF = 0;
+			Integer moving = 0;
+			Integer stopped = 0;
+			Integer onlineDevices =0;
+			Integer outOfNetworkDevices=0;
+			Integer totalDevices =0;
+			Integer offlineDevices=0;
+			Integer drivers =0;
+			 if(deviceIds.size()>0) {
+				 List<Long> onlineDeviceIds = deviceRepository.getNumberOfOnlineDevicesListByIds(deviceIds);
+				 List<Long> OutDeviceIds = deviceRepository.getNumberOfOutOfNetworkDevicesListByIds(deviceIds);
+
+				 onlineDevices = mongoPositionRepo.getDeviceIdDistincit(onlineDeviceIds);
+				 outOfNetworkDevices = mongoPositionRepo.getDeviceIdDistincit(OutDeviceIds);
+					
+			     totalDevices = deviceRepository.getTotalNumberOfUserDevicesByIds(deviceIds);
+				 offlineDevices = totalDevices - onlineDevices - outOfNetworkDevices;
+				 drivers = userClientDriverRepository.getDriverIds(userId).size();
+
+				List<MongoPositions> positionsList = new ArrayList<MongoPositions>();
+				List<String> positionIds = deviceRepository.getAllPositionsObjectIdsByIds(deviceIds);
+			
+				
+				positionsList = mongoPositionsRepository.findByIdIn(positionIds);
+				
+		
+				if(positionsList.size()>0) {
+					for(int i=0;i<positionsList.size();i++) {
+		
+					   ObjectMapper mapper = new ObjectMapper();
+			     	   String json = null;
+			     	   try {
+				 		   json = mapper.writeValueAsString(positionsList.get(i).getAttributes());
+					   } catch (JsonProcessingException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+		
+			         	JSONObject obj = new JSONObject(json);
+		
+						if(obj.has("ignition")) {
+		
+							if(obj.get("ignition").equals(true)) {
+								
+								ignitionON =ignitionON+1;
+							}
+		                    if(obj.get("ignition").equals(false)) {
+		                    	ignitionOFF =ignitionOFF+1;
+		
+							}
+						}
+						if(obj.has("motion")) {
+		
+							if(obj.get("motion").equals(true)) {
+								moving =moving+1;
+							}
+		                    if(obj.get("motion").equals(false)) {
+		                    	stopped =stopped+1;
+		
+							}
+						}
+					}
+				}
 			 }
+			 
+			 
+					
+			Map devicesStatus = new HashMap();
+			devicesStatus.put("online_devices", onlineDevices);
+			devicesStatus.put("unknown_devices" ,outOfNetworkDevices);
+			devicesStatus.put("offline_devices", offlineDevices);
+			devicesStatus.put("all_devices", onlineDevices+offlineDevices+outOfNetworkDevices);
+			devicesStatus.put("total_drivers", drivers);
+			devicesStatus.put("ignition_off", ignitionOFF);
+			devicesStatus.put("ignition_on", ignitionON);
+			devicesStatus.put("stopped", stopped);
+			devicesStatus.put("moving", moving);
+	
+			List<Map> data = new ArrayList<>();
+			data.add(devicesStatus);
+			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",data);
+			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+
 		 }
 		 else {
 			 List<User>childernUsers = userService.getAllChildernOfUser(userId);
@@ -1319,88 +1521,89 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					 usersIds.add(object.getId());
 				 }
 			 }
-		 }
 		 
+			 
+				
+			List<Long> onlineDeviceIds = deviceRepository.getNumberOfOnlineDevicesList(usersIds);
+			List<Long> OutDeviceIds = deviceRepository.getNumberOfOutOfNetworkDevicesList(usersIds);
+			 
+			Integer onlineDevices = mongoPositionRepo.getDeviceIdDistincit(onlineDeviceIds);
+			Integer outOfNetworkDevices = mongoPositionRepo.getDeviceIdDistincit(OutDeviceIds);
 			
-		List<Long> onlineDeviceIds = deviceRepository.getNumberOfOnlineDevicesList(usersIds);
-		List<Long> OutDeviceIds = deviceRepository.getNumberOfOutOfNetworkDevicesList(usersIds);
-		 
-		Integer onlineDevices = mongoPositionRepo.getDeviceIdDistincit(onlineDeviceIds);
-		Integer outOfNetworkDevices = mongoPositionRepo.getDeviceIdDistincit(OutDeviceIds);
-		
-		//Integer onlineDevices = deviceRepository.getNumberOfOnlineDevices(usersIds);
-		//Integer outOfNetworkDevices = deviceRepository.getNumberOfOutOfNetworkDevices(usersIds);
-		
-		Integer totalDevices = deviceRepository.getTotalNumberOfUserDevices(usersIds);
-		Integer offlineDevices = totalDevices - onlineDevices - outOfNetworkDevices;
-		Integer drivers = driverService.getTotalNumberOfUserDrivers(usersIds);
-		
-		
-		
-		List<MongoPositions> positionsList = new ArrayList<MongoPositions>();
-		List<String> positionIds = deviceRepository.getAllPositionsObjectIds(usersIds);
-
-		positionsList = mongoPositionsRepository.findByIdIn(positionIds);
-
-		Integer ignitionON = 0;
-		Integer ignitionOFF = 0;
-		Integer moving = 0;
-		Integer stopped = 0;
-
-		if(positionsList.size()>0) {
-			for(int i=0;i<positionsList.size();i++) {
-
-			   ObjectMapper mapper = new ObjectMapper();
-	     	   String json = null;
-	     	   try {
-		 		   json = mapper.writeValueAsString(positionsList.get(i).getAttributes());
-			   } catch (JsonProcessingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-	         	JSONObject obj = new JSONObject(json);
-
-				if(obj.has("ignition")) {
-
-					if(obj.get("ignition").equals(true)) {
-						
-						ignitionON =ignitionON+1;
+			//Integer onlineDevices = deviceRepository.getNumberOfOnlineDevices(usersIds);
+			//Integer outOfNetworkDevices = deviceRepository.getNumberOfOutOfNetworkDevices(usersIds);
+			
+			Integer totalDevices = deviceRepository.getTotalNumberOfUserDevices(usersIds);
+			Integer offlineDevices = totalDevices - onlineDevices - outOfNetworkDevices;
+			Integer drivers = driverService.getTotalNumberOfUserDrivers(usersIds);
+			
+			
+			
+			List<MongoPositions> positionsList = new ArrayList<MongoPositions>();
+			List<String> positionIds = deviceRepository.getAllPositionsObjectIds(usersIds);
+	
+			positionsList = mongoPositionsRepository.findByIdIn(positionIds);
+	
+			Integer ignitionON = 0;
+			Integer ignitionOFF = 0;
+			Integer moving = 0;
+			Integer stopped = 0;
+	
+			if(positionsList.size()>0) {
+				for(int i=0;i<positionsList.size();i++) {
+	
+				   ObjectMapper mapper = new ObjectMapper();
+		     	   String json = null;
+		     	   try {
+			 		   json = mapper.writeValueAsString(positionsList.get(i).getAttributes());
+				   } catch (JsonProcessingException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
-                    if(obj.get("ignition").equals(false)) {
-                    	ignitionOFF =ignitionOFF+1;
-
+	
+		         	JSONObject obj = new JSONObject(json);
+	
+					if(obj.has("ignition")) {
+	
+						if(obj.get("ignition").equals(true)) {
+							
+							ignitionON =ignitionON+1;
+						}
+	                    if(obj.get("ignition").equals(false)) {
+	                    	ignitionOFF =ignitionOFF+1;
+	
+						}
 					}
-				}
-				if(obj.has("motion")) {
-
-					if(obj.get("motion").equals(true)) {
-						moving =moving+1;
-					}
-                    if(obj.get("motion").equals(false)) {
-                    	stopped =stopped+1;
-
+					if(obj.has("motion")) {
+	
+						if(obj.get("motion").equals(true)) {
+							moving =moving+1;
+						}
+	                    if(obj.get("motion").equals(false)) {
+	                    	stopped =stopped+1;
+	
+						}
 					}
 				}
 			}
-		}
-				
-		Map devicesStatus = new HashMap();
-		devicesStatus.put("online_devices", onlineDevices);
-		devicesStatus.put("unknown_devices" ,outOfNetworkDevices);
-		devicesStatus.put("offline_devices", offlineDevices);
-		devicesStatus.put("all_devices", onlineDevices+offlineDevices+outOfNetworkDevices);
-		devicesStatus.put("total_drivers", drivers);
-		devicesStatus.put("ignition_off", ignitionOFF);
-		devicesStatus.put("ignition_on", ignitionON);
-		devicesStatus.put("stopped", stopped);
-		devicesStatus.put("moving", moving);
-
-		List<Map> data = new ArrayList<>();
-		data.add(devicesStatus);
-		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",data);
-		logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
-		return ResponseEntity.ok().body(getObjectResponse);
+					
+			Map devicesStatus = new HashMap();
+			devicesStatus.put("online_devices", onlineDevices);
+			devicesStatus.put("unknown_devices" ,outOfNetworkDevices);
+			devicesStatus.put("offline_devices", offlineDevices);
+			devicesStatus.put("all_devices", onlineDevices+offlineDevices+outOfNetworkDevices);
+			devicesStatus.put("total_drivers", drivers);
+			devicesStatus.put("ignition_off", ignitionOFF);
+			devicesStatus.put("ignition_on", ignitionON);
+			devicesStatus.put("stopped", stopped);
+			devicesStatus.put("moving", moving);
+	
+			List<Map> data = new ArrayList<>();
+			data.add(devicesStatus);
+			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",data);
+			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+		 }
 	}
 
 	@Override
@@ -1434,7 +1637,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	    userService.resetChildernArray();
 		List<Long>usersIds= new ArrayList<>();
 	    if(loggedUser.getAccountType().equals(4)) {
-			 Set<User> parentClients = loggedUser.getUsersOfUser();
+			 /*Set<User> parentClients = loggedUser.getUsersOfUser();
 			 if(parentClients.isEmpty()) {
 				
 				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get devices of this user",null);
@@ -1447,8 +1650,139 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				 }
 				 
 				 usersIds.add(parentClient.getId());
-			 }
-		 }
+			 }*/
+			List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(userId);
+			List<CustomDeviceLiveData> allDevicesLiveData = new ArrayList<CustomDeviceLiveData>();
+			Integer size=0;
+			if(deviceIds.size() >0) {
+				allDevicesLiveData=	deviceRepository.getAllDevicesDataByIds(deviceIds, offset, search);
+			    size=deviceRepository.getAllDevicesLiveDataSizeByIds(deviceIds,search);
+			    if(size > 0) {
+					for(int i=0;i<allDevicesLiveData.size();i++) {
+						long minutes = 0;
+		            	allDevicesLiveData.get(i).setVehicleStatus("offline");
+		
+						if(allDevicesLiveData.get(i).getLastUpdate() != null) {
+							SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+							Date now = new Date();
+							String strDate = formatter.format(now);
+							try {
+								Date dateLast = formatter.parse(allDevicesLiveData.get(i).getLastUpdate());
+								Date dateNow = formatter.parse(strDate);
+								
+						        minutes = getDateDiff (dateLast, dateNow, TimeUnit.MINUTES);  
+						        
+		
+							} catch (ParseException e) {
+								e.printStackTrace();
+							}
+							
+							if(minutes < 3) {
+		                    	allDevicesLiveData.get(i).setVehicleStatus("online");
+							}
+							if(minutes > 8) {
+		                    	allDevicesLiveData.get(i).setVehicleStatus("offline");
+							}
+							if(minutes < 8 && minutes > 3) {
+		                    	allDevicesLiveData.get(i).setVehicleStatus("unknown");
+		
+							}	
+						}
+						else {
+		                	allDevicesLiveData.get(i).setVehicleStatus("offline");
+		
+						}
+						
+						if(allDevicesLiveData.get(i).getPositionId() != null) {
+							
+							MongoPositions mongoPosition = mongoPositionsRepository.findById(allDevicesLiveData.get(i).getPositionId());
+							
+							if(mongoPosition != null) {
+		
+							   ObjectMapper mapper = new ObjectMapper();
+		                	   String json = null;
+		                	   try {
+		                		   json = mapper.writeValueAsString(mongoPosition.getAttributes());
+							   } catch (JsonProcessingException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+		
+		                    	JSONObject obj = new JSONObject(json);						
+								
+								allDevicesLiveData.get(i).setAttributes(mongoPosition.getAttributes());
+								allDevicesLiveData.get(i).setSpeed(mongoPosition.getSpeed());
+								allDevicesLiveData.get(i).setLatitude(mongoPosition.getLatitude());
+								allDevicesLiveData.get(i).setLongitude(mongoPosition.getLongitude());
+								
+								if(mongoPosition.getValid() == true) {
+									allDevicesLiveData.get(i).setValid(true);
+		
+								}
+								else {
+									allDevicesLiveData.get(i).setValid(false);
+		
+								}
+								
+								if(minutes > 8) {
+			                    	allDevicesLiveData.get(i).setStatus("In active");
+									
+								}
+								else {
+									if(obj.has("ignition")) {
+		
+										if(obj.get("ignition").equals(true)) {
+											if(obj.has("motion")) {
+		
+							                    if(obj.get("motion").equals(false)) {
+							                    	allDevicesLiveData.get(i).setStatus("Idle");
+												}
+							                    if(obj.get("motion").equals(true)) {
+							                    	allDevicesLiveData.get(i).setStatus("Running");
+												}
+											}
+										}
+					                    if(obj.get("ignition").equals(false)) {
+					                    	allDevicesLiveData.get(i).setStatus("Stopped");
+		
+										}
+									}
+									
+								}
+								
+								if(obj.has("power")) {
+									allDevicesLiveData.get(i).setPower(obj.getDouble("power"));
+		
+								}
+								if(obj.has("operator")) {
+									allDevicesLiveData.get(i).setOperator(obj.getDouble("operator"));
+		
+								}
+								if(obj.has("ignition")) {
+									allDevicesLiveData.get(i).setIgnition(obj.getBoolean("ignition"));
+		
+								}
+								
+							}
+							
+						}
+						else {
+		                	allDevicesLiveData.get(i).setStatus("No data");
+						}
+						
+					}
+				}
+			}
+	    	
+		    
+		    
+		    
+		    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevicesLiveData,size);
+			
+			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+
+	    }
 	    else {
 	    	List<User>childernUsers = userService.getAllChildernOfUser(userId);
 			 if(childernUsers.isEmpty()) {
@@ -1460,132 +1794,133 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					 usersIds.add(object.getId());
 				 }
 			 }
-	    }
+	    
 	     
-		List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getAllDevicesData(usersIds, offset, search);
-	    Integer size=deviceRepository.getAllDevicesLiveDataSize(usersIds);
-	    if(size > 0) {
-			for(int i=0;i<allDevicesLiveData.size();i++) {
-				long minutes = 0;
-            	allDevicesLiveData.get(i).setVehicleStatus("offline");
-
-				if(allDevicesLiveData.get(i).getLastUpdate() != null) {
-					SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-					Date now = new Date();
-					String strDate = formatter.format(now);
-					try {
-						Date dateLast = formatter.parse(allDevicesLiveData.get(i).getLastUpdate());
-						Date dateNow = formatter.parse(strDate);
-						
-				        minutes = getDateDiff (dateLast, dateNow, TimeUnit.MINUTES);  
-				        
-
-					} catch (ParseException e) {
-						e.printStackTrace();
-					}
-					
-					if(minutes < 3) {
-                    	allDevicesLiveData.get(i).setVehicleStatus("online");
-					}
-					if(minutes > 8) {
-                    	allDevicesLiveData.get(i).setVehicleStatus("offline");
-					}
-					if(minutes < 8 && minutes > 3) {
-                    	allDevicesLiveData.get(i).setVehicleStatus("unknown");
-
-					}	
-				}
-				else {
-                	allDevicesLiveData.get(i).setVehicleStatus("offline");
-
-				}
-				
-				if(allDevicesLiveData.get(i).getPositionId() != null) {
-					
-					MongoPositions mongoPosition = mongoPositionsRepository.findById(allDevicesLiveData.get(i).getPositionId());
-					
-					if(mongoPosition != null) {
-
-					   ObjectMapper mapper = new ObjectMapper();
-                	   String json = null;
-                	   try {
-                		   json = mapper.writeValueAsString(mongoPosition.getAttributes());
-					   } catch (JsonProcessingException e) {
-							// TODO Auto-generated catch block
+			List<CustomDeviceLiveData> allDevicesLiveData=	deviceRepository.getAllDevicesData(usersIds, offset, search);
+		    Integer size=deviceRepository.getAllDevicesLiveDataSize(usersIds,search);
+		    if(size > 0) {
+				for(int i=0;i<allDevicesLiveData.size();i++) {
+					long minutes = 0;
+	            	allDevicesLiveData.get(i).setVehicleStatus("offline");
+	
+					if(allDevicesLiveData.get(i).getLastUpdate() != null) {
+						SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+						Date now = new Date();
+						String strDate = formatter.format(now);
+						try {
+							Date dateLast = formatter.parse(allDevicesLiveData.get(i).getLastUpdate());
+							Date dateNow = formatter.parse(strDate);
+							
+					        minutes = getDateDiff (dateLast, dateNow, TimeUnit.MINUTES);  
+					        
+	
+						} catch (ParseException e) {
 							e.printStackTrace();
 						}
-
-                    	JSONObject obj = new JSONObject(json);						
 						
-						allDevicesLiveData.get(i).setAttributes(mongoPosition.getAttributes());
-						allDevicesLiveData.get(i).setSpeed(mongoPosition.getSpeed());
-						allDevicesLiveData.get(i).setLatitude(mongoPosition.getLatitude());
-						allDevicesLiveData.get(i).setLongitude(mongoPosition.getLongitude());
-						
-						if(mongoPosition.getValid() == true) {
-							allDevicesLiveData.get(i).setValid(true);
-
+						if(minutes < 3) {
+	                    	allDevicesLiveData.get(i).setVehicleStatus("online");
 						}
-						else {
-							allDevicesLiveData.get(i).setValid(false);
-
-						}
-						
 						if(minutes > 8) {
-	                    	allDevicesLiveData.get(i).setStatus("In active");
-							
+	                    	allDevicesLiveData.get(i).setVehicleStatus("offline");
 						}
-						else {
-							if(obj.has("ignition")) {
-
-								if(obj.get("ignition").equals(true)) {
-									if(obj.has("motion")) {
-
-					                    if(obj.get("motion").equals(false)) {
-					                    	allDevicesLiveData.get(i).setStatus("Idle");
-										}
-					                    if(obj.get("motion").equals(true)) {
-					                    	allDevicesLiveData.get(i).setStatus("Running");
+						if(minutes < 8 && minutes > 3) {
+	                    	allDevicesLiveData.get(i).setVehicleStatus("unknown");
+	
+						}	
+					}
+					else {
+	                	allDevicesLiveData.get(i).setVehicleStatus("offline");
+	
+					}
+					
+					if(allDevicesLiveData.get(i).getPositionId() != null) {
+						
+						MongoPositions mongoPosition = mongoPositionsRepository.findById(allDevicesLiveData.get(i).getPositionId());
+						
+						if(mongoPosition != null) {
+	
+						   ObjectMapper mapper = new ObjectMapper();
+	                	   String json = null;
+	                	   try {
+	                		   json = mapper.writeValueAsString(mongoPosition.getAttributes());
+						   } catch (JsonProcessingException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+	
+	                    	JSONObject obj = new JSONObject(json);						
+							
+							allDevicesLiveData.get(i).setAttributes(mongoPosition.getAttributes());
+							allDevicesLiveData.get(i).setSpeed(mongoPosition.getSpeed());
+							allDevicesLiveData.get(i).setLatitude(mongoPosition.getLatitude());
+							allDevicesLiveData.get(i).setLongitude(mongoPosition.getLongitude());
+							
+							if(mongoPosition.getValid() == true) {
+								allDevicesLiveData.get(i).setValid(true);
+	
+							}
+							else {
+								allDevicesLiveData.get(i).setValid(false);
+	
+							}
+							
+							if(minutes > 8) {
+		                    	allDevicesLiveData.get(i).setStatus("In active");
+								
+							}
+							else {
+								if(obj.has("ignition")) {
+	
+									if(obj.get("ignition").equals(true)) {
+										if(obj.has("motion")) {
+	
+						                    if(obj.get("motion").equals(false)) {
+						                    	allDevicesLiveData.get(i).setStatus("Idle");
+											}
+						                    if(obj.get("motion").equals(true)) {
+						                    	allDevicesLiveData.get(i).setStatus("Running");
+											}
 										}
 									}
+				                    if(obj.get("ignition").equals(false)) {
+				                    	allDevicesLiveData.get(i).setStatus("Stopped");
+	
+									}
 								}
-			                    if(obj.get("ignition").equals(false)) {
-			                    	allDevicesLiveData.get(i).setStatus("Stopped");
-
-								}
+								
+							}
+							
+							if(obj.has("power")) {
+								allDevicesLiveData.get(i).setPower(obj.getDouble("power"));
+	
+							}
+							if(obj.has("operator")) {
+								allDevicesLiveData.get(i).setOperator(obj.getDouble("operator"));
+	
+							}
+							if(obj.has("ignition")) {
+								allDevicesLiveData.get(i).setIgnition(obj.getBoolean("ignition"));
+	
 							}
 							
 						}
 						
-						if(obj.has("power")) {
-							allDevicesLiveData.get(i).setPower(obj.getDouble("power"));
-
-						}
-						if(obj.has("operator")) {
-							allDevicesLiveData.get(i).setOperator(obj.getDouble("operator"));
-
-						}
-						if(obj.has("ignition")) {
-							allDevicesLiveData.get(i).setIgnition(obj.getBoolean("ignition"));
-
-						}
-						
+					}
+					else {
+	                	allDevicesLiveData.get(i).setStatus("No data");
 					}
 					
 				}
-				else {
-                	allDevicesLiveData.get(i).setStatus("No data");
-				}
-				
 			}
-		}
-	    
-	    
-	    
-	    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevicesLiveData,size);
-		
-		logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
-		return ResponseEntity.ok().body(getObjectResponse);
+		    
+		    
+		    
+		    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevicesLiveData,size);
+			
+			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+	    }
 	 
 
 	}
@@ -1623,7 +1958,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		 List<Long>usersIds= new ArrayList<>();
 
 	    if(loggedUser.getAccountType().equals(4)) {
-			 Set<User> parentClients = loggedUser.getUsersOfUser();
+			 /*Set<User> parentClients = loggedUser.getUsersOfUser();
 			 if(parentClients.isEmpty()) {
 				
 				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get devices of this user",null);
@@ -1638,8 +1973,151 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 
 				 }
 				
+			 }*/
+			List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(userId);
+			List<CustomMapData> allDevicesLiveData = new ArrayList<CustomMapData>();
+			if(deviceIds.size()>0) {
+				allDevicesLiveData=	deviceRepository.getAllDevicesDataMapByIds(deviceIds);
 
-			 }
+				if(allDevicesLiveData.size() > 0) {
+					for(int i=0;i<allDevicesLiveData.size();i++) {
+						long minutes = 0;
+			        	allDevicesLiveData.get(i).setVehicleStatus(3);
+			
+						if(allDevicesLiveData.get(i).getLastUpdate() != null) {
+							
+							SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+							Date now = new Date();
+							String strDate = formatter.format(now);
+							try {
+								
+								Date dateLast = formatter.parse(allDevicesLiveData.get(i).getLastUpdate());
+								Date dateNow = formatter.parse(strDate);
+								
+								minutes = getDateDiff (dateLast, dateNow, TimeUnit.MINUTES);  
+								
+								
+							} catch (ParseException e) {
+								e.printStackTrace();
+							}					
+							if(minutes < 3) {
+			                	allDevicesLiveData.get(i).setVehicleStatus(1);
+							}
+							if(minutes > 8) {
+			                	allDevicesLiveData.get(i).setVehicleStatus(3);
+							}
+							if(minutes < 8 && minutes > 3) {
+			                	allDevicesLiveData.get(i).setVehicleStatus(2);
+							}
+						}
+						else {
+			            	allDevicesLiveData.get(i).setVehicleStatus(3);
+			
+						}
+			
+						
+						
+						
+						if(allDevicesLiveData.get(i).getPositionId() != null) {
+							
+			                MongoPositions mongoPosition = mongoPositionsRepository.findById(allDevicesLiveData.get(i).getPositionId());
+							
+			               if(mongoPosition != null) {
+			            	   
+			            	   ObjectMapper mapper = new ObjectMapper();
+			            	   String json = null;
+			            	   try {
+			            		   json = mapper.writeValueAsString(mongoPosition.getAttributes());
+							   } catch (JsonProcessingException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+			
+			                	JSONObject obj = new JSONObject(json);
+			
+								allDevicesLiveData.get(i).setLatitude(mongoPosition.getLatitude());
+								allDevicesLiveData.get(i).setLongitude(mongoPosition.getLongitude());
+								allDevicesLiveData.get(i).setSpeed(mongoPosition.getSpeed());
+			
+								if(mongoPosition.getValid()== true) {
+									allDevicesLiveData.get(i).setValid(1);
+			
+								}
+								else {
+									allDevicesLiveData.get(i).setValid(0);
+			
+								}
+								
+			                    
+								if(minutes > 8) {
+			                    	
+			                    	allDevicesLiveData.get(i).setStatus(4);
+									
+								}
+								else {
+									if(obj.has("ignition")) {
+			
+										if(obj.getBoolean("ignition")==true) {
+											if(obj.has("motion")) {
+			
+							                    if(obj.getBoolean("motion")==false) {
+							                    	allDevicesLiveData.get(i).setStatus(1);
+												}
+							                    if(obj.getBoolean("motion")==true) {
+							    			    	/*ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
+			
+							    			    	lastPoints = mongoPositionRepo.getLastPoints(allDevicesLiveData.get(i).getId());
+							                    	allDevicesLiveData.get(i).setLastPoints(lastPoints);*/
+							                    	
+							                    	allDevicesLiveData.get(i).setStatus(2);
+												}
+											}
+										}
+					                    if(obj.getBoolean("ignition")==false) {
+					                    	allDevicesLiveData.get(i).setStatus(3);
+			
+										}
+									}
+									
+								}
+								
+								if(obj.has("power")) {
+									allDevicesLiveData.get(i).setPower(obj.getDouble("power"));
+			
+								}
+								if(obj.has("operator")) {
+									allDevicesLiveData.get(i).setOperator(obj.getDouble("operator"));
+			
+								}
+								if(obj.has("ignition")) {
+									if(obj.getBoolean("ignition") == true) {
+			    						allDevicesLiveData.get(i).setIgnition(1);
+			
+									}
+									else {
+			    						allDevicesLiveData.get(i).setIgnition(0);
+			
+									}
+			
+								}
+			                }
+			                
+						}
+						else {
+							
+			            	allDevicesLiveData.get(i).setStatus(5);
+						}
+						
+					}
+				}
+			}
+			
+			
+		    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevicesLiveData);
+			
+			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+	    	
 		 }
 	    else {
 	    	 List<User>childernUsers = userService.getAllChildernOfUser(userId);
@@ -1652,146 +2130,147 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					 usersIds.add(object.getId());
 				 }
 			 }
-	    }
+	    
 	   
-		List<CustomMapData> allDevicesLiveData=	deviceRepository.getAllDevicesDataMap(usersIds);
+			List<CustomMapData> allDevicesLiveData=	deviceRepository.getAllDevicesDataMap(usersIds);
+			
+			if(allDevicesLiveData.size() > 0) {
+				for(int i=0;i<allDevicesLiveData.size();i++) {
+					long minutes = 0;
+		        	allDevicesLiveData.get(i).setVehicleStatus(3);
 		
-		if(allDevicesLiveData.size() > 0) {
-			for(int i=0;i<allDevicesLiveData.size();i++) {
-				long minutes = 0;
-            	allDevicesLiveData.get(i).setVehicleStatus(3);
-
-				if(allDevicesLiveData.get(i).getLastUpdate() != null) {
-					
-					SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-					Date now = new Date();
-					String strDate = formatter.format(now);
-					try {
+					if(allDevicesLiveData.get(i).getLastUpdate() != null) {
 						
-						Date dateLast = formatter.parse(allDevicesLiveData.get(i).getLastUpdate());
-						Date dateNow = formatter.parse(strDate);
-						
-						minutes = getDateDiff (dateLast, dateNow, TimeUnit.MINUTES);  
-						
-						
-					} catch (ParseException e) {
-						e.printStackTrace();
-					}					
-					if(minutes < 3) {
-	                	allDevicesLiveData.get(i).setVehicleStatus(1);
-					}
-					if(minutes > 8) {
-	                	allDevicesLiveData.get(i).setVehicleStatus(3);
-					}
-					if(minutes < 8 && minutes > 3) {
-	                	allDevicesLiveData.get(i).setVehicleStatus(2);
-					}
-				}
-				else {
-                	allDevicesLiveData.get(i).setVehicleStatus(3);
-
-				}
-
-				
-				
-				
-				if(allDevicesLiveData.get(i).getPositionId() != null) {
-					
-                    MongoPositions mongoPosition = mongoPositionsRepository.findById(allDevicesLiveData.get(i).getPositionId());
-					
-                   if(mongoPosition != null) {
-                	   
-                	   ObjectMapper mapper = new ObjectMapper();
-                	   String json = null;
-                	   try {
-                		   json = mapper.writeValueAsString(mongoPosition.getAttributes());
-					   } catch (JsonProcessingException e) {
-							// TODO Auto-generated catch block
+						SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+						Date now = new Date();
+						String strDate = formatter.format(now);
+						try {
+							
+							Date dateLast = formatter.parse(allDevicesLiveData.get(i).getLastUpdate());
+							Date dateNow = formatter.parse(strDate);
+							
+							minutes = getDateDiff (dateLast, dateNow, TimeUnit.MINUTES);  
+							
+							
+						} catch (ParseException e) {
 							e.printStackTrace();
+						}					
+						if(minutes < 3) {
+		                	allDevicesLiveData.get(i).setVehicleStatus(1);
 						}
-
-                    	JSONObject obj = new JSONObject(json);
-
-    					allDevicesLiveData.get(i).setLatitude(mongoPosition.getLatitude());
-    					allDevicesLiveData.get(i).setLongitude(mongoPosition.getLongitude());
-    					allDevicesLiveData.get(i).setSpeed(mongoPosition.getSpeed());
-
-    					if(mongoPosition.getValid()== true) {
-    						allDevicesLiveData.get(i).setValid(1);
-
-    					}
-    					else {
-    						allDevicesLiveData.get(i).setValid(0);
-
-    					}
-    					
-                        
-    					if(minutes > 8) {
-	                    	
-                        	allDevicesLiveData.get(i).setStatus(4);
-    						
-    					}
-    					else {
-    						if(obj.has("ignition")) {
-
-    							if(obj.getBoolean("ignition")==true) {
-    								if(obj.has("motion")) {
-
-    				                    if(obj.getBoolean("motion")==false) {
-    				                    	allDevicesLiveData.get(i).setStatus(1);
-    									}
-    				                    if(obj.getBoolean("motion")==true) {
-    				    			    	/*ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
-
-    				    			    	lastPoints = mongoPositionRepo.getLastPoints(allDevicesLiveData.get(i).getId());
-    				                    	allDevicesLiveData.get(i).setLastPoints(lastPoints);*/
-    				                    	
-    				                    	allDevicesLiveData.get(i).setStatus(2);
-    									}
-    								}
-    							}
-    		                    if(obj.getBoolean("ignition")==false) {
-    		                    	allDevicesLiveData.get(i).setStatus(3);
-
-    							}
-    						}
-    						
-    					}
-    					
-    					if(obj.has("power")) {
-    						allDevicesLiveData.get(i).setPower(obj.getDouble("power"));
-
-    					}
-    					if(obj.has("operator")) {
-    						allDevicesLiveData.get(i).setOperator(obj.getDouble("operator"));
-
-    					}
-    					if(obj.has("ignition")) {
-    						if(obj.getBoolean("ignition") == true) {
-        						allDevicesLiveData.get(i).setIgnition(1);
-	
-    						}
-    						else {
-        						allDevicesLiveData.get(i).setIgnition(0);
-
-    						}
-
-    					}
-                    }
-                    
-				}
-				else {
+						if(minutes > 8) {
+		                	allDevicesLiveData.get(i).setVehicleStatus(3);
+						}
+						if(minutes < 8 && minutes > 3) {
+		                	allDevicesLiveData.get(i).setVehicleStatus(2);
+						}
+					}
+					else {
+		            	allDevicesLiveData.get(i).setVehicleStatus(3);
+		
+					}
+		
 					
-                	allDevicesLiveData.get(i).setStatus(5);
+					
+					
+					if(allDevicesLiveData.get(i).getPositionId() != null) {
+						
+		                MongoPositions mongoPosition = mongoPositionsRepository.findById(allDevicesLiveData.get(i).getPositionId());
+						
+		               if(mongoPosition != null) {
+		            	   
+		            	   ObjectMapper mapper = new ObjectMapper();
+		            	   String json = null;
+		            	   try {
+		            		   json = mapper.writeValueAsString(mongoPosition.getAttributes());
+						   } catch (JsonProcessingException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+		
+		                	JSONObject obj = new JSONObject(json);
+		
+							allDevicesLiveData.get(i).setLatitude(mongoPosition.getLatitude());
+							allDevicesLiveData.get(i).setLongitude(mongoPosition.getLongitude());
+							allDevicesLiveData.get(i).setSpeed(mongoPosition.getSpeed());
+		
+							if(mongoPosition.getValid()== true) {
+								allDevicesLiveData.get(i).setValid(1);
+		
+							}
+							else {
+								allDevicesLiveData.get(i).setValid(0);
+		
+							}
+							
+		                    
+							if(minutes > 8) {
+		                    	
+		                    	allDevicesLiveData.get(i).setStatus(4);
+								
+							}
+							else {
+								if(obj.has("ignition")) {
+		
+									if(obj.getBoolean("ignition")==true) {
+										if(obj.has("motion")) {
+		
+						                    if(obj.getBoolean("motion")==false) {
+						                    	allDevicesLiveData.get(i).setStatus(1);
+											}
+						                    if(obj.getBoolean("motion")==true) {
+						    			    	/*ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
+		
+						    			    	lastPoints = mongoPositionRepo.getLastPoints(allDevicesLiveData.get(i).getId());
+						                    	allDevicesLiveData.get(i).setLastPoints(lastPoints);*/
+						                    	
+						                    	allDevicesLiveData.get(i).setStatus(2);
+											}
+										}
+									}
+				                    if(obj.getBoolean("ignition")==false) {
+				                    	allDevicesLiveData.get(i).setStatus(3);
+		
+									}
+								}
+								
+							}
+							
+							if(obj.has("power")) {
+								allDevicesLiveData.get(i).setPower(obj.getDouble("power"));
+		
+							}
+							if(obj.has("operator")) {
+								allDevicesLiveData.get(i).setOperator(obj.getDouble("operator"));
+		
+							}
+							if(obj.has("ignition")) {
+								if(obj.getBoolean("ignition") == true) {
+		    						allDevicesLiveData.get(i).setIgnition(1);
+		
+								}
+								else {
+		    						allDevicesLiveData.get(i).setIgnition(0);
+		
+								}
+		
+							}
+		                }
+		                
+					}
+					else {
+						
+		            	allDevicesLiveData.get(i).setStatus(5);
+					}
+					
 				}
-				
 			}
-		}
-		
-	    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevicesLiveData);
-		
-		logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
-		return ResponseEntity.ok().body(getObjectResponse);
+			
+		    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevicesLiveData);
+			
+			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+	    }
 
 	}
 		
@@ -1822,7 +2301,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				if(device.getDeleteDate()==null) {
 					boolean isParent = false;
 					   if(loggedUser.getAccountType().equals(4)) {
-						   Set<User>parentClient = loggedUser.getUsersOfUser();
+						    Set<User>parentClient = loggedUser.getUsersOfUser();
 							if(parentClient.isEmpty()) {
 								getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
 								logger.info("************************ editDevice ENDED ***************************");
@@ -1849,9 +2328,17 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 									}
 								}
 							}
+							 List<Long> devices = userClientDeviceRepository.getDevice(userId,deviceId);
+							 if(devices.isEmpty()) {
+									isParent = false;
+							 }
+							 else {
+									isParent = true;
+							 }
+
 					   }
-					   if(!checkIfParent(device , loggedUser)&& ! isParent) {
-							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to assign driver to this device ",null);
+					   if(!checkIfParent(device , loggedUser) && ! isParent) {
+							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this device ",null);
 							logger.info("************************ editDevice ENDED ***************************");
 							return ResponseEntity.badRequest().body(getObjectResponse);
 					   }
@@ -2177,29 +2664,36 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 						return ResponseEntity.status(404).body(getObjectResponse);
 					}
 					else {
-						boolean isParent = false;
+						boolean isParent = true;
 						User parent = null;
 
 						 if(loggedUser.getAccountType().equals(4)) {
 							 Set<User>parentClients = loggedUser.getUsersOfUser();
 							 if(parentClients.isEmpty()) {
-								  getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allowed to get this device",null);
-									
-									logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
-									return ResponseEntity.badRequest().body(getObjectResponse); 
+								 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allowed to get this device",null);
+								logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+								return ResponseEntity.badRequest().body(getObjectResponse); 
 							 }else {
 								 for(User object : parentClients) {
 									 parent = object ;
 								 }
 								 loggedUser=parent;
 							 }
+							List<Long> devices = userClientDeviceRepository.getDevice(userId,deviceId);
+							if(devices.isEmpty()) {
+                                isParent = false;
+									
+							}
+							else {
+								isParent = true;
+							}
 								 
 							 
 						 }
 						
 						
 						
-						if(checkIfParent( device ,  loggedUser)) {
+						if(checkIfParent( device ,  loggedUser) && isParent) {
 							if(!loggedUser.getAccountType().equals(1)) {
 								if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "calibration")) {
 									 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to edit calibration",null);
@@ -2243,101 +2737,111 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
     @Override
 	public ResponseEntity<?> addDataToCaliberation(String TOKEN,Long userId, Long deviceId,Map<String, List> data) {
 	// TODO Auto-generated method stub
-			if(TOKEN.equals("")) {
-				 List<Device> devices = null;
-				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
-				 return  ResponseEntity.badRequest().body(getObjectResponse);
-			}
+		if(TOKEN.equals("")) {
+			 List<Device> devices = null;
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(userId.equals(0) || deviceId.equals(0)) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "userId and deviceId are required",null);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		else {
+			User loggedUser = userService.findById(userId);
 			
-			if(super.checkActive(TOKEN)!= null)
-			{
-				return super.checkActive(TOKEN);
-			}
-			if(userId.equals(0) || deviceId.equals(0)) {
-				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "userId and deviceId are required",null);
-				return  ResponseEntity.badRequest().body(getObjectResponse);
+			if(loggedUser == null) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "loggedUser is not found",null);
+				
+				return ResponseEntity.status(404).body(getObjectResponse);
 			}
 			else {
-				User loggedUser = userService.findById(userId);
-				
-				if(loggedUser == null) {
-					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "loggedUser is not found",null);
-					
+				Device device = findById(deviceId);
+				if(device == null) {
+					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "device is not found",null);
 					return ResponseEntity.status(404).body(getObjectResponse);
 				}
 				else {
-					Device device = findById(deviceId);
-					if(device == null) {
-						getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "device is not found",null);
-						return ResponseEntity.status(404).body(getObjectResponse);
-					}
-					else {
-						boolean isParent = false;
-						User parent = null;
+					boolean isParent = true;
+					User parent = null;
 
-						 if(loggedUser.getAccountType().equals(4)) {
-							 Set<User>parentClients = loggedUser.getUsersOfUser();
-							 if(parentClients.isEmpty()) {
-								  getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allowed to get this device",null);
-									
-									logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
-									return ResponseEntity.badRequest().body(getObjectResponse); 
-							 }else {
-								 for(User object : parentClients) {
-									 parent = object ;
-								 }
-								 loggedUser=parent;
-							 }
-								 
-							 
-						 }
-						
-						
-						if(checkIfParent( device ,  loggedUser)) {
-							if(!loggedUser.getAccountType().equals(1)) {
-								if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "calibration")) {
-									 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to edit calibration",null);
-									 logger.info("************************ calibration ENDED ***************************");
-									return  ResponseEntity.badRequest().body(getObjectResponse);
-								}
-							}
-							
-							
-							if(data.get("calibrationData") == null) {
-								getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Caliberation data shouldn't be null",null);
-								return  ResponseEntity.badRequest().body(getObjectResponse);
-							}
-							List<?> calibrationData=new ArrayList<>();
-							calibrationData=data.get("calibrationData");
-							JSONArray jsArray = new JSONArray(calibrationData);
-							String req="";
-							for (Object pushed : jsArray) {
-								if(req.equals("")) {
-								   req+=pushed.toString();
-								}
-								else {
-									req+=" "+pushed.toString();
-								}
-							}
-							if(req.equals("")) {
-								   req = null;
-							}
-							device.setCalibrationData(req);
-							deviceRepository.save(device);
-
+					 if(loggedUser.getAccountType().equals(4)) {
+						 Set<User>parentClients = loggedUser.getUsersOfUser();
+						 if(parentClients.isEmpty()) {
+							  getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allowed to get this device",null);
 								
-							
-							getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Add successfully",null);
-							return ResponseEntity.ok().body(getObjectResponse);
+								logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+								return ResponseEntity.badRequest().body(getObjectResponse); 
+						 }else {
+							 for(User object : parentClients) {
+								 parent = object ;
+							 }
+							 loggedUser=parent;
+						 }
+						List<Long> devices = userClientDeviceRepository.getDevice(userId,deviceId);
+						if(devices.isEmpty()) {
+                            isParent = false;
+								
 						}
 						else {
-							getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "userId not from parents of this device",null);
-							return  ResponseEntity.badRequest().body(getObjectResponse);	
+							isParent = true;
 						}
-					}
+							 
+						 
+					 }
 					
+					
+					if(checkIfParent( device ,  loggedUser) && isParent) {
+						if(!loggedUser.getAccountType().equals(1)) {
+							if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "calibration")) {
+								 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to edit calibration",null);
+								 logger.info("************************ calibration ENDED ***************************");
+								return  ResponseEntity.badRequest().body(getObjectResponse);
+							}
+						}
+						
+						
+						if(data.get("calibrationData") == null) {
+							getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Caliberation data shouldn't be null",null);
+							return  ResponseEntity.badRequest().body(getObjectResponse);
+						}
+						List<?> calibrationData=new ArrayList<>();
+						calibrationData=data.get("calibrationData");
+						JSONArray jsArray = new JSONArray(calibrationData);
+						String calc = calculateSlopeAndFactor(jsArray);
+						device.setLineData(calc);
+						String req="";
+						for (Object pushed : jsArray) {
+							if(req.equals("")) {
+							   req+=pushed.toString();
+							}
+							else {
+								req+=" "+pushed.toString();
+							}
+						}
+						if(req.equals("")) {
+							   req = null;
+						}
+						device.setCalibrationData(req);
+						deviceRepository.save(device);
+
+						
+						
+						getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Add successfully",null);
+						return ResponseEntity.ok().body(getObjectResponse);
+					}
+					else {
+						getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "userId not from parents of this device",null);
+						return  ResponseEntity.badRequest().body(getObjectResponse);	
+					}
 				}
+				
 			}
+		}
    }
     
     @Override
@@ -2372,7 +2876,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 						return ResponseEntity.status(404).body(getObjectResponse);
 					}
 					else {
-						boolean isParent = false;
+						boolean isParent = true;
 						User parent = null;
 
 						 if(loggedUser.getAccountType().equals(4)) {
@@ -2388,12 +2892,20 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 								 }
 								 loggedUser=parent;
 							 }
-								 
+							 
+							List<Long> devices = userClientDeviceRepository.getDevice(userId,deviceId);
+							if(devices.isEmpty()) {
+	                            isParent = false;
+									
+							}
+							else {
+								isParent = true;
+							} 
 							 
 						 }
 						
 						
-						if(checkIfParent( device ,  loggedUser)) {
+						if(checkIfParent( device ,  loggedUser) && isParent) {
 							if(!loggedUser.getAccountType().equals(1)) {
 								if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "GetSpentFuel")) {
 									 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to edit Fuel",null);
@@ -2471,7 +2983,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 						return ResponseEntity.status(404).body(getObjectResponse);
 					}
 					else {
-						boolean isParent = false;
+						boolean isParent = true;
 						User parent = null;
 
 						 if(loggedUser.getAccountType().equals(4)) {
@@ -2488,12 +3000,19 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 								 loggedUser=parent;
 							 }
 								 
-							 
+							List<Long> devices = userClientDeviceRepository.getDevice(userId,deviceId);
+							if(devices.isEmpty()) {
+                                isParent = false;
+									
+							}
+							else {
+								isParent = true;
+							}
 						 }
 						
 						
 						
-						if(checkIfParent( device ,  loggedUser)) {
+						if(checkIfParent( device ,  loggedUser) && isParent) {
 							if(!loggedUser.getAccountType().equals(1)) {
 								if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "GetSpentFuel")) {
 									 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to edit calibration",null);
@@ -2642,7 +3161,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					return ResponseEntity.status(404).body(getObjectResponse);
 				}
 				else {
-					boolean isParent = false;
+					boolean isParent = true;
 					User parent = null;
 
 					 if(loggedUser.getAccountType().equals(4)) {
@@ -2659,12 +3178,20 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 							 loggedUser=parent;
 						 }
 							 
+						List<Long> devices = userClientDeviceRepository.getDevice(userId,deviceId);
+						if(devices.isEmpty()) {
+                            isParent = false;
+								
+						}
+						else {
+							isParent = true;
+						}
 						 
 					 }
 					
 					
 					
-					if(checkIfParent( device ,  loggedUser)) {
+					if(checkIfParent( device ,  loggedUser) && isParent) {
 						if(!loggedUser.getAccountType().equals(1)) {
 							if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "GetSensorSetting")) {
 								 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to edit sensorSettings",null);
@@ -2744,7 +3271,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					return ResponseEntity.status(404).body(getObjectResponse);
 				}
 				else {
-					boolean isParent = false;
+					boolean isParent = true;
 					User parent = null;
 
 					 if(loggedUser.getAccountType().equals(4)) {
@@ -2760,13 +3287,20 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 							 }
 							 loggedUser=parent;
 						 }
-							 
+						List<Long> devices = userClientDeviceRepository.getDevice(userId,deviceId);
+						if(devices.isEmpty()) {
+                            isParent = false;
+								
+						}
+						else {
+							isParent = true;
+						} 
 						 
 					 }
 					
 					
 					
-					if(checkIfParent( device ,  loggedUser)) {
+					if(checkIfParent( device ,  loggedUser) && isParent) {
 						
 						String data = deviceRepository.getIcon(deviceId);
 						
@@ -2847,7 +3381,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					return ResponseEntity.status(404).body(getObjectResponse);
 				}
 				else {
-					boolean isParent = false;
+					boolean isParent = true;
 					User parent = null;
 
 					 if(loggedUser.getAccountType().equals(4)) {
@@ -2863,12 +3397,19 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 							 }
 							 loggedUser=parent;
 						 }
-							 
+						List<Long> devices = userClientDeviceRepository.getDevice(userId,deviceId);
+						if(devices.isEmpty()) {
+                            isParent = false;
+								
+						}
+						else {
+							isParent = true;
+						}	 
 						 
 					 }
 					
 					
-					if(checkIfParent( device ,  loggedUser)) {
+					if(checkIfParent( device ,  loggedUser) && isParent) {
 						if(!loggedUser.getAccountType().equals(1)) {
 							if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "GetSensorSetting")) {
 								 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to edit sensorSettings",null);
@@ -3017,7 +3558,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					return ResponseEntity.status(404).body(getObjectResponse);
 				}
 				else {
-					boolean isParent = false;
+					boolean isParent = true;
 					User parent = null;
 
 					 if(loggedUser.getAccountType().equals(4)) {
@@ -3033,12 +3574,19 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 							 }
 							 loggedUser=parent;
 						 }
-							 
+						List<Long> devices = userClientDeviceRepository.getDevice(userId,deviceId);
+						if(devices.isEmpty()) {
+                            isParent = false;
+								
+						}
+						else {
+							isParent = true;
+						}	 
 						 
 					 }
 					
 					
-					if(checkIfParent( device ,  loggedUser)) {
+					if(checkIfParent( device ,  loggedUser) && isParent) {
 						
 
 						if(!data.containsKey("icon")) {
@@ -3116,7 +3664,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					return ResponseEntity.status(404).body(getObjectResponse);
 				}
 				else {
-					boolean isParent = false;
+					boolean isParent = true;
 					User parent = null;
 
 					 if(loggedUser.getAccountType().equals(4)) {
@@ -3132,12 +3680,19 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 							 }
 							 loggedUser=parent;
 						 }
-							 
+						List<Long> devices = userClientDeviceRepository.getDevice(userId,deviceId);
+						if(devices.isEmpty()) {
+                            isParent = false;
+								
+						}
+						else {
+							isParent = true;
+						}
 						 
 					 }
 					
 					
-					if(checkIfParent( device ,  loggedUser)) {
+					if(checkIfParent( device ,  loggedUser) && isParent) {
 						if(!loggedUser.getAccountType().equals(1)) {
 							if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "command")) {
 								 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to edit command",null);
@@ -3345,7 +3900,12 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		
         if(deviceIds.length > 0 && deviceIds[0] != 0) {
 			
-			
+        	List<userClientDevice> checkData = userClientDeviceRepository.getDevicesByDevIds(deviceIds,userId);
+        	if(checkData.size()>0) {
+        		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "There is device assigned to another user before it should only share with one user",null);
+				return ResponseEntity.badRequest().body(getObjectResponse);
+        	}
+        	
 			for(Long id:deviceIds) {
 				if(id == 0) {
 					
@@ -3467,5 +4027,110 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "Success",devices);
 		logger.info("************************ assignClientUsers ENDED ***************************");
 		return ResponseEntity.ok().body(getObjectResponse);
+	}
+
+	@Override
+	public ResponseEntity<?> getDeviceUnSelect(String TOKEN, Long userId) {
+		// TODO Auto-generated method stub
+		
+		
+		logger.info("************************ getDeviceSelect STARTED ***************************");
+		List<DeviceSelect> devices = new ArrayList<DeviceSelect>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+	    if(userId != 0) {
+	    	
+			userService.resetChildernArray();
+
+	    	User user = userService.findById(userId);
+	    	if(user == null) {
+	    		getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",devices);
+				return ResponseEntity.status(404).body(getObjectResponse);
+	    	}
+	    	if(user != null) {
+	    		if(user.getDelete_date() != null) {
+	    			getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",devices);
+					return ResponseEntity.status(404).body(getObjectResponse);
+	    		}
+	    	}
+	    	
+    		 
+
+			devices = deviceRepository.getDeviceUnSelectOfClient(userId);
+			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
+			logger.info("************************ getDeviceSelect ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+
+			
+		}
+		else {
+			
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",devices);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
+	
+	}
+
+	@Override
+	public String calculateSlopeAndFactor(JSONArray data) {
+		// TODO Auto-generated method stub
+		
+		if(data.length()>0) {
+			if(data.length()>1) {
+				JSONObject start = (JSONObject) data.get(0);
+				Integer length = data.length()-1;
+				JSONObject end = (JSONObject) data.get(length);
+
+				Double x1 = (start.getDouble("s1") + start.getDouble("s2") )/2;
+				Double y1 = start.getDouble("w");
+				
+				Double x2 = (end.getDouble("s1") + end.getDouble("s2") )/2;
+				Double y2 = end.getDouble("w");
+				
+				Double slope = ((y2 - y1) / (x2 - x1));
+				
+				Double b = y1-(slope*x1);
+				
+				JSONObject result = new JSONObject();
+				result.put("slope", slope);
+				result.put("factor", b);
+				
+				return result.toString();
+
+
+			}
+			else {
+				Integer length = data.length()-1;
+				JSONObject end = (JSONObject) data.get(length);
+				
+				Double x1 = 0.0;
+				Double y1 = 0.0;
+				
+				Double x2 = (end.getDouble("s1") + end.getDouble("s2") )/2;
+				Double y2 = end.getDouble("w");
+				
+				Double slope = ((y2 - y1) / (x2 - x1));
+				
+				Double b = y2-(slope*x2);
+				
+				JSONObject result = new JSONObject();
+				result.put("slope", slope);
+				result.put("factor", b);
+				
+				return result.toString();
+				
+			}
+		}
+
+		
+		return null;
 	}
 }

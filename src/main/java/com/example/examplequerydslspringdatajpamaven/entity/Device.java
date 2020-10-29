@@ -342,6 +342,24 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
      		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_users.name LIKE LOWER(CONCAT('%',:search, '%')) ) "
      		+ " GROUP BY tc_devices.id,tc_drivers.id,tc_users.id LIMIT :offset,10"),
 
+@NamedNativeQuery(name="getDevicesListByIds", 
+resultSetMapping="DevicesList", 
+query=" SELECT tc_devices.id as id ,tc_devices.name as deviceName, tc_devices.uniqueid as uniqueId,"
+		+ " tc_devices.sequence_number as sequenceNumber ,tc_devices.lastupdate as lastUpdate "
+		+ " ,tc_devices.reference_key as referenceKey, "
+		+ " tc_drivers.name as driverName,tc_users.name as companyName,tc_users.id as companyId ,GROUP_CONCAT(tc_geofences.name )AS geofenceName"
+		+ " FROM tc_devices LEFT JOIN  tc_device_driver ON tc_devices.id=tc_device_driver.deviceid"
+		+ " LEFT JOIN  tc_drivers ON tc_drivers.id=tc_device_driver.driverid and tc_drivers.delete_date is null" 
+		+ " LEFT JOIN  tc_device_geofence ON tc_devices.id=tc_device_geofence.deviceid" 
+		+ " LEFT JOIN  tc_geofences ON tc_geofences.id=tc_device_geofence.geofenceid and tc_geofences.delete_date"
+		+ " is null INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id "
+		+ " LEFT JOIN tc_users ON tc_user_device.userid = tc_users.id" 
+		+ " where tc_devices.id IN(:deviceIds) and tc_devices.delete_date is null "
+		+ " AND ( tc_devices.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.uniqueid LIKE LOWER(CONCAT('%',:search, '%')) "
+		+ " OR tc_devices.sequence_number LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))"
+		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_users.name LIKE LOWER(CONCAT('%',:search, '%')) ) "
+		+ " GROUP BY tc_devices.id,tc_drivers.id,tc_users.id LIMIT :offset,10"),
+
 @NamedNativeQuery(name="getDevicesListApp", 
 resultSetMapping="DevicesListApp", 
 query=" SELECT tc_devices.id as id ,tc_devices.name as deviceName, tc_devices.uniqueid as uniqueId,"
@@ -356,6 +374,25 @@ query=" SELECT tc_devices.id as id ,tc_devices.name as deviceName, tc_devices.un
 		+ " INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id "
 		+ " LEFT JOIN tc_users ON tc_user_device.userid = tc_users.id" 
 		+ " where tc_user_device.userid IN(:userIds) and tc_devices.delete_date is null"
+		+ " AND ( tc_devices.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.uniqueid LIKE LOWER(CONCAT('%',:search, '%')) "
+		+ " OR tc_devices.sequence_number LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))"
+		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%')) ) "
+		+ " GROUP BY tc_devices.id,tc_drivers.id,tc_users.id LIMIT :offset,3"),
+
+@NamedNativeQuery(name="getDevicesListAppByIds", 
+resultSetMapping="DevicesListApp", 
+query=" SELECT tc_devices.id as id ,tc_devices.name as deviceName, tc_devices.uniqueid as uniqueId,"
+		+ " tc_devices.sequence_number as sequenceNumber ,tc_devices.lastupdate as lastUpdate "
+		+ " ,tc_devices.reference_key as referenceKey, "
+		+ " tc_drivers.name as driverName,tc_drivers.mobile_num as driver_num,tc_users.name as companyName ,GROUP_CONCAT(tc_geofences.name )AS geofenceName ,"
+		+" tc_devices.positionid as positionId "
+		+ " FROM tc_devices LEFT JOIN  tc_device_driver ON tc_devices.id=tc_device_driver.deviceid"
+		+ " LEFT JOIN  tc_drivers ON tc_drivers.id=tc_device_driver.driverid and tc_drivers.delete_date is null" 
+		+ " LEFT JOIN  tc_device_geofence ON tc_devices.id=tc_device_geofence.deviceid" 
+		+ " LEFT JOIN  tc_geofences ON tc_geofences.id=tc_device_geofence.geofenceid and tc_geofences.delete_date is null "
+		+ " INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id "
+		+ " LEFT JOIN tc_users ON tc_user_device.userid = tc_users.id" 
+		+ " where tc_devices.id IN(:deviceIds) and tc_devices.delete_date is null"
 		+ " AND ( tc_devices.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.uniqueid LIKE LOWER(CONCAT('%',:search, '%')) "
 		+ " OR tc_devices.sequence_number LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))"
 		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%')) ) "
@@ -383,7 +420,17 @@ query=" SELECT  tc_devices.id as id ,tc_devices.uniqueid as uniqueId ,tc_devices
 		" tc_devices.photo as photo  FROM tc_devices "
 		+ " INNER JOIN  tc_user_device ON tc_devices.id=tc_user_device.deviceid " 
 		+ " where tc_user_device.userid IN (:userIds) and tc_devices.delete_date is null "
-		+ "  AND ( (tc_devices.name LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))))"
+		+ "  AND (  (tc_devices.uniqueid LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_devices.name LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))))"
+		+ " GROUP BY tc_devices.id LIMIT :offset,10"),
+
+@NamedNativeQuery(name="getDevicesDataByIds", 
+resultSetMapping="DevicesData", 
+query=" SELECT  tc_devices.id as id ,tc_devices.uniqueid as uniqueId ,tc_devices.name as deviceName ,"
+		+ " tc_devices.lastupdate as lastUpdate, " + 
+		"  tc_devices.positionid as positionId, " + 
+		" tc_devices.photo as photo  FROM tc_devices "
+		+ " where tc_devices.id IN (:deviceIds) and tc_devices.delete_date is null "
+		+ "  AND ( (tc_devices.uniqueid LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_devices.name LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))))"
 		+ " GROUP BY tc_devices.id LIMIT :offset,10"),
 		
 @NamedNativeQuery(name="getDevicesLiveDataMap", 
@@ -409,6 +456,14 @@ query="SELECT tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.la
 		+ " FROM tc_devices " + 
 		" INNER JOIN  tc_user_device ON tc_devices.id=tc_user_device.deviceid" + 
 		" where tc_user_device.userid IN(:userIds) and tc_devices.delete_date is null"
+		+ " GROUP BY tc_devices.id"),
+
+@NamedNativeQuery(name="getDevicesDataMapByIds", 
+resultSetMapping="DevicesDataMap", 
+query="SELECT tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.lastupdate as lastUpdate,"
+		+ "tc_devices.positionid as positionId "
+		+ " FROM tc_devices " + 
+		" where tc_devices.id IN(:deviceIds) and tc_devices.delete_date is null"
 		+ " GROUP BY tc_devices.id"),
 
 
@@ -549,7 +604,7 @@ public class Device {
 	
 	//should be isDeleted
 	@Column(name = "is_deleted")
-	private Integer is_deleted;
+	private Integer is_deleted=null;
 	
 	@Column(name = "delete_date")
 //	@CsvBindByName

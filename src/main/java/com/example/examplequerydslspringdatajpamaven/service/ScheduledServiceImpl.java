@@ -62,11 +62,13 @@ import com.example.examplequerydslspringdatajpamaven.entity.Event;
 import com.example.examplequerydslspringdatajpamaven.entity.EventReport;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 import com.example.examplequerydslspringdatajpamaven.entity.Group;
+import com.example.examplequerydslspringdatajpamaven.entity.Points;
 import com.example.examplequerydslspringdatajpamaven.entity.Schedule;
 import com.example.examplequerydslspringdatajpamaven.entity.StopReport;
 import com.example.examplequerydslspringdatajpamaven.entity.SummaryReport;
 import com.example.examplequerydslspringdatajpamaven.entity.TripReport;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
+import com.example.examplequerydslspringdatajpamaven.entity.userClientPoint;
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.DriverRepository;
@@ -115,6 +117,7 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 	
 	@Autowired
 	private ReportServiceImpl reportServiceImpl;
+	
 	
     @Autowired
     private JavaMailSender emailSender;
@@ -180,20 +183,9 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 					
 					if(schedule.getId()==null || schedule.getId()==0) {
 						if(user.getAccountType().equals(4)) {
-							 Set<User> parentClients = user.getUsersOfUser();
-							 if(parentClients.isEmpty()) {
-								 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are account type 4 and not has parent",null);
-								 return  ResponseEntity.badRequest().body(getObjectResponse);
-							 }else {
-								 User parent = null;
-								 for(User object : parentClients) {
-									 parent = object;
-								 }
-								 schedule.setUserId(parent.getId());
+							 schedule.setUserId(userId);
 
-
-							 }
-						 }
+						}
 						else {
 							 schedule.setUserId(userId);
 
@@ -309,19 +301,9 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 					
 					userServiceImpl.resetChildernArray();
 				    if(user.getAccountType().equals(4)) {
-						 Set<User> parentClients = user.getUsersOfUser();
-						 if(parentClients.isEmpty()) {
-							
-							 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get SCHEDULED of this user",null);
-							 logger.info("************************ getScheduledList ENDED ***************************");
-							return  ResponseEntity.status(404).body(getObjectResponse);
-						 }else {
-							 User parentClient = new User() ;
-							 for(User object : parentClients) {
-								 parentClient = object;
-							 }
+						
 							 List<Long>usersIds= new ArrayList<>();
-							 usersIds.add(parentClient.getId());
+							 usersIds.add(user.getId());
 							 schedules = scheduledRepository.getAllScheduled(usersIds,offset,search);
 							 Integer size = 0;
 							 List<Map> data = new ArrayList<>();
@@ -352,7 +334,7 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",data,size);
 							logger.info("************************ getScheduledList ENDED ***************************");
 							return  ResponseEntity.ok().body(getObjectResponse);
-						 }
+						 
 					}
 				    List<User>childernUsers = userServiceImpl.getActiveAndInactiveChildern(id);
 					 List<Long>usersIds= new ArrayList<>();
@@ -466,23 +448,14 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 		}
 		List<User>childs = new ArrayList<User>();
 		if(loggedUser.getAccountType().equals(4)) {
-			 List<User> parents=userServiceImpl.getAllParentsOfuser(loggedUser,loggedUser.getAccountType());
-			 if(parents.isEmpty()) {
-				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "as you are not have parent you cannot allow to edit this schedule.",null);
-				return  ResponseEntity.badRequest().body(getObjectResponse);
-			 }
-			 else {
-				 User parentClient = new User() ;
-
-				 for(User object : parents) {
-					 parentClient = object;
-					 break;
-				 }
-				 
-				userServiceImpl.resetChildernArray();
-				childs = userServiceImpl.getAllChildernOfUser(parentClient.getId()); 
-			 }
-			 
+			
+			if(isParent) {
+				List<Schedule> schedules = new ArrayList<>();
+				schedules.add(schedule);
+				getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",schedules);
+				return  ResponseEntity.ok().body(getObjectResponse);
+			}
+			
 		}
 		else {
 			userServiceImpl.resetChildernArray();
@@ -564,22 +537,37 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 		}
 		List<User>childs = new ArrayList<User>();
 		if(loggedUser.getAccountType().equals(4)) {
-			 List<User> parents=userServiceImpl.getAllParentsOfuser(loggedUser,loggedUser.getAccountType());
-			 if(parents.isEmpty()) {
-				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "as you are not have parent you cannot allow to edit this schedule.",null);
-				return  ResponseEntity.badRequest().body(getObjectResponse);
-			 }
-			 else {
-				 User parentClient = new User() ;
+			if(isParent) {
+				Calendar cal = Calendar.getInstance();
+				int day = cal.get(Calendar.DATE);
+			    int month = cal.get(Calendar.MONTH) + 1;
+			    int year = cal.get(Calendar.YEAR);
+			    String date =  Integer.toString(year)+"-"+ Integer.toString(month)+"-"+ Integer.toString(day);
+			    schedule.setDelete_date(date);
+			     
+			    scheduledRepository.save(schedule);
+			    
+			    
+			    List<Schedule> scheduleCheckBeforeRemove = scheduledRepository.getAllScheduledHaveExpression(schedule.getExpression());
+			    
+			    if(scheduleCheckBeforeRemove.isEmpty()) {
+			    	if(scheduledTasksRestController.cronsExpressions.contains(schedule.getExpression())) {
+						scheduledTasksRestController.cronsExpressions.remove(schedule.getExpression());
 
-				 for(User object : parents) {
-					 parentClient = object;
-					 break;
-				 }
-				 
-				userServiceImpl.resetChildernArray();
-				childs = userServiceImpl.getAllChildernOfUser(parentClient.getId()); 
-			 }
+						try {
+							scheduledTasksRestController.destroy();
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+			    }
+
+				getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",null);
+				return  ResponseEntity.ok().body(getObjectResponse);
+				
+				
+			}
 			 
 		}
 		else {
@@ -686,22 +674,73 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 		}
 		List<User>childs = new ArrayList<User>();
 		if(loggedUser.getAccountType().equals(4)) {
-			 List<User> parents=userServiceImpl.getAllParentsOfuser(loggedUser,loggedUser.getAccountType());
-			 if(parents.isEmpty()) {
-				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "as you are not have parent you cannot allow to edit this schedule.",null);
-				return  ResponseEntity.badRequest().body(getObjectResponse);
-			 }
-			 else {
-				 User parentClient = new User() ;
+			 
+			if(isParent) {
+				if(schedule.getEmail()==null || schedule.getEmail()=="") {
 
-				 for(User object : parents) {
-					 parentClient = object;
-					 break;
-				 }
-				 
-				userServiceImpl.resetChildernArray();
-				childs = userServiceImpl.getAllChildernOfUser(parentClient.getId()); 
-			 }
+					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Email is required.",null);
+					 return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				if(schedule.getDate()== null || schedule.getDate_type()== null
+						   || schedule.getTask() == null || schedule.getDate()== "" || schedule.getDate_type()== ""
+						   || schedule.getTask() == "") {
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Schedule task , date and date_type is Required",null);
+					return ResponseEntity.badRequest().body(getObjectResponse);
+
+				}
+				else {
+					JSONObject obj = new JSONObject(schedule.getDate().toString());
+					if(schedule.getDate_type().equals("everyDay")) {
+						String exp = "0 0 "+ obj.get("hour") +" ? * *";
+						schedule.setExpression(exp);
+					}
+					
+					else if(schedule.getDate_type().equals("everyWeek")) {
+						String exp = "0 0 "+ obj.get("hour") +" ? * "+obj.get("dayName");
+						schedule.setExpression(exp);
+					}
+					else if(schedule.getDate_type().equals("everyMonth")) {
+						String exp = "0 0 "+ obj.get("hour")+" "+obj.get("dayNumber")+" * ?";
+						schedule.setExpression(exp);
+					}
+					
+					
+					//only for test
+					/*else if(schedule.getDate_type().equals("every")) {
+						String exp = "0 "+ "0/"+obj.get("min") +" * * * *";
+						schedule.setExpression(exp);
+					}*/
+					
+					
+					else {
+						getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date Type should be everyDay ,everyWeek or everyMonth",null);
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+					}
+					
+					scheduledRepository.save(schedule);
+					
+					
+					if(!scheduledTasksRestController.cronsExpressions.contains(schedule.getExpression())) {
+						scheduledTasksRestController.cronsExpressions.add(schedule.getExpression());
+
+						try {
+							scheduledTasksRestController.destroy();
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+
+					
+					schedules.add(schedule);
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Updated Successfully",schedules);
+					logger.info("************************ editScheduled ENDED ***************************");
+					return ResponseEntity.ok().body(getObjectResponse);
+
+				}
+				
+			}
+
 			 
 		}
 		else {
@@ -2852,8 +2891,83 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 		
 		return true;
 	}
-	
 
+	@Override
+	public ResponseEntity<?> getScheduledSelect(String TOKEN, Long userId) {
+		// TODO Auto-generated method stub
+		
+		logger.info("************************ getNotificationSelect STARTED ***************************");
+		List<DriverSelect> drivers = new ArrayList<DriverSelect>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",drivers);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+	    if(userId != 0) {
+	    	User user = userServiceImpl.findById(userId);
+	    	userServiceImpl.resetChildernArray();
+
+	    	if(user != null) {
+	    		if(user.getDelete_date() == null) {
+	    			
+	    			if(user.getAccountType().equals(4)) {
+	   				 
+
+			   			List<Long>usersIds= new ArrayList<>();
+	   					usersIds.add(user.getId());
+						drivers = scheduledRepository.getScheduledSelect(usersIds);
+						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
+						logger.info("************************ getNotificationSelect ENDED ***************************");
+						return ResponseEntity.ok().body(getObjectResponse);
+	   						
+	   				}
+	    		
+	    			 List<User>childernUsers = userServiceImpl.getAllChildernOfUser(userId);
+		   			 List<Long>usersIds= new ArrayList<>();
+		   			 if(childernUsers.isEmpty()) {
+		   				 usersIds.add(userId);
+		   			 }
+		   			 else {
+		   				 usersIds.add(userId);
+		   				 for(User object : childernUsers) {
+		   					 usersIds.add(object.getId());
+		   				 }
+		   			 }
+	    			
+	    			drivers = scheduledRepository.getScheduledSelect(usersIds);
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
+					logger.info("************************ getNotificationSelect ENDED ***************************");
+					return ResponseEntity.ok().body(getObjectResponse);
+
+	    		}
+	    		else {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",drivers);
+					return ResponseEntity.status(404).body(getObjectResponse);
+
+	    		}
+	    	
+	    	
+	    	}
+	    	else {
+	    		getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",drivers);
+				return ResponseEntity.status(404).body(getObjectResponse);
+
+	    	}
+			
+		}
+		else {
+			
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",drivers);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
+	
+	}
+	
 	
 
 }

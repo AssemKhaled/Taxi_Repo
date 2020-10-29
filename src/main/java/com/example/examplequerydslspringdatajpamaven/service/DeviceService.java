@@ -4,11 +4,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.json.JSONArray;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 @Service
 public interface DeviceService {
 	
@@ -27,6 +29,8 @@ public interface DeviceService {
 	public ResponseEntity<?>  findDeviceById(String TOKEN,Long deviceId,Long userId);
 
 	public ResponseEntity<?> getDeviceSelect(String TOKEN,Long userId);
+	public ResponseEntity<?> getDeviceUnSelect(String TOKEN,Long userId);
+
 
 	public ResponseEntity<?> assignDeviceToDriver(String TOKEN,Long deviceId , Long driverId , Long userId);
 	
@@ -58,6 +62,9 @@ public interface DeviceService {
 	public ResponseEntity<?> addSensorSettings(String TOKEN,Long userId,Long deviceId,Map<String, Object> data);
 	public ResponseEntity<?> addIcon(String TOKEN,Long userId,Long deviceId,Map<String, Object> data);
 	public ResponseEntity<?> sendCommand(String TOKEN,Long userId,Long deviceId,Map<String, Object> data);
+
+	
+	public String calculateSlopeAndFactor(JSONArray  data);
 
 	public String sendCommandToServer(Map<String, Object> objectData);
 	

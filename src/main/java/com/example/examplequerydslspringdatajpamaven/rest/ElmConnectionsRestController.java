@@ -143,7 +143,7 @@ public class ElmConnectionsRestController {
 	}
 	
 	@GetMapping(path ="/lastLocations")
-	@Scheduled(fixedRate = 30000)
+	@Scheduled(fixedRate = 60000)
 	public ResponseEntity<?> lastLocations(){
 		
 		return elmServiceImpl.lastLocations();
@@ -154,5 +154,12 @@ public class ElmConnectionsRestController {
 	public ResponseEntity<?> getExpiredVehicles(){
 		
 		return elmServiceImpl.getExpiredVehicles();
+	}
+	
+	@GetMapping(path ="/checkBySequenceNumber")
+	public ResponseEntity<?> checkBySequenceNumber(
+			@RequestParam (value = "sequenceNumber", defaultValue = "") String sequenceNumber){
+		
+		return elmServiceImpl.checkBySequenceNumber(sequenceNumber);
 	}
 }

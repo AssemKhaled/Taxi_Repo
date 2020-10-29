@@ -115,4 +115,15 @@ public class ScheduledCRUDRestController {
 		return null;
 	
 	}
+	
+	@RequestMapping(value = "/getScheduledSelect", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getScheduledSelect(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                               @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		
+	
+    	return  scheduledServiceImpl.getScheduledSelect(TOKEN,userId);
+
+		
+	}
+	
 }

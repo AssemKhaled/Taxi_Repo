@@ -117,4 +117,13 @@ public class ComputedRestController {
 											@RequestParam (value = "userId", defaultValue = "0") Long userId) {
 		return computedServiceImpl.getClientComputeds(TOKEN,loggedUserId,userId);
 	}
+	
+	@RequestMapping(value = "/getComputedUnSelectOfClient", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getComputedUnSelect(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                                 @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		
+
+    	return  computedServiceImpl.getComputedUnSelect(TOKEN,userId);
+		
+	}
 }
