@@ -12,8 +12,8 @@ public interface PointsService {
 	public ResponseEntity<?> createPoints(String TOKEN,Points points,Long userId);
 	public ResponseEntity<?> editPoints(String TOKEN,Points points,Long userId);
 
-	public ResponseEntity<?> getPointSelect(String TOKEN,Long userId);
-	public ResponseEntity<?> getPointUnSelectOfClient(String TOKEN,Long userId);
+	public ResponseEntity<?> getPointSelect(String TOKEN,Long loggedUserId,Long userId);
+	public ResponseEntity<?> getPointUnSelectOfClient(String TOKEN,Long loggedUserId,Long userId);
 
 
 	public ResponseEntity<?> assignClientPoints(String TOKEN,Long loggedUserId,Long userId,Long [] pointIds);

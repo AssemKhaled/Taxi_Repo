@@ -25,7 +25,7 @@ public interface UserClientComputedRepository extends JpaRepository<userClientCo
 	@Query(value = "select * from tc_user_client_computed where tc_user_client_computed.userid=:userId", nativeQuery = true)
 	public List<userClientComputed> getComputedsOfUser(@Param("userId") Long userId);
 	
-	@Query(value = "select tc_attributes.id,tc_attributes.attribute from tc_attributes "
+	@Query(value = "select tc_attributes.id,tc_attributes.description from tc_attributes "
 			+ " INNER JOIN tc_user_client_computed ON tc_user_client_computed.computedid=tc_attributes.id "
 			+ "  where tc_user_client_computed.userid=:userId ", nativeQuery = true)
 	public List<DriverSelect> getComputedsOfUserList(@Param("userId") Long userId);

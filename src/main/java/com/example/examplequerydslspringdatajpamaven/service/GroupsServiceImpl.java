@@ -330,10 +330,10 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 				    	
 				    	List<Long> groupIds = userClientGroupRepository.getGroupsIds(id);
 						Integer size=0;
+						List<Map> data = new ArrayList<>();
 
 						 if(groupIds.size()>0) {
 							    groups = groupRepository.getAllGroupsByIds(groupIds,offset,search);
-								List<Map> data = new ArrayList<>();
 								
 								if(groups.size()>0) {
 									size=groupRepository.getAllGroupsSizeByIds(groupIds,search);
@@ -351,7 +351,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 
 										 
 										 
-										 Set<User>groupParents = group.getUserGroup();
+									    	Set<User>groupParents = group.getUserGroup();
 											if(groupParents.isEmpty()) {
 												
 
@@ -363,7 +363,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 														 PointsList.put("companyName", us.getName());
 
 													 }
-													break;
+													 break;
 													
 												}
 											}
@@ -375,7 +375,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 
 						 }
 						 
-						 getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",groups,size);
+						 getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",data,size);
 						 logger.info("************************ getAllUserGeofences ENDED ***************************");
 						 return  ResponseEntity.ok().body(getObjectResponse);
 					 }
@@ -394,8 +394,8 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 					
 					
 				    groups = groupRepository.getAllGroups(usersIds,offset,search);
-					List<Map> data = new ArrayList<>();
 					Integer size=0;
+					List<Map> data = new ArrayList<>();
 
 					
 					if(groups.size()>0) {
@@ -415,7 +415,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 
 							 
 							 
-							 Set<User>groupParents = group.getUserGroup();
+					     		Set<User>groupParents = group.getUserGroup();
 								if(groupParents.isEmpty()) {
 									
 
@@ -1449,7 +1449,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 	}
 
 	@Override
-	public ResponseEntity<?> getGroupSelect(String TOKEN, Long userId) {
+	public ResponseEntity<?> getGroupSelect(String TOKEN,Long loggedUserId, Long userId) {
 		logger.info("************************ getDriverSelect STARTED ***************************");
 		List<DriverSelect> drivers = new ArrayList<DriverSelect>();
 		if(TOKEN.equals("")) {
@@ -1461,6 +1461,31 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 		{
 			return super.checkActive(TOKEN);
 		}
+		
+		if(loggedUserId != 0) {
+	    	User loggedUser = userService.findById(loggedUserId);
+	    	
+	    	if(loggedUser != null) {
+	    		if(loggedUser.getDelete_date() == null) {
+	    			if(loggedUser.getAccountType().equals(4)) {	    				
+	    				List<Long> groupIds = userClientGroupRepository.getGroupsIds(loggedUserId);
+
+						 if(groupIds.size()>0) {
+				    			drivers = groupRepository.getGroupSelectByIds(groupIds);
+
+						 }
+						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
+						logger.info("************************ getDriverSelect ENDED ***************************");
+						return ResponseEntity.ok().body(getObjectResponse);
+	    				
+	    				
+	    			}
+	    		}
+	    	}
+	    	
+		}
+		
+		
 	    if(userId != 0) {
 	    	User user = userService.findById(userId);
 	    	userService.resetChildernArray();
@@ -1548,7 +1573,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 	}
 	
 	@Override
-	public ResponseEntity<?> getGroupUnSelectOfCient(String TOKEN, Long userId) {
+	public ResponseEntity<?> getGroupUnSelectOfCient(String TOKEN,Long loggedUserId, Long userId) {
 		logger.info("************************ getDriverSelect STARTED ***************************");
 		List<DriverSelect> drivers = new ArrayList<DriverSelect>();
 		if(TOKEN.equals("")) {
@@ -1560,41 +1585,77 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 		{
 			return super.checkActive(TOKEN);
 		}
-	    if(userId != 0) {
-	    	User user = userService.findById(userId);
-	    	userService.resetChildernArray();
-
-	    	if(user != null) {
-	    		if(user.getDelete_date() == null) {
-	    			
-	    			
-	    			
-	    			drivers = groupRepository.getGroupUnSelectOfClient(userId);
-					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
-					logger.info("************************ getDriverSelect ENDED ***************************");
-					return ResponseEntity.ok().body(getObjectResponse);
-
-	    		}
-	    		else {
-					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",drivers);
-					return ResponseEntity.status(404).body(getObjectResponse);
-
-	    		}
-	    	
-	    	}
-	    	else {
-				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",drivers);
-				return ResponseEntity.status(404).body(getObjectResponse);
-
-	    	}
+		
+        if(loggedUserId == 0) {
 			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User client = userService.findById(loggedUserId);
+		if(client == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged user is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(client.getAccountType() != 3) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User should be type client to assign his users",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(userId == 0) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User user = userService.findById(userId);
+		if(user == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(user.getAccountType() != 4) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User should be type user to assign him users",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		Set<User> UserParents = user.getUsersOfUser();
+		if(UserParents.isEmpty()) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
 		}
 		else {
+			User Parent= null;
+			for(User object : UserParents) {
+				Parent = object ;
+				break;
+			}
+			if(!Parent.getId().toString().equals(loggedUserId.toString())) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
+				return ResponseEntity.status(404).body(getObjectResponse);
+			}
 			
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",drivers);
-			return ResponseEntity.badRequest().body(getObjectResponse);
-
 		}
+		
+
+		drivers = groupRepository.getGroupUnSelectOfClient(loggedUserId,userId);
+		List<DriverSelect> selectedGroups = userClientGroupRepository.getGroupsOfUserList(userId);
+		
+		List<Map> data = new ArrayList<>();
+	    Map obj = new HashMap();
+	    
+	    obj.put("selectedGroups", selectedGroups);
+	    obj.put("groups", drivers);
+
+	    data.add(obj);
+		
+		getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",data);
+		logger.info("************************ getDriverSelect ENDED ***************************");
+		return ResponseEntity.ok().body(getObjectResponse);
+		
+
 	
 	}
 	

@@ -72,9 +72,9 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	
 	@Query(value = "SELECT tc_devices.id,tc_devices.name FROM tc_devices"
 			+ " INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id"
-			+ " WHERE tc_user_device.userid IN (:userId ) and tc_devices.delete_date is null "
-			+ " and tc_devices.id Not IN(Select tc_user_client_device.deviceid from tc_user_client_device) ",nativeQuery = true)
-	public List<DeviceSelect> getDeviceUnSelectOfClient(@Param("userId")Long userId);
+			+ " WHERE tc_user_device.userid IN (:loggedUserId ) and tc_devices.delete_date is null "
+			+ " and tc_devices.id Not IN(Select tc_user_client_device.deviceid from tc_user_client_device where tc_user_client_device.userid !=:userId) ",nativeQuery = true)
+	public List<DeviceSelect> getDeviceUnSelectOfClient(@Param("loggedUserId") Long loggedUserId,@Param("userId")Long userId);
 	
 	@Query(value = "SELECT tc_devices.id,tc_devices.name FROM tc_devices"
 			+ " WHERE tc_devices.id IN (:deviceIds ) and tc_devices.delete_date is null",nativeQuery = true)
@@ -228,7 +228,7 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 			" WHERE tc_device_notification.deviceid =:deviceId ",nativeQuery = true)
 	public List<DeviceSelect> getNotificationsDeviceSelect(@Param("deviceId") Long deviceId);
 	
-	@Query(value = "SELECT tc_attributes.id,tc_attributes.attribute FROM tc_attributes " + 
+	@Query(value = "SELECT tc_attributes.id,tc_attributes.description FROM tc_attributes " + 
 			" INNER JOIN tc_device_attribute ON tc_device_attribute.attributeid = tc_attributes.id " + 
 			" WHERE tc_device_attribute.deviceid =:deviceId ",nativeQuery = true)
 	public List<DeviceSelect> getAttributesDeviceSelect(@Param("deviceId") Long deviceId);

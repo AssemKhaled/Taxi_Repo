@@ -85,12 +85,8 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Only name and permissions are required to create Role ",null);
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
-
-		List<UserRole> roles = userRoleRepository.findByName(role.getName());
-		if(!roles.isEmpty()) {
-			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "This Role Name was added before you can Edit or Delete it only",null);
-			 return  ResponseEntity.badRequest().body(getObjectResponse);
-		}
+		 User parentClient = new User();
+		
 		if(loggedUser.getAccountType().equals(4)) {
 			 Long uId=(long) 0;
 			 List<User> parents=userService.getAllParentsOfuser(loggedUser,loggedUser.getAccountType());
@@ -99,7 +95,6 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 					return  ResponseEntity.badRequest().body(getObjectResponse);
 			 }
 			 else {
-				 User parentClient = new User() ;
 				 for(User object : parents) {
 					 parentClient = object;
 					 uId=parentClient.getId();
@@ -112,13 +107,20 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 		}
 		else {
 			role.setUserId(userId);
+			parentClient = loggedUser;
 		}
+		
+		List<UserRole> roles = userRoleRepository.checkDublicateAdd(parentClient.getId(),role.getName());
+		if(!roles.isEmpty()) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "This Role Name was added before you can Edit or Delete it only",null);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
 		String ParentRole="";
 		String childRole="";
 
 		if(!loggedUser.getAccountType().equals(1)) {
 			 List<User> parents=userService.getAllParentsOfuser(loggedUser,loggedUser.getAccountType());
-			 User parentClient = new User() ;
 			 if(parents.isEmpty()) {
 					getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "as you are not have parent you cannot allow to create this role.",null);
 					return  ResponseEntity.badRequest().body(getObjectResponse);
@@ -204,6 +206,8 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 		}
 		Long createdByUserId=userRole.getUserId();
 		User createdByUser = userService.findById(createdByUserId);
+		 User parentClient = new User();
+
 		if(loggedUser.getAccountType().equals(4)) {
 			 List<User> parents=userService.getAllParentsOfuser(loggedUser,loggedUser.getAccountType());
 			 if(parents.isEmpty()) {
@@ -211,7 +215,6 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 				return  ResponseEntity.badRequest().body(getObjectResponse);
 			 }
 			 else {
-				 User parentClient = new User() ;
 				 boolean isParent = false;
 
 				 for(User object : parents) {
@@ -229,6 +232,10 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 				 
 			 }
 			 
+		}
+		else {
+			
+			parentClient = loggedUser;
 		}
 		if(loggedUser.getAccountType().equals(3)) {
 			if(!userId.equals(createdByUserId)) {
@@ -342,7 +349,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 		
 		
 		
-		List<UserRole> roles = userRoleRepository.findByName(role.getName());
+		List<UserRole> roles = userRoleRepository.checkDublicateAdd(role.getUserId(),role.getName());
 		if(!roles.isEmpty()) {
 			if(roles.get(0).getId() != role.getId()) {
 				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "This Role Name was added before you can Edit or Delete it only",null);
@@ -1394,7 +1401,18 @@ public ResponseEntity<?> getUserParentRoles(String TOKEN, Long userId) {
 			usersIds.add(parent.getId());
 			
 			List<UserRole> roles = userRoleRepository.getAllRolesCreatedByUser(usersIds);
-			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",roles);
+			List<UserRole> selectedRoles = userRoleRepository.getUserRole(userId);
+
+			List<Map> data = new ArrayList<>();
+		    Map obj = new HashMap();
+		    
+		    obj.put("selectedRoles", selectedRoles);
+		    obj.put("roles", roles);
+
+		    data.add(obj);
+			
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",data);
 			
 			return ResponseEntity.ok().body(getObjectResponse);
 		}

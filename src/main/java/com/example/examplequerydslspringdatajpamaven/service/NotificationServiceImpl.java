@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -832,7 +833,7 @@ public class NotificationServiceImpl extends RestServiceController implements No
 	}
 
 	@Override
-	public ResponseEntity<?> getNotificationSelect(String TOKEN, Long userId) {
+	public ResponseEntity<?> getNotificationSelect(String TOKEN, Long userId,Long deviceId,Long groupId) {
 		logger.info("************************ getNotificationSelect STARTED ***************************");
 		List<DriverSelect> drivers = new ArrayList<DriverSelect>();
 		if(TOKEN.equals("")) {
@@ -844,6 +845,24 @@ public class NotificationServiceImpl extends RestServiceController implements No
 		{
 			return super.checkActive(TOKEN);
 		}
+		
+		List<DeviceSelect> devices = new ArrayList<DeviceSelect>();
+		List<DeviceSelect> groups = new ArrayList<DeviceSelect>();
+		List<Map> data = new ArrayList<>();
+	    Map obj = new HashMap();
+
+		if(deviceId != 0) {
+			devices = deviceRepository.getNotificationsDeviceSelect(deviceId);
+
+		}
+		if(groupId != 0) {
+			groups = groupRepository.getGroupNotificationsSelect(groupId);
+
+		}
+		obj.put("selectedDevices", devices);
+		obj.put("selectedGroups", groups);
+
+		
 	    if(userId != 0) {
 	    	User user = userService.findById(userId);
 	    	userService.resetChildernArray();
@@ -857,7 +876,10 @@ public class NotificationServiceImpl extends RestServiceController implements No
 			   			List<Long>usersIds= new ArrayList<>();
 	   					usersIds.add(user.getId());
 						drivers = notificationRepository.getNotificationSelect(usersIds);
-						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
+						obj.put("notifications", drivers);
+						data.add(obj);
+						
+						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",data);
 						logger.info("************************ getNotificationSelect ENDED ***************************");
 						return ResponseEntity.ok().body(getObjectResponse);
 	   						
@@ -875,7 +897,11 @@ public class NotificationServiceImpl extends RestServiceController implements No
 		   			 }
 	    			
 	    			drivers = notificationRepository.getNotificationSelect(usersIds);
-					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
+					obj.put("notifications", drivers);
+					data.add(obj);
+	    			
+	    			
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",data);
 					logger.info("************************ getNotificationSelect ENDED ***************************");
 					return ResponseEntity.ok().body(getObjectResponse);
 

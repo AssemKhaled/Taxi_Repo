@@ -82,9 +82,9 @@ public interface GeofenceRepository extends JpaRepository<Geofence, Long>, Query
 	
 	@Query(value = "SELECT tc_geofences.id,tc_geofences.name FROM tc_geofences"
 			+ " INNER JOIN tc_user_geofence ON tc_user_geofence.geofenceid = tc_geofences.id"
-			+ " WHERE tc_user_geofence.userid IN(:userId) and tc_geofences.delete_date is null "
-			+ " and tc_geofences.id Not IN(Select tc_user_client_geofence.geofenceid from tc_user_client_geofence) " ,nativeQuery = true)
-	public List<DriverSelect> getGeofenceUnSelectOfClient(@Param("userId") Long userId);
+			+ " WHERE tc_user_geofence.userid IN(:loggedUserId) and tc_geofences.delete_date is null "
+			+ " and tc_geofences.id Not IN(Select tc_user_client_geofence.geofenceid from tc_user_client_geofence where tc_user_client_geofence.userid !=:userId ) " ,nativeQuery = true)
+	public List<DriverSelect> getGeofenceUnSelectOfClient(@Param("loggedUserId") Long loggedUserId,@Param("userId") Long userId);
 	
 	
 	@Query(value = "SELECT tc_geofences.id from tc_geofences " + 

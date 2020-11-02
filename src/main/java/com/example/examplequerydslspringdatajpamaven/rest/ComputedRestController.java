@@ -96,10 +96,13 @@ public class ComputedRestController {
 	
 	@RequestMapping(value = "/getComputedSelect", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getComputedSelect(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+                                                             @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+                                                             @RequestParam (value = "groupId", defaultValue = "0") Long groupId,
+                                                             @RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,
 			                                                 @RequestParam (value = "userId", defaultValue = "0") Long userId) {
 		
 
-    	return  computedServiceImpl.getComputedSelect(TOKEN,userId);
+    	return  computedServiceImpl.getComputedSelect(TOKEN,loggedUserId,userId,deviceId,groupId);
 		
 	}
 	
@@ -120,10 +123,11 @@ public class ComputedRestController {
 	
 	@RequestMapping(value = "/getComputedUnSelectOfClient", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getComputedUnSelect(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                                 @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		                                                       @RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,
+			                                                   @RequestParam (value = "userId", defaultValue = "0") Long userId) {
 		
 
-    	return  computedServiceImpl.getComputedUnSelect(TOKEN,userId);
+    	return  computedServiceImpl.getComputedUnSelect(TOKEN,loggedUserId,userId);
 		
 	}
 }

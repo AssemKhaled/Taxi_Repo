@@ -125,7 +125,7 @@ public interface GroupRepository extends  JpaRepository<Group, Long>, QueryDslPr
 			" WHERE tc_group_notification.groupid =:groupId ",nativeQuery = true)
 	public List<DeviceSelect> getGroupNotificationsSelect(@Param("groupId") Long groupId);
 	
-	@Query(value = "SELECT tc_attributes.id,tc_attributes.attribute FROM tc_attributes " + 
+	@Query(value = "SELECT tc_attributes.id,tc_attributes.description FROM tc_attributes " + 
 			" INNER JOIN tc_group_attribute ON tc_group_attribute.attributeid = tc_attributes.id " + 
 			" WHERE tc_group_attribute.groupid =:groupId ",nativeQuery = true)
 	public List<DeviceSelect> getGroupAttrbuitesSelect(@Param("groupId") Long groupId);
@@ -147,9 +147,9 @@ public interface GroupRepository extends  JpaRepository<Group, Long>, QueryDslPr
 	
 	@Query(value = "SELECT tc_groups.id,tc_groups.name FROM tc_groups"
 			+ " INNER JOIN tc_user_group ON tc_user_group.groupid = tc_groups.id"
-			+ " WHERE tc_user_group.userid IN(:userId) and tc_groups.is_deleted is null "
-			+ " and tc_groups.id Not IN(Select tc_user_client_group.groupid from tc_user_client_group) " ,nativeQuery = true)
-	public List<DriverSelect> getGroupUnSelectOfClient(@Param("userId") Long userId);
+			+ " WHERE tc_user_group.userid IN(:loggedUserId) and tc_groups.is_deleted is null "
+			+ " and tc_groups.id Not IN(Select tc_user_client_group.groupid from tc_user_client_group where tc_user_client_group.userid !=:userId ) " ,nativeQuery = true)
+	public List<DriverSelect> getGroupUnSelectOfClient(@Param("loggedUserId") Long loggedUserId,@Param("userId") Long userId);
 	
 	@Query(value = "SELECT tc_groups.id from tc_groups " + 
 			" inner join tc_user_group on tc_groups.id = tc_user_group.groupid " + 

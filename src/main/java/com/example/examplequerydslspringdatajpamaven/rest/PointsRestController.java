@@ -84,17 +84,19 @@ public class PointsRestController {
 	
 	@RequestMapping(value = "/getPointSelect", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getPointSelect(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                               @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+                                                          @RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,
+			                                              @RequestParam (value = "userId", defaultValue = "0") Long userId) {
 		
-    	return  pointsServiceImpl.getPointSelect(TOKEN,userId);
+    	return  pointsServiceImpl.getPointSelect(TOKEN,loggedUserId,userId);
 
 	}
 	
 	@RequestMapping(value = "/getPointUnSelectOfClient", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getPointUnSelectOfClient(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                               @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+																	@RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,                                             
+																	@RequestParam (value = "userId", defaultValue = "0") Long userId) {
 		
-    	return  pointsServiceImpl.getPointUnSelectOfClient(TOKEN,userId);
+    	return  pointsServiceImpl.getPointUnSelectOfClient(TOKEN,loggedUserId,userId);
 
 	}
 	

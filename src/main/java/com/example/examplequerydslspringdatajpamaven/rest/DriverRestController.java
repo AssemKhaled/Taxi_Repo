@@ -87,27 +87,43 @@ public class DriverRestController {
 	// added by Maryam
 	@GetMapping(path = "/getUnassignedDrivers")
 	public ResponseEntity<?> getUnassignedDrivers(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+                                                  @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,                                              
+	                                              @RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,                                              
 			                                      @RequestParam (value = "userId",defaultValue = "0") Long userId){
 		
-		return driverServiceImpl.getUnassignedDrivers(TOKEN,userId);
+		return driverServiceImpl.getUnassignedDrivers(TOKEN,loggedUserId,userId,deviceId);
 	}
 	
 	@RequestMapping(value = "/getDriverSelect", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getDriverSelect(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                               @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+												           @RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,                                              
+														   @RequestParam (value = "userId", defaultValue = "0") Long userId) {
 		
 	
-    	return  driverServiceImpl.getDriverSelect(TOKEN,userId);
+    	return  driverServiceImpl.getDriverSelect(TOKEN,loggedUserId,userId);
+
+		
+	}
+	
+	@RequestMapping(value = "/getDriverSelectGroup", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getDriverSelectGroup(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+                                                           @RequestParam (value = "groupId", defaultValue = "0") Long groupId,                                               
+												           @RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,                                              
+														   @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		
+	
+    	return  driverServiceImpl.getDriverSelectGroup(TOKEN,loggedUserId,userId,groupId);
 
 		
 	}
 	
 	@RequestMapping(value = "/getDriverUnSelectOfClient", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getDriverUnSelectOfClient(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                                         @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+															         @RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,                                           
+																     @RequestParam (value = "userId", defaultValue = "0") Long userId) {
 		 
 	
-    	return  driverServiceImpl.getDriverUnSelectOfClient(TOKEN,userId);
+    	return  driverServiceImpl.getDriverUnSelectOfClient(TOKEN,loggedUserId,userId);
 
 		
 	}

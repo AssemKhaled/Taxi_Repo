@@ -28,8 +28,10 @@ public interface DeviceService {
 	
 	public ResponseEntity<?>  findDeviceById(String TOKEN,Long deviceId,Long userId);
 
-	public ResponseEntity<?> getDeviceSelect(String TOKEN,Long userId);
-	public ResponseEntity<?> getDeviceUnSelect(String TOKEN,Long userId);
+	public ResponseEntity<?> getDeviceSelectGroup(String TOKEN,Long loggedUserId,Long userId,Long groupId);
+	public ResponseEntity<?> getDeviceSelect(String TOKEN,Long loggedUserId,Long userId);
+
+	public ResponseEntity<?> getDeviceUnSelect(String TOKEN,Long loggedUserId,Long userId);
 
 
 	public ResponseEntity<?> assignDeviceToDriver(String TOKEN,Long deviceId , Long driverId , Long userId);

@@ -35,20 +35,20 @@ public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslP
 	
 	
 	@Query(value = "select * from tc_drivers INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id"
-			+ " where tc_drivers.email=:email and tc_user_driver.userid=:userId and tc_drivers.delete_date IS NULL", nativeQuery = true)
-	public List<Driver> checkDublicateDriverInAddEmail(@Param("userId") Long id,@Param("email") String email);
+			+ " where tc_drivers.name=:name and tc_user_driver.userid=:userId and tc_drivers.delete_date IS NULL", nativeQuery = true)
+	public List<Driver> checkDublicateDriverInAddEmail(@Param("userId") Long id,@Param("name") String name);
 	
 	@Query(value = "select * from tc_drivers INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id"
-			+ " where (tc_drivers.mobile_num=:mobileNum OR tc_drivers.uniqueid=:uniqueId) and tc_drivers.delete_date IS NULL", nativeQuery = true)
-	public List<Driver> checkDublicateDriverInAddUniqueMobile(@Param("uniqueId") String uniqueId,@Param("mobileNum") String mobileNum);
+			+ " where (tc_drivers.mobile_num=:mobileNum OR tc_drivers.uniqueid=:uniqueId OR tc_drivers.email=:email ) and tc_drivers.delete_date IS NULL", nativeQuery = true)
+	public List<Driver> checkDublicateDriverInAddUniqueMobile(@Param("uniqueId") String uniqueId,@Param("mobileNum") String mobileNum,@Param("email") String email);
 	
 	@Query(value = "select * from tc_drivers INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id"
-			+ " where tc_drivers.email=:email and tc_drivers.id !=:driverId and tc_user_driver.userid=:userId and tc_drivers.delete_date IS NULL", nativeQuery = true)
-	public List<Driver> checkDublicateDriverInEditEmail(@Param("driverId") Long driverId,@Param("userId") Long userId,@Param("email") String email);
+			+ " where tc_drivers.name=:name and tc_drivers.id !=:driverId and tc_user_driver.userid=:userId and tc_drivers.delete_date IS NULL", nativeQuery = true)
+	public List<Driver> checkDublicateDriverInEditEmail(@Param("driverId") Long driverId,@Param("userId") Long userId,@Param("name") String name);
 	
 	@Query(value = "select * from tc_drivers INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id"
-			+ " where (tc_drivers.mobile_num=:mobileNum OR tc_drivers.uniqueid=:uniqueId) and tc_drivers.id !=:driverId and tc_drivers.delete_date IS NULL", nativeQuery = true)
-	public List<Driver> checkDublicateDriverInEditUniqueMobile(@Param("driverId") Long driverId,@Param("uniqueId") String uniqueId,@Param("mobileNum") String mobileNum);
+			+ " where (tc_drivers.mobile_num=:mobileNum OR tc_drivers.uniqueid=:uniqueId OR tc_drivers.email=:email ) and tc_drivers.id !=:driverId and tc_drivers.delete_date IS NULL", nativeQuery = true)
+	public List<Driver> checkDublicateDriverInEditUniqueMobile(@Param("driverId") Long driverId,@Param("uniqueId") String uniqueId,@Param("mobileNum") String mobileNum,@Param("email") String email);
 	
 	
 	@Query(value = "SELECT tc_drivers.* FROM tc_drivers INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id"
@@ -118,9 +118,9 @@ public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslP
 	
 	@Query(value = "SELECT tc_drivers.id,tc_drivers.name FROM tc_drivers"
 			+ " INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id"
-			+ " WHERE tc_user_driver.userid IN(:userId) and tc_drivers.delete_date is null "
-			+ " and tc_drivers.id Not IN(Select tc_user_client_driver.driverid from tc_user_client_driver) ",nativeQuery = true)
-	public List<DriverSelect> getDriverUnSelectOfClient(@Param("userId")Long userId);
+			+ " WHERE tc_user_driver.userid IN(:loggedUserId) and tc_drivers.delete_date is null "
+			+ " and tc_drivers.id Not IN(Select tc_user_client_driver.driverid from tc_user_client_driver where tc_user_client_driver.userid !=:userId) ",nativeQuery = true)
+	public List<DriverSelect> getDriverUnSelectOfClient(@Param("loggedUserId") Long loggedUserId,@Param("userId")Long userId);
 	
 	@Query(value = "Select tc_device_driver.deviceid,tc_drivers.name from tc_device_driver " + 
 			" INNER JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id " + 

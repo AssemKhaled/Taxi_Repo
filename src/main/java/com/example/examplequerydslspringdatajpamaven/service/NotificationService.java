@@ -15,6 +15,6 @@ public interface NotificationService {
 	public ResponseEntity<?> assignNotificationToGroup(String TOKEN,Long groupId , Map<String, List> data, Long userId);
 	public ResponseEntity<?> assignNotificationToDevice(String TOKEN,Long deviceId , Map<String, List> data, Long userId);
 
-	public ResponseEntity<?> getNotificationSelect(String TOKEN,Long userId);
+	public ResponseEntity<?> getNotificationSelect(String TOKEN,Long userId,Long deviceId,Long groupId);
 
 }

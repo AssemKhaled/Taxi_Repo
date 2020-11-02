@@ -851,7 +851,7 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 	}
 
 	@Override
-	public ResponseEntity<?> getPointSelect(String TOKEN, Long userId) {
+	public ResponseEntity<?> getPointSelect(String TOKEN,Long loggedUserId, Long userId) {
 		// TODO Auto-generated method stub
 
 		logger.info("************************ getNotificationSelect STARTED ***************************");
@@ -865,6 +865,30 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 		{
 			return super.checkActive(TOKEN);
 		}
+		
+		if(loggedUserId != 0) {
+	    	User loggedUser = userServiceImpl.findById(loggedUserId);
+	    	
+	    	if(loggedUser != null) {
+	    		if(loggedUser.getDelete_date() == null) {
+	    			if(loggedUser.getAccountType().equals(4)) {	    				
+	    				 List<Long> pointIds = userClientPointRepository.getPointIds(loggedUserId);
+						 if(pointIds.size()>0) {
+							 drivers = pointsRepository.getPointSelectByIds(pointIds);
+							 
+						 }
+						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
+						logger.info("************************ getNotificationSelect ENDED ***************************");
+						return ResponseEntity.ok().body(getObjectResponse);
+	    				
+	    				
+	    			}
+	    		}
+	    	}
+	    	
+		}
+		
+		
 	    if(userId != 0) {
 	    	User user = userServiceImpl.findById(userId);
 	    	userServiceImpl.resetChildernArray();
@@ -898,8 +922,6 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 	   						
 	   					}*/
 	    				 List<Long> pointIds = userClientPointRepository.getPointIds(userId);
-						 Integer size = 0;
-						 List<Map> data = new ArrayList<>();
 						 if(pointIds.size()>0) {
 							 drivers = pointsRepository.getPointSelectByIds(pointIds);
 							 
@@ -950,7 +972,7 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 	
 	}
 	@Override
-	public ResponseEntity<?> getPointUnSelectOfClient(String TOKEN, Long userId) {
+	public ResponseEntity<?> getPointUnSelectOfClient(String TOKEN,Long loggedUserId, Long userId) {
 		// TODO Auto-generated method stub
 
 		logger.info("************************ getNotificationSelect STARTED ***************************");
@@ -964,39 +986,78 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 		{
 			return super.checkActive(TOKEN);
 		}
-	    if(userId != 0) {
-	    	User user = userServiceImpl.findById(userId);
-	    	userServiceImpl.resetChildernArray();
-
-	    	if(user != null) {
-	    		if(user.getDelete_date() == null) {
-	    		
-	    			drivers = pointsRepository.getPointUnSelectOfClient(userId);
-					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
-					logger.info("************************ getNotificationSelect ENDED ***************************");
-					return ResponseEntity.ok().body(getObjectResponse);
-
-	    		}
-	    		else {
-					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",drivers);
-					return ResponseEntity.status(404).body(getObjectResponse);
-
-	    		}
-	    	
-	    	}
-	    	else {
-				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",drivers);
-				return ResponseEntity.status(404).body(getObjectResponse);
-
-	    	}
+		
+        if(loggedUserId == 0) {
 			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User client = userServiceImpl.findById(loggedUserId);
+		if(client == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged user is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(client.getAccountType() != 3) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User should be type client to assign his users",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(userId == 0) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User user = userServiceImpl.findById(userId);
+		if(user == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(user.getAccountType() != 4) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User should be type user to assign him users",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		Set<User> UserParents = user.getUsersOfUser();
+		if(UserParents.isEmpty()) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
 		}
 		else {
+			User Parent= null;
+			for(User object : UserParents) {
+				Parent = object ;
+				break;
+			}
+			if(!Parent.getId().toString().equals(loggedUserId.toString())) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
+				return ResponseEntity.status(404).body(getObjectResponse);
+			}
 			
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",drivers);
-			return ResponseEntity.badRequest().body(getObjectResponse);
-
 		}
+		
+
+		drivers = pointsRepository.getPointUnSelectOfClient(loggedUserId,userId);
+		List<DriverSelect> selectedPoints = userClientPointRepository.getPointsOfUserList(userId);
+
+		
+		List<Map> data = new ArrayList<>();
+	    Map obj = new HashMap();
+	    
+	    obj.put("selectedPoints", selectedPoints);
+	    obj.put("points", drivers);
+
+	    data.add(obj);
+	    
+		getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",data);
+		logger.info("************************ getNotificationSelect ENDED ***************************");
+		return ResponseEntity.ok().body(getObjectResponse);
+		
+		
 	
 	
 	}

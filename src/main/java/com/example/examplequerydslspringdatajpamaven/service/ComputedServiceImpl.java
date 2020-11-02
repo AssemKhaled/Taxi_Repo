@@ -3,6 +3,7 @@ package com.example.examplequerydslspringdatajpamaven.service;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -125,61 +126,93 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 			return ResponseEntity.badRequest().body(getObjectResponse);
 					
 		}
-		else
-		{
-			Set<User> user=new HashSet<>() ;
-			User userCreater ;
-			userCreater=userService.findById(userId);
-			if(userCreater == null)
-			{
-
-				getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "Assigning to not found user",null);
-				logger.info("************************ createComputed ENDED ***************************");
-				return ResponseEntity.status(404).body(getObjectResponse);
-			}
-			else {
-				User parent = null;
-				if(userCreater.getAccountType().equals(4)) {
-					Set<User>parentClient = userCreater.getUsersOfUser();
-					if(parentClient.isEmpty()) {
-						getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "this user cannot add user",null);
-						logger.info("************************ createComputed ENDED ***************************");
-						return ResponseEntity.status(404).body(getObjectResponse);
-					}else {
+		
+		if( attribute.getDescription() == null) {
+			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "Description is required",attributes);
+			logger.info("************************ createComputed ENDED ***************************");
+			return ResponseEntity.badRequest().body(getObjectResponse);
 					
-					 for(User object : parentClient) {
-						 parent = object ;
-					 }
-					 
-					}
-				}else {
-					parent = userCreater;
-				}
-				
-				user.add(parent);	
-				attribute.setUserAttribute(user);
-		        computedRepository.save(attribute);
-		        
-				if(userCreater.getAccountType().equals(4)) {
+		}
+		
+		if( attribute.getDescription().equals("")) {
+			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "Description is required",attributes);
+			logger.info("************************ createComputed ENDED ***************************");
+			return ResponseEntity.badRequest().body(getObjectResponse);
+					
+		}
 
-			        userClientComputed saveData = new userClientComputed();
-			        Long attId = computedRepository.getComputedIdByName(parent.getId(),attribute.getDescription(),attribute.getType());
-		    		if(attId != null) {
-			    		saveData.setUserid(userId);
-			    		saveData.setComputedid(attId);
-				        userClientComputedRepository.save(saveData);
-		    		}
-		    		
+		
+		
+		Set<User> user=new HashSet<>() ;
+		User userCreater ;
+		userCreater=userService.findById(userId);
+		if(userCreater == null)
+		{
+
+			getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "Assigning to not found user",null);
+			logger.info("************************ createComputed ENDED ***************************");
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+		else {
+			User parent = null;
+			if(userCreater.getAccountType().equals(4)) {
+				Set<User>parentClient = userCreater.getUsersOfUser();
+				if(parentClient.isEmpty()) {
+					getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "this user cannot add user",null);
+					logger.info("************************ createComputed ENDED ***************************");
+					return ResponseEntity.status(404).body(getObjectResponse);
+				}else {
+				
+				 for(User object : parentClient) {
+					 parent = object ;
+				 }
+				 
 				}
-		        
-		    	getObjectResponse = new GetObjectResponse(HttpStatus.OK.value() , "success",attributes);
-				logger.info("************************ createComputed ENDED ***************************");
-				return ResponseEntity.ok().body(getObjectResponse);
+			}else {
+				parent = userCreater;
 			}
 			
+			List<Attribute> res1 = computedRepository.checkDuplicationAdd(parent.getId(), attribute.getDescription());
+			List<Integer> duplictionList =new ArrayList<Integer>();
+
+			if(!res1.isEmpty()) {
+				for(int i=0;i<res1.size();i++) {
+					if(res1.get(i).getDescription().equals(attribute.getDescription())) {
+						duplictionList.add(1);				
+					}
+		
+				}
+			}
 			
+			if(!res1.isEmpty()) {
+				getObjectResponse = new GetObjectResponse( 301, "This Attribute was found before",duplictionList);
+				return ResponseEntity.ok().body(getObjectResponse);	
+			}
 			
+			user.add(parent);	
+			attribute.setUserAttribute(user);
+	        computedRepository.save(attribute);
+	        
+			if(userCreater.getAccountType().equals(4)) {
+
+		        userClientComputed saveData = new userClientComputed();
+		        Long attId = computedRepository.getComputedIdByName(parent.getId(),attribute.getDescription(),attribute.getType());
+	    		if(attId != null) {
+		    		saveData.setUserid(userId);
+		    		saveData.setComputedid(attId);
+			        userClientComputedRepository.save(saveData);
+	    		}
+	    		
+			}
+	        
+	    	getObjectResponse = new GetObjectResponse(HttpStatus.OK.value() , "success",attributes);
+			logger.info("************************ createComputed ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
 		}
+			
+			
+			
+		
 	}
 
 	@Override
@@ -416,9 +449,8 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 		logger.info("************************ editGeofence STARTED ***************************");
 
 		GetObjectResponse getObjectResponse;
-		List<Attribute> attributes = new ArrayList<Attribute>();
 		if(TOKEN.equals("")) {
-			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",attributes);
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		
@@ -429,7 +461,7 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 		if(id != 0) {
 			User user = userService.findById(id);
 			if(user == null ) {
-				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",attributes);
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",null);
 				return ResponseEntity.status(404).body(getObjectResponse);
 
 			}
@@ -448,20 +480,19 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 
 						if(attributeCheck != null) {
 								boolean isParent = false;
-								
+								User parent = null;
 								if(user.getAccountType() == 4) {
 									Set<User>parentClient = user.getUsersOfUser();
 									if(parentClient.isEmpty()) {
-										 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allowed to edit attribute",attributes);
+										 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allowed to edit attribute",null);
 										 return  ResponseEntity.badRequest().body(getObjectResponse);
 									}
-									User parent = null;
 									for(User object : parentClient) {
 										parent = object ;
 									}
 									Set<User>attributeParent = attributeCheck.getUserAttribute();
 									if(attributeParent.isEmpty()) {
-										 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allowed to edit attribute",attributes);
+										 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allowed to edit attribute",null);
 										 return  ResponseEntity.badRequest().body(getObjectResponse);
 									}
 									for(User parentObject : attributeParent) {
@@ -480,6 +511,10 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 									 }
 									
 								}
+								else {
+									parent = user;
+									
+								}
 								if(!checkIfParent(attributeCheck , user) && ! isParent) {
 									getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this attribute ",null);
 									logger.info("************************ editGeofnece ENDED ***************************");
@@ -488,51 +523,68 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 								
 								
 								if(attributeCheck.getAttribute()== null ||  attributeCheck.getAttribute()== "" ) {
-									getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Attributea is Required",attributes);
+									getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Attribute is Required",null);
 									return ResponseEntity.badRequest().body(getObjectResponse);
 
 								}
-								else {
-									
+								
+								if(attributeCheck.getDescription()== null ||  attributeCheck.getDescription()== "" ) {
+									getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Description is Required",null);
+									return ResponseEntity.badRequest().body(getObjectResponse);
 
+								}
+								
+									
+								List<Attribute> res1 = computedRepository.checkDuplicationEdit(parent.getId(),attribute.getId() ,attribute.getDescription());
+								List<Integer> duplictionList =new ArrayList<Integer>();
+
+								if(!res1.isEmpty()) {
+									for(int i=0;i<res1.size();i++) {
+										if(res1.get(i).getDescription().equals(attribute.getDescription())) {
+											duplictionList.add(1);				
+										}
+							
+									}
+								}
+								
+								if(!res1.isEmpty()) {
+									getObjectResponse = new GetObjectResponse( 301, "This Attribute was found before",duplictionList);
+									return ResponseEntity.ok().body(getObjectResponse);	
+								}
 			    					
-			    					
+								
 									 
-									Set<User> userCreater=new HashSet<>();
-			    					userCreater = attributeCheck.getUserAttribute();			    					
-									attribute.setUserAttribute(userCreater);
-									
-									computedRepository.save(attribute);
-									attributes.add(attribute);
-									getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Updated Successfully",attributes);
-									logger.info("************************ editGeofence ENDED ***************************");
-									return ResponseEntity.ok().body(getObjectResponse);
-
-									
-			    					
-			    				}	
+								Set<User> userCreater=new HashSet<>();
+		    					userCreater = attributeCheck.getUserAttribute();			    					
+								attribute.setUserAttribute(userCreater);
 								
 								
+								
+								
+								
+								computedRepository.save(attribute);
 
-							
+								getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Updated Successfully",null);
+								logger.info("************************ editGeofence ENDED ***************************");
+								return ResponseEntity.ok().body(getObjectResponse);
 
-							
+									
 						}
 						else {
-							getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This attribute ID is not Found",attributes);
+							getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This attribute ID is not Found",null);
 							return ResponseEntity.status(404).body(getObjectResponse);
 
 						}
 					 }
 					 else {
-							getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "attribute ID is Required",attributes);
+							getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "attribute ID is Required",null);
 							return ResponseEntity.status(404).body(getObjectResponse);
 
 					 }
 					 
 				 }
 				 else {
-						getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",attributes);
+						getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",null);
 						return ResponseEntity.status(404).body(getObjectResponse);
 
 				 }
@@ -543,7 +595,7 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 		}
 		else {
 			
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",attributes);
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",null);
 			return ResponseEntity.badRequest().body(getObjectResponse);
 
 			
@@ -981,7 +1033,7 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 	}
 
 	@Override
-	public ResponseEntity<?> getComputedSelect(String TOKEN, Long userId) {
+	public ResponseEntity<?> getComputedSelect(String TOKEN,Long loggedUserId, Long userId ,Long deviceId, Long groupId) {
 		logger.info("************************ getComputedSelect STARTED ***************************");
 		List<DriverSelect> drivers = new ArrayList<DriverSelect>();
 		if(TOKEN.equals("")) {
@@ -993,6 +1045,49 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 		{
 			return super.checkActive(TOKEN);
 		}
+		List<DeviceSelect> devices = new ArrayList<DeviceSelect>();
+		List<DeviceSelect> groups = new ArrayList<DeviceSelect>();
+		List<Map> data = new ArrayList<>();
+	    Map obj = new HashMap();
+
+		if(deviceId != 0) {
+			devices = deviceRepository.getAttributesDeviceSelect(deviceId);
+
+		}
+		if(groupId != 0) {
+			groups = groupRepository.getGroupAttrbuitesSelect(groupId);
+
+		}
+		obj.put("selectedDevices", devices);
+		obj.put("selectedGroups", groups);
+
+		
+		if(loggedUserId != 0) {
+	    	User loggedUser = userService.findById(loggedUserId);
+	    	
+	    	if(loggedUser != null) {
+	    		if(loggedUser.getDelete_date() == null) {
+	    			if(loggedUser.getAccountType().equals(4)) {	    				
+	    				List<Long> computedIds = userClientComputedRepository.getComputedsIds(loggedUserId);
+				    	if(computedIds.size() > 0) {
+
+   							drivers = computedRepository.getComputedSelectByIds(computedIds);
+   							
+				    	}
+						obj.put("computeds", drivers);
+						data.add(obj);
+
+				    	getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",data);
+						logger.info("************************ getComputedSelect ENDED ***************************");
+						return ResponseEntity.ok().body(getObjectResponse);
+	    				
+	    				
+	    			}
+	    		}
+	    	}
+	    	
+		}
+		
 	    if(userId != 0) {
 	    	User user = userService.findById(userId);
 	    	userService.resetChildernArray();
@@ -1032,11 +1127,13 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 				    	if(computedIds.size() > 0) {
 
    							drivers = computedRepository.getComputedSelectByIds(computedIds);
-   							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
-   							logger.info("************************ getComputedSelect ENDED ***************************");
-   							return ResponseEntity.ok().body(getObjectResponse);
-							
+   								
 				    	}
+				    	obj.put("computeds", drivers);
+						data.add(obj);
+				    	getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",data);
+						logger.info("************************ getComputedSelect ENDED ***************************");
+						return ResponseEntity.ok().body(getObjectResponse);
 	   			    }
 	    			 List<User>childernUsers = userService.getAllChildernOfUser(userId);
 		   			 List<Long>usersIds= new ArrayList<>();
@@ -1051,7 +1148,9 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 		   			 }
 	    			
 	    			drivers = computedRepository.getComputedSelect(usersIds);
-					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
+			    	obj.put("computeds", drivers);
+					data.add(obj);
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",data);
 					logger.info("************************ getComputedSelect ENDED ***************************");
 					return ResponseEntity.ok().body(getObjectResponse);
 
@@ -1277,7 +1376,7 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 	}
 
 	@Override
-	public ResponseEntity<?> getComputedUnSelect(String TOKEN, Long userId) {
+	public ResponseEntity<?> getComputedUnSelect(String TOKEN,Long loggedUserId, Long userId) {
 		// TODO Auto-generated method stub
 		logger.info("************************ getComputedSelect STARTED ***************************");
 		List<DriverSelect> drivers = new ArrayList<DriverSelect>();
@@ -1290,40 +1389,74 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 		{
 			return super.checkActive(TOKEN);
 		}
-	    if(userId != 0) {
-	    	User user = userService.findById(userId);
-	    	userService.resetChildernArray();
-
-	    	if(user != null) {
-	    		if(user.getDelete_date() == null) {
-	    			
-	    			
-	    			drivers = computedRepository.getComputedUnSelectOfClient(userId);
-					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
-					logger.info("************************ getComputedSelect ENDED ***************************");
-					return ResponseEntity.ok().body(getObjectResponse);
-
-	    		}
-	    		else {
-					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",drivers);
-					return ResponseEntity.status(404).body(getObjectResponse);
-
-	    		}
-	    	
-	    	}
-	    	else {
-				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",drivers);
-				return ResponseEntity.status(404).body(getObjectResponse);
-
-	    	}
+		
+        if(loggedUserId == 0) {
 			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User client = userService.findById(loggedUserId);
+		if(client == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged user is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(client.getAccountType() != 3) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User should be type client to assign his users",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(userId == 0) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User user = userService.findById(userId);
+		if(user == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(user.getAccountType() != 4) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User should be type user to assign him users",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		Set<User> UserParents = user.getUsersOfUser();
+		if(UserParents.isEmpty()) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
 		}
 		else {
+			User Parent= null;
+			for(User object : UserParents) {
+				Parent = object ;
+				break;
+			}
+			if(!Parent.getId().toString().equals(loggedUserId.toString())) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
+				return ResponseEntity.status(404).body(getObjectResponse);
+			}
 			
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",drivers);
-			return ResponseEntity.badRequest().body(getObjectResponse);
-
 		}
+		
+		List<DriverSelect> computeds = userClientComputedRepository.getComputedsOfUserList(userId);
+		drivers = computedRepository.getComputedUnSelectOfClient(loggedUserId,userId);
+		
+		List<Map> data = new ArrayList<>();
+	    Map obj = new HashMap();
+	    
+	    obj.put("selectedComputeds", computeds);
+	    obj.put("computeds", drivers);
+
+	    data.add(obj);
+		
+		getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",data);
+		logger.info("************************ getComputedSelect ENDED ***************************");
+		return ResponseEntity.ok().body(getObjectResponse);
 	
 	}
 

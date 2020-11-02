@@ -98,10 +98,12 @@ public class NotificationsRestController {
 	
 	@RequestMapping(value = "/getNotificationSelect", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getNotificationSelect(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                               @RequestParam (value = "userId", defaultValue = "0") Long userId) {
-		
+													             @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+													             @RequestParam (value = "groupId", defaultValue = "0") Long groupId,                                              
+																 @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+															
 	
-    	return  notificationServiceImpl.getNotificationSelect(TOKEN,userId);
+    	return  notificationServiceImpl.getNotificationSelect(TOKEN,userId,deviceId,groupId);
 
 		
 	}

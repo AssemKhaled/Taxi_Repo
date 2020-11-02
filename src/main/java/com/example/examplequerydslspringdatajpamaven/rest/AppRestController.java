@@ -206,14 +206,14 @@ public class AppRestController {
 	}
 	@GetMapping(path = "/getUnassignedDriversApp")
 	public ResponseEntity<?> getUnassignedDriversApp(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                      @RequestParam (value = "userId",defaultValue = "0") Long userId){
+			                                         @RequestParam (value = "userId",defaultValue = "0") Long userId){
 		
 		return appService.getUnassignedDriversApp(TOKEN,userId);
 	}
 	
 	@RequestMapping(value = "/getDriverSelectApp", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getDriverSelectApp(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                               @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+			                                                  @RequestParam (value = "userId", defaultValue = "0") Long userId) {
 		
 	
     	return  appService.getDriverSelectApp(TOKEN,userId);
@@ -529,7 +529,7 @@ public class AppRestController {
 	
 	@RequestMapping(value = "/getGeofenceSelectApp", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getGeofenceSelectApp(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                               @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+			                                                    @RequestParam (value = "userId", defaultValue = "0") Long userId) {
 		
 	
     	return  appService.getGeofenceSelectApp(TOKEN,userId);
@@ -542,7 +542,7 @@ public class AppRestController {
 			                                                  @RequestParam (value = "userId", defaultValue = "0") Long userId) {
 		
 	
-    	return  deviceServiceImpl.getDeviceSelect(TOKEN,userId);
+    	return  appService.getDeviceSelectApp(TOKEN,userId);
 
 		
 	}

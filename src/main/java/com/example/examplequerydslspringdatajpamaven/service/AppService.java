@@ -26,7 +26,8 @@ public interface AppService {
 	public ResponseEntity<?> assignGeofencesToDeviceApp(String TOKEN,Long deviceId,Long [] geoIds,Long userId );
 	public ResponseEntity<?> getDeviceDriverApp(String TOKEN,Long deviceId);	
 	public ResponseEntity<?> getDeviceGeofencesApp(String TOKEN,Long deviceId);
-	
+	public ResponseEntity<?> getDeviceSelectApp(String TOKEN,Long userId);
+
 	public ResponseEntity<?> getAllDriversApp(String TOKEN,Long id,int offset,String search);
 	public ResponseEntity<?> getDriverByIdApp(String TOKEN,Long driverId,Long userId);
 	public ResponseEntity<?> deleteDriverApp(String TOKEN,Long driverId, Long userId);

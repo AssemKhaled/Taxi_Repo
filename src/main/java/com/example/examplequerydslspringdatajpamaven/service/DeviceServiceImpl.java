@@ -83,6 +83,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.userClientComputed;
 import com.example.examplequerydslspringdatajpamaven.entity.userClientDevice;
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.GroupRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionRepo;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionsRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserClientDeviceRepository;
@@ -108,6 +109,9 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	@Autowired
 	UserClientDriverRepository userClientDriverRepository;
 
+	@Autowired 
+	GroupRepository groupRepository;
+	
 	@Autowired
 	UserClientDeviceRepository userClientDeviceRepository;
 	
@@ -1163,7 +1167,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	}
 	
 	@Override
-	public  ResponseEntity<?> getDeviceSelect(String TOKEN,Long userId) {
+	public  ResponseEntity<?> getDeviceSelectGroup(String TOKEN,Long loggedUserId,Long userId,Long groupId) {
 
 		logger.info("************************ getDeviceSelect STARTED ***************************");
 		List<DeviceSelect> devices = new ArrayList<DeviceSelect>();
@@ -1176,6 +1180,43 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		{
 			return super.checkActive(TOKEN);
 		}
+		
+		List<Map> data = new ArrayList<>();
+	    Map obj = new HashMap();
+		List<DeviceSelect> groups = new ArrayList<DeviceSelect>();
+
+		if(groupId != 0) {
+			groups = groupRepository.getGroupDevicesSelect(groupId);
+
+		}
+		obj.put("selectedDevice", groups);
+
+		
+		if(loggedUserId != 0) {
+	    	User loggedUser = userService.findById(loggedUserId);
+	    	
+	    	if(loggedUser != null) {
+	    		if(loggedUser.getDelete_date() == null) {
+	    			if(loggedUser.getAccountType().equals(4)) {	    				
+	    				List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(loggedUserId);
+	   				 
+		   				 if(deviceIds.size()>0) {
+		   						devices = deviceRepository.getDeviceSelectByIds(deviceIds);
+	
+		   				 }
+						 obj.put("devices", devices);
+						 data.add(obj);
+		   				 getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",data);
+		   				 logger.info("************************ getDeviceSelect ENDED ***************************");
+		   				 return ResponseEntity.ok().body(getObjectResponse);
+	    				
+	    				
+	    			}
+	    		}
+	    	}
+	    	
+		}
+		
 	    if(userId != 0) {
 	    	
 			userService.resetChildernArray();
@@ -1224,6 +1265,138 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 						devices = deviceRepository.getDeviceSelectByIds(deviceIds);
 
 				 }
+				 obj.put("devices", devices);
+				 data.add(obj);
+				 getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",data);
+				 logger.info("************************ getDeviceSelect ENDED ***************************");
+				 return ResponseEntity.ok().body(getObjectResponse);
+			 }
+	    	
+	    	
+	    	
+	    			
+    		 List<User>childernUsers = userService.getAllChildernOfUser(userId);
+   			 List<Long>usersIds= new ArrayList<>();
+   			 if(childernUsers.isEmpty()) {
+   				 usersIds.add(userId);
+   			 }
+   			 else {
+   				 usersIds.add(userId);
+   				 for(User object : childernUsers) {
+   					 usersIds.add(object.getId());
+   				 }
+   			 }
+			devices = deviceRepository.getDeviceSelect(usersIds);
+			
+			 obj.put("devices", devices);
+			 data.add(obj);
+			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",data);
+			logger.info("************************ getDeviceSelect ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+
+			
+		}
+		else {
+			
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",devices);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
+	
+		
+
+	}
+	
+	@Override
+	public  ResponseEntity<?> getDeviceSelect(String TOKEN,Long loggedUserId,Long userId) {
+
+		logger.info("************************ getDeviceSelect STARTED ***************************");
+		List<DeviceSelect> devices = new ArrayList<DeviceSelect>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		
+
+		
+		if(loggedUserId != 0) {
+	    	User loggedUser = userService.findById(loggedUserId);
+	    	
+	    	if(loggedUser != null) {
+	    		if(loggedUser.getDelete_date() == null) {
+	    			if(loggedUser.getAccountType().equals(4)) {	    				
+	    				List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(loggedUserId);
+	   				 
+		   				 if(deviceIds.size()>0) {
+		   						devices = deviceRepository.getDeviceSelectByIds(deviceIds);
+	
+		   				 }
+
+		   				 getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
+		   				 logger.info("************************ getDeviceSelect ENDED ***************************");
+		   				 return ResponseEntity.ok().body(getObjectResponse);
+	    				
+	    				
+	    			}
+	    		}
+	    	}
+	    	
+		}
+		
+	    if(userId != 0) {
+	    	
+			userService.resetChildernArray();
+
+	    	User user = userService.findById(userId);
+	    	if(user == null) {
+	    		getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",devices);
+				return ResponseEntity.status(404).body(getObjectResponse);
+	    	}
+	    	if(user != null) {
+	    		if(user.getDelete_date() != null) {
+	    			getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",devices);
+					return ResponseEntity.status(404).body(getObjectResponse);
+	    		}
+	    	}
+	    	if(user.getAccountType().equals(4)) {
+			    /*Set<User>parentClient = user.getUsersOfUser();
+				if(parentClient.isEmpty()) {
+					getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
+					logger.info("************************ editDevice ENDED ***************************");
+					return ResponseEntity.badRequest().body(getObjectResponse);
+				}else {
+				  
+					User parent =null;
+					for(User object : parentClient) {
+						parent = object;
+					}
+					if(parent != null) {
+			   			List<Long>usersIds= new ArrayList<>();
+	   					usersIds.add(parent.getId());
+
+						devices = deviceRepository.getDeviceSelect(usersIds);
+						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
+						logger.info("************************ getDeviceSelect ENDED ***************************");
+						return ResponseEntity.ok().body(getObjectResponse);
+					}
+					else {
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "No parent for this type 4",null);
+						return ResponseEntity.badRequest().body(getObjectResponse);
+					}
+					
+				}*/
+	    		 List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(userId);
+				 
+				 if(deviceIds.size()>0) {
+						devices = deviceRepository.getDeviceSelectByIds(deviceIds);
+
+				 }
+
 				 getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
 				 logger.info("************************ getDeviceSelect ENDED ***************************");
 				 return ResponseEntity.ok().body(getObjectResponse);
@@ -1244,6 +1417,8 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
    				 }
    			 }
 			devices = deviceRepository.getDeviceSelect(usersIds);
+			
+			
 			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
 			logger.info("************************ getDeviceSelect ENDED ***************************");
 			return ResponseEntity.ok().body(getObjectResponse);
@@ -1476,16 +1651,17 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		
 							}
 						}
-						if(obj.has("motion")) {
+						
 		
-							if(obj.get("motion").equals(true)) {
-								moving =moving+1;
-							}
-		                    if(obj.get("motion").equals(false)) {
-		                    	stopped =stopped+1;
-		
-							}
+						if(positionsList.get(i).getSpeed() > 0) {
+							moving =moving+1;
 						}
+	                    if(positionsList.get(i).getSpeed() == 0) {
+	                    	stopped =stopped+1;
+	
+						}
+		                    
+						
 					}
 				}
 			 }
@@ -1574,15 +1750,12 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	
 						}
 					}
-					if(obj.has("motion")) {
-	
-						if(obj.get("motion").equals(true)) {
-							moving =moving+1;
-						}
-	                    if(obj.get("motion").equals(false)) {
-	                    	stopped =stopped+1;
-	
-						}
+					if(positionsList.get(i).getSpeed() > 0) {
+						moving =moving+1;
+					}
+                    if(positionsList.get(i).getSpeed() == 0) {
+                    	stopped =stopped+1;
+
 					}
 				}
 			}
@@ -1732,15 +1905,14 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 									if(obj.has("ignition")) {
 		
 										if(obj.get("ignition").equals(true)) {
-											if(obj.has("motion")) {
 		
-							                    if(obj.get("motion").equals(false)) {
-							                    	allDevicesLiveData.get(i).setStatus("Idle");
-												}
-							                    if(obj.get("motion").equals(true)) {
-							                    	allDevicesLiveData.get(i).setStatus("Running");
-												}
+						                    if(mongoPosition.getSpeed() == 0) {
+						                    	allDevicesLiveData.get(i).setStatus("Idle");
 											}
+						                    if(mongoPosition.getSpeed() > 0) {
+						                    	allDevicesLiveData.get(i).setStatus("Running");
+											}
+											
 										}
 					                    if(obj.get("ignition").equals(false)) {
 					                    	allDevicesLiveData.get(i).setStatus("Stopped");
@@ -1873,14 +2045,11 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 								if(obj.has("ignition")) {
 	
 									if(obj.get("ignition").equals(true)) {
-										if(obj.has("motion")) {
-	
-						                    if(obj.get("motion").equals(false)) {
-						                    	allDevicesLiveData.get(i).setStatus("Idle");
-											}
-						                    if(obj.get("motion").equals(true)) {
-						                    	allDevicesLiveData.get(i).setStatus("Running");
-											}
+										if(mongoPosition.getSpeed() == 0) {
+					                    	allDevicesLiveData.get(i).setStatus("Idle");
+										}
+					                    if(mongoPosition.getSpeed() > 0) {
+					                    	allDevicesLiveData.get(i).setStatus("Running");
 										}
 									}
 				                    if(obj.get("ignition").equals(false)) {
@@ -2058,19 +2227,16 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 									if(obj.has("ignition")) {
 			
 										if(obj.getBoolean("ignition")==true) {
-											if(obj.has("motion")) {
-			
-							                    if(obj.getBoolean("motion")==false) {
-							                    	allDevicesLiveData.get(i).setStatus(1);
-												}
-							                    if(obj.getBoolean("motion")==true) {
-							    			    	/*ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
-			
-							    			    	lastPoints = mongoPositionRepo.getLastPoints(allDevicesLiveData.get(i).getId());
-							                    	allDevicesLiveData.get(i).setLastPoints(lastPoints);*/
-							                    	
-							                    	allDevicesLiveData.get(i).setStatus(2);
-												}
+											if(mongoPosition.getSpeed() == 0) {
+						                    	allDevicesLiveData.get(i).setStatus(1);
+											}
+						                    if(mongoPosition.getSpeed() > 0) {
+						    			    	/*ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
+		
+						    			    	lastPoints = mongoPositionRepo.getLastPoints(allDevicesLiveData.get(i).getId());
+						                    	allDevicesLiveData.get(i).setLastPoints(lastPoints);*/
+						                    	
+						                    	allDevicesLiveData.get(i).setStatus(2);
 											}
 										}
 					                    if(obj.getBoolean("ignition")==false) {
@@ -2213,20 +2379,19 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 								if(obj.has("ignition")) {
 		
 									if(obj.getBoolean("ignition")==true) {
-										if(obj.has("motion")) {
 		
-						                    if(obj.getBoolean("motion")==false) {
-						                    	allDevicesLiveData.get(i).setStatus(1);
-											}
-						                    if(obj.getBoolean("motion")==true) {
-						    			    	/*ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
-		
-						    			    	lastPoints = mongoPositionRepo.getLastPoints(allDevicesLiveData.get(i).getId());
-						                    	allDevicesLiveData.get(i).setLastPoints(lastPoints);*/
-						                    	
-						                    	allDevicesLiveData.get(i).setStatus(2);
-											}
+					                    if(mongoPosition.getSpeed() == 0) {
+					                    	allDevicesLiveData.get(i).setStatus(1);
 										}
+					                    if(mongoPosition.getSpeed() > 0) {
+					    			    	/*ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
+	
+					    			    	lastPoints = mongoPositionRepo.getLastPoints(allDevicesLiveData.get(i).getId());
+					                    	allDevicesLiveData.get(i).setLastPoints(lastPoints);*/
+					                    	
+					                    	allDevicesLiveData.get(i).setStatus(2);
+										}
+										
 									}
 				                    if(obj.getBoolean("ignition")==false) {
 				                    	allDevicesLiveData.get(i).setStatus(3);
@@ -2382,15 +2547,14 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 							
 	                    	if(obj.has("ignition")) {
     							if(obj.getBoolean("ignition")==true) {
-    								if(obj.has("motion")) {
-    				                    if(obj.getBoolean("motion")==true) {
-    				    			    	ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
+				                    if(vehicleInfo.get(0).getSpeed() > 0) {
+				    			    	ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
 
-    				    			    	lastPoints = mongoPositionRepo.getLastPoints(deviceId);
-    				    			    	vehicleInfo.get(0).setLastPoints(lastPoints);
-    				                    
-    									}
-    								}
+				    			    	lastPoints = mongoPositionRepo.getLastPoints(deviceId);
+				    			    	vehicleInfo.get(0).setLastPoints(lastPoints);
+				                    
+									}
+    								
     							}
     		                    
     						}
@@ -4030,7 +4194,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	}
 
 	@Override
-	public ResponseEntity<?> getDeviceUnSelect(String TOKEN, Long userId) {
+	public ResponseEntity<?> getDeviceUnSelect(String TOKEN,Long loggedUserId, Long userId) {
 		// TODO Auto-generated method stub
 		
 		
@@ -4045,37 +4209,76 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		{
 			return super.checkActive(TOKEN);
 		}
-	    if(userId != 0) {
-	    	
-			userService.resetChildernArray();
-
-	    	User user = userService.findById(userId);
-	    	if(user == null) {
-	    		getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",devices);
-				return ResponseEntity.status(404).body(getObjectResponse);
-	    	}
-	    	if(user != null) {
-	    		if(user.getDelete_date() != null) {
-	    			getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",devices);
-					return ResponseEntity.status(404).body(getObjectResponse);
-	    		}
-	    	}
-	    	
-    		 
-
-			devices = deviceRepository.getDeviceUnSelectOfClient(userId);
-			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
-			logger.info("************************ getDeviceSelect ENDED ***************************");
-			return ResponseEntity.ok().body(getObjectResponse);
-
+		
+        if(loggedUserId == 0) {
 			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User client = userService.findById(loggedUserId);
+		if(client == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged user is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(client.getAccountType() != 3) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User should be type client to assign his users",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(userId == 0) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User user = userService.findById(userId);
+		if(user == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(user.getAccountType() != 4) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User should be type user to assign him users",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		Set<User> UserParents = user.getUsersOfUser();
+		if(UserParents.isEmpty()) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
 		}
 		else {
+			User Parent= null;
+			for(User object : UserParents) {
+				Parent = object ;
+				break;
+			}
+			if(!Parent.getId().toString().equals(loggedUserId.toString())) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you are not allowed to get this user",null);
+				return ResponseEntity.status(404).body(getObjectResponse);
+			}
 			
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",devices);
-			return ResponseEntity.badRequest().body(getObjectResponse);
-
 		}
+		
+
+
+		devices = deviceRepository.getDeviceUnSelectOfClient(loggedUserId,userId);
+		List<DeviceSelect> selectedDevices = userClientDeviceRepository.getDeviceOfUserList(userId);
+
+		List<Map> data = new ArrayList<>();
+	    Map obj = new HashMap();
+	    
+	    obj.put("selectedDevices", selectedDevices);
+	    obj.put("devices", devices);
+
+	    data.add(obj);
+	    
+		getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",data);
+		logger.info("************************ getDeviceSelect ENDED ***************************");
+		return ResponseEntity.ok().body(getObjectResponse);
 	
 	}
 

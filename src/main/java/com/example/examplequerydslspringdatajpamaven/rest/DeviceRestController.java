@@ -142,20 +142,34 @@ public class DeviceRestController {
 	
 	@RequestMapping(value = "/getDeviceSelect", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getDeviceSelect(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                               @RequestParam (value = "userId", defaultValue = "0") Long userId) {
-		
+												           @RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,                                               
+														   @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+														
 	
-    	return  deviceService.getDeviceSelect(TOKEN,userId);
+    	return  deviceService.getDeviceSelect(TOKEN,loggedUserId,userId);
+
+		
+	}
+	@RequestMapping(value = "/getDeviceSelectGroup", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getDeviceSelectGroup(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                                    @RequestParam (value = "groupId", defaultValue = "0") Long groupId,                                               
+														        @RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,                                               
+																@RequestParam (value = "userId", defaultValue = "0") Long userId) {
+																
+		
+    	return  deviceService.getDeviceSelectGroup(TOKEN,loggedUserId,userId,groupId);
 
 		
 	}
 	
+	
 	@RequestMapping(value = "/getDeviceUnSelectOfClient", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getDeviceUnSelect(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+                                                             @RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,
 			                                                 @RequestParam (value = "userId", defaultValue = "0") Long userId) {
 		
 	
-    	return  deviceService.getDeviceUnSelect(TOKEN,userId);
+    	return  deviceService.getDeviceUnSelect(TOKEN,loggedUserId,userId);
 
 		
 	}

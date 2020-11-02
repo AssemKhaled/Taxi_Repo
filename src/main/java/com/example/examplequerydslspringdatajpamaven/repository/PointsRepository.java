@@ -57,9 +57,9 @@ public interface PointsRepository  extends JpaRepository<Points, Long>, QueryDsl
 	public List<DriverSelect> getPointSelectByIds(@Param("pointIds") List<Long> pointIds);
 	
 	@Query(value = "SELECT tc_points.id,tc_points.name FROM tc_points " 
-			+ " WHERE tc_points.userId IN(:userId) and tc_points.delete_date is null "
-			+ " and tc_points.id Not IN(Select tc_user_client_point.pointid from tc_user_client_point) ",nativeQuery = true)
-	public List<DriverSelect> getPointUnSelectOfClient(@Param("userId") Long userId);
+			+ " WHERE tc_points.userId IN(:loggedUserId) and tc_points.delete_date is null "
+			+ " and tc_points.id Not IN(Select tc_user_client_point.pointid from tc_user_client_point where tc_user_client_point.userid !=:userId ) ",nativeQuery = true)
+	public List<DriverSelect> getPointUnSelectOfClient(@Param("loggedUserId") Long loggedUserId,@Param("userId") Long userId);
 	
 	
 	@Query(value = "SELECT tc_points.id FROM tc_points " 

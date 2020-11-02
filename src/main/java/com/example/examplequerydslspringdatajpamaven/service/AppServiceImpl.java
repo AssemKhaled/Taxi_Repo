@@ -43,6 +43,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.CustomDriverList;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomMapData;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
+import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
@@ -413,20 +414,19 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 									if(obj.has("ignition")) {
 			
 										if(obj.getBoolean("ignition")==true) {
-											if(obj.has("motion")) {
 			
-							                    if(obj.getBoolean("motion")==false) {
-							                    	allDevicesLiveData.get(i).setStatus(1);
-												}
-							                    if(obj.getBoolean("motion")==true) {
-							    			    	/*ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
-			
-							    			    	lastPoints = mongoPositionRepo.getLastPoints(allDevicesLiveData.get(i).getId());
-							                    	allDevicesLiveData.get(i).setLastPoints(lastPoints);*/
-							                    	
-							                    	allDevicesLiveData.get(i).setStatus(2);
-												}
+						                    if(mongoPosition.getSpeed() == 0) {
+						                    	allDevicesLiveData.get(i).setStatus(1);
 											}
+						                    if(mongoPosition.getSpeed() > 0) {
+						    			    	/*ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
+		
+						    			    	lastPoints = mongoPositionRepo.getLastPoints(allDevicesLiveData.get(i).getId());
+						                    	allDevicesLiveData.get(i).setLastPoints(lastPoints);*/
+						                    	
+						                    	allDevicesLiveData.get(i).setStatus(2);
+											}
+											
 										}
 					                    if(obj.getBoolean("ignition")==false) {
 					                    	allDevicesLiveData.get(i).setStatus(3);
@@ -568,20 +568,19 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 								if(obj.has("ignition")) {
 		
 									if(obj.getBoolean("ignition")==true) {
-										if(obj.has("motion")) {
 		
-						                    if(obj.getBoolean("motion")==false) {
-						                    	allDevicesLiveData.get(i).setStatus(1);
-											}
-						                    if(obj.getBoolean("motion")==true) {
-						    			    	/*ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
-		
-						    			    	lastPoints = mongoPositionRepo.getLastPoints(allDevicesLiveData.get(i).getId());
-						                    	allDevicesLiveData.get(i).setLastPoints(lastPoints);*/
-						                    	
-						                    	allDevicesLiveData.get(i).setStatus(2);
-											}
+					                    if(mongoPosition.getSpeed() == 0) {
+					                    	allDevicesLiveData.get(i).setStatus(1);
 										}
+					                    if(mongoPosition.getSpeed() > 0) {
+					    			    	/*ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
+	
+					    			    	lastPoints = mongoPositionRepo.getLastPoints(allDevicesLiveData.get(i).getId());
+					                    	allDevicesLiveData.get(i).setLastPoints(lastPoints);*/
+					                    	
+					                    	allDevicesLiveData.get(i).setStatus(2);
+										}
+										
 									}
 				                    if(obj.getBoolean("ignition")==false) {
 				                    	allDevicesLiveData.get(i).setStatus(3);
@@ -743,15 +742,14 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 							
 	                    	if(obj.has("ignition")) {
     							if(obj.getBoolean("ignition")==true) {
-    								if(obj.has("motion")) {
-    				                    if(obj.getBoolean("motion")==true) {
-    				    			    	ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
+				                    if(vehicleInfo.get(0).getSpeed() > 0) {
+				    			    	ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
 
-    				    			    	lastPoints = mongoPositionRepo.getLastPoints(deviceId);
-    				    			    	vehicleInfo.get(0).setLastPoints(lastPoints);
-    				                    
-    									}
-    								}
+				    			    	lastPoints = mongoPositionRepo.getLastPoints(deviceId);
+				    			    	vehicleInfo.get(0).setLastPoints(lastPoints);
+				                    
+									}
+    								
     							}
     		                    
     						}
@@ -2955,11 +2953,10 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 	@Override
 	public ResponseEntity<?> getGeofenceSelectApp(String TOKEN, Long userId) {
-		
 		logger.info("************************ getGeofenceSelect STARTED ***************************");
-		List<DriverSelect> geofences = new ArrayList<DriverSelect>();
+		List<DriverSelect> drivers = new ArrayList<DriverSelect>();
 		if(TOKEN.equals("")) {
-			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",geofences);
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",drivers);
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		
@@ -2967,6 +2964,8 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		{
 			return super.checkActive(TOKEN);
 		}
+		
+		
 	    if(userId != 0) {
 	    	User user = userServiceImpl.findById(userId);
 	    	userServiceImpl.resetChildernArray();
@@ -2975,7 +2974,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	    		if(user.getDelete_date() == null) {
 	    			
 	    			if(user.getAccountType().equals(4)) {
-	   				 Set<User>parentClient = user.getUsersOfUser();
+	   				/* Set<User>parentClient = user.getUsersOfUser();
 	   					if(parentClient.isEmpty()) {
 	   						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
 	   						logger.info("************************ getGeofenceSelect ENDED ***************************");
@@ -2990,8 +2989,8 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 					   			List<Long>usersIds= new ArrayList<>();
 			   					usersIds.add(parent.getId());
-			   					geofences = geofenceRepository.getGeofenceSelect(usersIds);
-	   							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",geofences);
+	   							drivers = geofenceRepository.getGeofenceSelect(usersIds);
+	   							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
 	   							logger.info("************************ getGeofenceSelect ENDED ***************************");
 	   							return ResponseEntity.ok().body(getObjectResponse);
 	   						}
@@ -3000,7 +2999,18 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	   							return ResponseEntity.badRequest().body(getObjectResponse);
 	   						}
 	   						
-	   					}
+	   					}*/
+	    				
+	    				List<Long> geofenceIds = userClientGeofenceRepository.getGeofneceIds(userId);
+
+						if(geofenceIds.size()>0) {
+
+							drivers = geofenceRepository.getGeofenceSelectByIds(geofenceIds);
+
+						 }
+						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
+						logger.info("************************ getGeofenceSelect ENDED ***************************");
+						return ResponseEntity.ok().body(getObjectResponse);
 	   			 }
 	    			 List<User>childernUsers = userServiceImpl.getAllChildernOfUser(userId);
 		   			 List<Long>usersIds= new ArrayList<>();
@@ -3014,21 +3024,21 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		   				 }
 		   			 }
 	    			
-		   			geofences = geofenceRepository.getGeofenceSelect(usersIds);
-					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",geofences);
+	    			drivers = geofenceRepository.getGeofenceSelect(usersIds);
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
 					logger.info("************************ getGeofenceSelect ENDED ***************************");
 					return ResponseEntity.ok().body(getObjectResponse);
 
 	    		}
 	    		else {
-					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",geofences);
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",drivers);
 					return ResponseEntity.status(404).body(getObjectResponse);
 
 	    		}
 	    	
 	    	}
 	    	else {
-				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",geofences);
+				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User ID is not found",drivers);
 				return ResponseEntity.status(404).body(getObjectResponse);
 
 	    	}
@@ -3036,7 +3046,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		}
 		else {
 			
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",geofences);
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",drivers);
 			return ResponseEntity.badRequest().body(getObjectResponse);
 
 		}
@@ -3300,15 +3310,29 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 					    	}
 						}
 							
+				    	User driverParent = new User();
+						if(user.getAccountType().equals(4)) {
+							Set<User> parentClients = user.getUsersOfUser();
+							if(parentClients.isEmpty()) {
+								 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allowed to add driver",drivers);
+								 return  ResponseEntity.badRequest().body(getObjectResponse);
+							}
+							for(User object : parentClients) {
+								driverParent = object;
+							}
+						}else {
+							driverParent = user;
+						}
 						
-						List<Driver> res1=driverServiceImpl.checkDublicateDriverInAddEmail(id,driver.getEmail());					    
-					    List<Driver> res2=driverServiceImpl.checkDublicateDriverInAddUniqueMobile(driver.getUniqueid(),driver.getMobile_num());
+				    	List<Driver> res1=driverServiceImpl.checkDublicateDriverInAddEmail(driverParent.getId(),driver.getName());					    
+					    List<Driver> res2=driverServiceImpl.checkDublicateDriverInAddUniqueMobile(driver.getUniqueid(),driver.getMobile_num(),driver.getEmail());
 					    List<Integer> duplictionList =new ArrayList<Integer>();
 
 						if(!res1.isEmpty()) {
 							for(int i=0;i<res1.size();i++) {
-								if(res1.get(i).getEmail().equals(driver.getEmail())) {
-									duplictionList.add(1);				
+								
+								if(res1.get(i).getName().equals(driver.getName())) {
+									duplictionList.add(4);				
 								}
 					
 							}
@@ -3318,7 +3342,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 						
 						if(!res2.isEmpty()) {
 							for(int i=0;i<res2.size();i++) {
-								
+								if(res2.get(i).getEmail().equals(driver.getEmail())) {
+									duplictionList.add(1);				
+								}
 								if(res2.get(i).getUniqueid().equals(driver.getUniqueid())) {
 									duplictionList.add(2);				
 				
@@ -3340,19 +3366,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 						
 						else {
 							if(driver.getId() == null || driver.getId() == 0) {
-								User driverParent = new User();
-								if(user.getAccountType().equals(4)) {
-									Set<User> parentClients = user.getUsersOfUser();
-									if(parentClients.isEmpty()) {
-										 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allowed to add driver",drivers);
-										 return  ResponseEntity.badRequest().body(getObjectResponse);
-									}
-									for(User object : parentClients) {
-										driverParent = object;
-									}
-								}else {
-									driverParent = user;
-								}
+								
 								Set<User> userDriver = new HashSet<>();
 								userDriver.add(driverParent);
 								driver.setUserDriver(userDriver);
@@ -3442,14 +3456,13 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 						if(driverCheck != null) {
 							if(driverCheck.getDelete_date() == null) {
 								boolean isParent = false;
-								
+								User parent = null;
 								if(user.getAccountType().equals(4)) {
 									Set<User>parentClient = user.getUsersOfUser();
 									if(parentClient.isEmpty()) {
 										 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allowed to edit driver",drivers);
 										 return  ResponseEntity.badRequest().body(getObjectResponse);
 									}
-									User parent = null;
 									for(User object : parentClient) {
 										parent = object ;
 									}
@@ -3472,6 +3485,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 									else {
 											isParent = true;
 									}
+								}
+								else {
+									parent=user;
 								}
 								if(!driverServiceImpl.checkIfParent(driverCheck , user) && ! isParent) {
 									getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this driver ",null);
@@ -3516,15 +3532,16 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 									
 										
 									
-									List<Driver> res1=driverServiceImpl.checkDublicateDriverInEditEmail(driver.getId(),id,driver.getEmail());
-									List<Driver> res2=driverServiceImpl.checkDublicateDriverInEditMobileUnique(driver.getId(),driver.getUniqueid(),driver.getMobile_num());
+									List<Driver> res1=driverServiceImpl.checkDublicateDriverInEditEmail(driver.getId(),parent.getId(),driver.getName());
+									List<Driver> res2=driverServiceImpl.checkDublicateDriverInEditMobileUnique(driver.getId(),driver.getUniqueid(),driver.getMobile_num(),driver.getEmail());
 
 									List<Integer> duplictionList =new ArrayList<Integer>();
 									
 									if(!res1.isEmpty()) {
 										for(int i=0;i<res1.size();i++) {
-											if(res1.get(i).getEmail().equals(driver.getEmail())) {
-												duplictionList.add(1);				
+											
+											if(res1.get(i).getName().equals(driver.getName())) {
+												duplictionList.add(4);				
 											}
 											
 											
@@ -3536,7 +3553,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 									
 									if(!res2.isEmpty()) {
 										for(int i=0;i<res2.size();i++) {
-											
+											if(res2.get(i).getEmail().equals(driver.getEmail())) {
+												duplictionList.add(1);				
+											}
 											if(res2.get(i).getUniqueid().equals(driver.getUniqueid())) {
 												duplictionList.add(2);				
 							
@@ -3619,7 +3638,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	@Override
 	public ResponseEntity<?> getUnassignedDriversApp(String TOKEN, Long userId) {
 		// TODO Auto-generated method stub
-		
+
 		logger.info("************************ getUnassignedDrivers STARETED ***************************");
 		if(TOKEN.equals("")) {
 			List<Driver> unAssignedDrivers = new ArrayList<>();
@@ -3632,8 +3651,11 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		{
 			return super.checkActive(TOKEN);
 		}
+		List<Driver> unAssignedDrivers = new ArrayList<>();
+
+		
+		
 		if(userId.equals(0)) {
-			List<Driver> unAssignedDrivers = new ArrayList<>();
 			
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",unAssignedDrivers);
 			
@@ -3644,7 +3666,6 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			User user = userServiceImpl.findById(userId);
 
 			if(user == null) {
-				List<Driver> unAssignedDrivers = new ArrayList<>();
 				
 				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This User ID is not Found",unAssignedDrivers);
 				return ResponseEntity.status(404).body(getObjectResponse);
@@ -3680,17 +3701,14 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 					List<Long>usersIds= new ArrayList<>();
 				    usersIds.add(userId);
-					List<Driver> unAssignedDrivers = new ArrayList<Driver>();
                     unAssignedDrivers = driverRepository.getUnassignedDriversByIds(usersIds);
-					
-
-					
+										
 					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",unAssignedDrivers);
 					logger.info("************************ getUnassignedDrivers ENDED ***************************");
 					return ResponseEntity.ok().body(getObjectResponse);
 				 }
 				
-				List<User>childernUsers = userServiceImpl.getActiveAndInactiveChildern(userId);
+				 List<User>childernUsers = userServiceImpl.getActiveAndInactiveChildern(userId);
 				 List<Long>usersIds= new ArrayList<>();
 				 if(childernUsers.isEmpty()) {
 					 usersIds.add(userId);
@@ -3702,7 +3720,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 					 }
 				 }
 				 
-				List<Driver> unAssignedDrivers = driverRepository.getUnassignedDrivers(usersIds);
+				unAssignedDrivers = driverRepository.getUnassignedDrivers(usersIds);
 				
 				getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",unAssignedDrivers);
 				logger.info("************************ getUnassignedDrivers ENDED ***************************");
@@ -3726,6 +3744,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		{
 			return super.checkActive(TOKEN);
 		}
+		
+		
+	
 	    if(userId != 0) {
 	    	User user = userServiceImpl.findById(userId);
 	    	userServiceImpl.resetChildernArray();
@@ -10304,6 +10325,113 @@ logger.info("************************ getNotifications STARTED *****************
 			
 			
 			
+	}
+
+	@Override
+	public ResponseEntity<?> getDeviceSelectApp(String TOKEN, Long userId) {
+		// TODO Auto-generated method stub
+		
+		logger.info("************************ getDeviceSelect STARTED ***************************");
+		List<DeviceSelect> devices = new ArrayList<DeviceSelect>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		
+
+		
+	    if(userId != 0) {
+	    	
+			userServiceImpl.resetChildernArray();
+
+	    	User user = userServiceImpl.findById(userId);
+	    	if(user == null) {
+	    		getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",devices);
+				return ResponseEntity.status(404).body(getObjectResponse);
+	    	}
+	    	if(user != null) {
+	    		if(user.getDelete_date() != null) {
+	    			getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",devices);
+					return ResponseEntity.status(404).body(getObjectResponse);
+	    		}
+	    	}
+	    	if(user.getAccountType().equals(4)) {
+			    /*Set<User>parentClient = user.getUsersOfUser();
+				if(parentClient.isEmpty()) {
+					getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
+					logger.info("************************ editDevice ENDED ***************************");
+					return ResponseEntity.badRequest().body(getObjectResponse);
+				}else {
+				  
+					User parent =null;
+					for(User object : parentClient) {
+						parent = object;
+					}
+					if(parent != null) {
+			   			List<Long>usersIds= new ArrayList<>();
+	   					usersIds.add(parent.getId());
+
+						devices = deviceRepository.getDeviceSelect(usersIds);
+						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
+						logger.info("************************ getDeviceSelect ENDED ***************************");
+						return ResponseEntity.ok().body(getObjectResponse);
+					}
+					else {
+						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "No parent for this type 4",null);
+						return ResponseEntity.badRequest().body(getObjectResponse);
+					}
+					
+				}*/
+	    		 List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(userId);
+				 
+				 if(deviceIds.size()>0) {
+						devices = deviceRepository.getDeviceSelectByIds(deviceIds);
+
+				 }
+
+				 getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
+				 logger.info("************************ getDeviceSelect ENDED ***************************");
+				 return ResponseEntity.ok().body(getObjectResponse);
+			 }
+	    	
+	    	
+	    	
+	    			
+    		 List<User>childernUsers = userServiceImpl.getAllChildernOfUser(userId);
+   			 List<Long>usersIds= new ArrayList<>();
+   			 if(childernUsers.isEmpty()) {
+   				 usersIds.add(userId);
+   			 }
+   			 else {
+   				 usersIds.add(userId);
+   				 for(User object : childernUsers) {
+   					 usersIds.add(object.getId());
+   				 }
+   			 }
+			devices = deviceRepository.getDeviceSelect(usersIds);
+			
+			
+			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
+			logger.info("************************ getDeviceSelect ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+
+			
+		}
+		else {
+			
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",devices);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
+	
+		
+
+
 	}
 
 }

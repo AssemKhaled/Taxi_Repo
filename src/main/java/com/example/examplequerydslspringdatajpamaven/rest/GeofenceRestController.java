@@ -86,20 +86,24 @@ public class GeofenceRestController {
 	
 	@RequestMapping(value = "/getGeofenceSelect", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getGeofenceSelect(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                               @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+												             @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+												             @RequestParam (value = "groupId", defaultValue = "0") Long groupId,
+                                                             @RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,
+			                                                 @RequestParam (value = "userId", defaultValue = "0") Long userId) {
 		
 	
-    	return  geofenceServiceImpl.getGeofenceSelect(TOKEN,userId);
+    	return  geofenceServiceImpl.getGeofenceSelect(TOKEN,loggedUserId,userId,deviceId,groupId);
 
 		
 	}
 	
 	@RequestMapping(value = "/getGeofenceUnSelectOfClient", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getGeofenceUnSelectOfClient(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                                 @RequestParam (value = "userId", defaultValue = "0") Long userId) {
-		
+															            @RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,                                                 
+																		@RequestParam (value = "userId", defaultValue = "0") Long userId) {
+																	
 	
-    	return  geofenceServiceImpl.getGeofenceUnSelectOfClient(TOKEN,userId);
+    	return  geofenceServiceImpl.getGeofenceUnSelectOfClient(TOKEN,loggedUserId,userId);
 
 		
 	}
