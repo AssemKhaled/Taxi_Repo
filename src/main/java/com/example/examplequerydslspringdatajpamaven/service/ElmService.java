@@ -13,6 +13,7 @@ public interface ElmService {
 	public ResponseEntity<?> deviceRegistrtaion(String TOKEN,Long deviceId,Long userId);
 	public ResponseEntity<?> deviceUpdate(String TOKEN,Map<String, String> data,Long deviceId,Long userId);
 	public ResponseEntity<?> deviceDelete(String TOKEN,Long deviceId,Long userId);
+	public ResponseEntity<?> deleteVehicleFromElm(String TOKEN,Long deviceId,Long userId,Map<String, String> data);
 
 	public ResponseEntity<?> driverRegistrtaion(String TOKEN,Long driverId,Long userId);
 	public ResponseEntity<?> driverUpdate(String TOKEN,Map<String, String> data,Long driverId, Long userId);

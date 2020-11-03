@@ -107,27 +107,27 @@ public interface GroupRepository extends  JpaRepository<Group, Long>, QueryDslPr
 	
 	@Query(value = "SELECT tc_devices.id,tc_devices.name FROM tc_devices " + 
 			" INNER JOIN tc_group_device ON tc_group_device.deviceid = tc_devices.id " + 
-			" WHERE tc_group_device.groupid =:groupId ",nativeQuery = true)
+			" WHERE tc_group_device.groupid =:groupId and tc_devices.delete_date is null",nativeQuery = true)
 	public List<DeviceSelect> getGroupDevicesSelect(@Param("groupId") Long groupId);
 	
 	@Query(value = "SELECT tc_drivers.id,tc_drivers.name FROM tc_drivers " + 
 			" INNER JOIN tc_group_driver ON tc_group_driver.driverid = tc_drivers.id " + 
-			" WHERE tc_group_driver.groupid =:groupId ",nativeQuery = true)
+			" WHERE tc_group_driver.groupid =:groupId and tc_drivers.delete_date is null",nativeQuery = true)
 	public List<DeviceSelect> getGroupDriverSelect(@Param("groupId") Long groupId);
 	
 	@Query(value = "SELECT tc_geofences.id,tc_geofences.name FROM tc_geofences " + 
 			" INNER JOIN tc_group_geofence ON tc_group_geofence.geofenceid = tc_geofences.id " + 
-			" WHERE tc_group_geofence.groupid =:groupId ",nativeQuery = true)
+			" WHERE tc_group_geofence.groupid =:groupId and tc_geofences.delete_date is null",nativeQuery = true)
 	public List<DeviceSelect> getGroupGeofencesSelect(@Param("groupId") Long groupId);
 	
 	@Query(value = "SELECT tc_notifications.id,tc_notifications.type FROM tc_notifications " + 
 			" INNER JOIN tc_group_notification ON tc_group_notification.notificationid = tc_notifications.id " + 
-			" WHERE tc_group_notification.groupid =:groupId ",nativeQuery = true)
+			" WHERE tc_group_notification.groupid =:groupId and tc_notifications.delete_date is null",nativeQuery = true)
 	public List<DeviceSelect> getGroupNotificationsSelect(@Param("groupId") Long groupId);
 	
 	@Query(value = "SELECT tc_attributes.id,tc_attributes.description FROM tc_attributes " + 
 			" INNER JOIN tc_group_attribute ON tc_group_attribute.attributeid = tc_attributes.id " + 
-			" WHERE tc_group_attribute.groupid =:groupId ",nativeQuery = true)
+			" WHERE tc_group_attribute.groupid =:groupId and tc_attributes.delete_date is null",nativeQuery = true)
 	public List<DeviceSelect> getGroupAttrbuitesSelect(@Param("groupId") Long groupId);
 	
 	@Query(value = "select tc_group_attribute.attributeid from tc_group_attribute where tc_group_attribute.groupid=:groupId ", nativeQuery = true)

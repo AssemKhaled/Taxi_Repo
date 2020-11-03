@@ -64,4 +64,15 @@ public class ProfileRestController {
 
 	}
 	
+	@RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<?> restPassword(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+                                                        @RequestBody Map<String, String> data ,
+			                                            @RequestParam (value = "loggedUserId", defaultValue = "0") Long loggedUserId,
+			                                            @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+		
+	
+    	return  profileServiceImpl.restPassword(TOKEN,loggedUserId,userId,data);
+
+	}
+	
 }

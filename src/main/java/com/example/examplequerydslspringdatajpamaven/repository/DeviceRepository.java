@@ -225,12 +225,12 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 
 	@Query(value = "SELECT tc_notifications.id,tc_notifications.type FROM tc_notifications " + 
 			" INNER JOIN tc_device_notification ON tc_device_notification.notificationid = tc_notifications.id " + 
-			" WHERE tc_device_notification.deviceid =:deviceId ",nativeQuery = true)
+			" WHERE tc_device_notification.deviceid =:deviceId and tc_notifications.delete_date is null",nativeQuery = true)
 	public List<DeviceSelect> getNotificationsDeviceSelect(@Param("deviceId") Long deviceId);
 	
 	@Query(value = "SELECT tc_attributes.id,tc_attributes.description FROM tc_attributes " + 
 			" INNER JOIN tc_device_attribute ON tc_device_attribute.attributeid = tc_attributes.id " + 
-			" WHERE tc_device_attribute.deviceid =:deviceId ",nativeQuery = true)
+			" WHERE tc_device_attribute.deviceid =:deviceId and tc_attributes.delete_date is null",nativeQuery = true)
 	public List<DeviceSelect> getAttributesDeviceSelect(@Param("deviceId") Long deviceId);
 	
 	

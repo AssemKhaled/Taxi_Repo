@@ -4509,6 +4509,299 @@ elmLogsRepository.save(elmLogs);
 
 
 
+	@Override
+	public ResponseEntity<?> deleteVehicleFromElm(String TOKEN, Long deviceId, Long userId, Map<String, String> dataObject) {
+		// TODO Auto-generated method stub
+		
+		logger.info("************************ deviceDelete STARTED ***************************");
+
+		Date date = new Date();
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String time = formatter.format(date);
+		String type = "Delete Vehicle From Inquery";
+		Map requet = new HashMap();
+		Map response = new HashMap();
+		
+		SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); 
+
+		String currentDate=formatter.format(date);
+		
+		Date dateRegDelete = null;
+		try {
+			dateRegDelete = output.parse(currentDate);
+
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+
+        if(userId == 0) {
+			
+			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "User Id is Required",null);
+			logger.info("************************ deviceUpdate ENDED ***************************");
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User loggedUser = userRepository.findOne(userId);
+		
+        if(loggedUser == null) {
+			
+			getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "This user is not found",null);
+			logger.info("************************ deviceUpdate ENDED ***************************");
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+
+
+		if(loggedUser.getDelete_date() != null) {
+			
+			getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "This user is deleted",null);
+			logger.info("************************ deviceUpdate ENDED ***************************");
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+
+		if(loggedUser.getAccountType()!= 1) {
+			if(!userRoleService.checkUserHasPermission(userId, "DEVICE", "deleteFromElm")) {
+				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to deleteFromElm",null);
+				 logger.info("************************ deviceUpdate ENDED ***************************");
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+		}
+		
+		
+       if(deviceId == 0) {
+			
+			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "Device Id is Required",null);
+			logger.info("************************ deviceUpdate ENDED ***************************");
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		Device device = deviceRepository.findOne(deviceId);
+		
+       if(device == null) {
+			
+			getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "This Device is not found",null);
+			logger.info("************************ deviceUpdate ENDED ***************************");
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+
+
+		if(device.getDelete_date() != null) {
+			
+			getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "This Device is deleted",null);
+			logger.info("************************ deviceUpdate ENDED ***************************");
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+		
+		 Set<User> parentClients = device.getUser();
+		 User parent =null;
+
+		 for(User object : parentClients) {
+			 parent = object;
+			 break;
+		 }
+		 if(parent == null) {
+			getObjectResponse = new GetObjectResponse( HttpStatus.NOT_FOUND.value(), "This Device is not have parent company",null);
+			logger.info("************************ deviceUpdate ENDED ***************************");
+			return ResponseEntity.status(404).body(getObjectResponse);
+		 }
+
+		 boolean isParent = false;
+
+		 if(loggedUser.getAccountType().equals(4)) {
+			 User parentUser =new User();
+
+			 Set<User> parentClient = loggedUser.getUsersOfUser();
+			 if(parentClient.isEmpty()) {
+				    getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is type 4 not have parent can't request to elm.",null);
+					logger.info("************************ deviceUpdate ENDED ***************************");
+					return ResponseEntity.badRequest().body(getObjectResponse); 
+			 }else {
+				 for(User object : parentClient) {
+					 parentUser = object ;
+					 break;
+				 }
+				 isParent = deviceServiceImpl.checkIfParent( device ,  parentUser);
+				 if(parent.getId() == userId) {
+					 isParent=true;
+				 }
+
+
+			 }
+			 List<Long> CheckData = userClientDeviceRepository.getDevice(userId,deviceId);
+			if(CheckData.isEmpty()) {
+					isParent = false;
+			}
+			else {
+					isParent = true;
+			}
+			 
+		 }
+		 else {
+			 isParent = deviceServiceImpl.checkIfParent(device ,  loggedUser);
+			 if(loggedUser.getAccountType().equals(1)) {
+				 isParent=true;
+			 }
+			 if(parent.getId() == userId) {
+				 isParent=true;
+			 }
+		 }
+		 
+		 if(isParent == false) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "as you are not the parent of this creater user you cannot allow to register in elm.",null);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+		 }
+		 
+		 if(!dataObject.containsKey("companyReferenceKey")) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "companyReferenceKey shouldn't be null",null);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+		 }
+		 if(!dataObject.containsKey("deviceReferenceKey")) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "deviceReferenceKey shouldn't be null",null);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+		 }
+		 
+		 
+		  String url = elm+"/operationCompany/"+dataObject.get("companyReferenceKey")+"/vehicle/"+dataObject.get("deviceReferenceKey");
+
+
+		  Map bodyToMiddleWare = new HashMap();
+		  
+		  bodyToMiddleWare.put("dataObject", null);
+		  bodyToMiddleWare.put("url",url);
+		  bodyToMiddleWare.put("methodType","DELETE");
+		 		  
+		  
+		  requet = bodyToMiddleWare;
+		  TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+
+			SSLContext sslContext = null;
+			try {
+				sslContext = org.apache.http.ssl.SSLContexts.custom()
+				        .loadTrustMaterial(null, acceptingTrustStrategy)
+				        .build();
+			} catch (KeyManagementException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchAlgorithmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (KeyStoreException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
+
+			CloseableHttpClient httpClient = HttpClients.custom()
+			        .setSSLSocketFactory(csf)
+			        .build();
+
+			HttpComponentsClientHttpRequestFactory requestFactory =
+			        new HttpComponentsClientHttpRequestFactory();
+
+			requestFactory.setHttpClient(httpClient);
+
+			RestTemplate restTemplate = new RestTemplate(requestFactory);
+			
+			
+			  restTemplate.getMessageConverters()
+		        .add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
+			  
+		  HttpEntity<Object> entity = new HttpEntity<Object>(bodyToMiddleWare);
+
+
+		  ResponseEntity<ElmReturn> rateResponse;
+		  
+			 List<ElmReturn> data = new ArrayList<ElmReturn>();
+
+			  try {
+				  rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
+	          } catch (Exception e) {
+		        getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Can't Request To Elm Error in Elm Server",data);
+				logger.info("************************ companyRegistrtaion ENDED ***************************");
+				return  ResponseEntity.ok().body(getObjectResponse);
+		     }
+
+			 
+			 if(rateResponse.getStatusCode().OK == null) {
+				  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Not Requested To Elm",data);
+				  logger.info("************************ companyRegistrtaion ENDED ***************************");
+				  return  ResponseEntity.ok().body(getObjectResponse);
+			  }
+		  
+		  ElmReturn elmReturn = rateResponse.getBody();
+
+		  
+		  response.put("body", elmReturn.getBody());
+		  response.put("statusCode", elmReturn.getStatusCode());
+		  response.put("message", elmReturn.getMessage());
+
+         // send Logs
+		  MongoElmLogs elmLogs = new MongoElmLogs(null,parent.getId(),parent.getName(),null,null,deviceId,device.getName(),time,type,requet,response);
+		  elmLogsRepository.save(elmLogs);
+		  
+		  
+		  data.add(elmReturn);
+
+		  
+		  Map resp = new HashMap();
+		  resp = elmReturn.getBody();
+		  
+         if(resp.containsKey("errorCode")) {
+			  
+			  device.setReject_reason(resp.get("errorMsg").toString());
+			  deviceRepository.save(device);
+			  
+			  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),resp.get("errorMsg").toString(),data);
+			  logger.info("************************ deviceDelete ENDED ***************************");
+			  return  ResponseEntity.ok().body(getObjectResponse);
+		  }
+		  else if(resp.containsKey("resultCode")) {
+			  if(resp.get("success").equals(true)) {
+				  
+				  device.setReject_reason(null);
+				  device.setReference_key(null);
+				  device.setDelete_from_elm_date(dateRegDelete);
+				  device.setUpdate_date_in_elm(dateRegDelete);
+				  device.setExpired(1);
+				  
+				  
+				  deviceRepository.save(device);
+				  
+				  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",data);
+				  logger.info("************************ deviceDelete ENDED ***************************");
+				  return  ResponseEntity.ok().body(getObjectResponse);
+				
+			  }
+			  else {
+					device.setReject_reason(resp.get("resultCode").toString());
+					deviceRepository.save(device);
+
+				  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),resp.get("resultCode").toString(),data);
+				  logger.info("************************ deviceDelete ENDED ***************************");
+				  return  ResponseEntity.ok().body(getObjectResponse);
+			  }
+			  
+			 
+		  }
+		  else {
+			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"cann't request to elm",data);
+			logger.info("************************ deviceDelete ENDED ***************************");
+			return  ResponseEntity.ok().body(getObjectResponse);	
+		  }
+	}
+
+
+
+
 	
 	
 

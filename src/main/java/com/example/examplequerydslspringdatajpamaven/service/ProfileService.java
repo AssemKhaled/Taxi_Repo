@@ -18,7 +18,8 @@ public interface ProfileService {
 
 	public ResponseEntity<?> updateProfilePhoto(String TOKEN,Map<String, String> data,Long userId);
 
-	
+	public ResponseEntity<?> restPassword(String TOKEN,Long loggedUserId,Long userId,Map<String, String> data);
+
 	
 
 

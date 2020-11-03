@@ -143,7 +143,7 @@ public class ElmConnectionsRestController {
 	}
 	
 	@GetMapping(path ="/lastLocations")
-//	@Scheduled(fixedRate = 60000)
+	@Scheduled(fixedRate = 60000)
 	public ResponseEntity<?> lastLocations(){
 		
 		return elmServiceImpl.lastLocations();
@@ -161,5 +161,14 @@ public class ElmConnectionsRestController {
 			@RequestParam (value = "sequenceNumber", defaultValue = "") String sequenceNumber){
 		
 		return elmServiceImpl.checkBySequenceNumber(sequenceNumber);
+	}
+	
+	@PostMapping(path ="/deleteVehicleFromElm")
+	public ResponseEntity<?> deleteVehicleFromElm(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                                     @RequestBody Map<String, String> data,
+			                                     @RequestParam (value = "userId", defaultValue = "0") Long userId,
+			                                     @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId){
+		
+		return elmServiceImpl.deleteVehicleFromElm(TOKEN,deviceId,userId,data);
 	}
 }

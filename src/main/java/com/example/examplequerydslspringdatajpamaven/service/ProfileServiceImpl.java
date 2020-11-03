@@ -8,6 +8,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
 import com.example.examplequerydslspringdatajpamaven.repository.ProfileRepository;
@@ -353,6 +355,75 @@ public class ProfileServiceImpl extends RestServiceController implements Profile
 		else
 		{
 			return user;
+		}
+		
+	}
+
+
+	@Override
+	public ResponseEntity<?> restPassword(String TOKEN, Long loggedUserId, Long userId, Map<String, String> data) {
+		// TODO Auto-generated method stub
+		
+		logger.info("************************ restPassword STARTED ***************************");
+		List<DriverSelect> drivers = new ArrayList<DriverSelect>();
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",drivers);
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		
+        if(loggedUserId == 0) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User ID is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User admin = userServiceImpl.findById(loggedUserId);
+		if(admin == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged user is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+       
+		if(admin.getAccountType() != 1) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged User should be type admin to reset passwords",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+        if(userId == 0) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "userId is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User user = userServiceImpl.findById(userId);
+		if(user == null) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This user is not found",null);
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+		
+		
+		if(data.get("password") == null || data.get("password") == "") {
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "password is Required",null);
+			return ResponseEntity.badRequest().body(getObjectResponse);
+
+		}
+		else {
+			String password= userServiceImpl.getMd5(data.get("password").toString());
+			
+			user.setPassword(password);
+			profileRepository.save(user);
+
+			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success" ,null);
+			logger.info("************************ restPassword ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+
+			
+		
 		}
 		
 	}
