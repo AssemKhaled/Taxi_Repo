@@ -14,7 +14,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "tc_user_roles" ,schema = "sareb_gold")
+@Table(name = "tc_user_roles")
 public class UserRole {
 
 	@Id

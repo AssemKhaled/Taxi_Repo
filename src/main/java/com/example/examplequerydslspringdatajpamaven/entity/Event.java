@@ -28,7 +28,7 @@ import javax.persistence.Table;
 
 
 @Entity
-@Table(name = "tc_events" , schema = "sareb_gold")
+@Table(name = "tc_events")
 public class Event {
 	
 

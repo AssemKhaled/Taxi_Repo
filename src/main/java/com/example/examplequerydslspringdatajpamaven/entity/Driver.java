@@ -94,7 +94,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 
 @Entity
-@Table(name = "tc_drivers" , schema = "sareb_gold")
+@Table(name = "tc_drivers")
 @JsonIgnoreProperties(value = { "device" })
 public class Driver {
 	

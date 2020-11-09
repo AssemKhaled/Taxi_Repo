@@ -282,8 +282,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 	@Override
 	public ResponseEntity<?> getAllDeviceLiveDataMapApp(String TOKEN, Long userId) {
-		// TODO Auto-generated method stub
-		
+
 		// TODO Auto-generated method stub
 		if(TOKEN.equals("")) {
 			 List<Device> devices = null;
@@ -311,164 +310,47 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				return ResponseEntity.status(404).body(getObjectResponse);
 	    }
 	    userServiceImpl.resetChildernArray();
-		List<Long>usersIds= new ArrayList<>();
+		 List<Long>usersIds= new ArrayList<>();
 
 	    if(loggedUser.getAccountType().equals(4)) {
-			 /*Set<User> parentClients = loggedUser.getUsersOfUser();
-			 if(parentClients.isEmpty()) {
-				
-				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get devices of this user",null);
-				 logger.info("************************ getAllUserDevices ENDED ***************************");
-				return  ResponseEntity.status(404).body(getObjectResponse);
-			 }else {
-				 User parentClient = new User() ;
-
-				 for(User object : parentClients) {
-					 parentClient = object;
-					 usersIds.add(parentClient.getId());
-
-				 }
-				
-			 }*/
+			 
 			List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(userId);
-			List<CustomMapData> allDevicesLiveData = new ArrayList<CustomMapData>();
-			if(deviceIds.size()>0) {
-				allDevicesLiveData=	deviceRepository.getAllDevicesDataMapByIds(deviceIds);
+			List<CustomMapData> allDevicesLiveDataNoPosition = new ArrayList<CustomMapData>();
+            List<CustomMapData> allDevices = new ArrayList<CustomMapData>();
 
-				if(allDevicesLiveData.size() > 0) {
-					for(int i=0;i<allDevicesLiveData.size();i++) {
-						long minutes = 0;
-			        	allDevicesLiveData.get(i).setVehicleStatus(3);
-			
-						if(allDevicesLiveData.get(i).getLastUpdate() != null) {
-							
-							SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-							Date now = new Date();
-							String strDate = formatter.format(now);
-							try {
-								
-								Date dateLast = formatter.parse(allDevicesLiveData.get(i).getLastUpdate());
-								Date dateNow = formatter.parse(strDate);
-								
-								minutes = getDateDiff (dateLast, dateNow, TimeUnit.MINUTES);  
-								
-								
-							} catch (ParseException e) {
-								e.printStackTrace();
-							}					
-							if(minutes < 3) {
-			                	allDevicesLiveData.get(i).setVehicleStatus(1);
-							}
-							if(minutes > 8) {
-			                	allDevicesLiveData.get(i).setVehicleStatus(3);
-							}
-							if(minutes < 8 && minutes > 3) {
-			                	allDevicesLiveData.get(i).setVehicleStatus(2);
-							}
-						}
-						else {
-			            	allDevicesLiveData.get(i).setVehicleStatus(3);
-			
-						}
-			
-						
-						
-						
-						if(allDevicesLiveData.get(i).getPositionId() != null) {
-							
-			                MongoPositions mongoPosition = mongoPositionsRepository.findById(allDevicesLiveData.get(i).getPositionId());
-							
-			               if(mongoPosition != null) {
-			            	   
-			            	   ObjectMapper mapper = new ObjectMapper();
-			            	   String json = null;
-			            	   try {
-			            		   json = mapper.writeValueAsString(mongoPosition.getAttributes());
-							   } catch (JsonProcessingException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-			
-			                	JSONObject obj = new JSONObject(json);
-			
-								allDevicesLiveData.get(i).setLatitude(mongoPosition.getLatitude());
-								allDevicesLiveData.get(i).setLongitude(mongoPosition.getLongitude());
-								allDevicesLiveData.get(i).setSpeed(mongoPosition.getSpeed());
-			
-								if(mongoPosition.getValid()== true) {
-									allDevicesLiveData.get(i).setValid(1);
-			
-								}
-								else {
-									allDevicesLiveData.get(i).setValid(0);
-			
-								}
-								
-			                    
-								if(minutes > 8) {
-			                    	
-			                    	allDevicesLiveData.get(i).setStatus(4);
-									
-								}
-								else {
-									if(obj.has("ignition")) {
-			
-										if(obj.getBoolean("ignition")==true) {
-			
-						                    if(mongoPosition.getSpeed() == 0) {
-						                    	allDevicesLiveData.get(i).setStatus(1);
-											}
-						                    if(mongoPosition.getSpeed() > 0) {
-						    			    	/*ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
-		
-						    			    	lastPoints = mongoPositionRepo.getLastPoints(allDevicesLiveData.get(i).getId());
-						                    	allDevicesLiveData.get(i).setLastPoints(lastPoints);*/
-						                    	
-						                    	allDevicesLiveData.get(i).setStatus(2);
-											}
-											
-										}
-					                    if(obj.getBoolean("ignition")==false) {
-					                    	allDevicesLiveData.get(i).setStatus(3);
-			
-										}
-									}
-									
-								}
-								
-								if(obj.has("power")) {
-									allDevicesLiveData.get(i).setPower(obj.getDouble("power"));
-			
-								}
-								if(obj.has("operator")) {
-									allDevicesLiveData.get(i).setOperator(obj.getDouble("operator"));
-			
-								}
-								if(obj.has("ignition")) {
-									if(obj.getBoolean("ignition") == true) {
-			    						allDevicesLiveData.get(i).setIgnition(1);
-			
-									}
-									else {
-			    						allDevicesLiveData.get(i).setIgnition(0);
-			
-									}
-			
-								}
-			                }
-			                
-						}
-						else {
-							
-			            	allDevicesLiveData.get(i).setStatus(5);
-						}
-						
-					}
+			if(deviceIds.size()>0) {
+				allDevicesLiveDataNoPosition =	deviceRepository.getAllDevicesDataMapByIds(deviceIds);
+				allDevices.addAll(allDevicesLiveDataNoPosition);
+
+				List<String> positionIdsOffline =  deviceRepository.getNumberOfOfflineDevicesListByIds(deviceIds);
+				List<String> positionIdsOutOfNetwork =  deviceRepository.getNumberOfOutOfNetworkDevicesListByIds(deviceIds);
+				List<String> positionIdsOnline =  deviceRepository.getNumberOfOnlineDevicesListByIds(deviceIds);
+
+
+
+				if(positionIdsOffline.size() > 0 ) {
+					List<CustomMapData> allDevicesPositionOffline = mongoPositionRepo.getOfflineList(positionIdsOffline);
+					allDevices.addAll(allDevicesPositionOffline);
+
 				}
+				
+				if(positionIdsOutOfNetwork.size() > 0 ) {
+					List<CustomMapData> allDevicesPositionOutOfNetwork= mongoPositionRepo.getOutOfNetworkList(positionIdsOutOfNetwork);
+					allDevices.addAll(allDevicesPositionOutOfNetwork);
+
+				}
+				
+				if(positionIdsOnline.size() > 0 ) {
+					List<CustomMapData> allDevicesPositionOnline= mongoPositionRepo.getOnlineList(positionIdsOnline);
+					allDevices.addAll(allDevicesPositionOnline);
+
+				}
+
+			
 			}
 			
 			
-		    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevicesLiveData);
+		    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevices);
 			
 			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
 			return ResponseEntity.ok().body(getObjectResponse);
@@ -486,146 +368,40 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				 }
 			 }
 	    
-	   
-			List<CustomMapData> allDevicesLiveData=	deviceRepository.getAllDevicesDataMap(usersIds);
+            List<CustomMapData> allDevices = new ArrayList<CustomMapData>();
+
+			List<CustomMapData> allDevicesNoPosition = deviceRepository.getAllDevicesDataMap(usersIds);
+			allDevices.addAll(allDevicesNoPosition);
+
 			
-			if(allDevicesLiveData.size() > 0) {
-				for(int i=0;i<allDevicesLiveData.size();i++) {
-					long minutes = 0;
-		        	allDevicesLiveData.get(i).setVehicleStatus(3);
-		
-					if(allDevicesLiveData.get(i).getLastUpdate() != null) {
-						
-						SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-						Date now = new Date();
-						String strDate = formatter.format(now);
-						try {
-							
-							Date dateLast = formatter.parse(allDevicesLiveData.get(i).getLastUpdate());
-							Date dateNow = formatter.parse(strDate);
-							
-							minutes = getDateDiff (dateLast, dateNow, TimeUnit.MINUTES);  
-							
-							
-						} catch (ParseException e) {
-							e.printStackTrace();
-						}					
-						if(minutes < 3) {
-		                	allDevicesLiveData.get(i).setVehicleStatus(1);
-						}
-						if(minutes > 8) {
-		                	allDevicesLiveData.get(i).setVehicleStatus(3);
-						}
-						if(minutes < 8 && minutes > 3) {
-		                	allDevicesLiveData.get(i).setVehicleStatus(2);
-						}
-					}
-					else {
-		            	allDevicesLiveData.get(i).setVehicleStatus(3);
-		
-					}
-		
-					
-					
-					
-					if(allDevicesLiveData.get(i).getPositionId() != null) {
-						
-		                MongoPositions mongoPosition = mongoPositionsRepository.findById(allDevicesLiveData.get(i).getPositionId());
-						
-		               if(mongoPosition != null) {
-		            	   
-		            	   ObjectMapper mapper = new ObjectMapper();
-		            	   String json = null;
-		            	   try {
-		            		   json = mapper.writeValueAsString(mongoPosition.getAttributes());
-						   } catch (JsonProcessingException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-		
-		                	JSONObject obj = new JSONObject(json);
-		
-							allDevicesLiveData.get(i).setLatitude(mongoPosition.getLatitude());
-							allDevicesLiveData.get(i).setLongitude(mongoPosition.getLongitude());
-							allDevicesLiveData.get(i).setSpeed(mongoPosition.getSpeed());
-		
-							if(mongoPosition.getValid()== true) {
-								allDevicesLiveData.get(i).setValid(1);
-		
-							}
-							else {
-								allDevicesLiveData.get(i).setValid(0);
-		
-							}
-							
-		                    
-							if(minutes > 8) {
-		                    	
-		                    	allDevicesLiveData.get(i).setStatus(4);
-								
-							}
-							else {
-								if(obj.has("ignition")) {
-		
-									if(obj.getBoolean("ignition")==true) {
-		
-					                    if(mongoPosition.getSpeed() == 0) {
-					                    	allDevicesLiveData.get(i).setStatus(1);
-										}
-					                    if(mongoPosition.getSpeed() > 0) {
-					    			    	/*ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
-	
-					    			    	lastPoints = mongoPositionRepo.getLastPoints(allDevicesLiveData.get(i).getId());
-					                    	allDevicesLiveData.get(i).setLastPoints(lastPoints);*/
-					                    	
-					                    	allDevicesLiveData.get(i).setStatus(2);
-										}
-										
-									}
-				                    if(obj.getBoolean("ignition")==false) {
-				                    	allDevicesLiveData.get(i).setStatus(3);
-		
-									}
-								}
-								
-							}
-							
-							if(obj.has("power")) {
-								allDevicesLiveData.get(i).setPower(obj.getDouble("power"));
-		
-							}
-							if(obj.has("operator")) {
-								allDevicesLiveData.get(i).setOperator(obj.getDouble("operator"));
-		
-							}
-							if(obj.has("ignition")) {
-								if(obj.getBoolean("ignition") == true) {
-		    						allDevicesLiveData.get(i).setIgnition(1);
-		
-								}
-								else {
-		    						allDevicesLiveData.get(i).setIgnition(0);
-		
-								}
-		
-							}
-		                }
-		                
-					}
-					else {
-						
-		            	allDevicesLiveData.get(i).setStatus(5);
-					}
-					
-				}
+			
+
+			List<String> positionIdsOffline =  deviceRepository.getNumberOfOfflineDevicesList(usersIds);
+			List<String> positionIdsOutOfNetwork =  deviceRepository.getNumberOfOutOfNetworkDevicesList(usersIds);
+			List<String> positionIdsOnline =  deviceRepository.getNumberOfOnlineDevicesList(usersIds);
+
+			if(positionIdsOffline.size() > 0 ) {
+				List<CustomMapData> allDevicesPositionOffline = mongoPositionRepo.getOfflineList(positionIdsOffline);
+				allDevices.addAll(allDevicesPositionOffline);
+
 			}
 			
-		    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevicesLiveData);
+			if(positionIdsOutOfNetwork.size() > 0 ) {
+				List<CustomMapData> allDevicesPositionOutOfNetwork= mongoPositionRepo.getOutOfNetworkList(positionIdsOutOfNetwork);
+				allDevices.addAll(allDevicesPositionOutOfNetwork);
+
+			}
+			
+			if(positionIdsOnline.size() > 0 ) {
+				List<CustomMapData> allDevicesPositionOnline= mongoPositionRepo.getOnlineList(positionIdsOnline);
+				allDevices.addAll(allDevicesPositionOnline);
+
+			}
+		    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevices);
 			
 			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
 			return ResponseEntity.ok().body(getObjectResponse);
 	    }
-
 
 	}
 	public static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) 
@@ -5028,10 +4804,17 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
 			return ResponseEntity.status(404).body(getObjectResponse);
 		}
+		
+		Integer onlineDevices = 0;
+		Integer outOfNetworkDevices = 0;
+		Integer totalDevices = 0;
+		Integer offlineDevices = 0;
+		
+		
 		userServiceImpl.resetChildernArray();
 		 List<Long>usersIds= new ArrayList<>();
 		 if(loggedUser.getAccountType().equals(4)) {
-			 Set<User> parentClients = loggedUser.getUsersOfUser();
+			 /*Set<User> parentClients = loggedUser.getUsersOfUser();
 			 if(parentClients.isEmpty()) {
 				
 				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get devices of this user",null);
@@ -5045,7 +4828,34 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				 usersIds.add(parentClient.getId());
 				 
 
-			 }
+			 }*/
+			List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(userId);
+
+			
+			if(deviceIds.size()>0) {
+				List<String> onlineDeviceIds = deviceRepository.getNumberOfOnlineDevicesListByIds(deviceIds);
+				List<String> OutDeviceIds = deviceRepository.getNumberOfOutOfNetworkDevicesListByIds(deviceIds);
+				
+				 onlineDevices = onlineDeviceIds.size();
+				 outOfNetworkDevices = OutDeviceIds.size();
+				
+				totalDevices = deviceRepository.getTotalNumberOfUserDevicesByIds(deviceIds);
+				offlineDevices = totalDevices - onlineDevices - outOfNetworkDevices;
+
+			}
+			
+			
+			Map devicesStatus = new HashMap();
+			devicesStatus.put("online_devices", onlineDevices);
+			devicesStatus.put("unknown_devices" ,outOfNetworkDevices);
+			devicesStatus.put("offline_devices", offlineDevices);
+			devicesStatus.put("total_devices", totalDevices);
+			List<Map> data = new ArrayList<>();
+			data.add(devicesStatus);
+			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",data);
+			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+
 		 }
 		 else {
 			 List<User>childernUsers = userServiceImpl.getAllChildernOfUser(userId);
@@ -5058,29 +4868,32 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 					 usersIds.add(object.getId());
 				 }
 			 }
-		 }
-		 
-		
-		List<Long> onlineDeviceIds = deviceRepository.getNumberOfOnlineDevicesList(usersIds);
-		List<Long> OutDeviceIds = deviceRepository.getNumberOfOutOfNetworkDevicesList(usersIds);
-		
-		Integer onlineDevices = mongoPositionRepo.getDeviceIdDistincit(onlineDeviceIds);
-		Integer outOfNetworkDevices = mongoPositionRepo.getDeviceIdDistincit(OutDeviceIds);
-		
-		Integer totalDevices = deviceRepository.getTotalNumberOfUserDevices(usersIds);
-		Integer offlineDevices = totalDevices - onlineDevices - outOfNetworkDevices;
+			 
+			//Integer onlineDevices = deviceRepository.getNumberOfOnlineDevices(usersIds);
+			//Integer outOfNetworkDevices = deviceRepository.getNumberOfOutOfNetworkDevices(usersIds);
 
-		
-		Map devicesStatus = new HashMap();
-		devicesStatus.put("online_devices", onlineDevices);
-		devicesStatus.put("unknown_devices" ,outOfNetworkDevices);
-		devicesStatus.put("offline_devices", offlineDevices);
-		devicesStatus.put("total_devices", totalDevices);
-		List<Map> data = new ArrayList<>();
-		data.add(devicesStatus);
-		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",data);
-		logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
-		return ResponseEntity.ok().body(getObjectResponse);
+			
+			List<String> onlineDeviceIds = deviceRepository.getNumberOfOnlineDevicesList(usersIds);
+			List<String> OutDeviceIds = deviceRepository.getNumberOfOutOfNetworkDevicesList(usersIds);
+			
+			 onlineDevices = onlineDeviceIds.size();
+			 outOfNetworkDevices = OutDeviceIds.size();
+			
+			totalDevices = deviceRepository.getTotalNumberOfUserDevices(usersIds);
+			offlineDevices = totalDevices - onlineDevices - outOfNetworkDevices;
+
+			
+			Map devicesStatus = new HashMap();
+			devicesStatus.put("online_devices", onlineDevices);
+			devicesStatus.put("unknown_devices" ,outOfNetworkDevices);
+			devicesStatus.put("offline_devices", offlineDevices);
+			devicesStatus.put("total_devices", totalDevices);
+			List<Map> data = new ArrayList<>();
+			data.add(devicesStatus);
+			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",data);
+			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+		 }
 	}
 
 	@Override
@@ -5111,23 +4924,115 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			logger.info("************************ getIgnition ENDED ***************************");
 			return ResponseEntity.status(404).body(getObjectResponse);
 		}
-		 userServiceImpl.resetChildernArray();
+		userServiceImpl.resetChildernArray();
 		 List<Long>usersIds= new ArrayList<>();
 		 if(loggedUser.getAccountType().equals(4)) {
-			 Set<User> parentClients = loggedUser.getUsersOfUser();
-			 if(parentClients.isEmpty()) {
-				
-				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get devices of this user",null);
-				 logger.info("************************ getIgnition ENDED ***************************");
-				return  ResponseEntity.status(404).body(getObjectResponse);
-			 }else {
-				 User parentClient = new User() ;
-				 for(User object : parentClients) {
-					 parentClient = object;
-				 }
-				 usersIds.add(parentClient.getId());
+			
+			 List<Long> allDevices = userClientDeviceRepository.getDevicesIds(userId);
+			 List<Map> finalData = new ArrayList<>();
 
+			 if(allDevices.size()>0) {
+				 List<String> positionIds = deviceRepository.getAllPositionsObjectIdsByIds(allDevices);
+				
+				 
+				 Integer ignitionON= 0;
+				 Integer ignitionOFF= 0;
+
+				 ignitionON = mongoPositionRepo.getCountFromAttrbuitesChart(positionIds, "ignition", true);
+				 ignitionOFF = mongoPositionRepo.getCountFromAttrbuitesChart(positionIds, "ignition", false);
+				 
+
+				List<CustomPositions> positionsList = mongoPositionRepo.getCharts(positionIds);
+				List<Map> data = new ArrayList<>();
+				
+				
+
+			    if(positionsList.size()>0) {
+			    	
+					for(int i=0;i<positionsList.size();i++) {
+
+
+		             	JSONObject obj = new JSONObject(positionsList.get(i).getAttributes().toString());
+						Map devicesList = new HashMap();
+						if(obj.has("todayHoursString")) {
+							SimpleDateFormat time = new SimpleDateFormat("HH:mm");
+							try {
+								Date date =  time.parse((String) obj.get("todayHoursString"));
+							    devicesList.put("hours", date.getHours());
+								
+							} catch (JSONException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (ParseException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+
+
+						}
+						else {
+						    devicesList.put("hours",0);
+
+						}
+
+					    devicesList.put("deviceName", positionsList.get(i).getDeviceName());
+					    devicesList.put("driverName", positionsList.get(i).getDriverName());
+
+
+					    if(data.size() == 10) {
+				    		Integer newData = Integer.parseInt( devicesList.get("hours").toString() );
+
+					    	for(int k=0;k<data.size();k++) {
+					    		Integer oldData = Integer.parseInt( data.get(k).get("hours").toString() );
+
+					    		if(newData > oldData) {
+
+					    			data.get(k).replace("hours", devicesList.get("hours"));
+					    			data.get(k).replace("driverName", devicesList.get("driverName"));
+					    			data.get(k).replace("deviceName", devicesList.get("deviceName"));
+					    			break;
+
+					    		}
+
+					    	
+
+					    	}
+
+					    }
+					    if(data.size() < 10) {
+					    	data.add(devicesList);
+					    						
+					    }
+
+					    
+						
+					}
+					
+					
+				
+				}
+			    
+			    Map dev = new HashMap();
+			    dev.put("ignition_on", ignitionON);
+			    dev.put("ignition_off" ,ignitionOFF);
+				
+				
+			    Map ig = new HashMap();
+			    ig.put("status",dev);
+			    ig.put("hours",data);
+
+			    finalData.add(ig);
+				
+				
 			 }
+			 
+			 
+			
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",finalData,finalData.size());
+			logger.info("************************ getIgnitionMotion ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+
 		 }
 		 else {
 			 List<User>childernUsers = userServiceImpl.getAllChildernOfUser(userId);
@@ -5140,142 +5045,103 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 					 usersIds.add(object.getId());
 				 }
 			 }
+			 
+			 List<String> positionIds = deviceRepository.getAllPositionsObjectIds(usersIds);
+
+			 Integer ignitionON= 0;
+			 Integer ignitionOFF= 0;
+
+			 ignitionON = mongoPositionRepo.getCountFromAttrbuitesChart(positionIds, "ignition", true);
+			 ignitionOFF = mongoPositionRepo.getCountFromAttrbuitesChart(positionIds, "ignition", false);
+
+
+
+			List<CustomPositions> positionsList = mongoPositionRepo.getCharts(positionIds);
+			List<Map> data = new ArrayList<>();
+			List<Map> finalData = new ArrayList<>();
+
+		    if(positionsList.size()>0) {
+		    	
+				for(int i=0;i<positionsList.size();i++) {
+
+
+	             	JSONObject obj = new JSONObject(positionsList.get(i).getAttributes().toString());
+					Map devicesList = new HashMap();
+					if(obj.has("todayHoursString")) {
+						SimpleDateFormat time = new SimpleDateFormat("HH:mm");
+						try {
+							Date date =  time.parse((String) obj.get("todayHoursString"));
+						    devicesList.put("hours", date.getHours());
+							
+						} catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+
+					}
+					else {
+					    devicesList.put("hours",0);
+
+					}
+
+				    devicesList.put("deviceName", positionsList.get(i).getDeviceName());
+				    devicesList.put("driverName", positionsList.get(i).getDriverName());
+
+
+				    if(data.size() == 10) {
+			    		Integer newData = Integer.parseInt( devicesList.get("hours").toString() );
+
+				    	for(int k=0;k<data.size();k++) {
+				    		Integer oldData = Integer.parseInt( data.get(k).get("hours").toString() );
+
+				    		if(newData > oldData) {
+
+				    			data.get(k).replace("hours", devicesList.get("hours"));
+				    			data.get(k).replace("driverName", devicesList.get("driverName"));
+				    			data.get(k).replace("deviceName", devicesList.get("deviceName"));
+				    			break;
+
+				    		}
+
+				    	
+
+				    	}
+
+				    }
+				    if(data.size() < 10) {
+				    	data.add(devicesList);
+				    						
+				    }
+
+				    
+					
+				}
+				
+				
+			
+			}
+		    
+		    Map dev = new HashMap();
+		    dev.put("ignition_on", ignitionON);
+		    dev.put("ignition_off" ,ignitionOFF);
+			
+			
+		    Map ig = new HashMap();
+		    ig.put("status",dev);
+		    ig.put("hours",data);
+
+		    finalData.add(ig);
+			
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",finalData,finalData.size());
+			logger.info("************************ getIgnitionMotion ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
 		 }
 		 
-		List<String> positionIds = deviceRepository.getAllPositionsObjectIds(usersIds);
-		
-
-		List<CustomPositions> positionsList = mongoPositionRepo.getCharts(positionIds);
-		List<Map> data = new ArrayList<>();
-		
-		
-		List<String> ignitionON= new ArrayList<String>();				  
-		List<String> ignitionOFF = new ArrayList<String>();				  
-		List<String> motionON= new ArrayList<String>();				  
-		List<String> motionOFF = new ArrayList<String>();
-		List<Map> finalData = new ArrayList<>();
-
-	    if(positionsList.size()>0) {
-	    	
-			for(int i=0;i<positionsList.size();i++) {
-
-
-             	JSONObject obj = new JSONObject(positionsList.get(i).getAttributes().toString());
-				
-             	
-             	Device deviceToBind = deviceRepository.findOne(positionsList.get(i).getDeviceId());
-             	if(obj.has("ignition")) {
-					if(obj.getBoolean("ignition") == true) {
-						ignitionON.add(deviceToBind.getName());
-					}
-					else {
-						ignitionOFF.add(deviceToBind.getName());
-
-					}
-             	}
-             	if(obj.has("motion")) {
-					if(obj.getBoolean("motion") == true) {
-						motionON.add(deviceToBind.getName());
-					}
-					else {
-						motionOFF.add(deviceToBind.getName());
-
-					}
-				}
-             	
-				Map devicesList = new HashMap();
-				if(obj.has("todayHoursString")) {
-					SimpleDateFormat time = new SimpleDateFormat("HH:mm");
-					try {
-						Date date =  time.parse((String) obj.get("todayHoursString"));
-					    devicesList.put("hours", date.getHours());
-						
-					} catch (JSONException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (ParseException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-
-				}
-				else {
-				    devicesList.put("hours",0);
-
-				}
-
-			    devicesList.put("deviceName", deviceToBind.getName());
-
-			    Set<Driver> drivers=new HashSet<>() ;
-				drivers= deviceToBind.getDriver();
-		        if(drivers.isEmpty()) {
-					devicesList.put("driverName", null);
-
-		        }
-		        else {
-		        	for(Driver driver : drivers ) {
-						devicesList.put("driverName", driver.getName());
-					}
-
-		        }
-				
-
-			    if(data.size() == 10) {
-		    		Integer newData = Integer.parseInt( devicesList.get("hours").toString() );
-
-			    	for(int k=0;k<data.size();k++) {
-			    		Integer oldData = Integer.parseInt( data.get(k).get("hours").toString() );
-
-			    		if(newData > oldData) {
-
-			    			data.get(k).replace("hours", devicesList.get("hours"));
-			    			data.get(k).replace("driverName", devicesList.get("driverName"));
-			    			data.get(k).replace("deviceName", devicesList.get("deviceName"));
-			    			break;
-
-			    		}
-
-			    	
-
-			    	}
-
-			    }
-			    if(data.size() < 10) {
-			    	data.add(devicesList);
-			    						
-			    }
-
-			    
-				
-			}
-			
-			
-		
-		}
-	    
-	    Map dev = new HashMap();
-	    dev.put("ignition_on", ignitionON.size());
-	    dev.put("ignition_off" ,ignitionOFF.size());
-	    //dev.put("ignition_on_list", ignitionON);
-	    //dev.put("ignition_off_list", ignitionOFF);
-		
-	    dev.put("motion_on", motionON.size());
-		dev.put("motion_off" ,motionOFF.size());
-		//dev.put("motion_on_list", motionON);
-		//dev.put("motion_off_list", motionOFF);
-		
-		
-	    Map ig = new HashMap();
-	    ig.put("status",dev);
-	    ig.put("hours",data);
-
-	    finalData.add(ig);
-		
-		
-		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",finalData,finalData.size());
-		logger.info("************************ getIgnitionMotion ENDED ***************************");
-		return ResponseEntity.ok().body(getObjectResponse);
 	}
 
 	@Override
@@ -6412,7 +6278,7 @@ logger.info("************************ getNotifications STARTED *****************
 				if(deviceHours.size()>0) {
    				    size=mongoPositionRepo.getDeviceWorkingHoursSize(allDevices,dateFrom, dateTo);
 
-					for(int i=0;i<deviceHours.size();i++) {
+					/*for(int i=0;i<deviceHours.size();i++) {
 						
 						Device device = deviceRepository.findOne(deviceHours.get(i).getDeviceId());
 						deviceHours.get(i).setDeviceName(device.getName());
@@ -6427,14 +6293,14 @@ logger.info("************************ getNotifications STARTED *****************
 
 						}
 						
-					}
+					}*/
 				
 				}
 			}
 			else {
 				deviceHours = mongoPositionRepo.getDeviceWorkingHoursScheduled(allDevices,dateFrom,dateTo);			
 
-				if(deviceHours.size()>0) {
+				/*if(deviceHours.size()>0) {
 					for(int i=0;i<deviceHours.size();i++) {
 						
 						Device device = deviceRepository.findOne(deviceHours.get(i).getDeviceId());
@@ -6452,7 +6318,7 @@ logger.info("************************ getNotifications STARTED *****************
 						
 					}
 				
-				}
+				}*/
 			}
 				
 			
@@ -6766,7 +6632,7 @@ logger.info("************************ getNotifications STARTED *****************
 				if(deviceHours.size()>0) {
 					size=mongoPositionRepo.getDeviceCustomSize(allDevices,dateFrom, dateTo,custom,value);
 
-					for(int i=0;i<deviceHours.size();i++) {
+					/*for(int i=0;i<deviceHours.size();i++) {
 						
 						Device device = deviceRepository.findOne(deviceHours.get(i).getDeviceId());
 						deviceHours.get(i).setDeviceName(device.getName());
@@ -6775,14 +6641,14 @@ logger.info("************************ getNotifications STARTED *****************
 						deviceHours.get(i).setAttributes(custom +":"+obj.get(custom));
 
 						
-					}
+					}*/
 				
 				}
 			}
 			else {
 
 				deviceHours = mongoPositionRepo.getDeviceCustomScheduled(allDevices,dateFrom,dateFrom,custom,value);
-				if(deviceHours.size()>0) {
+				/*if(deviceHours.size()>0) {
 					
 					for(int i=0;i<deviceHours.size();i++) {
 						
@@ -6795,7 +6661,7 @@ logger.info("************************ getNotifications STARTED *****************
 						
 					}
 				
-				}
+				}*/
 			}
 				
 			
@@ -7100,7 +6966,7 @@ logger.info("************************ getNotifications STARTED *****************
 				if(driverHours.size()>0) {
   				    size=mongoPositionRepo.getDriverWorkingHoursSize(allDevices,dateFrom,dateTo);
 
-					for(int i=0;i<driverHours.size();i++) {
+					/*for(int i=0;i<driverHours.size();i++) {
 						for(int j=0;j<allDevicesList.size();j++) {
 							Long id1 = driverHours.get(i).getDeviceId().longValue();
 							Long id2 = allDevicesList.get(j).getId();
@@ -7122,7 +6988,7 @@ logger.info("************************ getNotifications STARTED *****************
 
 						}
 						
-					}
+					}*/
 				
 				}
 				
@@ -7130,7 +6996,7 @@ logger.info("************************ getNotifications STARTED *****************
 			else {
 				driverHours = mongoPositionRepo.getDriverWorkingHoursScheduled(allDevices,dateFrom,dateFrom);			
 
-				if(driverHours.size()>0) {
+				/*if(driverHours.size()>0) {
 					for(int i=0;i<driverHours.size();i++) {
 						for(int j=0;j<allDevicesList.size();j++) {
 							Long id1 = driverHours.get(i).getDeviceId().longValue();
@@ -7155,7 +7021,7 @@ logger.info("************************ getNotifications STARTED *****************
 						
 					}
 				
-				}
+				}*/
 			}
 				
 			
@@ -8233,7 +8099,7 @@ logger.info("************************ getNotifications STARTED *****************
 			if(positionsList.size()>0) {
 				    size=mongoPositionRepo.getSensorsListSize(allDevices,dateFrom, dateTo);
 
-				for(int i=0;i<positionsList.size();i++) {
+				/*for(int i=0;i<positionsList.size();i++) {
 					
 					Device device = deviceRepository.findOne(positionsList.get(i).getDeviceId());
 					positionsList.get(i).setDeviceName(device.getName());
@@ -8251,7 +8117,7 @@ logger.info("************************ getNotifications STARTED *****************
 
 					
 					
-				}
+				}*/
 			
 			}
 			
@@ -8259,7 +8125,7 @@ logger.info("************************ getNotifications STARTED *****************
 		else {
 			positionsList = mongoPositionRepo.getPositionsListScheduled(allDevices,dateFrom, dateTo);
 
-			if(positionsList.size()>0) {
+			/*if(positionsList.size()>0) {
 				
 				for(int i=0;i<positionsList.size();i++) {
 					
@@ -8281,7 +8147,7 @@ logger.info("************************ getNotifications STARTED *****************
 					
 				}
 				
-			}
+			}*/
 		}
 		getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",positionsList,size);
 		 logger.info("************************ getSensorsReport ENDED ***************************");
@@ -10073,24 +9939,35 @@ logger.info("************************ getNotifications STARTED *****************
 										}
 									}
 								}
+								List<Long> CheckData = userClientGroupRepository.getGroup(userId,groupId);
+								if(CheckData.isEmpty()) {
+										isParent = false;
+								}
+								else {
+										isParent = true;
+								}
 							}
 							if(!groupsServiceImpl.checkIfParent(group , loggedUser) && ! isParent) {
 								getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group ",driverHours);
 								logger.info("************************ getNumberDriverWorkingHours ENDED ***************************");
 								return ResponseEntity.badRequest().body(getObjectResponse);
 							}
-							if(group.getType().equals("driver")) {
-								allDrivers.addAll(groupRepository.getDriversFromGroup(groupId));
+							if(group.getType() != null) {
+								if(group.getType().equals("driver")) {
+									allDrivers.addAll(groupRepository.getDriversFromGroup(groupId));
 
-							}
-							else if(group.getType().equals("device")) {
-								allDrivers.addAll(groupRepository.getDriverFromDevices(groupId));
-								
-							}
-							else if(group.getType().equals("geofence")) {
-								allDrivers.addAll(groupRepository.getDriversFromGeofence(groupId));
+								}
+								else if(group.getType().equals("device")) {
+									allDrivers.addAll(groupRepository.getDriverFromDevices(groupId));
+									
+								}
+								else if(group.getType().equals("geofence")) {
+									allDrivers.addAll(groupRepository.getDriversFromGeofence(groupId));
 
+								}
 							}
+
+							
 						}
 			    	}
 			    	
@@ -10130,6 +10007,13 @@ logger.info("************************ getNotifications STARTED *****************
 									}
 								}
 							}
+							List<Long> CheckData = userClientDriverRepository.getDriver(userId,driverId);
+							if(CheckData.isEmpty()) {
+									isParent = false;
+							}
+							else {
+									isParent = true;
+							}
 						}
 						if(!driverServiceImpl.checkIfParent(driver , loggedUser) && ! isParent) {
 							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this driver",driverHours);
@@ -10151,6 +10035,7 @@ logger.info("************************ getNotifications STARTED *****************
 		for(DriverSelect object : allDevicesList) {
 			allDevices.add(object.getId());
 		}
+
 
 		Date dateFrom;
 		Date dateTo;
@@ -10274,23 +10159,20 @@ logger.info("************************ getNotifications STARTED *****************
 					  for(DriverWorkingHours driverH: driverHours) {
 
 
-						  devicesStatus.put("deviceName", null);
-						  devicesStatus.put("deviceId" ,null);
-						  devicesStatus.put("driverName", null);
+						  devicesStatus.put("deviceName", driverH.getDeviceName());
+						  devicesStatus.put("deviceId" ,driverH.getDeviceId());
+						  devicesStatus.put("driverName", driverH.getDriverName());
 						  devicesStatus.put("driverUniqueId",null);
 					      devicesStatus.put("totalHours", totalHours);
 						  
-						  Device device= deviceServiceImpl.findById(dev);
-						  
-					      devicesStatus.put("deviceName", device.getName());
-						  devicesStatus.put("deviceId" ,device.getId());
+						  Device device= deviceServiceImpl.findById(driverH.getDeviceId());
+						 
 						  Set<Driver>  drivers = device.getDriver();
-
 						  for(Driver driver : drivers ) {
 
-							  devicesStatus.put("driverName", driver.getName());
 							  devicesStatus.put("driverUniqueId", driver.getUniqueid());
-							  
+							  devicesStatus.put("driverName", driver.getName());
+
 						  }
 						  
 
@@ -10322,7 +10204,6 @@ logger.info("************************ getNotifications STARTED *****************
 			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",dataAll,dataAll.size());
 			logger.info("************************ getNumberDriverWorkingHours ENDED ***************************");
 			return  ResponseEntity.ok().body(getObjectResponse);
-			
 			
 			
 	}

@@ -3606,59 +3606,49 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		 List<String> ids = new ArrayList<>();
 
 		 
-		 List<Long> deviceIds = new ArrayList<>();
+		 List<Long> deviceIds = new ArrayList<Long>();
 
-		List<LastLocationsList> locations = new ArrayList<LastLocationsList>();
-		List<LastLocationsList> locationsList = new ArrayList<LastLocationsList>();
+//		List<LastLocationsList> locations = new ArrayList<LastLocationsList>();
+//		List<LastLocationsList> locationsList = new ArrayList<LastLocationsList>();
 		List<MongoElmLastLocations> elm_connection_logs = new ArrayList<MongoElmLastLocations>();
 		List<MongoPositionsElm> positions_elm = new ArrayList<MongoPositionsElm>();
 
-		//locations = positionElmRepository.getAllPositionsNotSent();
 		
-		locationsList = deviceRepository.getAllDevicesIdsToSendLocation();
-		for(LastLocationsList loc:locationsList) {
-			deviceIds.add(loc.getDeviceid());
-		}
-
-		positions_elm = mongoPositionsElmRepository.findByDeviceIdIn(deviceIds,new PageRequest(0, 100));
+		deviceIds = deviceRepository.getAllDevicesIdsToSendLocationIds();
+		positions_elm = mongoPositionsElmRepository.findByDeviceIdIn(deviceIds,new PageRequest(0, 1000));
 		
-		for(MongoPositionsElm posElm:positions_elm) {
+		/*for(MongoPositionsElm posElm:positions_elm) {
+			
 			LastLocationsList location = new LastLocationsList();
-			for(LastLocationsList loc:locationsList) {
-				if(posElm.getDeviceid().toString().equals(loc.getDeviceid().toString())) {
-					location.setId(posElm.get_id().toString());
-					location.setLasttime(posElm.getServertime());
-					location.setDeviceid(posElm.getDeviceid());
-					location.setLatitude(posElm.getLatitude());
-					location.setLongitude(posElm.getLongitude());
-					location.setSpeed(posElm.getSpeed());
-					location.setAttributes(posElm.getAttributes());
-					location.setDevicetime(posElm.getDevicetime());
-					location.setDeviceRK(loc.getDeviceRK());
-					location.setDriver_RK(loc.getDriver_RK());
-					location.setDriverid(loc.getDriverid());
-					location.setDrivername(loc.getDrivername());
-					location.setWeight(posElm.getWeight());
-					location.setAddress(posElm.getAddress());
-					location.setIs_offline(posElm.getIs_offline());
-					location.setDevicename(loc.getDevicename());
-					location.setUserid(loc.getUserid());
-					location.setUsername(loc.getUsername());
-					location.setUserRK(loc.getUserRK());
+		
+			location.setId(posElm.get_id().toString());
+			location.setLasttime(posElm.getServertime());
+			location.setDeviceid(posElm.getDeviceid());
+			location.setLatitude(posElm.getLatitude());
+			location.setLongitude(posElm.getLongitude());
+			location.setSpeed(posElm.getSpeed());
+			location.setWeight(posElm.getWeight());
+			location.setAttributes(posElm.getAttributes());
+			location.setDevicetime(posElm.getDevicetime());
+			location.setAddress(posElm.getAddress());
+			location.setDevicetime(posElm.getDevicetime());
+			location.setDeviceRK(posElm.getDeviceReferenceKey());
+			location.setDriver_RK(posElm.getDriverReferenceKey());
+			location.setDriverid(posElm.getDriverid());
+			location.setDrivername(posElm.getDriverName());
+			location.setDevicename(posElm.getDeviceName());
 
-					
-					locations.add(location);
-					break;
-				}
-			}
-	
-		}
-		
-		
-		
-		Map body = new HashMap();
 
-		 for(LastLocationsList location : locations) {
+		
+			locations.add(location);
+
+		}*/
+		
+		
+		
+    	 Map body = new HashMap();
+
+		 for(MongoPositionsElm location : positions_elm) {
 				Map record = new HashMap();
 				JSONObject obj =  new JSONObject();
 				Boolean set_status = false;
@@ -3697,7 +3687,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 					if(avg == 0)
 	                {
 						record.put("vehicleStatus", "TAMPER_WEIGHT");
-						location.setWeight((float) 0);
+						location.setWeight((double) 0);
 						set_status = true;
 	                }
 
@@ -3766,7 +3756,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				}
 				
 				
-	            String calcWeightPhp = "";
+	            String calcWeightInitial = "";
 				if( (location.getWeight() == null || location.getWeight() ==0 ) 
 						&& record.get("vehicleStatus") != "TAMPER_WEIGHT"  ) {
 					Float vehicle_initial_weight = deviceRepository.getWeight(location.getDeviceid());
@@ -3775,25 +3765,30 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 					Float max = vehicle_initial_weight+1000;
 
 					Random r = new Random();
-					Float  weight =  min + (max - min) * r.nextFloat();	
+					Double  weight =  min + (max - min) * r.nextDouble();	
 				    
-				    Float roundOffWeight= (float) (Math.round(weight * 100.0) / 100.0);
+				    Double roundOffWeight= (double) (Math.round(weight * 100.0) / 100.0);
 				    location.setWeight(roundOffWeight);
-				    calcWeightPhp = "calc from php";
+				    calcWeightInitial = "calc from initial";
 
 				
 				}
+				
+				if(location.getWeight() > 99000) {
+					
+					location.setWeight((double) 90000);
+				}
 
 				record.put("weight", location.getWeight());
-				record.put("referenceKey", location.getDeviceRK());
-				record.put("driverReferenceKey", location.getDriver_RK());
+				record.put("referenceKey", location.getDeviceReferenceKey());
+				record.put("driverReferenceKey", location.getDriverReferenceKey());
 				record.put("latitude", location.getLatitude());
 				record.put("longitude", location.getLongitude());
 				
 				Double roundOffSpeed= Math.round((location.getSpeed()*2) * 100.0) / 100.0;
 				record.put("velocity", roundOffSpeed);
 
-				Date dt = location.getLasttime();
+				Date dt = location.getDevicetime();
 
 				SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'");
 				
@@ -3822,33 +3817,30 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				
 				MongoElmLastLocations connection_log = new MongoElmLastLocations();  
 				
-				connection_log.setPositionid(location.getId());
+				connection_log.setPositionid(location.get_id().toString());
 				connection_log.setElm_data(record);
 				connection_log.setSendtime(nowTime);
 				connection_log.setVehicleid(location.getDeviceid());
-				connection_log.setVehiclename(location.getDevicename());
-				connection_log.setVehicleReferenceKey(location.getDeviceRK());
+				connection_log.setVehiclename(location.getDeviceName());
+				connection_log.setVehicleReferenceKey(location.getDeviceReferenceKey());
 				connection_log.setDriverid(location.getDriverid());
-				connection_log.setDrivername(location.getDrivername());
-				connection_log.setDriverReferenceKey(location.getDriver_RK());
-				connection_log.setUser_id(location.getUserid());
-				connection_log.setUsername(location.getUsername());
-				connection_log.setUserReferenceKey(location.getUserRK());
-				connection_log.setReason(calcWeightPhp);
+				connection_log.setDrivername(location.getDriverName());
+				connection_log.setDriverReferenceKey(location.getDriverReferenceKey());
+				connection_log.setReason(calcWeightInitial);
 				connection_log.setResponsetime(nowTime);
 				connection_log.setResponsetype(1);
 				
 				elm_connection_logs.add(connection_log);
 			
 				dataArray.add(record);
-				ids.add(location.getId());
+				ids.add(location.get_id().toString());
 				
 				location.setAttributes(obj.toString());
 
 		 }
 		 
 
-		body.put("vehicleLocations", dataArray);
+		  body.put("vehicleLocations", dataArray);
 		
 		  TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
 
@@ -3920,17 +3912,15 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  response.put("statusCode", elmReturnd.getStatusCode());
 		  response.put("message", elmReturnd.getMessage());
 		  
-MongoElmLogs elmLogs = new MongoElmLogs(null,null,null,null,null,null,null,time,type,requet,response);
-elmLogsRepository.save(elmLogs);
+		  MongoElmLogs elmLogs = new MongoElmLogs(null,null,null,null,null,null,null,time,type,requet,response);
+		  elmLogsRepository.save(elmLogs);
 		  
 
-        if(resp.containsKey("resultCode")) {
+      	elmLastLocationsRepository.save(elm_connection_logs);  
+      	mongoPositionsElmRepository.deleteByIdIn(ids);
+        /*if(resp.containsKey("resultCode")) {
         	
-        	elmLastLocationsRepository.save(elm_connection_logs);  
-          	mongoPositionsElmRepository.deleteByIdIn(ids);
-
-
-        }
+        }*/
         
 	    getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",data);
 		logger.info("************************ lastLocations ENDED ***************************");

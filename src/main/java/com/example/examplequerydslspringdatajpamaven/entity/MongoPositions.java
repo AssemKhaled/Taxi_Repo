@@ -18,7 +18,7 @@ import com.opencsv.bean.CsvDate;
 
 @Document(collection = "tc_positions")
 public class MongoPositions {
-
+	
 	@Id
 	private ObjectId _id;
 	
@@ -38,11 +38,11 @@ public class MongoPositions {
 	
 	private Double longitude;
 	
-	private Float altitude;
+	private Double altitude;
 	
-	private Float speed;
+	private Double speed;
 	
-	private Float course;
+	private Double course;
 	
 	private String address;
 	
@@ -52,12 +52,17 @@ public class MongoPositions {
 	
 	private String network;
 	
-	private Integer is_sent;
-	
-	private Integer is_offline;
-	
-	private Float weight;
+	private String deviceName;
 
+	private String deviceReferenceKey;
+
+	private String driverReferenceKey;
+
+	private String driverName;
+
+	private Long driverid;
+
+	private Double weight;
 	
 	
 	public MongoPositions() {
@@ -65,10 +70,10 @@ public class MongoPositions {
 	}
 
 
-
 	public MongoPositions(ObjectId _id, String protocol, Long deviceid, Date servertime, Date devicetime, Date fixtime,
-			Boolean valid, Double latitude, Double longitude, Float altitude, Float speed, Float course, String address,
-			Object attributes, Double accuracy, String network, Integer is_sent, Integer is_offline, Float weight) {
+			Boolean valid, Double latitude, Double longitude, Double altitude, Double speed, Double course,
+			String address, Object attributes, Double accuracy, String network, String deviceName,
+			String deviceReferenceKey, String driverReferenceKey, String driverName, Long driverid, Double weight) {
 		super();
 		this._id = _id;
 		this.protocol = protocol;
@@ -86,11 +91,13 @@ public class MongoPositions {
 		this.attributes = attributes;
 		this.accuracy = accuracy;
 		this.network = network;
-		this.is_sent = is_sent;
-		this.is_offline = is_offline;
+		this.deviceName = deviceName;
+		this.deviceReferenceKey = deviceReferenceKey;
+		this.driverReferenceKey = driverReferenceKey;
+		this.driverName = driverName;
+		this.driverid = driverid;
 		this.weight = weight;
 	}
-
 
 
 	public ObjectId get_id() {
@@ -98,11 +105,9 @@ public class MongoPositions {
 	}
 
 
-
 	public void set_id(ObjectId _id) {
 		this._id = _id;
 	}
-
 
 
 	public String getProtocol() {
@@ -110,11 +115,9 @@ public class MongoPositions {
 	}
 
 
-
 	public void setProtocol(String protocol) {
 		this.protocol = protocol;
 	}
-
 
 
 	public Long getDeviceid() {
@@ -122,11 +125,9 @@ public class MongoPositions {
 	}
 
 
-
 	public void setDeviceid(Long deviceid) {
 		this.deviceid = deviceid;
 	}
-
 
 
 	public Date getServertime() {
@@ -134,11 +135,9 @@ public class MongoPositions {
 	}
 
 
-
 	public void setServertime(Date servertime) {
 		this.servertime = servertime;
 	}
-
 
 
 	public Date getDevicetime() {
@@ -146,11 +145,9 @@ public class MongoPositions {
 	}
 
 
-
 	public void setDevicetime(Date devicetime) {
 		this.devicetime = devicetime;
 	}
-
 
 
 	public Date getFixtime() {
@@ -158,11 +155,9 @@ public class MongoPositions {
 	}
 
 
-
 	public void setFixtime(Date fixtime) {
 		this.fixtime = fixtime;
 	}
-
 
 
 	public Boolean getValid() {
@@ -170,11 +165,9 @@ public class MongoPositions {
 	}
 
 
-
 	public void setValid(Boolean valid) {
 		this.valid = valid;
 	}
-
 
 
 	public Double getLatitude() {
@@ -182,11 +175,9 @@ public class MongoPositions {
 	}
 
 
-
 	public void setLatitude(Double latitude) {
 		this.latitude = latitude;
 	}
-
 
 
 	public Double getLongitude() {
@@ -194,47 +185,39 @@ public class MongoPositions {
 	}
 
 
-
 	public void setLongitude(Double longitude) {
 		this.longitude = longitude;
 	}
 
 
-
-	public Float getAltitude() {
+	public Double getAltitude() {
 		return altitude;
 	}
 
 
-
-	public void setAltitude(Float altitude) {
+	public void setAltitude(Double altitude) {
 		this.altitude = altitude;
 	}
 
 
-
-	public Float getSpeed() {
+	public Double getSpeed() {
 		return speed;
 	}
 
 
-
-	public void setSpeed(Float speed) {
+	public void setSpeed(Double speed) {
 		this.speed = speed;
 	}
 
 
-
-	public Float getCourse() {
+	public Double getCourse() {
 		return course;
 	}
 
 
-
-	public void setCourse(Float course) {
+	public void setCourse(Double course) {
 		this.course = course;
 	}
-
 
 
 	public String getAddress() {
@@ -242,11 +225,9 @@ public class MongoPositions {
 	}
 
 
-
 	public void setAddress(String address) {
 		this.address = address;
 	}
-
 
 
 	public Object getAttributes() {
@@ -254,11 +235,9 @@ public class MongoPositions {
 	}
 
 
-
 	public void setAttributes(Object attributes) {
 		this.attributes = attributes;
 	}
-
 
 
 	public Double getAccuracy() {
@@ -266,11 +245,9 @@ public class MongoPositions {
 	}
 
 
-
 	public void setAccuracy(Double accuracy) {
 		this.accuracy = accuracy;
 	}
-
 
 
 	public String getNetwork() {
@@ -278,48 +255,74 @@ public class MongoPositions {
 	}
 
 
-
 	public void setNetwork(String network) {
 		this.network = network;
 	}
 
 
-
-	public Integer getIs_sent() {
-		return is_sent;
+	public String getDeviceName() {
+		return deviceName;
 	}
 
 
-
-	public void setIs_sent(Integer is_sent) {
-		this.is_sent = is_sent;
+	public void setDeviceName(String deviceName) {
+		this.deviceName = deviceName;
 	}
 
 
-
-	public Integer getIs_offline() {
-		return is_offline;
+	public String getDeviceReferenceKey() {
+		return deviceReferenceKey;
 	}
 
 
-
-	public void setIs_offline(Integer is_offline) {
-		this.is_offline = is_offline;
+	public void setDeviceReferenceKey(String deviceReferenceKey) {
+		this.deviceReferenceKey = deviceReferenceKey;
 	}
 
 
+	public String getDriverReferenceKey() {
+		return driverReferenceKey;
+	}
 
-	public Float getWeight() {
+
+	public void setDriverReferenceKey(String driverReferenceKey) {
+		this.driverReferenceKey = driverReferenceKey;
+	}
+
+
+	public String getDriverName() {
+		return driverName;
+	}
+
+
+	public void setDriverName(String driverName) {
+		this.driverName = driverName;
+	}
+
+
+	public Long getDriverid() {
+		return driverid;
+	}
+
+
+	public void setDriverid(Long driverid) {
+		this.driverid = driverid;
+	}
+
+
+	public Double getWeight() {
 		return weight;
 	}
 
 
-
-	public void setWeight(Float weight) {
+	public void setWeight(Double weight) {
 		this.weight = weight;
 	}
+
 	
 	
+
+
 	
 	
 	

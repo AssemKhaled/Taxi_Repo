@@ -849,7 +849,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				if(deviceHours.size()>0) {
    				    size=mongoPositionRepo.getDeviceWorkingHoursSize(allDevices,dateFrom, dateTo);
 
-					for(int i=0;i<deviceHours.size();i++) {
+					/*for(int i=0;i<deviceHours.size();i++) {
 						
 						Device device = deviceRepository.findOne(deviceHours.get(i).getDeviceId());
 						deviceHours.get(i).setDeviceName(device.getName());
@@ -864,14 +864,14 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 						}
 						
-					}
+					}*/
 				
 				}
 			}
 			else {
 				deviceHours = mongoPositionRepo.getDeviceWorkingHoursScheduled(allDevices,dateFrom,dateTo);			
 
-				if(deviceHours.size()>0) {
+				/*if(deviceHours.size()>0) {
 					for(int i=0;i<deviceHours.size();i++) {
 						
 						Device device = deviceRepository.findOne(deviceHours.get(i).getDeviceId());
@@ -889,7 +889,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 						
 					}
 				
-				}
+				}*/
 			}
 				
 			
@@ -1206,7 +1206,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				if(deviceHours.size()>0) {
 					size=mongoPositionRepo.getDeviceCustomSize(allDevices,dateFrom, dateTo,custom,value);
 
-					for(int i=0;i<deviceHours.size();i++) {
+					/*for(int i=0;i<deviceHours.size();i++) {
 						
 						Device device = deviceRepository.findOne(deviceHours.get(i).getDeviceId());
 						deviceHours.get(i).setDeviceName(device.getName());
@@ -1215,14 +1215,14 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 						deviceHours.get(i).setAttributes(custom +":"+obj.get(custom));
 
 						
-					}
+					}*/
 				
 				}
 			}
 			else {
 
 				deviceHours = mongoPositionRepo.getDeviceCustomScheduled(allDevices,dateFrom,dateFrom,custom,value);
-				if(deviceHours.size()>0) {
+				/*if(deviceHours.size()>0) {
 					
 					for(int i=0;i<deviceHours.size();i++) {
 						
@@ -1235,7 +1235,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 						
 					}
 				
-				}
+				}*/
 			}
 				
 			
@@ -1540,7 +1540,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				if(driverHours.size()>0) {
    				    size=mongoPositionRepo.getDriverWorkingHoursSize(allDevices,dateFrom,dateTo);
 
-					for(int i=0;i<driverHours.size();i++) {
+					/*for(int i=0;i<driverHours.size();i++) {
 						for(int j=0;j<allDevicesList.size();j++) {
 							Long id1 = driverHours.get(i).getDeviceId().longValue();
 							Long id2 = allDevicesList.get(j).getId();
@@ -1562,7 +1562,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 						}
 						
-					}
+					}*/
 				
 				}
 				
@@ -1570,7 +1570,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			else {
 				driverHours = mongoPositionRepo.getDriverWorkingHoursScheduled(allDevices,dateFrom,dateFrom);			
 
-				if(driverHours.size()>0) {
+				/*if(driverHours.size()>0) {
 					for(int i=0;i<driverHours.size();i++) {
 						for(int j=0;j<allDevicesList.size();j++) {
 							Long id1 = driverHours.get(i).getDeviceId().longValue();
@@ -1595,7 +1595,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 						
 					}
 				
-				}
+				}*/
 			}
 				
 			
@@ -3909,7 +3909,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			if(positionsList.size()>0) {
 				    size=mongoPositionRepo.getSensorsListSize(allDevices,dateFrom, dateTo);
 
-				for(int i=0;i<positionsList.size();i++) {
+				/*for(int i=0;i<positionsList.size();i++) {
 					
 					Device device = deviceRepository.findOne(positionsList.get(i).getDeviceId());
 					positionsList.get(i).setDeviceName(device.getName());
@@ -3927,7 +3927,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 					
 					
-				}
+				}*/
 			
 			}
 			
@@ -3937,7 +3937,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 			if(positionsList.size()>0) {
 				
-				for(int i=0;i<positionsList.size();i++) {
+				/*for(int i=0;i<positionsList.size();i++) {
 					
 					Device device = deviceRepository.findOne(positionsList.get(i).getDeviceId());
 					positionsList.get(i).setDeviceName(device.getName());
@@ -3955,7 +3955,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 					
 					
-				}
+				}*/
 				
 			}
 		}
@@ -4421,9 +4421,9 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 						  
 					  }
 					  
-					  
-					  if(stop.getDeviceId() == dev) {
-						  
+
+					  if((long) stop.getDeviceId() == (long) dev) {
+
 						  count= count+1;
 						  devicesStatus.put("stops" ,count);
 					  }
@@ -4831,7 +4831,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 							  
 						  }
 						  
-						  if(stopReportOne.getDeviceId() == dev) {
+						  if((long) stopReportOne.getDeviceId() == (long) dev) {
 							  duplicateAddressList.clear();
 							  if(stopReportOne.getAddress() != null && stopReportOne.getAddress() != "") {
 								  duplicateAddressList.add(stopReportOne.getAddress());
@@ -5295,7 +5295,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 						  
 					  }
 					  
-					  if(tripReportOne.getDeviceId() == dev) {
+					  if((long) tripReportOne.getDeviceId() == (long) dev) {
 						  if(tripReportOne.getDistance() != null && tripReportOne.getDistance() != "") {
 							  totalDistance += Math.abs(  Double.parseDouble(tripReportOne.getDistance())/1000  );
 							  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
@@ -5735,7 +5735,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 					  }
 					  
 					  
-					  if(trip.getDeviceId() == dev) {
+					  if((long) trip.getDeviceId() == (long) dev) {
 						  
 						  count= count+1;
 						  devicesStatus.put("trips" ,count);
@@ -6154,23 +6154,20 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 					  for(DriverWorkingHours driverH: driverHours) {
 
 
-						  devicesStatus.put("deviceName", null);
-						  devicesStatus.put("deviceId" ,null);
-						  devicesStatus.put("driverName", null);
+						  devicesStatus.put("deviceName", driverH.getDeviceName());
+						  devicesStatus.put("deviceId" ,driverH.getDeviceId());
+						  devicesStatus.put("driverName", driverH.getDriverName());
 						  devicesStatus.put("driverUniqueId",null);
 					      devicesStatus.put("totalHours", totalHours);
 						  
-						  Device device= deviceServiceImpl.findById(dev);
-						  
-					      devicesStatus.put("deviceName", device.getName());
-						  devicesStatus.put("deviceId" ,device.getId());
+						  Device device= deviceServiceImpl.findById(driverH.getDeviceId());
+						 
 						  Set<Driver>  drivers = device.getDriver();
-
 						  for(Driver driver : drivers ) {
 
-							  devicesStatus.put("driverName", driver.getName());
 							  devicesStatus.put("driverUniqueId", driver.getUniqueid());
-							  
+							  devicesStatus.put("driverName", driver.getName());
+
 						  }
 						  
 

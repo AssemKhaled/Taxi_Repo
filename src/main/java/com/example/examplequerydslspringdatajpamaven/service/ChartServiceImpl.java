@@ -115,6 +115,13 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
 			return ResponseEntity.status(404).body(getObjectResponse);
 		}
+		
+		Integer onlineDevices = 0;
+		Integer outOfNetworkDevices = 0;
+		Integer totalDevices = 0;
+		Integer offlineDevices = 0;
+		
+		
 		 userService.resetChildernArray();
 		 List<Long>usersIds= new ArrayList<>();
 		 if(loggedUser.getAccountType().equals(4)) {
@@ -134,17 +141,14 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 
 			 }*/
 			List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(userId);
-			Integer onlineDevices = 0;
-			Integer outOfNetworkDevices = 0;
-			Integer totalDevices = 0;
-			Integer offlineDevices = 0;
+
 			
 			if(deviceIds.size()>0) {
-				List<Long> onlineDeviceIds = deviceRepository.getNumberOfOnlineDevicesListByIds(deviceIds);
-				List<Long> OutDeviceIds = deviceRepository.getNumberOfOutOfNetworkDevicesListByIds(deviceIds);
+				List<String> onlineDeviceIds = deviceRepository.getNumberOfOnlineDevicesListByIds(deviceIds);
+				List<String> OutDeviceIds = deviceRepository.getNumberOfOutOfNetworkDevicesListByIds(deviceIds);
 				
-				onlineDevices = mongoPositionRepo.getDeviceIdDistincit(onlineDeviceIds);
-				outOfNetworkDevices = mongoPositionRepo.getDeviceIdDistincit(OutDeviceIds);
+				onlineDevices = onlineDeviceIds.size();
+				outOfNetworkDevices = OutDeviceIds.size();
 				
 				totalDevices = deviceRepository.getTotalNumberOfUserDevicesByIds(deviceIds);
 				offlineDevices = totalDevices - onlineDevices - outOfNetworkDevices;
@@ -180,14 +184,14 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 			//Integer outOfNetworkDevices = deviceRepository.getNumberOfOutOfNetworkDevices(usersIds);
 
 			
-			List<Long> onlineDeviceIds = deviceRepository.getNumberOfOnlineDevicesList(usersIds);
-			List<Long> OutDeviceIds = deviceRepository.getNumberOfOutOfNetworkDevicesList(usersIds);
+			List<String> onlineDeviceIds = deviceRepository.getNumberOfOnlineDevicesList(usersIds);
+			List<String> OutDeviceIds = deviceRepository.getNumberOfOutOfNetworkDevicesList(usersIds);
 			
-			Integer onlineDevices = mongoPositionRepo.getDeviceIdDistincit(onlineDeviceIds);
-			Integer outOfNetworkDevices = mongoPositionRepo.getDeviceIdDistincit(OutDeviceIds);
+			onlineDevices = onlineDeviceIds.size();
+			outOfNetworkDevices = OutDeviceIds.size();
 			
-			Integer totalDevices = deviceRepository.getTotalNumberOfUserDevices(usersIds);
-			Integer offlineDevices = totalDevices - onlineDevices - outOfNetworkDevices;
+			totalDevices = deviceRepository.getTotalNumberOfUserDevices(usersIds);
+			offlineDevices = totalDevices - onlineDevices - outOfNetworkDevices;
 
 			
 			Map devicesStatus = new HashMap();
@@ -1034,35 +1038,25 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 		 userService.resetChildernArray();
 		 List<Long>usersIds= new ArrayList<>();
 		 if(loggedUser.getAccountType().equals(4)) {
-			 /*Set<User> parentClients = loggedUser.getUsersOfUser();
-			 if(parentClients.isEmpty()) {
-				
-				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get devices of this user",null);
-				 logger.info("************************ getIgnition ENDED ***************************");
-				return  ResponseEntity.status(404).body(getObjectResponse);
-			 }else {
-				 User parentClient = new User() ;
-				 for(User object : parentClients) {
-					 parentClient = object;
-				 }
-				 usersIds.add(parentClient.getId());
-
-			 }*/
+			
 			 List<Long> allDevices = userClientDeviceRepository.getDevicesIds(userId);
 			 List<Map> finalData = new ArrayList<>();
 
 			 if(allDevices.size()>0) {
 				 List<String> positionIds = deviceRepository.getAllPositionsObjectIdsByIds(allDevices);
 				
+				 
+				 Integer ignitionON= 0;
+				 Integer ignitionOFF= 0;
+
+				 ignitionON = mongoPositionRepo.getCountFromAttrbuitesChart(positionIds, "ignition", true);
+				 ignitionOFF = mongoPositionRepo.getCountFromAttrbuitesChart(positionIds, "ignition", false);
+				 
 
 				List<CustomPositions> positionsList = mongoPositionRepo.getCharts(positionIds);
 				List<Map> data = new ArrayList<>();
 				
 				
-				List<String> ignitionON= new ArrayList<String>();				  
-				List<String> ignitionOFF = new ArrayList<String>();				  
-				List<String> motionON= new ArrayList<String>();				  
-				List<String> motionOFF = new ArrayList<String>();
 
 			    if(positionsList.size()>0) {
 			    	
@@ -1070,28 +1064,6 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 
 
 		             	JSONObject obj = new JSONObject(positionsList.get(i).getAttributes().toString());
-						
-		             	
-		             	Device deviceToBind = deviceRepository.findOne(positionsList.get(i).getDeviceId());
-		             	if(obj.has("ignition")) {
-							if(obj.getBoolean("ignition") == true) {
-								ignitionON.add(deviceToBind.getName());
-							}
-							else {
-								ignitionOFF.add(deviceToBind.getName());
-
-							}
-		             	}
-		             	if(obj.has("motion")) {
-							if(obj.getBoolean("motion") == true) {
-								motionON.add(deviceToBind.getName());
-							}
-							else {
-								motionOFF.add(deviceToBind.getName());
-
-							}
-						}
-		             	
 						Map devicesList = new HashMap();
 						if(obj.has("todayHoursString")) {
 							SimpleDateFormat time = new SimpleDateFormat("HH:mm");
@@ -1114,21 +1086,9 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 
 						}
 
-					    devicesList.put("deviceName", deviceToBind.getName());
+					    devicesList.put("deviceName", positionsList.get(i).getDeviceName());
+					    devicesList.put("driverName", positionsList.get(i).getDriverName());
 
-					    Set<Driver> drivers=new HashSet<>() ;
-						drivers= deviceToBind.getDriver();
-				        if(drivers.isEmpty()) {
-							devicesList.put("driverName", null);
-
-				        }
-				        else {
-				        	for(Driver driver : drivers ) {
-								devicesList.put("driverName", driver.getName());
-							}
-
-				        }
-						
 
 					    if(data.size() == 10) {
 				    		Integer newData = Integer.parseInt( devicesList.get("hours").toString() );
@@ -1164,15 +1124,8 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 				}
 			    
 			    Map dev = new HashMap();
-			    dev.put("ignition_on", ignitionON.size());
-			    dev.put("ignition_off" ,ignitionOFF.size());
-			    //dev.put("ignition_on_list", ignitionON);
-			    //dev.put("ignition_off_list", ignitionOFF);
-				
-			    dev.put("motion_on", motionON.size());
-				dev.put("motion_off" ,motionOFF.size());
-				//dev.put("motion_on_list", motionON);
-				//dev.put("motion_off_list", motionOFF);
+			    dev.put("ignition_on", ignitionON);
+			    dev.put("ignition_off" ,ignitionOFF);
 				
 				
 			    Map ig = new HashMap();
@@ -1180,6 +1133,8 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 			    ig.put("hours",data);
 
 			    finalData.add(ig);
+				
+				
 			 }
 			 
 			 
@@ -1203,16 +1158,17 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 			 }
 			 
 			 List<String> positionIds = deviceRepository.getAllPositionsObjectIds(usersIds);
-				
+
+			 Integer ignitionON= 0;
+			 Integer ignitionOFF= 0;
+
+			 ignitionON = mongoPositionRepo.getCountFromAttrbuitesChart(positionIds, "ignition", true);
+			 ignitionOFF = mongoPositionRepo.getCountFromAttrbuitesChart(positionIds, "ignition", false);
+
+
 
 			List<CustomPositions> positionsList = mongoPositionRepo.getCharts(positionIds);
 			List<Map> data = new ArrayList<>();
-			
-			
-			List<String> ignitionON= new ArrayList<String>();				  
-			List<String> ignitionOFF = new ArrayList<String>();				  
-			List<String> motionON= new ArrayList<String>();				  
-			List<String> motionOFF = new ArrayList<String>();
 			List<Map> finalData = new ArrayList<>();
 
 		    if(positionsList.size()>0) {
@@ -1221,28 +1177,6 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 
 
 	             	JSONObject obj = new JSONObject(positionsList.get(i).getAttributes().toString());
-					
-	             	
-	             	Device deviceToBind = deviceRepository.findOne(positionsList.get(i).getDeviceId());
-	             	if(obj.has("ignition")) {
-						if(obj.getBoolean("ignition") == true) {
-							ignitionON.add(deviceToBind.getName());
-						}
-						else {
-							ignitionOFF.add(deviceToBind.getName());
-
-						}
-	             	}
-	             	if(obj.has("motion")) {
-						if(obj.getBoolean("motion") == true) {
-							motionON.add(deviceToBind.getName());
-						}
-						else {
-							motionOFF.add(deviceToBind.getName());
-
-						}
-					}
-	             	
 					Map devicesList = new HashMap();
 					if(obj.has("todayHoursString")) {
 						SimpleDateFormat time = new SimpleDateFormat("HH:mm");
@@ -1265,21 +1199,9 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 
 					}
 
-				    devicesList.put("deviceName", deviceToBind.getName());
+				    devicesList.put("deviceName", positionsList.get(i).getDeviceName());
+				    devicesList.put("driverName", positionsList.get(i).getDriverName());
 
-				    Set<Driver> drivers=new HashSet<>() ;
-					drivers= deviceToBind.getDriver();
-			        if(drivers.isEmpty()) {
-						devicesList.put("driverName", null);
-
-			        }
-			        else {
-			        	for(Driver driver : drivers ) {
-							devicesList.put("driverName", driver.getName());
-						}
-
-			        }
-					
 
 				    if(data.size() == 10) {
 			    		Integer newData = Integer.parseInt( devicesList.get("hours").toString() );
@@ -1315,15 +1237,8 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 			}
 		    
 		    Map dev = new HashMap();
-		    dev.put("ignition_on", ignitionON.size());
-		    dev.put("ignition_off" ,ignitionOFF.size());
-		    //dev.put("ignition_on_list", ignitionON);
-		    //dev.put("ignition_off_list", ignitionOFF);
-			
-		    dev.put("motion_on", motionON.size());
-			dev.put("motion_off" ,motionOFF.size());
-			//dev.put("motion_on_list", motionON);
-			//dev.put("motion_off_list", motionOFF);
+		    dev.put("ignition_on", ignitionON);
+		    dev.put("ignition_off" ,ignitionOFF);
 			
 			
 		    Map ig = new HashMap();

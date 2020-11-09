@@ -38,7 +38,7 @@ public class CustomDeviceLiveData {
 	private String driverWorkingHoursPerDay;
 	private Double power;
 	private String photo;
-	private Float speed ;
+	private Double speed ;
 	private String status;
 	private String vehicleStatus;
 	private String positionId;
@@ -65,7 +65,7 @@ public class CustomDeviceLiveData {
 	}
 	
 	public CustomDeviceLiveData(Double weight, Double latitude, Double longitude, String address, Object attributes,
-			Float speed) {
+			Double speed) {
 		super();
 		this.weight = weight;
 		this.latitude = latitude;
@@ -75,7 +75,7 @@ public class CustomDeviceLiveData {
 		this.speed = speed;
 	}
 	public CustomDeviceLiveData(int id ,String deviceName , String lastUpdate , String address , Object attributes ,  Double latitude ,
-			  Double longitude ,Float speed , String photo , String positionId) {
+			  Double longitude ,Double speed , String photo , String positionId) {
 		this.id = id ;
 		this.deviceName = deviceName ;
 		this.lastUpdate = lastUpdate;
@@ -216,7 +216,7 @@ public class CustomDeviceLiveData {
 		
 	}
 	public CustomDeviceLiveData(int id ,String deviceName , String lastUpdate , String address , Object attributes ,  Double latitude ,
-			  Double longitude ,Float speed ,String positionId, String leftLetter,String middleLetter,String rightLetter,String driverName ) {
+			  Double longitude ,Double speed ,String positionId, String leftLetter,String middleLetter,String rightLetter,String driverName ) {
 		this.id = id ;
 		this.deviceName = deviceName ;
 		this.lastUpdate = lastUpdate;
@@ -361,7 +361,7 @@ public class CustomDeviceLiveData {
 	
 	public CustomDeviceLiveData(int id ,String deviceName , String lastUpdate ,
 			String positionId, String leftLetter,String middleLetter,String rightLetter,String driverName,
-			Double latitude ,Double longitude,Object attributes,String address,Float speed,String plate_num
+			Double latitude ,Double longitude,Object attributes,String address,Double speed,String plate_num
 			,String sequence_number,String owner_name,Boolean valid) {
 		this.id = id ;
 		this.deviceName = deviceName ;
@@ -446,7 +446,7 @@ public class CustomDeviceLiveData {
 	   		
 	}
 	public CustomDeviceLiveData(int id ,String deviceName , String uniqueId,String lastUpdate ,String positionId,String photo
-			,Object attributes , Float speed,Double latitude ,Double longitude,Boolean valid) {
+			,Object attributes , Double speed,Double latitude ,Double longitude,Boolean valid) {
 		this.id = id ;
 		this.uniqueId = uniqueId ;
 		this.deviceName = deviceName ;
@@ -586,11 +586,11 @@ public class CustomDeviceLiveData {
 		this.photo = photo;
 	}
 
-	public Float getSpeed() {
+	public Double getSpeed() {
 		return speed;
 	}
 
-	public void setSpeed(Float speed) {
+	public void setSpeed(Double speed) {
 		this.speed = speed;
 	}
 

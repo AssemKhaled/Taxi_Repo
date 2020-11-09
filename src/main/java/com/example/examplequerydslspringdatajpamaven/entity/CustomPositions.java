@@ -8,26 +8,26 @@ public class CustomPositions {
 	private String servertime;
 	private Object attributes;
 	private Double speed;
-	private String weight;
-	private String sensor1;
-	private String sensor2;
+	private Double weight;
+	private Double sensor1;
+	private Double sensor2;
 	
-	public String getWeight() {
+	public Double getWeight() {
 		return weight;
 	}
-	public void setWeight(String weight) {
+	public void setWeight(Double weight) {
 		this.weight = weight;
 	}
-	public String getSensor1() {
+	public Double getSensor1() {
 		return sensor1;
 	}
-	public void setSensor1(String sensor1) {
+	public void setSensor1(Double sensor1) {
 		this.sensor1 = sensor1;
 	}
-	public String getSensor2() {
+	public Double getSensor2() {
 		return sensor2;
 	}
-	public void setSensor2(String sensor2) {
+	public void setSensor2(Double sensor2) {
 		this.sensor2 = sensor2;
 	}
 	public String getDriverName() {
@@ -61,7 +61,7 @@ public class CustomPositions {
 	
 	
 	public CustomPositions(String id, Long deviceId, String deviceName, String driverName, String servertime,
-			Object attributes, Double speed, String weight, String sensor1, String sensor2) {
+			Object attributes, Double speed, Double weight, Double sensor1, Double sensor2) {
 		super();
 		this.id = id;
 		this.deviceId = deviceId;

@@ -17,10 +17,19 @@ public class CustomMapData {
 	private Double operator;
 	private Double latitude;
 	private Double longitude;
-	private Float speed ;
+	private Double speed ;
 
 	public CustomMapData() {
 		
+	}
+    public CustomMapData(Long id, String deviceName, String lastUpdate, String positionId,Integer status,Integer vehicleStatus) {
+    	super();
+		this.id = id;
+		this.deviceName = deviceName;
+		this.lastUpdate = lastUpdate;
+		this.positionId = positionId;
+		this.status = status;
+		this.vehicleStatus = vehicleStatus;
 	}
 	
     public CustomMapData(Long id, String deviceName, String lastUpdate, String positionId) {
@@ -33,7 +42,7 @@ public class CustomMapData {
 
 	public CustomMapData(Long id, String deviceName, String lastUpdate, String positionId, Integer status,
 			Integer vehicleStatus, Integer valid, Integer ignition, Double power, Double operator, Double latitude,
-			Double longitude, Float speed) {
+			Double longitude, Double speed) {
 		super();
 		this.id = id;
 		this.deviceName = deviceName;
@@ -146,11 +155,11 @@ public class CustomMapData {
 		this.longitude = longitude;
 	}
 
-	public Float getSpeed() {
+	public Double getSpeed() {
 		return speed;
 	}
 
-	public void setSpeed(Float speed) {
+	public void setSpeed(Double speed) {
 		this.speed = speed;
 	}
 

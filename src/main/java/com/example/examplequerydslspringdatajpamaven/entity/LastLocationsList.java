@@ -10,22 +10,17 @@ public class LastLocationsList {
 	private Long deviceid;
 	private Double latitude;
 	private Double longitude;
-	private Float speed;
+	private Double speed;
 	private Object attributes;
 	private Date devicetime;
 	private String deviceRK;
 	private String driver_RK;
 	private Long driverid;
 	private String drivername;
-	private Float weight;
+	private Double weight;
 	private String address;
-	private Integer is_offline;
 	private String devicename;
-	private Long userid;
-	private String username;
-	private String userRK;
-	
-	
+
 	
 	
 	public LastLocationsList() {
@@ -33,22 +28,18 @@ public class LastLocationsList {
 	}
 	
 	public LastLocationsList(Long deviceid, String deviceRK, String driver_RK, Long driverid, String drivername,
-		    String devicename, Long userid, String username,String userRK) {
+		    String devicename) {
 		this.deviceid = deviceid;
 		this.deviceRK = deviceRK;
 		this.driver_RK = driver_RK;
 		this.driverid = driverid;
 		this.drivername = drivername;
 		this.devicename = devicename;
-		this.userid = userid;
-		this.username = username;
-		this.userRK = userRK;
 	}
 	
-	public LastLocationsList(String id, Date lasttime, Long deviceid, Double latitude, Double longitude, Float speed,
+	public LastLocationsList(String id, Date lasttime, Long deviceid, Double latitude, Double longitude, Double speed,
 			Object attributes, Date devicetime, String deviceRK, String driver_RK, Long driverid, String drivername,
-			Float weight, String address, Integer is_offline, String devicename, Long userid, String username,
-			String userRK) {
+			Double weight, String address, String devicename) {
 		super();
 		this.id = id;
 		this.lasttime = lasttime;
@@ -64,11 +55,7 @@ public class LastLocationsList {
 		this.drivername = drivername;
 		this.weight = weight;
 		this.address = address;
-		this.is_offline = is_offline;
 		this.devicename = devicename;
-		this.userid = userid;
-		this.username = username;
-		this.userRK = userRK;
 	}
 	
 	public String getId() {
@@ -101,10 +88,10 @@ public class LastLocationsList {
 	public void setLongitude(Double longitude) {
 		this.longitude = longitude;
 	}
-	public Float getSpeed() {
+	public Double getSpeed() {
 		return speed;
 	}
-	public void setSpeed(Float speed) {
+	public void setSpeed(Double speed) {
 		this.speed = speed;
 	}
 	public Object getAttributes() {
@@ -143,10 +130,10 @@ public class LastLocationsList {
 	public void setDrivername(String drivername) {
 		this.drivername = drivername;
 	}
-	public Float getWeight() {
+	public Double getWeight() {
 		return weight;
 	}
-	public void setWeight(Float weight) {
+	public void setWeight(Double weight) {
 		this.weight = weight;
 	}
 	public String getAddress() {
@@ -155,36 +142,13 @@ public class LastLocationsList {
 	public void setAddress(String address) {
 		this.address = address;
 	}
-	public Integer getIs_offline() {
-		return is_offline;
-	}
-	public void setIs_offline(Integer is_offline) {
-		this.is_offline = is_offline;
-	}
 	public String getDevicename() {
 		return devicename;
 	}
 	public void setDevicename(String devicename) {
 		this.devicename = devicename;
 	}
-	public Long getUserid() {
-		return userid;
-	}
-	public void setUserid(Long userid) {
-		this.userid = userid;
-	}
-	public String getUsername() {
-		return username;
-	}
-	public void setUsername(String username) {
-		this.username = username;
-	}
-	public String getUserRK() {
-		return userRK;
-	}
-	public void setUserRK(String userRK) {
-		this.userRK = userRK;
-	}
+
 	
 	
 

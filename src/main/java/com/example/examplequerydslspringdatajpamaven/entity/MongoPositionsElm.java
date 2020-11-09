@@ -29,11 +29,11 @@ public class MongoPositionsElm {
 	
 	private Double longitude;
 	
-	private Float altitude;
+	private Double altitude;
 	
-	private Float speed;
+	private Double speed;
 	
-	private Float course;
+	private Double course;
 	
 	private String address;
 	
@@ -43,12 +43,18 @@ public class MongoPositionsElm {
 	
 	private String network;
 	
-	private Integer is_sent;
-	
-	private Integer is_offline;
-	
-	private Float weight;
+	private String deviceName;
 
+	private String deviceReferenceKey;
+
+	private String driverReferenceKey;
+
+	private String driverName;
+
+	private Long driverid;
+
+	private Double weight;
+	
 	
 	
 	public MongoPositionsElm() {
@@ -57,9 +63,10 @@ public class MongoPositionsElm {
 
 
 
-	public MongoPositionsElm(ObjectId _id, String protocol, Long deviceid, Date servertime, Date devicetime, Date fixtime,
-			Boolean valid, Double latitude, Double longitude, Float altitude, Float speed, Float course, String address,
-			Object attributes, Double accuracy, String network, Integer is_sent, Integer is_offline, Float weight) {
+	public MongoPositionsElm(ObjectId _id, String protocol, Long deviceid, Date servertime, Date devicetime,
+			Date fixtime, Boolean valid, Double latitude, Double longitude, Double altitude, Double speed,
+			Double course, String address, Object attributes, Double accuracy, String network, String deviceName,
+			String deviceReferenceKey, String driverReferenceKey, String driverName, Long driverid, Double weight) {
 		super();
 		this._id = _id;
 		this.protocol = protocol;
@@ -77,8 +84,11 @@ public class MongoPositionsElm {
 		this.attributes = attributes;
 		this.accuracy = accuracy;
 		this.network = network;
-		this.is_sent = is_sent;
-		this.is_offline = is_offline;
+		this.deviceName = deviceName;
+		this.deviceReferenceKey = deviceReferenceKey;
+		this.driverReferenceKey = driverReferenceKey;
+		this.driverName = driverName;
+		this.driverid = driverid;
 		this.weight = weight;
 	}
 
@@ -192,37 +202,37 @@ public class MongoPositionsElm {
 
 
 
-	public Float getAltitude() {
+	public Double getAltitude() {
 		return altitude;
 	}
 
 
 
-	public void setAltitude(Float altitude) {
+	public void setAltitude(Double altitude) {
 		this.altitude = altitude;
 	}
 
 
 
-	public Float getSpeed() {
+	public Double getSpeed() {
 		return speed;
 	}
 
 
 
-	public void setSpeed(Float speed) {
+	public void setSpeed(Double speed) {
 		this.speed = speed;
 	}
 
 
 
-	public Float getCourse() {
+	public Double getCourse() {
 		return course;
 	}
 
 
 
-	public void setCourse(Float course) {
+	public void setCourse(Double course) {
 		this.course = course;
 	}
 
@@ -276,42 +286,82 @@ public class MongoPositionsElm {
 
 
 
-	public Integer getIs_sent() {
-		return is_sent;
+	public String getDeviceName() {
+		return deviceName;
 	}
 
 
 
-	public void setIs_sent(Integer is_sent) {
-		this.is_sent = is_sent;
+	public void setDeviceName(String deviceName) {
+		this.deviceName = deviceName;
 	}
 
 
 
-	public Integer getIs_offline() {
-		return is_offline;
+	public String getDeviceReferenceKey() {
+		return deviceReferenceKey;
 	}
 
 
 
-	public void setIs_offline(Integer is_offline) {
-		this.is_offline = is_offline;
+	public void setDeviceReferenceKey(String deviceReferenceKey) {
+		this.deviceReferenceKey = deviceReferenceKey;
 	}
 
 
 
-	public Float getWeight() {
+	public String getDriverReferenceKey() {
+		return driverReferenceKey;
+	}
+
+
+
+	public void setDriverReferenceKey(String driverReferenceKey) {
+		this.driverReferenceKey = driverReferenceKey;
+	}
+
+
+
+	public String getDriverName() {
+		return driverName;
+	}
+
+
+
+	public void setDriverName(String driverName) {
+		this.driverName = driverName;
+	}
+
+
+
+	public Long getDriverid() {
+		return driverid;
+	}
+
+
+
+	public void setDriverid(Long driverid) {
+		this.driverid = driverid;
+	}
+
+
+
+	public Double getWeight() {
 		return weight;
 	}
 
 
 
-	public void setWeight(Float weight) {
+	public void setWeight(Double weight) {
 		this.weight = weight;
 	}
 	
 	
-	
+
+
+
+
+
 	
 	
 }
