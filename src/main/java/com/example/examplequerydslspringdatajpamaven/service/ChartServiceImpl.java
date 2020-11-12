@@ -241,20 +241,7 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 		 List<Long>userIds= new ArrayList<>();
 
 		 if(loggedUser.getAccountType().equals(4)) {
-			 /*Set<User> parentClients = loggedUser.getUsersOfUser();
-			 if(parentClients.isEmpty()) {
-				
-				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get devices of this user",null);
-				 logger.info("************************ getDistanceFuelEngine ENDED ***************************");
-				return  ResponseEntity.status(404).body(getObjectResponse);
-			 }else {
-				 User parentClient = new User() ;
-				 for(User object : parentClients) {
-					 parentClient = object;
-				 }
-				 userIds.add(parentClient.getId());
-				
-		    }*/
+			
 			List<Long> allDevices = userClientDeviceRepository.getDevicesIds(userId);
 			List<Map> data = new ArrayList<>();
 
@@ -321,28 +308,21 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 						  
 							Map devicesList = new HashMap();
 		
-						  
-						  /*if(summaryReportOne.getEngineHours() != null) {
-							  if(!summaryReportOne.getEngineHours().equals("0")) {
-									SimpleDateFormat time = new SimpleDateFormat("HH:mm");
-									try {
-										Date date =  time.parse((String) summaryReportOne.getEngineHours());
-										summaryReportOne.setEngineHours(String.valueOf(date.getHours()));
-									} catch (JSONException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
-									} catch (ParseException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
-									}
 		
-		
-								}
-							  
-						  }*/
+						  Double totalDistance = 0.0 ;
+						  double roundOffDistance = 0.0;
+						  Double litres=10.0;
+						  double roundOffFuel=0.0;
+						  Double Fuel =0.0;
+						  Double distance=0.0;
 						  
-		
-						  
+						  if(summaryReportOne.getDistance() != null && summaryReportOne.getDistance() != "") {
+							  totalDistance = Math.abs(  Double.parseDouble(summaryReportOne.getDistance())/1000  );
+							  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+							  summaryReportOne.setDistance(Double.toString(roundOffDistance));
+
+
+						  }
 						  
 						  Device device= deviceServiceImpl.findById(summaryReportOne.getDeviceId());
 						  if(device != null) {
@@ -352,32 +332,28 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 								 summaryReportOne.setDriverName(driver.getName());
 								 
 							  }
+
+							  
 							  if(device.getFuel() != null) {
-									 
-									
-									Double litres=0.0;
-									Double Fuel =0.0;
-									Double distance=0.0;
 									if(device.getFuel() != null && device.getFuel() != "" && device.getFuel().startsWith("{")) {
 										JSONObject obj = new JSONObject(device.getFuel());	
 										if(obj.has("fuelPerKM")) {
 											litres=obj.getDouble("fuelPerKM");
+											
 										}
 									}
-									
-		
-									distance = Double.parseDouble(summaryReportOne.getDistance().toString());
-									if(distance > 0) {
-										Fuel = (distance/100)*litres;
-									}
-		
-									summaryReportOne.setSpentFuel(Double.toString(Fuel));
-		
-		
-									
-		
 							   }
+							  
+							 
 						   }
+						  distance = Double.parseDouble(summaryReportOne.getDistance().toString());
+						  if(distance > 0) {
+							Fuel = (distance*litres)/100;
+						  }
+	
+						  roundOffFuel = Math.round(Fuel * 100.0 )/ 100.0;
+						  summaryReportOne.setSpentFuel(Double.toString(roundOffFuel));
+						  
 							devicesList.put("spentFuel", summaryReportOne.getSpentFuel());
 							devicesList.put("distance", summaryReportOne.getDistance());
 							devicesList.put("deviceId", summaryReportOne.getDeviceId());
@@ -490,28 +466,20 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 					  
 						Map devicesList = new HashMap();
 	
+					  Double totalDistance = 0.0 ;
+					  double roundOffDistance = 0.0;
+					  Double litres=10.0;
+					  double roundOffFuel=0.0;
+					  Double Fuel =0.0;
+					  Double distance=0.0;
 					  
-					  /*if(summaryReportOne.getEngineHours() != null) {
-						  if(!summaryReportOne.getEngineHours().equals("0")) {
-								SimpleDateFormat time = new SimpleDateFormat("HH:mm");
-								try {
-									Date date =  time.parse((String) summaryReportOne.getEngineHours());
-									summaryReportOne.setEngineHours(String.valueOf(date.getHours()));
-								} catch (JSONException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch (ParseException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-	
-	
-							}
-						  
-					  }*/
-					  
-	
-					  
+					  if(summaryReportOne.getDistance() != null && summaryReportOne.getDistance() != "") {
+						  totalDistance = Math.abs(  Double.parseDouble(summaryReportOne.getDistance())/1000  );
+						  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+						  summaryReportOne.setDistance(Double.toString(roundOffDistance));
+
+
+					  }
 					  
 					  Device device= deviceServiceImpl.findById(summaryReportOne.getDeviceId());
 					  if(device != null) {
@@ -521,32 +489,28 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 							 summaryReportOne.setDriverName(driver.getName());
 							 
 						  }
+						  
+						  
 						  if(device.getFuel() != null) {
-								 
-								
-								Double litres=0.0;
-								Double Fuel =0.0;
-								Double distance=0.0;
 								if(device.getFuel() != null && device.getFuel() != "" && device.getFuel().startsWith("{")) {
 									JSONObject obj = new JSONObject(device.getFuel());	
 									if(obj.has("fuelPerKM")) {
 										litres=obj.getDouble("fuelPerKM");
+										
 									}
+
 								}
-								
-	
-								distance = Double.parseDouble(summaryReportOne.getDistance().toString());
-								if(distance > 0) {
-									Fuel = (distance/100)*litres;
-								}
-	
-								summaryReportOne.setSpentFuel(Double.toString(Fuel));
-	
-	
-								
-	
-						   }
+						  }
+						  
 					   }
+						  distance = Double.parseDouble(summaryReportOne.getDistance().toString());
+						  if(distance > 0) {
+							Fuel = (distance*litres)/100;
+						  }
+	
+						  roundOffFuel = Math.round(Fuel * 100.0 )/ 100.0;
+						  summaryReportOne.setSpentFuel(Double.toString(roundOffFuel));
+					  
 						devicesList.put("spentFuel", summaryReportOne.getSpentFuel());
 						devicesList.put("distance", summaryReportOne.getDistance());
 						devicesList.put("deviceId", summaryReportOne.getDeviceId());
@@ -1053,75 +1017,11 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 				 ignitionOFF = mongoPositionRepo.getCountFromAttrbuitesChart(positionIds, "ignition", false);
 				 
 
-				List<CustomPositions> positionsList = mongoPositionRepo.getCharts(positionIds);
 				List<Map> data = new ArrayList<>();
 				
-				
+				data = mongoPositionRepo.getCharts(positionIds);
 
-			    if(positionsList.size()>0) {
-			    	
-					for(int i=0;i<positionsList.size();i++) {
-
-
-		             	JSONObject obj = new JSONObject(positionsList.get(i).getAttributes().toString());
-						Map devicesList = new HashMap();
-						if(obj.has("todayHoursString")) {
-							SimpleDateFormat time = new SimpleDateFormat("HH:mm");
-							try {
-								Date date =  time.parse((String) obj.get("todayHoursString"));
-							    devicesList.put("hours", date.getHours());
-								
-							} catch (JSONException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} catch (ParseException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-
-
-						}
-						else {
-						    devicesList.put("hours",0);
-
-						}
-
-					    devicesList.put("deviceName", positionsList.get(i).getDeviceName());
-					    devicesList.put("driverName", positionsList.get(i).getDriverName());
-
-
-					    if(data.size() == 10) {
-				    		Integer newData = Integer.parseInt( devicesList.get("hours").toString() );
-
-					    	for(int k=0;k<data.size();k++) {
-					    		Integer oldData = Integer.parseInt( data.get(k).get("hours").toString() );
-
-					    		if(newData > oldData) {
-
-					    			data.get(k).replace("hours", devicesList.get("hours"));
-					    			data.get(k).replace("driverName", devicesList.get("driverName"));
-					    			data.get(k).replace("deviceName", devicesList.get("deviceName"));
-					    			break;
-
-					    		}
-
-					    	
-
-					    	}
-
-					    }
-					    if(data.size() < 10) {
-					    	data.add(devicesList);
-					    						
-					    }
-
-					    
-						
-					}
-					
-					
-				
-				}
+			    
 			    
 			    Map dev = new HashMap();
 			    dev.put("ignition_on", ignitionON);
@@ -1167,74 +1067,12 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 
 
 
-			List<CustomPositions> positionsList = mongoPositionRepo.getCharts(positionIds);
 			List<Map> data = new ArrayList<>();
+			
+			data = mongoPositionRepo.getCharts(positionIds);
 			List<Map> finalData = new ArrayList<>();
 
-		    if(positionsList.size()>0) {
-		    	
-				for(int i=0;i<positionsList.size();i++) {
-
-
-	             	JSONObject obj = new JSONObject(positionsList.get(i).getAttributes().toString());
-					Map devicesList = new HashMap();
-					if(obj.has("todayHoursString")) {
-						SimpleDateFormat time = new SimpleDateFormat("HH:mm");
-						try {
-							Date date =  time.parse((String) obj.get("todayHoursString"));
-						    devicesList.put("hours", date.getHours());
-							
-						} catch (JSONException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (ParseException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-
-
-					}
-					else {
-					    devicesList.put("hours",0);
-
-					}
-
-				    devicesList.put("deviceName", positionsList.get(i).getDeviceName());
-				    devicesList.put("driverName", positionsList.get(i).getDriverName());
-
-
-				    if(data.size() == 10) {
-			    		Integer newData = Integer.parseInt( devicesList.get("hours").toString() );
-
-				    	for(int k=0;k<data.size();k++) {
-				    		Integer oldData = Integer.parseInt( data.get(k).get("hours").toString() );
-
-				    		if(newData > oldData) {
-
-				    			data.get(k).replace("hours", devicesList.get("hours"));
-				    			data.get(k).replace("driverName", devicesList.get("driverName"));
-				    			data.get(k).replace("deviceName", devicesList.get("deviceName"));
-				    			break;
-
-				    		}
-
-				    	
-
-				    	}
-
-				    }
-				    if(data.size() < 10) {
-				    	data.add(devicesList);
-				    						
-				    }
-
-				    
-					
-				}
-				
-				
-			
-			}
+		   
 		    
 		    Map dev = new HashMap();
 		    dev.put("ignition_on", ignitionON);

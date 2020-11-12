@@ -272,4 +272,11 @@ public class DeviceRestController {
 		return deviceService.getClientDevices(TOKEN,loggedUserId,userId);
 	}
 	
+	@GetMapping("/updateLineData")
+	public ResponseEntity<?> updateLineData() {
+		return deviceService.updateLineData();
+	}
+	
+	
+	
 }

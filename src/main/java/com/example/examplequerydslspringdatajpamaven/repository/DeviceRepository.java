@@ -207,6 +207,10 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	@Query(value = "SELECT tc_devices.calibrationData FROM tc_devices WHERE tc_devices.id=:deviceId AND tc_devices.delete_date IS NULL ",nativeQuery = true)
 	public String getCalibrationDataCCC(@Param("deviceId")Long deviceId);
 	
+	@Query(value = "SELECT tc_devices.* FROM tc_devices "
+			+ " WHERE tc_devices.lineData is null and tc_devices.calibrationData is not null ",nativeQuery = true)
+	public List<Device> getAllDevicesNotHaveLineData();
+	
 	@Query(value = "SELECT tc_devices.fuel FROM tc_devices WHERE tc_devices.id=:deviceId AND tc_devices.delete_date IS NULL ",nativeQuery = true)
 	public String getFuelData(@Param("deviceId")Long deviceId);
 	

@@ -78,5 +78,9 @@ public interface DeviceService {
 	public ResponseEntity<?> assignClientDevices(String TOKEN,Long loggedUserId,Long userId,Long [] deviceIds);
 
 	public ResponseEntity<?> getClientDevices(String TOKEN,Long loggedUserId,Long userId);
+	
+	public ResponseEntity<?> updateLineData();
+	
+
 
 }

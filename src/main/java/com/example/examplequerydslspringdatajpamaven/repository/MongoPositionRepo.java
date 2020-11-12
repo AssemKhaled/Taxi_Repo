@@ -4,12 +4,14 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -109,18 +111,29 @@ public class MongoPositionRepo {
 	}
 	public List<TripPositions> getTripPositions(Long deviceId,Date start,Date end){
 	
+		
+		Calendar calendarFrom = Calendar.getInstance();
+		calendarFrom.setTime(start);
+		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
+		start = calendarFrom.getTime();
+	    
+		Calendar calendarTo = Calendar.getInstance();
+		calendarTo.setTime(end);
+		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
+		end = calendarTo.getTime();
+		
+		
         List<TripPositions> positions = new ArrayList<TripPositions>();
 		
 		BasicDBObject basicDBObject = new BasicDBObject();
 		
 	    Aggregation aggregation = newAggregation(
 	            match(Criteria.where("deviceid").in(deviceId).and("devicetime").gte(start).lte(end)),
-	            project("deviceid","devicetime","latitude","longitude"),
+	            project("deviceid","latitude","longitude").and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("devicetime"),
 	            sort(Sort.Direction.DESC, "devicetime")
 	            
 	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
 
-	    System.out.println(aggregation);
 	    
 	        AggregationResults<MongoPositions> groupResults
 	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
@@ -158,6 +171,16 @@ public class MongoPositionRepo {
 	}	
 	public List<DeviceWorkingHours> getDeviceCustom(List<Long> allDevices,int offset,Date start,Date end,String custom,String value){
 
+		Calendar calendarFrom = Calendar.getInstance();
+		calendarFrom.setTime(start);
+		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
+		start = calendarFrom.getTime();
+	    
+		Calendar calendarTo = Calendar.getInstance();
+		calendarTo.setTime(end);
+		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
+		end = calendarTo.getTime();
+		
 		List<DeviceWorkingHours> deviceHours = new ArrayList<DeviceWorkingHours>();
 		
 		BasicDBObject basicDBObject = new BasicDBObject();
@@ -239,7 +262,28 @@ public class MongoPositionRepo {
 	
 	            	}
 					if(object.has("devicetime")) {
-		            	device.setDeviceTime(object.getString("devicetime"));    		
+						
+						Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(object.getString("devicetime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+
+						
+						device.setDeviceTime(outputFormat.format(dateTime));
+						   		
 	                }
 					if(object.has("_id")) {
 		            	JSONObject objId = (JSONObject) object.get("_id");
@@ -264,6 +308,17 @@ public class MongoPositionRepo {
 	}
 	public List<DeviceWorkingHours> getDeviceCustomScheduled(List<Long> allDevices,Date start,Date end,String custom,String value){
 
+		Calendar calendarFrom = Calendar.getInstance();
+		calendarFrom.setTime(start);
+		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
+		start = calendarFrom.getTime();
+	    
+		Calendar calendarTo = Calendar.getInstance();
+		calendarTo.setTime(end);
+		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
+		end = calendarTo.getTime();
+		
+		
 		List<DeviceWorkingHours> deviceHours = new ArrayList<DeviceWorkingHours>();
 		
 		BasicDBObject basicDBObject = new BasicDBObject();
@@ -338,7 +393,29 @@ public class MongoPositionRepo {
 	
 	            	}
 					if(object.has("devicetime")) {
-		            	device.setDeviceTime(object.getString("devicetime"));    		
+						
+						Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(object.getString("devicetime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+
+						
+						device.setDeviceTime(outputFormat.format(dateTime));
+						
+
 	                }
 					if(object.has("_id")) {
 		            	JSONObject objId = (JSONObject) object.get("_id");
@@ -363,6 +440,16 @@ public class MongoPositionRepo {
 	}
 	public Integer getDeviceCustomSize(List<Long> allDevices,Date start,Date end,String custom,String value){
 
+		Calendar calendarFrom = Calendar.getInstance();
+		calendarFrom.setTime(start);
+		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
+		start = calendarFrom.getTime();
+	    
+		Calendar calendarTo = Calendar.getInstance();
+		calendarTo.setTime(end);
+		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
+		end = calendarTo.getTime();
+		
 		Integer size = 0;
 
 		BasicDBObject basicDBObject = new BasicDBObject();
@@ -429,6 +516,16 @@ public class MongoPositionRepo {
 	}
 	public Integer getSensorsListSize(List<Long> allDevices,Date start,Date end){
 
+		Calendar calendarFrom = Calendar.getInstance();
+		calendarFrom.setTime(start);
+		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
+		start = calendarFrom.getTime();
+	    
+		Calendar calendarTo = Calendar.getInstance();
+		calendarTo.setTime(end);
+		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
+		end = calendarTo.getTime();
+		
 		Integer size = 0;
 
 		
@@ -464,6 +561,16 @@ public class MongoPositionRepo {
 	
 	public List<CustomPositions> getSensorsList(List<Long> allDevices,int offset,Date start,Date end){
 
+		Calendar calendarFrom = Calendar.getInstance();
+		calendarFrom.setTime(start);
+		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
+		start = calendarFrom.getTime();
+	    
+		Calendar calendarTo = Calendar.getInstance();
+		calendarTo.setTime(end);
+		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
+		end = calendarTo.getTime();
+		
 		List<CustomPositions> positions = new ArrayList<CustomPositions>();
 
 				
@@ -514,7 +621,29 @@ public class MongoPositionRepo {
 		            	device.setSpeed(object.getDouble("speed"));    		
 	                }
 					if(object.has("devicetime")) {
-		            	device.setServertime(object.getString("devicetime"));    		
+						
+						Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(object.getString("devicetime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+
+						
+						device.setServertime(outputFormat.format(dateTime));
+						
+						
 	                }
 					if(object.has("_id")) {
 		            	JSONObject objId = (JSONObject) object.get("_id");
@@ -540,6 +669,17 @@ public class MongoPositionRepo {
 	
 	public List<CustomPositions> getPositionsListScheduled(List<Long> allDevices,Date start,Date end){
 
+		Calendar calendarFrom = Calendar.getInstance();
+		calendarFrom.setTime(start);
+		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
+		start = calendarFrom.getTime();
+	    
+		Calendar calendarTo = Calendar.getInstance();
+		calendarTo.setTime(end);
+		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
+		end = calendarTo.getTime();
+		
+		
 		List<CustomPositions> positions = new ArrayList<CustomPositions>();
 
 				
@@ -586,7 +726,29 @@ public class MongoPositionRepo {
 		            	device.setSpeed(object.getDouble("speed"));    		
 	                }
 					if(object.has("devicetime")) {
-		            	device.setServertime(object.getString("devicetime"));    		
+						
+						Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(object.getString("devicetime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+
+						
+						device.setServertime(outputFormat.format(dateTime));
+						
+						
 	                }
 					if(object.has("_id")) {
 		            	JSONObject objId = (JSONObject) object.get("_id");
@@ -610,7 +772,7 @@ public class MongoPositionRepo {
         
 		return positions;
 	}
-	public List<CustomPositions> getCharts(List<String> positionIds){
+	public List<Map> getCharts(List<String> positionIds){
 
 		Date date = new Date();
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
@@ -632,8 +794,17 @@ public class MongoPositionRepo {
 			e.printStackTrace();
 		}
 
+		Calendar calendarFrom = Calendar.getInstance();
+		calendarFrom.setTime(dateFrom);
+		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
+		dateFrom = calendarFrom.getTime();
+	    
+		Calendar calendarTo = Calendar.getInstance();
+		calendarTo.setTime(dateTo);
+		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
+		dateTo = calendarTo.getTime();
 		
-		List<CustomPositions> positions = new ArrayList<CustomPositions>();
+		List<Map> positions = new ArrayList<Map>();
 
 
 		BasicDBObject basicDBObject = new BasicDBObject();
@@ -647,9 +818,12 @@ public class MongoPositionRepo {
 		
 	    Aggregation aggregation = newAggregation(
 	            match(Criteria.where("_id").in(ids).and("devicetime").gte(dateFrom).lte(dateTo)),
-	            project("deviceid","attributes","deviceName","driverName").and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("devicetime"),
-	            sort(Sort.Direction.DESC, "devicetime")
+	            project("deviceid","attributes","deviceName","driverName","attributes.todayHours","attributes.todayHoursString").and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("devicetime"),
+	            sort(Sort.Direction.DESC, "devicetime"),
+	            sort(Sort.Direction.DESC, "attributes.todayHours"),
+	            limit(10)
 	            
+
 	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
 
 
@@ -665,35 +839,32 @@ public class MongoPositionRepo {
 	            while (iterator.hasNext()) {
 
 	            	JSONObject object = (JSONObject) iterator.next();
-	            	CustomPositions position = new CustomPositions();
+	            	Map position = new HashMap();
 	            	
-                    if(object.has("attributes")) {
+
+                	position.put("hours","0");
+
+                    if(object.has("todayHours")) {
+                    	                    	
+                    	long min = TimeUnit.MILLISECONDS.toMinutes((long) object.getDouble("todayHours"));
                     	
-                    	position.setAttributes(object.get("attributes").toString());
+                    	Double hours = (double) min;
+						double roundOffDistance = Math.round(hours * 100.0) / 100.0;
+
+                    	position.put("hours",hours/60);
 
 	            	}
-					if(object.has("deviceName")) {
+	            	if(object.has("deviceName")) {
                     	
-                    	position.setDeviceName(object.get("deviceName").toString());
+                    	position.put("deviceName",object.get("deviceName").toString());
 
 	            	}
 					if(object.has("driverName")) {
 						
-						position.setDriverName(object.get("driverName").toString());
+						position.put("driverName",object.get("driverName").toString());
 					
 					}
-	            	if(object.has("deviceid")) {
-	            		position.setDeviceId(object.getLong("deviceid"));
-	
-	            	}
-					
-					if(object.has("_id")) {
-		            	JSONObject objId = (JSONObject) object.get("_id");
-		            	if(objId.has("$oid")) {
-		            		position.setId(objId.getString("$oid"));
-						}
-	
-					}
+
 					positions.add(position);
 
 	            }
@@ -704,6 +875,18 @@ public class MongoPositionRepo {
 	
 	public List<DeviceWorkingHours> getDeviceWorkingHours(List<Long> allDevices,int offset,Date start,Date end){
 
+		
+		Calendar calendarFrom = Calendar.getInstance();
+		calendarFrom.setTime(start);
+		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
+		start = calendarFrom.getTime();
+	    
+		Calendar calendarTo = Calendar.getInstance();
+		calendarTo.setTime(end);
+		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
+		end = calendarTo.getTime();
+		
+		
 		List<DeviceWorkingHours> deviceHours = new ArrayList<DeviceWorkingHours>();
 
 
@@ -754,7 +937,11 @@ public class MongoPositionRepo {
 	
 	            	}
 					if(object.has("devicetime")) {
-		            	device.setDeviceTime(object.getString("devicetime"));    		
+
+
+						device.setDeviceTime(object.getString("devicetime"));
+						
+						
 	                }
 					if(object.has("_id")) {
 		            	JSONObject objId = (JSONObject) object.get("_id");
@@ -783,6 +970,16 @@ public class MongoPositionRepo {
 	
 	public List<DriverWorkingHours> getDriverWorkingHours(List<Long> allDevices,int offset,Date start,Date end){
 
+		Calendar calendarFrom = Calendar.getInstance();
+		calendarFrom.setTime(start);
+		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
+		start = calendarFrom.getTime();
+	    
+		Calendar calendarTo = Calendar.getInstance();
+		calendarTo.setTime(end);
+		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
+		end = calendarTo.getTime();
+		
 		List<DriverWorkingHours> driverHours = new ArrayList<DriverWorkingHours>();
 
 				
@@ -829,7 +1026,10 @@ public class MongoPositionRepo {
 	
 	            	}
 					if(object.has("devicetime")) {
-		            	device.setDeviceTime(object.getString("devicetime"));    		
+						
+						device.setDeviceTime(object.getString("devicetime"));
+
+						
 	                }
 					if(object.has("_id")) {
 		            	JSONObject objId = (JSONObject) object.get("_id");
@@ -856,6 +1056,16 @@ public class MongoPositionRepo {
 	
 	public List<DeviceWorkingHours> getDeviceWorkingHoursScheduled(List<Long> allDevices,Date start,Date end){
 
+		Calendar calendarFrom = Calendar.getInstance();
+		calendarFrom.setTime(start);
+		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
+		start = calendarFrom.getTime();
+	    
+		Calendar calendarTo = Calendar.getInstance();
+		calendarTo.setTime(end);
+		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
+		end = calendarTo.getTime();
+		
 		List<DeviceWorkingHours> deviceHours = new ArrayList<DeviceWorkingHours>();
 
 				
@@ -903,7 +1113,10 @@ public class MongoPositionRepo {
 	
 	            	}
 					if(object.has("devicetime")) {
-		            	device.setDeviceTime(object.getString("devicetime"));    		
+						
+						device.setDeviceTime(object.getString("devicetime"));
+
+						
 	                }
 					if(object.has("_id")) {
 		            	JSONObject objId = (JSONObject) object.get("_id");
@@ -932,6 +1145,16 @@ public class MongoPositionRepo {
 	
 	public List<DriverWorkingHours> getDriverWorkingHoursScheduled(List<Long> allDevices,Date start,Date end){
 
+		Calendar calendarFrom = Calendar.getInstance();
+		calendarFrom.setTime(start);
+		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
+		start = calendarFrom.getTime();
+	    
+		Calendar calendarTo = Calendar.getInstance();
+		calendarTo.setTime(end);
+		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
+		end = calendarTo.getTime();
+		
 		List<DriverWorkingHours> driverHours = new ArrayList<DriverWorkingHours>();
 
 				
@@ -975,7 +1198,8 @@ public class MongoPositionRepo {
 	
 	            	}
 					if(object.has("devicetime")) {
-		            	device.setDeviceTime(object.getString("devicetime"));    		
+						device.setDeviceTime(object.getString("devicetime"));
+
 	                }
 					if(object.has("_id")) {
 		            	JSONObject objId = (JSONObject) object.get("_id");
@@ -1002,6 +1226,16 @@ public class MongoPositionRepo {
 	
 	public Integer getDeviceWorkingHoursSize(List<Long> allDevices,Date start,Date end){
 
+		Calendar calendarFrom = Calendar.getInstance();
+		calendarFrom.setTime(start);
+		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
+		start = calendarFrom.getTime();
+	    
+		Calendar calendarTo = Calendar.getInstance();
+		calendarTo.setTime(end);
+		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
+		end = calendarTo.getTime();
+		
 		Integer size = 0;
 
 		
@@ -1039,6 +1273,16 @@ public class MongoPositionRepo {
 	}
 	public Integer getDriverWorkingHoursSize(List<Long> allDevices,Date start,Date end){
 
+		Calendar calendarFrom = Calendar.getInstance();
+		calendarFrom.setTime(start);
+		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
+		start = calendarFrom.getTime();
+	    
+		Calendar calendarTo = Calendar.getInstance();
+		calendarTo.setTime(end);
+		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
+		end = calendarTo.getTime();
+		
 		Integer size = 0;
 
 		
@@ -1107,17 +1351,77 @@ public class MongoPositionRepo {
 	            	JSONObject object = (JSONObject) iterator.next();
 	            	
 	            	if(object.has("servertime")) {
-	            		position.setServertime( object.getString("servertime"));
+	            		
+						Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(object.getString("servertime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+	            		
+	            		position.setServertime(outputFormat.format(dateTime));
+	            		
 	            		
 	            	}  
                     if(object.has("devicetime")) {
-	            		position.setDevicetime(object.getString("devicetime"));
+                    	
+						Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
 
+						try {
+							dateTime = inputFormat.parse(object.getString("devicetime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+	            		
+	            		position.setDevicetime(outputFormat.format(dateTime));
+	            		
+	            		
 	            		
 	            	}
                     if(object.has("fixtime")) {
 	            		
-	            		position.setFixtime( object.getString("fixtime"));
+                    	
+						Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(object.getString("fixtime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+	            		
+	            		position.setFixtime(outputFormat.format(dateTime));
+	            		
 
 	            	}
 	            	if(object.has("attributes")) {
@@ -1178,17 +1482,77 @@ public class MongoPositionRepo {
 	            	JSONObject object = (JSONObject) iterator.next();
 	            	LastPositionData position = new LastPositionData();
 	            	if(object.has("servertime")) {
-	            		position.setServertime( object.getString("servertime"));
+	            		
+						Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(object.getString("servertime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+	            		
+	            		position.setServertime(outputFormat.format(dateTime));
+	            		
 	            		
 	            	}  
                     if(object.has("devicetime")) {
-	            		position.setDevicetime(object.getString("devicetime"));
+                    	
+						Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
 
+						try {
+							dateTime = inputFormat.parse(object.getString("devicetime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+	            		
+	            		position.setDevicetime(outputFormat.format(dateTime));
+	            		
+	            		
 	            		
 	            	}
                     if(object.has("fixtime")) {
 	            		
-	            		position.setFixtime( object.getString("fixtime"));
+                    	
+						Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(object.getString("fixtime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+	            		
+	            		position.setFixtime(outputFormat.format(dateTime));
+	            		
 
 	            	}
 	            	if(object.has("attributes")) {
@@ -1248,18 +1612,78 @@ public class MongoPositionRepo {
 	            while (iterator.hasNext()) {
 	            	JSONObject object = (JSONObject) iterator.next();
 	            	LastPositionData position = new LastPositionData();
-	            	if(object.has("servertime")) {
-	            		position.setServertime( object.getString("servertime"));
+                    if(object.has("servertime")) {
+	            		
+						Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(object.getString("servertime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+	            		
+	            		position.setServertime(outputFormat.format(dateTime));
+	            		
 	            		
 	            	}  
                     if(object.has("devicetime")) {
-	            		position.setDevicetime(object.getString("devicetime"));
+                    	
+						Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
 
+						try {
+							dateTime = inputFormat.parse(object.getString("devicetime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+	            		
+	            		position.setDevicetime(outputFormat.format(dateTime));
+	            		
+	            		
 	            		
 	            	}
                     if(object.has("fixtime")) {
 	            		
-	            		position.setFixtime( object.getString("fixtime"));
+                    	
+						Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(object.getString("fixtime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+	            		
+	            		position.setFixtime(outputFormat.format(dateTime));
+	            		
 
 	            	}
 	            	if(object.has("attributes")) {
@@ -1649,7 +2073,26 @@ public class MongoPositionRepo {
 	
 	            	}
 	            	if(object.has("servertime")) {
-	            		position.setLastUpdate(object.getString("servertime"));
+	            		
+						Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(object.getString("servertime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+	            		
+	            		position.setLastUpdate(outputFormat.format(dateTime));
 	
 	            	} 
 					if(object.has("_id")) {
@@ -1774,7 +2217,27 @@ public class MongoPositionRepo {
 	
 	            	}
 	            	if(object.has("servertime")) {
-	            		position.setLastUpdate(object.getString("servertime"));
+	            		
+						Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(object.getString("servertime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+	            		
+	            		position.setLastUpdate(outputFormat.format(dateTime));
+	            		
 	
 	            	} 
 					if(object.has("_id")) {
@@ -1874,7 +2337,7 @@ public class MongoPositionRepo {
  	            
  	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
 
- 	    
+ 	    System.out.println(aggregation);
 
 
  	        AggregationResults<MongoPositions> groupResults
@@ -1899,7 +2362,27 @@ public class MongoPositionRepo {
  	
  	            	}
  	            	if(object.has("servertime")) {
- 	            		position.setLastUpdate(object.getString("servertime"));
+ 	            		
+						Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(object.getString("servertime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+	            		
+	            		position.setLastUpdate(outputFormat.format(dateTime));
+	            		
  	
  	            	} 
  					if(object.has("_id")) {

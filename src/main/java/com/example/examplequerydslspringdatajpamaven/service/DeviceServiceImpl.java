@@ -505,23 +505,32 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 						}
 					}
 				}
-
-				if(newPhoto.equals("")) {
-					
-					device.setPhoto("not_available.png");				
+				
+				
+				if(newPhoto == null) {
+					device.setPhoto("not_available.png");
 				}
 				else {
-					if(newPhoto.equals(oldPhoto)) {
-						device.setPhoto(oldPhoto);				
+					if(newPhoto.equals("")) {
+						
+						device.setPhoto("not_available.png");				
 					}
-					else{
-			    		if(newPhoto.startsWith("data:image")) {
+					else {
+						if(newPhoto.equals(oldPhoto)) {
+							device.setPhoto(oldPhoto);				
+						}
+						else{
+				    		if(newPhoto.startsWith("data:image")) {
 
-			    			device.setPhoto(decodePhoto.Base64_Image(newPhoto,"vehicle"));
-			    		}
-					}
+				    			device.setPhoto(decodePhoto.Base64_Image(newPhoto,"vehicle"));
+				    		}
+						}
 
-			    }
+				    }
+				}
+
+				
+				
 				
 				
 			
@@ -2273,7 +2282,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 								if(obj.get("power") != null) {
 									if(obj.get("power") != "") {
 										double p = Double.valueOf(obj.get("power").toString());
-										double round = Math.round(p * 100.0 / 100.0);
+										double round = Math.round(p * 100.0 )/ 100.0;
 										obj.put("power",String.valueOf(round));
 
 
@@ -2290,7 +2299,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 								if(obj.get("battery") != null) {
 									if(obj.get("battery") != "") {
 										double p = Double.valueOf(obj.get("battery").toString());
-										double round = Math.round(p * 100.0 / 100.0);
+										double round = Math.round(p * 100.0 )/ 100.0;
 										obj.put("battery",String.valueOf(round));
 
 
@@ -4042,6 +4051,48 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			}
 		}
 
+		
+		return null;
+	}
+
+	@Override
+	public ResponseEntity<?> updateLineData() {
+		// TODO Auto-generated method stub
+		
+		List<Device> devices=deviceRepository.getAllDevicesNotHaveLineData();
+		
+
+	    for(Device device:devices) {
+	    	
+	    	String calibrationData = device.getCalibrationData();
+	    	
+	    	List<Map> data=new ArrayList<Map>();
+			if(calibrationData != null) {
+
+				 String str = calibrationData.toString(); 
+			     String arrOfStr[] = str.split(" "); 
+			     for (String a : arrOfStr) {
+			    	 JSONObject obj =new JSONObject(a);
+					 Map list   = new HashMap<>();
+					 list.put("s1",obj.get("s1"));
+					 list.put("s2",obj.get("s2"));
+					 list.put("w",obj.get("w"));
+			         data.add(list);
+
+			     }
+				
+				 
+			}
+
+			JSONArray jsArray = new JSONArray(data);
+			String calc = calculateSlopeAndFactor(jsArray);
+
+		    device.setLineData(calc);
+		    
+		    deviceRepository.save(device);
+	    	
+	    }
+		
 		
 		return null;
 	}

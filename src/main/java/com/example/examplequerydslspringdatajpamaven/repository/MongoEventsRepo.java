@@ -13,6 +13,7 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.sort
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -42,6 +43,17 @@ public class MongoEventsRepo {
 	
 	public Integer getEventsWithoutTypeSize(List<Long> allDevices,Date start, Date end){
 
+		Calendar calendarFrom = Calendar.getInstance();
+		calendarFrom.setTime(start);
+		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
+		start = calendarFrom.getTime();
+	    
+		Calendar calendarTo = Calendar.getInstance();
+		calendarTo.setTime(end);
+		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
+		end = calendarTo.getTime();
+		
+		
 		Integer size = 0;
 		
 		List<EventReport> events = new ArrayList<EventReport>();
@@ -79,6 +91,17 @@ public class MongoEventsRepo {
 	}
 	public Integer getEventsWithTypeSize(List<Long> allDevices,Date start, Date end,String type){
 
+		Calendar calendarFrom = Calendar.getInstance();
+		calendarFrom.setTime(start);
+		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
+		start = calendarFrom.getTime();
+	    
+		Calendar calendarTo = Calendar.getInstance();
+		calendarTo.setTime(end);
+		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
+		end = calendarTo.getTime();
+		
+		
 		Integer size = 0;
 		
 		List<EventReport> events = new ArrayList<EventReport>();
@@ -116,6 +139,18 @@ public class MongoEventsRepo {
 	}
 	
 	public List<EventReport> getEventsScheduled(List<Long> allDevices,Date start, Date end){
+		
+		Calendar calendarFrom = Calendar.getInstance();
+		calendarFrom.setTime(start);
+		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
+		start = calendarFrom.getTime();
+	    
+		Calendar calendarTo = Calendar.getInstance();
+		calendarTo.setTime(end);
+		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
+		end = calendarTo.getTime();
+		
+		
 		List<EventReport> events = new ArrayList<EventReport>();
 
 
@@ -151,7 +186,28 @@ public class MongoEventsRepo {
 	
 	            	}
 					if(object.has("servertime")) {
-						event.setServerTime(object.getString("servertime"));    		
+						
+						Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(object.getString("servertime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+
+						
+						event.setServerTime(outputFormat.format(dateTime)); 
+						
 	                }
 					if(object.has("type")) {
 						event.setEventType(object.getString("type"));    		
@@ -177,6 +233,18 @@ public class MongoEventsRepo {
 	}
 	
 	public List<EventReport> getEventsWithoutType(List<Long> allDevices, int offset,Date start, Date end){
+		
+		Calendar calendarFrom = Calendar.getInstance();
+		calendarFrom.setTime(start);
+		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
+		start = calendarFrom.getTime();
+	    
+		Calendar calendarTo = Calendar.getInstance();
+		calendarTo.setTime(end);
+		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
+		end = calendarTo.getTime();
+		
+		
 		List<EventReport> events = new ArrayList<EventReport>();
 
 
@@ -213,7 +281,29 @@ public class MongoEventsRepo {
 	
 	            	}
 					if(object.has("servertime")) {
-						event.setServerTime(object.getString("servertime"));    		
+						
+						Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(object.getString("servertime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+
+						
+						event.setServerTime(outputFormat.format(dateTime)); 
+						
+						
 	                }
 					if(object.has("type")) {
 						event.setEventType(object.getString("type"));    		
@@ -240,6 +330,17 @@ public class MongoEventsRepo {
 	
 	
 	public List<EventReport> getEventsWithType(List<Long> allDevices, int offset,Date start, Date end,String type){
+		Calendar calendarFrom = Calendar.getInstance();
+		calendarFrom.setTime(start);
+		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
+		start = calendarFrom.getTime();
+	    
+		Calendar calendarTo = Calendar.getInstance();
+		calendarTo.setTime(end);
+		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
+		end = calendarTo.getTime();
+		
+		
 		List<EventReport> events = new ArrayList<EventReport>();
 
 
@@ -276,7 +377,26 @@ public class MongoEventsRepo {
 	
 	            	}
 					if(object.has("servertime")) {
-						event.setServerTime(object.getString("servertime"));    		
+						Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(object.getString("servertime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+
+						
+						event.setServerTime(outputFormat.format(dateTime)); 
 	                }
 					if(object.has("type")) {
 						event.setEventType(object.getString("type"));    		
@@ -309,6 +429,7 @@ public class MongoEventsRepo {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); 
 
+	    
 		String currentDate=formatter.format(date);
 		
 		String from = currentDate +" 00:00:01";
@@ -325,6 +446,15 @@ public class MongoEventsRepo {
 			e.printStackTrace();
 		}
 
+		Calendar calendarFrom = Calendar.getInstance();
+		calendarFrom.setTime(dateFrom);
+		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
+		dateFrom = calendarFrom.getTime();
+	    
+		Calendar calendarTo = Calendar.getInstance();
+		calendarTo.setTime(dateTo);
+		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
+		dateTo = calendarTo.getTime();
 		
 		List<EventReport> notifications = new ArrayList<EventReport>();
 
@@ -360,7 +490,27 @@ public class MongoEventsRepo {
 	
 	            	}
 					if(object.has("servertime")) {
-						notification.setServerTime(object.getString("servertime"));    		
+
+						Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(object.getString("servertime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+
+						
+						notification.setServerTime(outputFormat.format(dateTime)); 
 	                }
 					if(object.has("type")) {
 						notification.setEventType(object.getString("type"));    		
@@ -392,6 +542,8 @@ public class MongoEventsRepo {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); 
 
+	    
+		
 		String currentDate=formatter.format(date);
 		
 		String from = currentDate +" 00:00:01";
@@ -408,6 +560,16 @@ public class MongoEventsRepo {
 			e.printStackTrace();
 		}
 
+		Calendar calendarFrom = Calendar.getInstance();
+		calendarFrom.setTime(dateFrom);
+		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
+		dateFrom = calendarFrom.getTime();
+	    
+		Calendar calendarTo = Calendar.getInstance();
+		calendarTo.setTime(dateTo);
+		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
+		dateTo = calendarTo.getTime();
+		
 		
 		List<EventReport> notifications = new ArrayList<EventReport>();
 
@@ -446,7 +608,26 @@ public class MongoEventsRepo {
 	
 	            	}
 					if(object.has("servertime")) {
-						notification.setServerTime(object.getString("servertime"));    		
+						Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(object.getString("servertime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+
+						
+						notification.setServerTime(outputFormat.format(dateTime));    		
 	                }
 					if(object.has("type")) {
 						notification.setEventType(object.getString("type"));    		
@@ -479,6 +660,7 @@ public class MongoEventsRepo {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); 
 
+		
 		String currentDate=formatter.format(date);
 		
 		String from = currentDate +" 00:00:01";
@@ -495,6 +677,15 @@ public class MongoEventsRepo {
 			e.printStackTrace();
 		}
 
+		Calendar calendarFrom = Calendar.getInstance();
+		calendarFrom.setTime(dateFrom);
+		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
+		dateFrom = calendarFrom.getTime();
+	    
+		Calendar calendarTo = Calendar.getInstance();
+		calendarTo.setTime(dateTo);
+		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
+		dateTo = calendarTo.getTime();
 		
 		List<EventReport> notifications = new ArrayList<EventReport>();
 
@@ -508,7 +699,6 @@ public class MongoEventsRepo {
 	            count().as("size")
 	            
 	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
-
 
 	        AggregationResults<MongoEvents> groupResults
 	            = mongoTemplate.aggregate(aggregation,"tc_events", MongoEvents.class);

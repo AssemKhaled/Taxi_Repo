@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -2402,6 +2403,9 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				  Double totalDistance = 0.0 ;
 				  double roundOffDistance = 0.0;
 				  double roundOffFuel = 0.0;
+				  Double litres=10.0;
+				  Double Fuel =0.0;
+				  Double distance=0.0;
 				  
 				  Set<Driver>  drivers = device.getDriver();
 				  for(Driver driver : drivers ) {
@@ -2412,29 +2416,33 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 					
 					 
 				  }
-				  if(device.getFuel() != null) {
-						 
-						Double litres=0.0;
-						Double Fuel =0.0;
-						Double distance=0.0;
-						
-						JSONObject obj = new JSONObject(device.getFuel());	
-						if(obj.has("fuelPerKM")) {
-							litres=Double.parseDouble(obj.get("fuelPerKM").toString());
-						}
 
-						distance = Double.parseDouble(tripReportOne.getDistance());
-						if(distance > 0) {
-							Fuel = (distance/100)*litres;
-						}
+				  if(tripReportOne.getDistance() != null && tripReportOne.getDistance() != "") {
+					  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getDistance())/1000  );
+					  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+					  tripReportOne.setDistance(Double.toString(roundOffDistance));
 
 
-						roundOffFuel = Math.round(Fuel * 100.0 / 100.0);
-
-						tripReportOne.setSpentFuel(Double.toString(roundOffFuel));
-
-					 }
+				  }
 				  
+				  if(device.getFuel() != null) {
+						if(device.getFuel() != null && device.getFuel() != "" && device.getFuel().startsWith("{")) {
+							JSONObject obj = new JSONObject(device.getFuel());	
+							if(obj.has("fuelPerKM")) {
+								litres=obj.getDouble("fuelPerKM");
+								
+							}
+						}
+				   }
+					  
+				  distance = Double.parseDouble(tripReportOne.getDistance().toString());
+				  if(distance > 0) {
+					Fuel = (distance*litres)/100;
+				  }
+
+				  roundOffFuel = Math.round(Fuel * 100.0)/ 100.0;
+				  tripReportOne.setSpentFuel(Double.toString(roundOffFuel));
+
 				  
 				  if(tripReportOne.getDuration() != null && tripReportOne.getDuration() != "") {
 					  Long time=(long) 0;
@@ -2448,13 +2456,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 					  String totalHours = String.valueOf(hoursEngine)+":"+String.valueOf(minutesEngine)+":"+String.valueOf(secondsEngine);
 					  tripReportOne.setDuration(totalHours);
 				  }
-				  if(tripReportOne.getDistance() != null && tripReportOne.getDistance() != "") {
-					  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getDistance())/1000  );
-					  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
-					  tripReportOne.setDistance(Double.toString(roundOffDistance));
-
-
-				  }
+				 
 				  if(tripReportOne.getAverageSpeed() != null && tripReportOne.getAverageSpeed() != "") {
 					  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getAverageSpeed())  );
 					  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
@@ -2852,6 +2854,9 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 					  Double totalDistance = 0.0 ;
 					  double roundOffDistance = 0.0;
 					  double roundOffFuel = 0.0;
+					  Double litres=10.0;
+					  Double Fuel =0.0;
+					  Double distance=0.0;
 					  
 					  Device device= deviceServiceImpl.findById(tripReportOne.getDeviceId());
 					  Set<Driver>  drivers = device.getDriver();
@@ -2863,28 +2868,32 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 						
 						 
 					  }
-					  if( device.getFuel() != null) {
-							 
-							Double litres=0.0;
-							Double Fuel =0.0;
-							Double distance=0.0;
-							
-							JSONObject obj = new JSONObject(device.getFuel());	
-							if(obj.has("fuelPerKM")) {
-								litres=Double.parseDouble(obj.get("fuelPerKM").toString());
+					  if(tripReportOne.getDistance() != null && tripReportOne.getDistance() != "") {
+						  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getDistance())/1000  );
+						  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+						  tripReportOne.setDistance(Double.toString(roundOffDistance));
+
+
+					  }
+					  if(device.getFuel() != null) {
+							if(device.getFuel() != null && device.getFuel() != "" && device.getFuel().startsWith("{")) {
+								JSONObject obj = new JSONObject(device.getFuel());	
+								if(obj.has("fuelPerKM")) {
+									litres=obj.getDouble("fuelPerKM");
+									
+								}
 							}
+					   }
+					  
+					 
+				   
+				  distance = Double.parseDouble(tripReportOne.getDistance().toString());
+				  if(distance > 0) {
+					Fuel = (distance*litres)/100;
+				  }
 
-							distance = Double.parseDouble(tripReportOne.getDistance());
-							if(distance > 0) {
-								Fuel = (distance/100)*litres;
-							}
-
-
-							roundOffFuel = Math.round(Fuel * 100.0 / 100.0);
-
-							tripReportOne.setSpentFuel(Double.toString(roundOffFuel));
-
-						 }
+				  roundOffFuel = Math.round(Fuel * 100.0 )/ 100.0;
+				  tripReportOne.setSpentFuel(Double.toString(roundOffFuel));
 					  
 					  
 					  if(tripReportOne.getDuration() != null && tripReportOne.getDuration() != "") {
@@ -2899,13 +2908,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 						  String totalHours = String.valueOf(hoursEngine)+":"+String.valueOf(minutesEngine)+":"+String.valueOf(secondsEngine);
 						  tripReportOne.setDuration(totalHours);
 					  }
-					  if(tripReportOne.getDistance() != null && tripReportOne.getDistance() != "") {
-						  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getDistance())/1000  );
-						  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
-						  tripReportOne.setDistance(Double.toString(roundOffDistance));
-
-
-					  }
+					  
 					  if(tripReportOne.getAverageSpeed() != null && tripReportOne.getAverageSpeed() != "") {
 						  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getAverageSpeed())  );
 						  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
@@ -3541,6 +3544,9 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			  Double totalDistance = 0.0 ;
 			  double roundOffDistance = 0.0;
 			  double roundOffFuel = 0.0;
+			  Double litres=10.0;
+			  Double Fuel =0.0;
+			  Double distance=0.0;
 			  
 			  for(SummaryReport summaryReportOne : summaryReport ) {
 				  Device device= deviceServiceImpl.findById(summaryReportOne.getDeviceId());
@@ -3550,29 +3556,33 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 					 summaryReportOne.setDriverName(driver.getName());
 				  }
-					 if(device.getFuel() != null) {
-						 
-						
-						Double litres=0.0;
-						Double Fuel =0.0;
-						Double distance=0.0;
-						JSONObject obj = new JSONObject(device.getFuel());	
-						if(obj.has("fuelPerKM")) {
-							litres=obj.getDouble("fuelPerKM");
+				  if(summaryReportOne.getDistance() != null && summaryReportOne.getDistance() != "") {
+					  totalDistance = Math.abs(  Double.parseDouble(summaryReportOne.getDistance())/1000  );
+					  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+					  summaryReportOne.setDistance(Double.toString(roundOffDistance));
+
+
+				  }
+				  
+				  if(device.getFuel() != null) {
+						if(device.getFuel() != null && device.getFuel() != "" && device.getFuel().startsWith("{")) {
+							JSONObject obj = new JSONObject(device.getFuel());	
+							if(obj.has("fuelPerKM")) {
+								litres=obj.getDouble("fuelPerKM");
+								
+							}
 						}
-
-						distance = Double.parseDouble(summaryReportOne.getDistance());
-						if(distance > 0) {
-							Fuel = (distance/100)*litres;
-						}
-
-
-						roundOffFuel = Math.round(Fuel * 100.0 / 100.0);
-
-						summaryReportOne.setSpentFuel(Double.toString(roundOffFuel));
-						
-
-					 }
+				   }
+				  
+				  
+				  distance = Double.parseDouble(summaryReportOne.getDistance().toString());
+				  if(distance > 0) {
+					Fuel = (distance*litres)/100;
+				  }
+	
+				  roundOffFuel = Math.round(Fuel * 100.0 )/ 100.0;
+				  summaryReportOne.setSpentFuel(Double.toString(roundOffFuel));
+				  
 				
 			  }
 				  if(summaryReportOne.getEngineHours() != null && summaryReportOne.getEngineHours() != "") {
@@ -3587,13 +3597,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 					  String totalHours = String.valueOf(hoursEngine)+":"+String.valueOf(minutesEngine)+":"+String.valueOf(secondsEngine);
 					  summaryReportOne.setEngineHours(totalHours);
 				  }
-				  if(summaryReportOne.getDistance() != null && summaryReportOne.getDistance() != "") {
-					  totalDistance = Math.abs(  Double.parseDouble(summaryReportOne.getDistance())/1000  );
-					  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
-					  summaryReportOne.setDistance(Double.toString(roundOffDistance));
 
-
-				  }
 				  if(summaryReportOne.getAverageSpeed() != null && summaryReportOne.getAverageSpeed() != "") {
 					  totalDistance = Math.abs(  Double.parseDouble(summaryReportOne.getAverageSpeed())  );
 					  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
@@ -3968,6 +3972,44 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		
 		 logger.info("************************ returnFromTraccar STARTED ***************************");
 
+		 
+		 SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+         outputFormat.setLenient(false);
+
+		Date dateFrom;	
+		Date dateTo;	
+		
+		try {
+			dateFrom = outputFormat.parse(from);
+			
+			Calendar calendarFrom = Calendar.getInstance();
+			calendarFrom.setTime(dateFrom);
+			calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
+			dateFrom = calendarFrom.getTime();
+			
+			from = outputFormat.format(dateFrom);
+			
+
+		} catch (ParseException e2) {
+			
+		}
+		
+		try {
+			dateTo = outputFormat.parse(to);
+			
+			Calendar calendarFrom = Calendar.getInstance();
+			calendarFrom.setTime(dateTo);
+			calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
+			dateTo = calendarFrom.getTime();
+			
+			to = outputFormat.format(dateTo);
+			
+
+		} catch (ParseException e2) {
+			
+		}
+		 
+		 
 		
 		String plainCreds = "admin@fuinco.com:admin";
 		byte[] plainCredsBytes = plainCreds.getBytes();
@@ -4863,27 +4905,33 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 
 							  if(stopReportOne.getSpentFuel() != null && stopReportOne.getSpentFuel() != "") {
-								  if( device.getFuel() != null) {
-										 
-										Double litres=0.0;
-										Double Fuel =0.0;
-										Double distance=0.0;
-										JSONObject obj = new JSONObject(device.getFuel());	
-										if(obj.has("fuelPerKM")) {
-											litres=Math.abs( Double.parseDouble(obj.get("fuelPerKM").toString()) );
+								  Double litres=10.0;
+								  Double Fuel =0.0;
+								  Double distance=0.0;
+								  
+								  if(device.getFuel() != null) {
+										if(device.getFuel() != null && device.getFuel() != "" && device.getFuel().startsWith("{")) {
+											JSONObject obj = new JSONObject(device.getFuel());	
+											if(obj.has("fuelPerKM")) {
+												litres=obj.getDouble("fuelPerKM");
+												
+											}
 										}
+								   }
+								  
+								  
+								  distance = Double.parseDouble(stopReportOne.getDistance().toString());
+								  if(distance > 0) {
+									Fuel = (distance*litres)/100;
+								  }
+					
+								  roundOffFuel = Math.round(Fuel * 100.0 )/ 100.0;
+								  stopReportOne.setSpentFuel(Double.toString(roundOffFuel));
+								  
 
-										distance =Math.abs( Double.parseDouble(stopReportOne.getDistance()) );
-										if(distance > 0) {
-											Fuel = (distance/100)*litres;
-										}
-
-										stopReportOne.setSpentFuel(Double.toString(Fuel));
-
-
-									 }
-									totalFuel += Double.parseDouble(stopReportOne.getSpentFuel());
-									roundOffFuel = Math.round(totalFuel * 100.0) / 100.0;
+								  totalFuel += Double.parseDouble(stopReportOne.getSpentFuel());
+								  roundOffFuel = Math.round(totalFuel * 100.0) / 100.0;
+									
 
 							  }
 							  devicesStatus.put("totalDuration", totalDuration);
@@ -5206,7 +5254,6 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			
 			
 			
-			
 			Date today=new Date();
 
 			if(dateFrom.getTime() > dateTo.getTime()) {
@@ -5314,27 +5361,33 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 						  }
 						  if(tripReportOne.getSpentFuel() != null && tripReportOne.getSpentFuel() != "") {
-							  if( device.getFuel() != null) {
-									 
-									Double litres=0.0;
-									Double Fuel =0.0;
-									Double distance=0.0;
-									JSONObject obj = new JSONObject(device.getFuel());	
-									if(obj.has("fuelPerKM")) {
-										litres=Math.abs( Double.parseDouble(obj.get("fuelPerKM").toString()) );
+							  Double litres=10.0;
+							  Double Fuel =0.0;
+							  Double distance=0.0;
+							  
+							  if(device.getFuel() != null) {
+									if(device.getFuel() != null && device.getFuel() != "" && device.getFuel().startsWith("{")) {
+										JSONObject obj = new JSONObject(device.getFuel());	
+										if(obj.has("fuelPerKM")) {
+											litres=obj.getDouble("fuelPerKM");
+											
+										}
 									}
+							   }
+							  
+							  
+							  distance = Double.parseDouble(tripReportOne.getDistance().toString());
+							  if(distance > 0) {
+								Fuel = (distance*litres)/100;
+							  }
+				
+							  roundOffFuel = Math.round(Fuel * 100.0 )/ 100.0;
+							  tripReportOne.setSpentFuel(Double.toString(roundOffFuel));
+							  
 
-									distance =Math.abs( Double.parseDouble(tripReportOne.getDistance()) );
-									if(distance > 0) {
-										Fuel = (distance/100)*litres;
-									}
-
-									tripReportOne.setSpentFuel(Double.toString(Fuel));
-
-
-								 }
-								totalFuel += Double.parseDouble(tripReportOne.getSpentFuel());
-								roundOffFuel = Math.round(totalFuel * 100.0) / 100.0;
+							  totalFuel += Double.parseDouble(tripReportOne.getSpentFuel());
+							  roundOffFuel = Math.round(totalFuel * 100.0) / 100.0;
+								
 
 						  }
 						  devicesStatus.put("totalDrivingHours",totalDuration);

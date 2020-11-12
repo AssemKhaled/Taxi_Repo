@@ -535,7 +535,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 								if(obj.get("power") != null) {
 									if(obj.get("power") != "") {
 										double p = Double.valueOf(obj.get("power").toString());
-										double round = Math.round(p * 100.0 / 100.0);
+										double round = Math.round(p * 100.0 )/ 100.0;
 										obj.put("power",String.valueOf(round));
 
 
@@ -552,7 +552,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 								if(obj.get("battery") != null) {
 									if(obj.get("battery") != "") {
 										double p = Double.valueOf(obj.get("battery").toString());
-										double round = Math.round(p * 100.0 / 100.0);
+										double round = Math.round(p * 100.0 )/ 100.0;
 										obj.put("battery",String.valueOf(round));
 
 
@@ -1518,6 +1518,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				  Double totalDistance = 0.0 ;
 				  double roundOffDistance = 0.0;
 				  double roundOffFuel = 0.0;
+				  Double litres=10.0;
+				  Double Fuel =0.0;
+				  Double distance=0.0;
 				  
 				  Set<Driver>  drivers = device.getDriver();
 				  for(Driver driver : drivers ) {
@@ -1528,28 +1531,32 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 					
 					 
 				  }
+
+				  if(tripReportOne.getDistance() != null && tripReportOne.getDistance() != "") {
+					  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getDistance())/1000  );
+					  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+					  tripReportOne.setDistance(Double.toString(roundOffDistance));
+
+
+				  }
+				  
 				  if(device.getFuel() != null) {
-						 
-						Double litres=0.0;
-						Double Fuel =0.0;
-						Double distance=0.0;
-						
-						JSONObject obj = new JSONObject(device.getFuel());	
-						if(obj.has("fuelPerKM")) {
-							litres=Double.parseDouble(obj.get("fuelPerKM").toString());
+						if(device.getFuel() != null && device.getFuel() != "" && device.getFuel().startsWith("{")) {
+							JSONObject obj = new JSONObject(device.getFuel());	
+							if(obj.has("fuelPerKM")) {
+								litres=obj.getDouble("fuelPerKM");
+								
+							}
 						}
+				   }
+					  
+				  distance = Double.parseDouble(tripReportOne.getDistance().toString());
+				  if(distance > 0) {
+					Fuel = (distance*litres)/100;
+				  }
 
-						distance = Double.parseDouble(tripReportOne.getDistance());
-						if(distance > 0) {
-							Fuel = (distance/100)*litres;
-						}
-
-
-						roundOffFuel = Math.round(Fuel * 100.0 / 100.0);
-
-						tripReportOne.setSpentFuel(Double.toString(roundOffFuel));
-
-					 }
+				  roundOffFuel = Math.round(Fuel * 100.0) / 100.0;
+				  tripReportOne.setSpentFuel(Double.toString(roundOffFuel));
 				  
 				  
 				  if(tripReportOne.getDuration() != null && tripReportOne.getDuration() != "") {
@@ -1564,13 +1571,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 					  String totalHours = String.valueOf(hoursEngine)+":"+String.valueOf(minutesEngine)+":"+String.valueOf(secondsEngine);
 					  tripReportOne.setDuration(totalHours);
 				  }
-				  if(tripReportOne.getDistance() != null && tripReportOne.getDistance() != "") {
-					  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getDistance())/1000  );
-					  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
-					  tripReportOne.setDistance(Double.toString(roundOffDistance));
-
-
-				  }
+				 
 				  if(tripReportOne.getAverageSpeed() != null && tripReportOne.getAverageSpeed() != "") {
 					  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getAverageSpeed())  );
 					  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
@@ -1962,6 +1963,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			  Double totalDistance = 0.0 ;
 			  double roundOffDistance = 0.0;
 			  double roundOffFuel = 0.0;
+			  Double litres=10.0;
+			  Double Fuel =0.0;
+			  Double distance=0.0;
 			  
 			  for(SummaryReport summaryReportOne : summaryReport ) {
 				  Device device= deviceServiceImpl.findById(summaryReportOne.getDeviceId());
@@ -1971,29 +1975,33 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 					 summaryReportOne.setDriverName(driver.getName());
 				  }
-					 if(device.getFuel() != null) {
-						 
-						
-						Double litres=0.0;
-						Double Fuel =0.0;
-						Double distance=0.0;
-						JSONObject obj = new JSONObject(device.getFuel());	
-						if(obj.has("fuelPerKM")) {
-							litres=obj.getDouble("fuelPerKM");
+				  if(summaryReportOne.getDistance() != null && summaryReportOne.getDistance() != "") {
+					  totalDistance = Math.abs(  Double.parseDouble(summaryReportOne.getDistance())/1000  );
+					  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+					  summaryReportOne.setDistance(Double.toString(roundOffDistance));
+
+
+				  }
+				  
+				  if(device.getFuel() != null) {
+						if(device.getFuel() != null && device.getFuel() != "" && device.getFuel().startsWith("{")) {
+							JSONObject obj = new JSONObject(device.getFuel());	
+							if(obj.has("fuelPerKM")) {
+								litres=obj.getDouble("fuelPerKM");
+								
+							}
 						}
-
-						distance = Double.parseDouble(summaryReportOne.getDistance());
-						if(distance > 0) {
-							Fuel = (distance/100)*litres;
-						}
-
-
-						roundOffFuel = Math.round(Fuel * 100.0 / 100.0);
-
-						summaryReportOne.setSpentFuel(Double.toString(roundOffFuel));
-						
-
-					 }
+				   }
+				  
+				  
+				  distance = Double.parseDouble(summaryReportOne.getDistance().toString());
+				  if(distance > 0) {
+					Fuel = (distance*litres)/100;
+				  }
+	
+				  roundOffFuel = Math.round(Fuel * 100.0 )/ 100.0;
+				  summaryReportOne.setSpentFuel(Double.toString(roundOffFuel));
+				  
 				
 			  }
 				  if(summaryReportOne.getEngineHours() != null && summaryReportOne.getEngineHours() != "") {
@@ -2008,13 +2016,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 					  String totalHours = String.valueOf(hoursEngine)+":"+String.valueOf(minutesEngine)+":"+String.valueOf(secondsEngine);
 					  summaryReportOne.setEngineHours(totalHours);
 				  }
-				  if(summaryReportOne.getDistance() != null && summaryReportOne.getDistance() != "") {
-					  totalDistance = Math.abs(  Double.parseDouble(summaryReportOne.getDistance())/1000  );
-					  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
-					  summaryReportOne.setDistance(Double.toString(roundOffDistance));
 
-
-				  }
 				  if(summaryReportOne.getAverageSpeed() != null && summaryReportOne.getAverageSpeed() != "") {
 					  totalDistance = Math.abs(  Double.parseDouble(summaryReportOne.getAverageSpeed())  );
 					  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
@@ -2037,7 +2039,6 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",summaryReport,summaryReport.size());
 			 logger.info("************************ getSummaryReport ENDED ***************************");
 			return  ResponseEntity.ok().body(getObjectResponse);
-		
 	}
 
 	@Override
@@ -4942,75 +4943,11 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				 ignitionOFF = mongoPositionRepo.getCountFromAttrbuitesChart(positionIds, "ignition", false);
 				 
 
-				List<CustomPositions> positionsList = mongoPositionRepo.getCharts(positionIds);
 				List<Map> data = new ArrayList<>();
 				
-				
+				data = mongoPositionRepo.getCharts(positionIds);
 
-			    if(positionsList.size()>0) {
-			    	
-					for(int i=0;i<positionsList.size();i++) {
-
-
-		             	JSONObject obj = new JSONObject(positionsList.get(i).getAttributes().toString());
-						Map devicesList = new HashMap();
-						if(obj.has("todayHoursString")) {
-							SimpleDateFormat time = new SimpleDateFormat("HH:mm");
-							try {
-								Date date =  time.parse((String) obj.get("todayHoursString"));
-							    devicesList.put("hours", date.getHours());
-								
-							} catch (JSONException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} catch (ParseException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-
-
-						}
-						else {
-						    devicesList.put("hours",0);
-
-						}
-
-					    devicesList.put("deviceName", positionsList.get(i).getDeviceName());
-					    devicesList.put("driverName", positionsList.get(i).getDriverName());
-
-
-					    if(data.size() == 10) {
-				    		Integer newData = Integer.parseInt( devicesList.get("hours").toString() );
-
-					    	for(int k=0;k<data.size();k++) {
-					    		Integer oldData = Integer.parseInt( data.get(k).get("hours").toString() );
-
-					    		if(newData > oldData) {
-
-					    			data.get(k).replace("hours", devicesList.get("hours"));
-					    			data.get(k).replace("driverName", devicesList.get("driverName"));
-					    			data.get(k).replace("deviceName", devicesList.get("deviceName"));
-					    			break;
-
-					    		}
-
-					    	
-
-					    	}
-
-					    }
-					    if(data.size() < 10) {
-					    	data.add(devicesList);
-					    						
-					    }
-
-					    
-						
-					}
-					
-					
-				
-				}
+			    
 			    
 			    Map dev = new HashMap();
 			    dev.put("ignition_on", ignitionON);
@@ -5056,74 +4993,12 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 
 
-			List<CustomPositions> positionsList = mongoPositionRepo.getCharts(positionIds);
 			List<Map> data = new ArrayList<>();
+			
+			data = mongoPositionRepo.getCharts(positionIds);
 			List<Map> finalData = new ArrayList<>();
 
-		    if(positionsList.size()>0) {
-		    	
-				for(int i=0;i<positionsList.size();i++) {
-
-
-	             	JSONObject obj = new JSONObject(positionsList.get(i).getAttributes().toString());
-					Map devicesList = new HashMap();
-					if(obj.has("todayHoursString")) {
-						SimpleDateFormat time = new SimpleDateFormat("HH:mm");
-						try {
-							Date date =  time.parse((String) obj.get("todayHoursString"));
-						    devicesList.put("hours", date.getHours());
-							
-						} catch (JSONException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (ParseException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-
-
-					}
-					else {
-					    devicesList.put("hours",0);
-
-					}
-
-				    devicesList.put("deviceName", positionsList.get(i).getDeviceName());
-				    devicesList.put("driverName", positionsList.get(i).getDriverName());
-
-
-				    if(data.size() == 10) {
-			    		Integer newData = Integer.parseInt( devicesList.get("hours").toString() );
-
-				    	for(int k=0;k<data.size();k++) {
-				    		Integer oldData = Integer.parseInt( data.get(k).get("hours").toString() );
-
-				    		if(newData > oldData) {
-
-				    			data.get(k).replace("hours", devicesList.get("hours"));
-				    			data.get(k).replace("driverName", devicesList.get("driverName"));
-				    			data.get(k).replace("deviceName", devicesList.get("deviceName"));
-				    			break;
-
-				    		}
-
-				    	
-
-				    	}
-
-				    }
-				    if(data.size() < 10) {
-				    	data.add(devicesList);
-				    						
-				    }
-
-				    
-					
-				}
-				
-				
-			
-			}
+		   
 		    
 		    Map dev = new HashMap();
 		    dev.put("ignition_on", ignitionON);
@@ -5141,7 +5016,6 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			logger.info("************************ getIgnitionMotion ENDED ***************************");
 			return ResponseEntity.ok().body(getObjectResponse);
 		 }
-		 
 	}
 
 	@Override
@@ -5176,40 +5050,24 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		 List<Long>userIds= new ArrayList<>();
 
 		 if(loggedUser.getAccountType().equals(4)) {
-			 Set<User> parentClients = loggedUser.getUsersOfUser();
-			 if(parentClients.isEmpty()) {
-				
-				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get devices of this user",null);
-				 logger.info("************************ getDistanceFuelEngine ENDED ***************************");
-				return  ResponseEntity.status(404).body(getObjectResponse);
-			 }else {
-				 User parentClient = new User() ;
-				 for(User object : parentClients) {
-					 parentClient = object;
-				 }
-				 userIds.add(parentClient.getId());
-				
-		    }
-		 }
-		 else {
-			userIds.add(userId);
-		 }
-			List<SummaryReport> summaryReport = new ArrayList<>();
-
-
-			List<Long>allDevices= new ArrayList<>();
-			allDevices = deviceRepository.getDevicesUsers(userIds);
-
-		 
-			String plainCreds = "admin@fuinco.com:admin";
-			byte[] plainCredsBytes = plainCreds.getBytes();
 			
-			byte[] base64CredsBytes = Base64.getEncoder().encode(plainCredsBytes);
-			String base64Creds = new String(base64CredsBytes);
+			List<Long> allDevices = userClientDeviceRepository.getDevicesIds(userId);
+			List<Map> data = new ArrayList<>();
 
-			HttpHeaders headers = new HttpHeaders();
-			headers.add("Authorization", "Basic " + base64Creds);
-			
+			if(allDevices.size()>0) {
+
+				
+				List<SummaryReport> summaryReport = new ArrayList<>();
+			 
+				String plainCreds = "admin@fuinco.com:admin";
+				byte[] plainCredsBytes = plainCreds.getBytes();
+				
+				byte[] base64CredsBytes = Base64.getEncoder().encode(plainCredsBytes);
+				String base64Creds = new String(base64CredsBytes);
+
+				HttpHeaders headers = new HttpHeaders();
+				headers.add("Authorization", "Basic " + base64Creds);
+				
 			  String GET_URL = summaryUrl;
 			  RestTemplate restTemplate = new RestTemplate();
 			  restTemplate.getMessageConverters()
@@ -5240,6 +5098,163 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				        .queryParam("start", 0)
 				        .queryParam("limit",25).build();
 			  HttpEntity<String> request = new HttpEntity<String>(headers);
+				  String URL = builder.toString();
+				  if(allDevices.size()>0) {
+					  for(int i=0;i<allDevices.size();i++) {
+						  URL +="&deviceId="+allDevices.get(i);
+					  }
+				  }
+				  ResponseEntity<List<SummaryReport>> rateResponse =
+					        restTemplate.exchange(URL,
+					                    HttpMethod.GET,request, new ParameterizedTypeReference<List<SummaryReport>>() {
+					            });
+				  
+				  summaryReport = rateResponse.getBody();
+		
+				  if(summaryReport.size()>0) {
+		
+					  for(SummaryReport summaryReportOne : summaryReport ) {
+						  
+							Map devicesList = new HashMap();
+		
+		
+						  Double totalDistance = 0.0 ;
+						  double roundOffDistance = 0.0;
+						  Double litres=10.0;
+						  double roundOffFuel=0.0;
+						  Double Fuel =0.0;
+						  Double distance=0.0;
+						  
+						  if(summaryReportOne.getDistance() != null && summaryReportOne.getDistance() != "") {
+							  totalDistance = Math.abs(  Double.parseDouble(summaryReportOne.getDistance())/1000  );
+							  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+							  summaryReportOne.setDistance(Double.toString(roundOffDistance));
+
+
+						  }
+						  
+						  Device device= deviceServiceImpl.findById(summaryReportOne.getDeviceId());
+						  if(device != null) {
+							  Set<Driver>  drivers = device.getDriver();
+							  for(Driver driver : drivers ) {
+		
+								 summaryReportOne.setDriverName(driver.getName());
+								 
+							  }
+
+							  
+							  if(device.getFuel() != null) {
+									if(device.getFuel() != null && device.getFuel() != "" && device.getFuel().startsWith("{")) {
+										JSONObject obj = new JSONObject(device.getFuel());	
+										if(obj.has("fuelPerKM")) {
+											litres=obj.getDouble("fuelPerKM");
+											
+										}
+									}
+							   }
+							  
+							 
+						   }
+						  distance = Double.parseDouble(summaryReportOne.getDistance().toString());
+						  if(distance > 0) {
+							Fuel = (distance*litres)/100;
+						  }
+	
+						  roundOffFuel = Math.round(Fuel * 100.0 )/ 100.0;
+						  summaryReportOne.setSpentFuel(Double.toString(roundOffFuel));
+						  
+							devicesList.put("spentFuel", summaryReportOne.getSpentFuel());
+							devicesList.put("distance", summaryReportOne.getDistance());
+							devicesList.put("deviceId", summaryReportOne.getDeviceId());
+							devicesList.put("deviceName", summaryReportOne.getDeviceName());
+							
+							if(data.size() == 10) {
+					    		Double newData = Double.parseDouble( devicesList.get("distance").toString() );
+		
+						    	for(int k=0;k<data.size();k++) {
+						    		Double oldData = Double.parseDouble( data.get(k).get("distance").toString() );
+		
+						    		if(newData > oldData) {
+		
+						    			data.get(k).replace("spentFuel", devicesList.get("spentFuel"));
+						    			data.get(k).replace("distance", devicesList.get("distance"));
+						    			data.get(k).replace("deviceId", devicesList.get("deviceId"));
+						    			data.get(k).replace("deviceName", devicesList.get("deviceName"));
+						    			break;
+		
+						    		}
+		
+						    	
+		
+						    	}
+		
+						    }
+						    if(data.size() < 10) {
+								data.add(devicesList);
+						    }
+							
+						 }
+						  
+				  }
+		    
+			}
+
+
+		
+		
+			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",data);
+			logger.info("************************ getDistanceFuelEngine ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+
+		 }
+		 else {
+			userIds.add(userId);
+			List<SummaryReport> summaryReport = new ArrayList<>();
+
+
+			List<Long>allDevices= new ArrayList<>();
+			allDevices = deviceRepository.getDevicesUsers(userIds);
+
+		 
+			String plainCreds = "admin@fuinco.com:admin";
+			byte[] plainCredsBytes = plainCreds.getBytes();
+			
+			byte[] base64CredsBytes = Base64.getEncoder().encode(plainCredsBytes);
+			String base64Creds = new String(base64CredsBytes);
+
+			HttpHeaders headers = new HttpHeaders();
+			headers.add("Authorization", "Basic " + base64Creds);
+			
+		  String GET_URL = summaryUrl;
+		  RestTemplate restTemplate = new RestTemplate();
+		  restTemplate.getMessageConverters()
+	        .add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
+		  
+		    SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+			inputFormat.setLenient(false);
+			outputFormat.setLenient(false);
+			Date dateTo;
+			Date dateFrom = new Date();
+			Calendar c = Calendar.getInstance(); 
+			c.setTime(dateFrom); 
+			c.add(Calendar.DATE, 1);
+			dateTo = c.getTime();
+			String from = "";
+			String to = "";
+			from = outputFormat.format(dateFrom);
+			to = outputFormat.format(dateTo);
+				
+			
+
+		  UriComponents builder = UriComponentsBuilder.fromHttpUrl(GET_URL)
+			        .queryParam("type", "allEvents")
+			        .queryParam("from", from)
+			        .queryParam("to", to)
+			        .queryParam("page", 1)
+			        .queryParam("start", 0)
+			        .queryParam("limit",25).build();
+		  HttpEntity<String> request = new HttpEntity<String>(headers);
 			  String URL = builder.toString();
 			  if(allDevices.size()>0) {
 				  for(int i=0;i<allDevices.size();i++) {
@@ -5253,46 +5268,58 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			  
 			  summaryReport = rateResponse.getBody();
 			  List<Map> data = new ArrayList<>();
-
+	
 			  if(summaryReport.size()>0) {
-
+	
 				  for(SummaryReport summaryReportOne : summaryReport ) {
 					  
 						Map devicesList = new HashMap();
-
+	
+					  Double totalDistance = 0.0 ;
+					  double roundOffDistance = 0.0;
+					  Double litres=10.0;
+					  double roundOffFuel=0.0;
+					  Double Fuel =0.0;
+					  Double distance=0.0;
 					  
+					  if(summaryReportOne.getDistance() != null && summaryReportOne.getDistance() != "") {
+						  totalDistance = Math.abs(  Double.parseDouble(summaryReportOne.getDistance())/1000  );
+						  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+						  summaryReportOne.setDistance(Double.toString(roundOffDistance));
+
+
+					  }
 					  
 					  Device device= deviceServiceImpl.findById(summaryReportOne.getDeviceId());
 					  if(device != null) {
 						  Set<Driver>  drivers = device.getDriver();
 						  for(Driver driver : drivers ) {
-
+	
 							 summaryReportOne.setDriverName(driver.getName());
 							 
 						  }
+						  
+						  
 						  if(device.getFuel() != null) {
-								 
-								
-								Double litres=0.0;
-								Double Fuel =0.0;
-								Double distance=0.0;
-								JSONObject obj = new JSONObject(device.getFuel());	
-								if(obj.has("fuelPerKM")) {
-									litres=obj.getDouble("fuelPerKM");
+								if(device.getFuel() != null && device.getFuel() != "" && device.getFuel().startsWith("{")) {
+									JSONObject obj = new JSONObject(device.getFuel());	
+									if(obj.has("fuelPerKM")) {
+										litres=obj.getDouble("fuelPerKM");
+										
+									}
+
 								}
-
-								distance = Double.parseDouble(summaryReportOne.getDistance().toString());
-								if(distance > 0) {
-									Fuel = (distance/100)*litres;
-								}
-
-								summaryReportOne.setSpentFuel(Double.toString(Fuel));
-
-
-								
-
-						   }
+						  }
+						  
 					   }
+						  distance = Double.parseDouble(summaryReportOne.getDistance().toString());
+						  if(distance > 0) {
+							Fuel = (distance*litres)/100;
+						  }
+	
+						  roundOffFuel = Math.round(Fuel * 100.0 )/ 100.0;
+						  summaryReportOne.setSpentFuel(Double.toString(roundOffFuel));
+					  
 						devicesList.put("spentFuel", summaryReportOne.getSpentFuel());
 						devicesList.put("distance", summaryReportOne.getDistance());
 						devicesList.put("deviceId", summaryReportOne.getDeviceId());
@@ -5300,24 +5327,24 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 						
 						if(data.size() == 10) {
 				    		Double newData = Double.parseDouble( devicesList.get("distance").toString() );
-
+	
 					    	for(int k=0;k<data.size();k++) {
 					    		Double oldData = Double.parseDouble( data.get(k).get("distance").toString() );
-
+	
 					    		if(newData > oldData) {
-
+	
 					    			data.get(k).replace("spentFuel", devicesList.get("spentFuel"));
 					    			data.get(k).replace("distance", devicesList.get("distance"));
 					    			data.get(k).replace("deviceId", devicesList.get("deviceId"));
 					    			data.get(k).replace("deviceName", devicesList.get("deviceName"));
 					    			break;
-
+	
 					    		}
-
+	
 					    	
-
+	
 					    	}
-
+	
 					    }
 					    if(data.size() < 10) {
 							data.add(devicesList);
@@ -5329,14 +5356,15 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	    
 		
 		
-		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",data);
-		logger.info("************************ getDistanceFuelEngine ENDED ***************************");
-		return ResponseEntity.ok().body(getObjectResponse);
+			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",data);
+			logger.info("************************ getDistanceFuelEngine ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+		 }
 	}
 
 	@Override
 	public ResponseEntity<?> getNotificationsChartApp(String TOKEN, Long userId) {
-logger.info("************************ getNotifications STARTED ***************************");
+        logger.info("************************ getNotifications STARTED ***************************");
 		
 		List<EventReport> notifications = new ArrayList<EventReport>();
 		if(TOKEN.equals("")) {
@@ -7404,6 +7432,9 @@ logger.info("************************ getNotifications STARTED *****************
 					  Double totalDistance = 0.0 ;
 					  double roundOffDistance = 0.0;
 					  double roundOffFuel = 0.0;
+					  Double litres=10.0;
+					  Double Fuel =0.0;
+					  Double distance=0.0;
 					  
 					  Device device= deviceServiceImpl.findById(tripReportOne.getDeviceId());
 					  Set<Driver>  drivers = device.getDriver();
@@ -7415,28 +7446,32 @@ logger.info("************************ getNotifications STARTED *****************
 						
 						 
 					  }
-					  if( device.getFuel() != null) {
-							 
-							Double litres=0.0;
-							Double Fuel =0.0;
-							Double distance=0.0;
-							
-							JSONObject obj = new JSONObject(device.getFuel());	
-							if(obj.has("fuelPerKM")) {
-								litres=Double.parseDouble(obj.get("fuelPerKM").toString());
+					  if(tripReportOne.getDistance() != null && tripReportOne.getDistance() != "") {
+						  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getDistance())/1000  );
+						  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+						  tripReportOne.setDistance(Double.toString(roundOffDistance));
+
+
+					  }
+					  if(device.getFuel() != null) {
+							if(device.getFuel() != null && device.getFuel() != "" && device.getFuel().startsWith("{")) {
+								JSONObject obj = new JSONObject(device.getFuel());	
+								if(obj.has("fuelPerKM")) {
+									litres=obj.getDouble("fuelPerKM");
+									
+								}
 							}
+					   }
+					  
+					 
+				   
+				  distance = Double.parseDouble(tripReportOne.getDistance().toString());
+				  if(distance > 0) {
+					Fuel = (distance*litres)/100;
+				  }
 
-							distance = Double.parseDouble(tripReportOne.getDistance());
-							if(distance > 0) {
-								Fuel = (distance/100)*litres;
-							}
-
-
-							roundOffFuel = Math.round(Fuel * 100.0 / 100.0);
-
-							tripReportOne.setSpentFuel(Double.toString(roundOffFuel));
-
-						 }
+				  roundOffFuel = Math.round(Fuel * 100.0 )/ 100.0;
+				  tripReportOne.setSpentFuel(Double.toString(roundOffFuel));
 					  
 					  
 					  if(tripReportOne.getDuration() != null && tripReportOne.getDuration() != "") {
@@ -7451,13 +7486,7 @@ logger.info("************************ getNotifications STARTED *****************
 						  String totalHours = String.valueOf(hoursEngine)+":"+String.valueOf(minutesEngine)+":"+String.valueOf(secondsEngine);
 						  tripReportOne.setDuration(totalHours);
 					  }
-					  if(tripReportOne.getDistance() != null && tripReportOne.getDistance() != "") {
-						  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getDistance())/1000  );
-						  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
-						  tripReportOne.setDistance(Double.toString(roundOffDistance));
-
-
-					  }
+					  
 					  if(tripReportOne.getAverageSpeed() != null && tripReportOne.getAverageSpeed() != "") {
 						  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getAverageSpeed())  );
 						  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
@@ -8952,82 +8981,157 @@ logger.info("************************ getNotifications STARTED *****************
 			String type, String from, String to, int page, int start, int limit, Long userId) {
 		 logger.info("************************ geTotalTripsReport STARTED ***************************");
 
-		List<TripReport> tripReport = new ArrayList<>();
+			List<TripReport> tripReport = new ArrayList<>();
 
-		List<Long>allDrivers= new ArrayList<>();
-		List<DriverSelect>allDevicesList= new ArrayList<DriverSelect>();
-		if(TOKEN.equals("")) {
-			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",tripReport);
-			 logger.info("************************ geTotalTripsReport ENDED ***************************");
-			 return  ResponseEntity.badRequest().body(getObjectResponse);
-		}
-		
-		
-		if(!TOKEN.equals("Schedule")) {
-			if(super.checkActive(TOKEN)!= null)
-			{
-				return super.checkActive(TOKEN);
+			List<Long>allDrivers= new ArrayList<>();
+			List<DriverSelect>allDevicesList= new ArrayList<DriverSelect>();
+			if(TOKEN.equals("")) {
+				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",tripReport);
+				 logger.info("************************ geTotalTripsReport ENDED ***************************");
+				 return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
-		}
-		
-		
-		User loggedUser = new User();
-		if(userId != 0) {
 			
-			loggedUser = userServiceImpl.findById(userId);
-			if(loggedUser == null) {
-				getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",tripReport);
-				 logger.info("************************ geTotalTripsReport ENDED ***************************");
-				return  ResponseEntity.status(404).body(getObjectResponse);
+			
+			if(!TOKEN.equals("Schedule")) {
+				if(super.checkActive(TOKEN)!= null)
+				{
+					return super.checkActive(TOKEN);
+				}
 			}
-		}	
-		
-		if(!loggedUser.getAccountType().equals(1)) {
-			if(!userRoleService.checkUserHasPermission(userId, "TOTALDISTANCE", "list")) {
-				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get trip list",tripReport);
-				 logger.info("************************ geTotalTripsReport ENDED ***************************");
-				return  ResponseEntity.badRequest().body(getObjectResponse);
+			
+			
+			User loggedUser = new User();
+			if(userId != 0) {
+				
+				loggedUser = userServiceImpl.findById(userId);
+				if(loggedUser == null) {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",tripReport);
+					 logger.info("************************ geTotalTripsReport ENDED ***************************");
+					return  ResponseEntity.status(404).body(getObjectResponse);
+				}
+			}	
+			
+			if(!loggedUser.getAccountType().equals(1)) {
+				if(!userRoleService.checkUserHasPermission(userId, "TOTALDISTANCE", "list")) {
+					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get trip list",tripReport);
+					 logger.info("************************ geTotalTripsReport ENDED ***************************");
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
 			}
-		}
-		
-		
-		
-		List<Long>allDevices= new ArrayList<>();
+			
+			
+			
+			List<Long>allDevices= new ArrayList<>();
 
-		if(groupIds.length != 0) {
-			for(Long groupId:groupIds) {
-				if(groupId != 0) {
-			    	Group group=groupRepository.findOne(groupId);
-			    	if(group != null) {
-						if(group.getIs_deleted() == null) {
-							boolean isParent = false;
-							if(loggedUser.getAccountType().equals(4)) {
-								Set<User> clientParents = loggedUser.getUsersOfUser();
-								if(clientParents.isEmpty()) {
-									getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group",tripReport);
-									 logger.info("************************ geTotalTripsReport ENDED ***************************");
-									return  ResponseEntity.badRequest().body(getObjectResponse);
-								}else {
-									User parent = null;
-									for(User object : clientParents) {
-										parent = object ;
-									}
-
-									Set<User>groupParents = group.getUserGroup();
-									if(groupParents.isEmpty()) {
+			if(groupIds.length != 0) {
+				for(Long groupId:groupIds) {
+					if(groupId != 0) {
+				    	Group group=groupRepository.findOne(groupId);
+				    	if(group != null) {
+							if(group.getIs_deleted() == null) {
+								boolean isParent = false;
+								if(loggedUser.getAccountType().equals(4)) {
+									Set<User> clientParents = loggedUser.getUsersOfUser();
+									if(clientParents.isEmpty()) {
 										getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group",tripReport);
 										 logger.info("************************ geTotalTripsReport ENDED ***************************");
 										return  ResponseEntity.badRequest().body(getObjectResponse);
 									}else {
-										for(User parentObject : groupParents) {
-											if(parentObject.getId().equals(parent.getId())) {
+										User parent = null;
+										for(User object : clientParents) {
+											parent = object ;
+										}
+
+										Set<User>groupParents = group.getUserGroup();
+										if(groupParents.isEmpty()) {
+											getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group",tripReport);
+											 logger.info("************************ geTotalTripsReport ENDED ***************************");
+											return  ResponseEntity.badRequest().body(getObjectResponse);
+										}else {
+											for(User parentObject : groupParents) {
+												if(parentObject.getId().equals(parent.getId())) {
+													isParent = true;
+													break;
+												}
+											}
+										}
+									}
+									List<Long> CheckData = userClientGroupRepository.getGroup(userId,groupId);
+									if(CheckData.isEmpty()) {
+											isParent = false;
+									}
+									else {
+											isParent = true;
+									}
+								}
+								if(!groupsServiceImpl.checkIfParent(group , loggedUser) && ! isParent) {
+									getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group ",tripReport);
+									 logger.info("************************ geTotalTripsReport ENDED ***************************");
+									return ResponseEntity.badRequest().body(getObjectResponse);
+								}
+								if(group.getType() != null) {
+									if(group.getType().equals("driver")) {
+										
+										allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
+									
+
+									}
+									else if(group.getType().equals("device")) {
+										
+										allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
+										
+										
+									}
+									else if(group.getType().equals("geofence")) {
+										
+										allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
+										
+
+									}
+								}
+
+								
+							}
+				    	}
+				    	
+
+					}
+				}
+			}
+			
+			if(driverIds.length !=0 ) {
+				for(Long driverId : driverIds) {
+					if(driverId !=0) {
+						
+						Driver driver =driverServiceImpl.getDriverById(driverId);
+						if(driver != null) {
+							boolean isParent = false;
+							if(loggedUser.getAccountType() == 4) {
+								Set<User>parentClients = loggedUser.getUsersOfUser();
+								if(parentClients.isEmpty()) {
+									getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this driver ",tripReport);
+									 logger.info("************************ geTotalTripsReport ENDED ***************************");
+									return  ResponseEntity.badRequest().body(getObjectResponse);
+								}else {
+									User parent = null;
+									for(User object : parentClients) {
+										parent = object ;
+									}
+									Set<User>driverParent = driver.getUserDriver();
+									if(driverParent.isEmpty()) {
+										getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this driver ",tripReport);
+										 logger.info("************************ geTotalTripsReport ENDED ***************************");
+										return  ResponseEntity.badRequest().body(getObjectResponse);
+									}else {
+										for(User  parentObject : driverParent) {
+											if(parent.getId() == parentObject.getId()) {
 												isParent = true;
 												break;
 											}
 										}
 									}
 								}
-								List<Long> CheckData = userClientGroupRepository.getGroup(userId,groupId);
+								List<Long> CheckData = userClientDriverRepository.getDriver(userId,driverId);
 								if(CheckData.isEmpty()) {
 										isParent = false;
 								}
@@ -9035,52 +9139,37 @@ logger.info("************************ getNotifications STARTED *****************
 										isParent = true;
 								}
 							}
-							if(!groupsServiceImpl.checkIfParent(group , loggedUser) && ! isParent) {
-								getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group ",tripReport);
+							if(!driverServiceImpl.checkIfParent(driver , loggedUser) && ! isParent) {
+								getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this driver",tripReport);
 								 logger.info("************************ geTotalTripsReport ENDED ***************************");
 								return ResponseEntity.badRequest().body(getObjectResponse);
 							}
-							if(group.getType() != null) {
-								if(group.getType().equals("driver")) {
-									
-									allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
-								
-
-								}
-								else if(group.getType().equals("device")) {
-									
-									allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
-									
-									
-								}
-								else if(group.getType().equals("geofence")) {
-									
-									allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
-									
-
-								}
-							}
-
+							allDrivers.add(driverId);
+							
 							
 						}
-			    	}
-			    	
-
+						
+		
+					}
 				}
 			}
-		}
-		
-		if(driverIds.length !=0 ) {
-			for(Long driverId : driverIds) {
-				if(driverId !=0) {
-					
-					Driver driver =driverServiceImpl.getDriverById(driverId);
-					if(driver != null) {
+			if(allDrivers.size()>0) {
+				allDevicesList.addAll(driverRepository.devicesOfDrivers(allDrivers));
+			}
+			
+			for(DriverSelect object : allDevicesList) {
+				allDevices.add(object.getId());
+			}
+			
+			if(deviceIds.length != 0 ) {
+				for(Long deviceId:deviceIds) {
+					if(deviceId !=0) {
+						Device device =deviceServiceImpl.findById(deviceId);
 						boolean isParent = false;
 						if(loggedUser.getAccountType() == 4) {
 							Set<User>parentClients = loggedUser.getUsersOfUser();
 							if(parentClients.isEmpty()) {
-								getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this driver ",tripReport);
+								getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this device ",tripReport);
 								 logger.info("************************ geTotalTripsReport ENDED ***************************");
 								return  ResponseEntity.badRequest().body(getObjectResponse);
 							}else {
@@ -9088,13 +9177,13 @@ logger.info("************************ getNotifications STARTED *****************
 								for(User object : parentClients) {
 									parent = object ;
 								}
-								Set<User>driverParent = driver.getUserDriver();
-								if(driverParent.isEmpty()) {
-									getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this driver ",tripReport);
+								Set<User>deviceParent = device.getUser();
+								if(deviceParent.isEmpty()) {
+									getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this device ",tripReport);
 									 logger.info("************************ geTotalTripsReport ENDED ***************************");
 									return  ResponseEntity.badRequest().body(getObjectResponse);
 								}else {
-									for(User  parentObject : driverParent) {
+									for(User  parentObject : deviceParent) {
 										if(parent.getId() == parentObject.getId()) {
 											isParent = true;
 											break;
@@ -9102,7 +9191,7 @@ logger.info("************************ getNotifications STARTED *****************
 									}
 								}
 							}
-							List<Long> CheckData = userClientDriverRepository.getDriver(userId,driverId);
+							List<Long> CheckData = userClientDeviceRepository.getDevice(userId,deviceId);
 							if(CheckData.isEmpty()) {
 									isParent = false;
 							}
@@ -9110,295 +9199,240 @@ logger.info("************************ getNotifications STARTED *****************
 									isParent = true;
 							}
 						}
-						if(!driverServiceImpl.checkIfParent(driver , loggedUser) && ! isParent) {
-							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this driver",tripReport);
+						if(!deviceServiceImpl.checkIfParent(device , loggedUser) && ! isParent) {
+							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this device",tripReport);
 							 logger.info("************************ geTotalTripsReport ENDED ***************************");
 							return ResponseEntity.badRequest().body(getObjectResponse);
 						}
-						allDrivers.add(driverId);
 						
+						allDevices.add(deviceId);
+
 						
+		
 					}
-					
-	
 				}
 			}
-		}
-		if(allDrivers.size()>0) {
-			allDevicesList.addAll(driverRepository.devicesOfDrivers(allDrivers));
-		}
-		
-		for(DriverSelect object : allDevicesList) {
-			allDevices.add(object.getId());
-		}
-		
-		if(deviceIds.length != 0 ) {
-			for(Long deviceId:deviceIds) {
-				if(deviceId !=0) {
-					Device device =deviceServiceImpl.findById(deviceId);
-					boolean isParent = false;
-					if(loggedUser.getAccountType() == 4) {
-						Set<User>parentClients = loggedUser.getUsersOfUser();
-						if(parentClients.isEmpty()) {
-							getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this device ",tripReport);
-							 logger.info("************************ geTotalTripsReport ENDED ***************************");
-							return  ResponseEntity.badRequest().body(getObjectResponse);
-						}else {
-							User parent = null;
-							for(User object : parentClients) {
-								parent = object ;
-							}
-							Set<User>deviceParent = device.getUser();
-							if(deviceParent.isEmpty()) {
-								getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this device ",tripReport);
-								 logger.info("************************ geTotalTripsReport ENDED ***************************");
-								return  ResponseEntity.badRequest().body(getObjectResponse);
-							}else {
-								for(User  parentObject : deviceParent) {
-									if(parent.getId() == parentObject.getId()) {
-										isParent = true;
-										break;
-									}
-								}
-							}
-						}
-						List<Long> CheckData = userClientDeviceRepository.getDevice(userId,deviceId);
-						if(CheckData.isEmpty()) {
-								isParent = false;
-						}
-						else {
-								isParent = true;
-						}
-					}
-					if(!deviceServiceImpl.checkIfParent(device , loggedUser) && ! isParent) {
-						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this device",tripReport);
-						 logger.info("************************ geTotalTripsReport ENDED ***************************");
-						return ResponseEntity.badRequest().body(getObjectResponse);
-					}
-					
-					allDevices.add(deviceId);
 
-					
-	
-				}
+			Date dateFrom;
+			Date dateTo;
+			if(from.equals("0") || to.equals("0")) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+
 			}
-		}
+			else {
+				SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+				SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+				SimpleDateFormat inputFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+				inputFormat1.setLenient(false);
+				inputFormat.setLenient(false);
+				outputFormat.setLenient(false);
 
-		Date dateFrom;
-		Date dateTo;
-		if(from.equals("0") || to.equals("0")) {
-			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",null);
-			logger.info("************************ getEventsReport ENDED ***************************");		
-			return  ResponseEntity.badRequest().body(getObjectResponse);
-
-		}
-		else {
-			SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-			SimpleDateFormat inputFormat1 = new SimpleDateFormat("yyyy-MM-dd");
-			inputFormat1.setLenient(false);
-			inputFormat.setLenient(false);
-			outputFormat.setLenient(false);
-
-			
-			try {
-				dateFrom = inputFormat.parse(from);
-				from = outputFormat.format(dateFrom);
 				
-
-			} catch (ParseException e2) {
-				// TODO Auto-generated catch block
 				try {
-					dateFrom = inputFormat1.parse(from);
+					dateFrom = inputFormat.parse(from);
 					from = outputFormat.format(dateFrom);
-
-				} catch (ParseException e) {
-					// TODO Auto-generated catch block
 					
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
-					logger.info("************************ getEventsReport ENDED ***************************");		
-					return  ResponseEntity.badRequest().body(getObjectResponse);
-				}
-				
-			}
-			
-			try {
-				dateTo = inputFormat.parse(to);
-				to = outputFormat.format(dateTo);
-				
 
-			} catch (ParseException e2) {
-				// TODO Auto-generated catch block
-				try {
-					dateTo = inputFormat1.parse(to);
-					to = outputFormat.format(dateTo);
-
-				} catch (ParseException e) {
+				} catch (ParseException e2) {
 					// TODO Auto-generated catch block
-					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+					try {
+						dateFrom = inputFormat1.parse(from);
+						from = outputFormat.format(dateFrom);
+
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						
+						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+						logger.info("************************ getEventsReport ENDED ***************************");		
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+					}
+					
+				}
+				
+				try {
+					dateTo = inputFormat.parse(to);
+					to = outputFormat.format(dateTo);
+					
+
+				} catch (ParseException e2) {
+					// TODO Auto-generated catch block
+					try {
+						dateTo = inputFormat1.parse(to);
+						to = outputFormat.format(dateTo);
+
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+						logger.info("************************ getEventsReport ENDED ***************************");		
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+					}
+					
+				}
+				
+				
+				
+				Date today=new Date();
+
+				if(dateFrom.getTime() > dateTo.getTime()) {
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",null);
 					logger.info("************************ getEventsReport ENDED ***************************");		
 					return  ResponseEntity.badRequest().body(getObjectResponse);
 				}
 				
-			}
-			
-			
-			
-			
-			Date today=new Date();
-
-			if(dateFrom.getTime() > dateTo.getTime()) {
-				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",null);
-				logger.info("************************ getEventsReport ENDED ***************************");		
-				return  ResponseEntity.badRequest().body(getObjectResponse);
-			}
-			if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
-				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",null);
-				logger.info("************************ getEventsReport ENDED ***************************");		
-				return  ResponseEntity.badRequest().body(getObjectResponse);
-			}
-			
-			Integer size = 0;
-			
-			String appendString="";
-	
-			if(allDevices.size()>0) {
-				  for(int i=0;i<allDevices.size();i++) {
-					  if(appendString != "") {
-						  appendString +=","+allDevices.get(i);
-					  }
-					  else {
-						  appendString +=allDevices.get(i);
-					  }
-				  }
-			 }
-			allDevices = new ArrayList<Long>();
-			
-			String[] data = {};
-			if(!appendString.equals("")) {
-		        data = appendString.split(",");
-
-			}
-	        
-
-	        for(String d:data) {
-
-	        	if(!allDevices.contains(Long.parseLong(d))) {
-		        	allDevices.add(Long.parseLong(d));
-	        	}
-	        }
-	        
-	        if(allDevices.isEmpty()) {
-
-	        	getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "no data for devices of group or devices that you selected ",tripReport);
-	   		 logger.info("************************ geTotalTripsReport ENDED ***************************");
-	        	return  ResponseEntity.badRequest().body(getObjectResponse);
-	        }
-		}
-		tripReport = (List<TripReport>) returnFromTraccarApp(tripsUrl,"trips",allDevices, from, to, type, page, start, limit).getBody();
+				Integer size = 0;
+				
+				String appendString="";
 		
-		List<Map> data = new ArrayList<Map>();
-
-		if(tripReport.size()>0) {
-
-			  for(Long dev:allDevices) {
-				  
-				  Double totalDistance = 0.0 ;
-				  double roundOffDistance = 0.0;
-				  Long time = (long) 0;
-				  Double totalFuel=0.0;
-				  double roundOffFuel = 0.0;
-				  String totalDuration = "00:00:00";
-
-				  Map devicesStatus = new HashMap();
-				  for(TripReport tripReportOne: tripReport) {
-					  devicesStatus.put("deviceName", null);
-					  devicesStatus.put("deviceId" ,null);
-					  devicesStatus.put("driverName", null);
-					  devicesStatus.put("driverUniqueId",null);
-					  devicesStatus.put("totalDrivingHours",totalDuration);
-				      devicesStatus.put("totalDistance", roundOffDistance);
-				      devicesStatus.put("totalSpentFuel", roundOffFuel);
-					  
-					  Device device= deviceServiceImpl.findById(dev);
-					  
-				      devicesStatus.put("deviceName", device.getName());
-					  devicesStatus.put("deviceId" ,device.getId());
-					  Set<Driver>  drivers = device.getDriver();
-
-					  for(Driver driver : drivers ) {
-
-						  devicesStatus.put("driverName", driver.getName());
-						  devicesStatus.put("driverUniqueId", driver.getUniqueid());
-						  
+				if(allDevices.size()>0) {
+					  for(int i=0;i<allDevices.size();i++) {
+						  if(appendString != "") {
+							  appendString +=","+allDevices.get(i);
+						  }
+						  else {
+							  appendString +=allDevices.get(i);
+						  }
 					  }
+				 }
+				allDevices = new ArrayList<Long>();
+				
+				String[] data = {};
+				if(!appendString.equals("")) {
+			        data = appendString.split(",");
+
+				}
+		        
+
+		        for(String d:data) {
+
+		        	if(!allDevices.contains(Long.parseLong(d))) {
+			        	allDevices.add(Long.parseLong(d));
+		        	}
+		        }
+		        
+		        if(allDevices.isEmpty()) {
+
+		        	getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "no data for devices of group or devices that you selected ",tripReport);
+		   		 logger.info("************************ geTotalTripsReport ENDED ***************************");
+		        	return  ResponseEntity.badRequest().body(getObjectResponse);
+		        }
+			}
+			tripReport = (List<TripReport>) returnFromTraccarApp(tripsUrl,"trips",allDevices, from, to, type, page, start, limit).getBody();
+			
+			List<Map> data = new ArrayList<Map>();
+
+			if(tripReport.size()>0) {
+
+				  for(Long dev:allDevices) {
 					  
-					  if(tripReportOne.getDeviceId() == dev) {
-						  if(tripReportOne.getDistance() != null && tripReportOne.getDistance() != "") {
-							  totalDistance += Math.abs(  Double.parseDouble(tripReportOne.getDistance())/1000  );
-							  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+					  Double totalDistance = 0.0 ;
+					  double roundOffDistance = 0.0;
+					  Long time = (long) 0;
+					  Double totalFuel=0.0;
+					  double roundOffFuel = 0.0;
+					  String totalDuration = "00:00:00";
 
-
-						  }
-						  if(tripReportOne.getDuration() != null && tripReportOne.getDuration() != "") {
-
-							  time += Math.abs(  Long.parseLong(tripReportOne.getDuration())  );
-							  
-							  Long hours =   TimeUnit.MILLISECONDS.toHours(time) ;
-							  Long minutes = TimeUnit.MILLISECONDS.toMinutes(time) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(time));
-							  Long seconds = TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time));
-							  
-							  totalDuration = String.valueOf(hours)+":"+String.valueOf(minutes)+":"+String.valueOf(seconds);
-
-						  }
-						  if(tripReportOne.getSpentFuel() != null && tripReportOne.getSpentFuel() != "") {
-							  if( device.getFuel() != null) {
-									 
-									Double litres=0.0;
-									Double Fuel =0.0;
-									Double distance=0.0;
-									JSONObject obj = new JSONObject(device.getFuel());	
-									if(obj.has("fuelPerKM")) {
-										litres=Math.abs( Double.parseDouble(obj.get("fuelPerKM").toString()) );
-									}
-
-									distance =Math.abs( Double.parseDouble(tripReportOne.getDistance()) );
-									if(distance > 0) {
-										Fuel = (distance/100)*litres;
-									}
-
-									tripReportOne.setSpentFuel(Double.toString(Fuel));
-
-
-								 }
-								totalFuel += Double.parseDouble(tripReportOne.getSpentFuel());
-								roundOffFuel = Math.round(totalFuel * 100.0) / 100.0;
-
-						  }
+					  Map devicesStatus = new HashMap();
+					  for(TripReport tripReportOne: tripReport) {
+						  devicesStatus.put("deviceName", null);
+						  devicesStatus.put("deviceId" ,null);
+						  devicesStatus.put("driverName", null);
+						  devicesStatus.put("driverUniqueId",null);
 						  devicesStatus.put("totalDrivingHours",totalDuration);
 					      devicesStatus.put("totalDistance", roundOffDistance);
 					      devicesStatus.put("totalSpentFuel", roundOffFuel);
-					  }
-				      
-					  
-				  }
-				  data.add(devicesStatus);
+						  
+						  Device device= deviceServiceImpl.findById(dev);
+						  
+					      devicesStatus.put("deviceName", device.getName());
+						  devicesStatus.put("deviceId" ,device.getId());
+						  Set<Driver>  drivers = device.getDriver();
 
+						  for(Driver driver : drivers ) {
+
+							  devicesStatus.put("driverName", driver.getName());
+							  devicesStatus.put("driverUniqueId", driver.getUniqueid());
+							  
+						  }
+						  
+						  if((long) tripReportOne.getDeviceId() == (long) dev) {
+							  if(tripReportOne.getDistance() != null && tripReportOne.getDistance() != "") {
+								  totalDistance += Math.abs(  Double.parseDouble(tripReportOne.getDistance())/1000  );
+								  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
+
+
+							  }
+							  if(tripReportOne.getDuration() != null && tripReportOne.getDuration() != "") {
+
+								  time += Math.abs(  Long.parseLong(tripReportOne.getDuration())  );
+								  
+								  Long hours =   TimeUnit.MILLISECONDS.toHours(time) ;
+								  Long minutes = TimeUnit.MILLISECONDS.toMinutes(time) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(time));
+								  Long seconds = TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time));
+								  
+								  totalDuration = String.valueOf(hours)+":"+String.valueOf(minutes)+":"+String.valueOf(seconds);
+
+							  }
+							  if(tripReportOne.getSpentFuel() != null && tripReportOne.getSpentFuel() != "") {
+								  Double litres=10.0;
+								  Double Fuel =0.0;
+								  Double distance=0.0;
+								  
+								  if(device.getFuel() != null) {
+										if(device.getFuel() != null && device.getFuel() != "" && device.getFuel().startsWith("{")) {
+											JSONObject obj = new JSONObject(device.getFuel());	
+											if(obj.has("fuelPerKM")) {
+												litres=obj.getDouble("fuelPerKM");
+												
+											}
+										}
+								   }
+								  
+								  
+								  distance = Double.parseDouble(tripReportOne.getDistance().toString());
+								  if(distance > 0) {
+									Fuel = (distance*litres)/100;
+								  }
+					
+								  roundOffFuel = Math.round(Fuel * 100.0 )/ 100.0;
+								  tripReportOne.setSpentFuel(Double.toString(roundOffFuel));
+								  
+
+								  totalFuel += Double.parseDouble(tripReportOne.getSpentFuel());
+								  roundOffFuel = Math.round(totalFuel * 100.0) / 100.0;
+									
+
+							  }
+							  devicesStatus.put("totalDrivingHours",totalDuration);
+						      devicesStatus.put("totalDistance", roundOffDistance);
+						      devicesStatus.put("totalSpentFuel", roundOffFuel);
+						  }
+					      
+						  
+					  }
+					  data.add(devicesStatus);
+
+				  }
+				  
 			  }
 			  
-		  }
-		  
-		  
-		  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",data,data.size());
-			 logger.info("************************ geTotalTripsReport ENDED ***************************");
-			return  ResponseEntity.ok().body(getObjectResponse);
+			  
+			  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",data,data.size());
+				 logger.info("************************ geTotalTripsReport ENDED ***************************");
+				return  ResponseEntity.ok().body(getObjectResponse);
 	}
 	
 	@Override
 	public ResponseEntity<?> getTotalStopsReportApp(String TOKEN, Long[] deviceIds, Long[] driverIds, Long[] groupIds,
 			String type, String from, String to, int page, int start, int limit, Long userId) {
 		
-		
+
 		 logger.info("************************ getTotalStopsReport STARTED ***************************");
 
 		List<StopReport> stopReport = new ArrayList<>();
@@ -9786,7 +9820,7 @@ logger.info("************************ getNotifications STARTED *****************
 							  
 						  }
 						  
-						  if(stopReportOne.getDeviceId() == dev) {
+						  if((long) stopReportOne.getDeviceId() == (long) dev) {
 							  duplicateAddressList.clear();
 							  if(stopReportOne.getAddress() != null && stopReportOne.getAddress() != "") {
 								  duplicateAddressList.add(stopReportOne.getAddress());
@@ -9818,27 +9852,33 @@ logger.info("************************ getNotifications STARTED *****************
 
 
 							  if(stopReportOne.getSpentFuel() != null && stopReportOne.getSpentFuel() != "") {
-								  if( device.getFuel() != null) {
-										 
-										Double litres=0.0;
-										Double Fuel =0.0;
-										Double distance=0.0;
-										JSONObject obj = new JSONObject(device.getFuel());	
-										if(obj.has("fuelPerKM")) {
-											litres=Math.abs( Double.parseDouble(obj.get("fuelPerKM").toString()) );
+								  Double litres=10.0;
+								  Double Fuel =0.0;
+								  Double distance=0.0;
+								  
+								  if(device.getFuel() != null) {
+										if(device.getFuel() != null && device.getFuel() != "" && device.getFuel().startsWith("{")) {
+											JSONObject obj = new JSONObject(device.getFuel());	
+											if(obj.has("fuelPerKM")) {
+												litres=obj.getDouble("fuelPerKM");
+												
+											}
 										}
+								   }
+								  
+								  
+								  distance = Double.parseDouble(stopReportOne.getDistance().toString());
+								  if(distance > 0) {
+									Fuel = (distance*litres)/100;
+								  }
+					
+								  roundOffFuel = Math.round(Fuel * 100.0 )/ 100.0;
+								  stopReportOne.setSpentFuel(Double.toString(roundOffFuel));
+								  
 
-										distance =Math.abs( Double.parseDouble(stopReportOne.getDistance()) );
-										if(distance > 0) {
-											Fuel = (distance/100)*litres;
-										}
-
-										stopReportOne.setSpentFuel(Double.toString(Fuel));
-
-
-									 }
-									totalFuel += Double.parseDouble(stopReportOne.getSpentFuel());
-									roundOffFuel = Math.round(totalFuel * 100.0) / 100.0;
+								  totalFuel += Double.parseDouble(stopReportOne.getSpentFuel());
+								  roundOffFuel = Math.round(totalFuel * 100.0) / 100.0;
+									
 
 							  }
 							  devicesStatus.put("totalDuration", totalDuration);

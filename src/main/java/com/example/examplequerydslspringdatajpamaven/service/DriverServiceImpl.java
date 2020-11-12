@@ -457,23 +457,29 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 										}
 									}
 
-									if(newPhoto.equals("")) {
-										
-										driver.setPhoto("not_available.png");				
+									if(newPhoto == null) {
+										driver.setPhoto("not_available.png");
 									}
 									else {
-										if(newPhoto.equals(oldPhoto)) {
-											driver.setPhoto(oldPhoto);				
+										if(newPhoto.equals("")) {
+											
+											driver.setPhoto("not_available.png");				
 										}
-										else{
-											if(newPhoto.startsWith("data:image")) {
-									        	driver.setPhoto(decodePhoto.Base64_Image(newPhoto,"driver"));				
-								    		
-								    		}
+										else {
+											if(newPhoto.equals(oldPhoto)) {
+												driver.setPhoto(oldPhoto);				
+											}
+											else{
+												if(newPhoto.startsWith("data:image")) {
+										        	driver.setPhoto(decodePhoto.Base64_Image(newPhoto,"driver"));				
+									    		
+									    		}
 
-										}
+											}
 
-								    }
+									    }
+									}
+									
 									
 										
 									

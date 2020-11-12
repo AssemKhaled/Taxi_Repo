@@ -1,6 +1,9 @@
 package com.example.examplequerydslspringdatajpamaven;
 
 import java.io.File;
+import java.util.TimeZone;
+
+import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -19,6 +22,13 @@ import com.example.examplequerydslspringdatajpamaven.service.ProfileServiceImpl;
 @ComponentScan(basePackages = { "com.example.examplequerydslspringdatajpamaven.*"})
 public class ExampleQuerydslSpringDataJpaMavenApplication  {
 
+	
+//    @PostConstruct
+//    public void init(){
+//      // Setting Spring Boot SetTimeZone
+//      TimeZone.setDefault(TimeZone.getTimeZone("Asia/Riyadh"));
+//    }
+	 
 	public static void main(String[] args) {
 
 		
