@@ -1210,6 +1210,38 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 					  stopReportOne.setEngineHours(totalEngineHours.toString());
 
 				  }
+				  if(stopReportOne.getStartTime() != null && stopReportOne.getStartTime() != "") {
+					    Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS+SSSS");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(stopReportOne.getStartTime());
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+						stopReportOne.setStartTime(outputFormat.format(dateTime));
+
+				  }
+				  if(stopReportOne.getEndTime() != null && stopReportOne.getEndTime() != "") {
+					    Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS+SSSS");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(stopReportOne.getEndTime());
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+						stopReportOne.setEndTime(outputFormat.format(dateTime));
+
+				  }
 			  }
 			  
 			  
@@ -1584,6 +1616,39 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 					  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
 					  tripReportOne.setMaxSpeed(Double.toString(roundOffDistance));
 
+
+				  }
+				  
+				  if(tripReportOne.getStartTime() != null && tripReportOne.getStartTime() != "") {
+					    Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS+SSSS");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(tripReportOne.getStartTime());
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+						tripReportOne.setStartTime(outputFormat.format(dateTime));
+
+				  }
+				  if(tripReportOne.getEndTime() != null && tripReportOne.getEndTime() != "") {
+					    Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS+SSSS");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(tripReportOne.getEndTime());
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+						tripReportOne.setEndTime(outputFormat.format(dateTime));
 
 				  }
 				  
@@ -7502,6 +7567,39 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 					  }
 					  
+					  if(tripReportOne.getStartTime() != null && tripReportOne.getStartTime() != "") {
+						    Date dateTime = null;
+							SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS+SSSS");
+							SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+							try {
+								dateTime = inputFormat.parse(tripReportOne.getStartTime());
+
+							} catch (ParseException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							
+							tripReportOne.setStartTime(outputFormat.format(dateTime));
+
+					  }
+					  if(tripReportOne.getEndTime() != null && tripReportOne.getEndTime() != "") {
+						    Date dateTime = null;
+							SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS+SSSS");
+							SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+							try {
+								dateTime = inputFormat.parse(tripReportOne.getEndTime());
+
+							} catch (ParseException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							
+							tripReportOne.setEndTime(outputFormat.format(dateTime));
+
+					  }
+					  
 					  
 					  tripData.add(tripReportOne);
 					  
@@ -7821,10 +7919,26 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				  
 				  if(eventReportOne.getType().equals("alarm")) {
 
-				        ObjectMapper objectMapper = new ObjectMapper();
-				        Map<String, String> map = objectMapper.convertValue(eventReportOne.getAttributes(), Map.class);
-						eventReportOne.setType(map.get("alarm"));
-					}
+			        ObjectMapper objectMapper = new ObjectMapper();
+			        Map<String, String> map = objectMapper.convertValue(eventReportOne.getAttributes(), Map.class);
+					eventReportOne.setType(map.get("alarm"));
+				 }
+				  
+				  if(eventReportOne.getServerTime() != null && eventReportOne.getServerTime() != "") {
+					    Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS+SSSS");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(eventReportOne.getServerTime());
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+						eventReportOne.setServerTime(outputFormat.format(dateTime));
+				  }
 				  
 
 				
@@ -9781,7 +9895,6 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		
 		 stopReport = (List<StopReport>) returnFromTraccarApp(stopsUrl,"stops",allDevices, from, to, type, page, start, limit).getBody();
 		 List<Map> data = new ArrayList<Map>();
-		 List<String> duplicateAddressList = new ArrayList<String>();				  
 
 			if(stopReport.size()>0) {
 
@@ -9793,35 +9906,42 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 					  String totalEngineHours = "00:00:00";
 					  Double totalFuel=0.0;
 					  double roundOffFuel = 0.0;
+					  
+					  List<String> duplicateAddressList = new ArrayList<String>();				  
+					  duplicateAddressList.clear();
 
 					  Map devicesStatus = new HashMap();
 					  for(StopReport stopReportOne: stopReport) {
-						  devicesStatus.put("deviceName", null);
-						  devicesStatus.put("deviceId" ,null);
-						  devicesStatus.put("driverName", null);
-						  devicesStatus.put("driverUniqueId",null);
-						  
-						  devicesStatus.put("totalDuration", totalDuration);
-					      devicesStatus.put("totalEngineHours", totalEngineHours);
-					      devicesStatus.put("totalSpentFuel", roundOffFuel);
-						  devicesStatus.put("totalVisitedPlace" ,0);
-
-						  
-						  Device device= deviceServiceImpl.findById(dev);
-						  
-					      devicesStatus.put("deviceName", device.getName());
-						  devicesStatus.put("deviceId" ,device.getId());
-						  Set<Driver>  drivers = device.getDriver();
-
-						  for(Driver driver : drivers ) {
-
-							  devicesStatus.put("driverName", driver.getName());
-							  devicesStatus.put("driverUniqueId", driver.getUniqueid());
-							  
-						  }
+						 
 						  
 						  if((long) stopReportOne.getDeviceId() == (long) dev) {
-							  duplicateAddressList.clear();
+							  
+							  
+							  devicesStatus.put("deviceName", null);
+							  devicesStatus.put("deviceId" ,null);
+							  devicesStatus.put("driverName", null);
+							  devicesStatus.put("driverUniqueId",null);
+							  
+							  devicesStatus.put("totalDuration", totalDuration);
+						      devicesStatus.put("totalEngineHours", totalEngineHours);
+						      devicesStatus.put("totalSpentFuel", roundOffFuel);
+							  devicesStatus.put("totalVisitedPlace" ,0);
+
+							  
+							  Device device= deviceServiceImpl.findById(dev);
+							  
+						      devicesStatus.put("deviceName", device.getName());
+							  devicesStatus.put("deviceId" ,device.getId());
+							  Set<Driver>  drivers = device.getDriver();
+
+							  for(Driver driver : drivers ) {
+
+								  devicesStatus.put("driverName", driver.getName());
+								  devicesStatus.put("driverUniqueId", driver.getUniqueid());
+								  
+							  }
+							  
+							  
 							  if(stopReportOne.getAddress() != null && stopReportOne.getAddress() != "") {
 								  duplicateAddressList.add(stopReportOne.getAddress());
 							  
@@ -9884,13 +10004,11 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 							  devicesStatus.put("totalDuration", totalDuration);
 						      devicesStatus.put("totalEngineHours", totalEngineHours);
 						      devicesStatus.put("totalSpentFuel", roundOffFuel);
-						      Map<String, Long> couterMap = duplicateAddressList.stream().collect(Collectors.groupingBy(e -> e.toString(),Collectors.counting()));
-							  devicesStatus.put("totalVisitedPlace" ,couterMap.size());
 						  }
 					     
-						  
-						  
 					  }
+					  Map<String, Long> couterMap = duplicateAddressList.stream().collect(Collectors.groupingBy(e -> e.toString(),Collectors.counting()));
+					  devicesStatus.put("totalVisitedPlace" ,couterMap.size());
 					  data.add(devicesStatus);
 
 				  }
@@ -10187,42 +10305,46 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	        }
 	        
 			List<Map> dataAll = new ArrayList<Map>();
+			
+			
 	        driverHours = mongoPositionRepo.getDriverWorkingHoursScheduled(allDevices, dateFrom, dateTo);
 			  if(driverHours.size()>0) {
 
 				  for(Long dev:allDevices) {
 
-						Long time= (long) 0;
 						String totalHours = "00:00:00";
-						
+						Long time= (long) 0;
+
 					  Map devicesStatus = new HashMap();
 					  for(DriverWorkingHours driverH: driverHours) {
 
+						  if( (long) driverH.getDeviceId() == (long) dev ) {
+							  
+							  devicesStatus.put("deviceId" ,driverH.getDeviceId());
 
-						  devicesStatus.put("deviceName", driverH.getDeviceName());
-						  devicesStatus.put("deviceId" ,driverH.getDeviceId());
-						  devicesStatus.put("driverName", driverH.getDriverName());
-						  devicesStatus.put("driverUniqueId",null);
-					      devicesStatus.put("totalHours", totalHours);
-						  
-						  Device device= deviceServiceImpl.findById(driverH.getDeviceId());
-						 
-						  Set<Driver>  drivers = device.getDriver();
-						  for(Driver driver : drivers ) {
+							  if(driverH.getDeviceName() != null) {
+								  devicesStatus.put("deviceName", driverH.getDeviceName());
+							  }
+							  if(driverH.getDriverName() != null) {
+								  devicesStatus.put("driverName", driverH.getDriverName());
+							  }
+//							  devicesStatus.put("driverUniqueId",null);
+						      devicesStatus.put("totalHours", totalHours);
+							  
+//							  Device device= deviceServiceImpl.findById(driverH.getDeviceId());
+//							 
+//							  Set<Driver>  drivers = device.getDriver();
+//							  for(Driver driver : drivers ) {
+//
+//								  devicesStatus.put("driverUniqueId", driver.getUniqueid());
+//								  devicesStatus.put("driverName", driver.getName());
+//
+//							  }
+						      
+							JSONObject obj = new JSONObject(driverH.getAttributes().toString());
 
-							  devicesStatus.put("driverUniqueId", driver.getUniqueid());
-							  devicesStatus.put("driverName", driver.getName());
-
-						  }
-						  
-
-
-						  if( driverH.getDeviceId().toString().equals(dev.toString())) {
-
-							JSONObject obj = new JSONObject(driverH.getAttributes());
 							if(obj.has("todayHours")) {
-								time += Math.abs(  obj.getLong("todayHours")  );
-
+								  time += Math.abs(  obj.getLong("todayHours") );
 								  Long hoursEngine =   TimeUnit.MILLISECONDS.toHours(time) ;
 								  Long minutesEngine = TimeUnit.MILLISECONDS.toMinutes(time) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(time));
 								  Long secondsEngine = TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time));

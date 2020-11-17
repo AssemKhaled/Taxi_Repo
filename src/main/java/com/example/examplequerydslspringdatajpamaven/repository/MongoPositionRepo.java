@@ -246,7 +246,7 @@ public class MongoPositionRepo {
 	            	DeviceWorkingHours device = new DeviceWorkingHours();
 	            	
 	            	
-	            	if(object.has("attributes")) {
+	            	if(object.has("attributes") && object.get("attributes").toString() != "null") {
 	                	device.setAttributes(object.get("attributes").toString());
 	                	
 	                	JSONObject attr = new JSONObject(device.getAttributes().toString());
@@ -261,7 +261,7 @@ public class MongoPositionRepo {
 	                	device.setDeviceId(object.getLong("deviceid"));
 	
 	            	}
-					if(object.has("devicetime")) {
+					if(object.has("devicetime") && object.get("devicetime").toString() != "null") {
 						
 						Date dateTime = null;
 						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -293,7 +293,7 @@ public class MongoPositionRepo {
 	
 					}
 					
-					if(object.has("deviceName")) {
+					if(object.has("deviceName") && object.get("deviceName").toString() != "null") {
 		            	device.setDeviceName(object.getString("deviceName"));    		
 	                }
 					
@@ -377,7 +377,7 @@ public class MongoPositionRepo {
 	            	
 	            	
 
-	            	if(object.has("attributes")) {
+	            	if(object.has("attributes") && object.get("attributes").toString() != "null") {
 	                	device.setAttributes(object.get("attributes").toString());
 	                	
 	                	JSONObject attr = new JSONObject(device.getAttributes().toString());
@@ -392,7 +392,7 @@ public class MongoPositionRepo {
 	                	device.setDeviceId(object.getLong("deviceid"));
 	
 	            	}
-					if(object.has("devicetime")) {
+					if(object.has("devicetime") && object.get("devicetime").toString() != "null") {
 						
 						Date dateTime = null;
 						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -425,7 +425,7 @@ public class MongoPositionRepo {
 	
 					}
 					
-					if(object.has("deviceName")) {
+					if(object.has("deviceName") && object.get("deviceName").toString() != "null") {
 		            	device.setDeviceName(object.getString("deviceName"));    		
 	                }
 					
@@ -601,7 +601,7 @@ public class MongoPositionRepo {
 	            	
 	            	
 	            	
-	            	if(object.has("attributes")) {
+	            	if(object.has("attributes") && object.get("attributes").toString() != "null") {
 	                	device.setAttributes(object.get("attributes").toString());
 	
                        JSONObject attr = new JSONObject(device.getAttributes().toString());
@@ -620,7 +620,7 @@ public class MongoPositionRepo {
 	            	if(object.has("speed")) {
 		            	device.setSpeed(object.getDouble("speed"));    		
 	                }
-					if(object.has("devicetime")) {
+					if(object.has("devicetime") && object.get("devicetime").toString() != "null") {
 						
 						Date dateTime = null;
 						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -652,7 +652,7 @@ public class MongoPositionRepo {
 						}
 	
 					}
-					if(object.has("deviceName")) {
+					if(object.has("deviceName") && object.get("deviceName").toString() != "null") {
 		            	device.setDeviceName(object.getString("deviceName"));    		
 	                }
 					if(object.has("weight")) {
@@ -706,7 +706,7 @@ public class MongoPositionRepo {
 	            	JSONObject object = (JSONObject) iterator.next();
 	            	CustomPositions device = new CustomPositions();
 	            	
-	            	if(object.has("attributes")) {
+	            	if(object.has("attributes") && object.get("attributes").toString() != "null") {
 	                	device.setAttributes(object.get("attributes").toString());
 	
                        JSONObject attr = new JSONObject(device.getAttributes().toString());
@@ -725,7 +725,7 @@ public class MongoPositionRepo {
 	            	if(object.has("speed")) {
 		            	device.setSpeed(object.getDouble("speed"));    		
 	                }
-					if(object.has("devicetime")) {
+					if(object.has("devicetime") && object.get("devicetime").toString() != "null") {
 						
 						Date dateTime = null;
 						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -757,7 +757,7 @@ public class MongoPositionRepo {
 						}
 	
 					}
-					if(object.has("deviceName")) {
+					if(object.has("deviceName") && object.get("deviceName").toString() != "null") {
 		            	device.setDeviceName(object.getString("deviceName"));    		
 	                }
 					if(object.has("weight")) {
@@ -854,12 +854,12 @@ public class MongoPositionRepo {
                     	position.put("hours",hours/60);
 
 	            	}
-	            	if(object.has("deviceName")) {
+	            	if(object.has("deviceName") && object.get("deviceName").toString() != "null") {
                     	
                     	position.put("deviceName",object.get("deviceName").toString());
 
 	            	}
-					if(object.has("driverName")) {
+					if(object.has("driverName") && object.get("driverName").toString() != "null") {
 						
 						position.put("driverName",object.get("driverName").toString());
 					
@@ -920,7 +920,7 @@ public class MongoPositionRepo {
 	            	
 	            	device.setHours("0");
 	            	
-	            	if(object.has("attributes")) {
+	            	if(object.has("attributes") && object.get("attributes").toString() != "null") {
                     	
 	                	device.setAttributes(object.get("attributes").toString());
 	                	
@@ -936,7 +936,7 @@ public class MongoPositionRepo {
 	                	device.setDeviceId(object.getLong("deviceid"));
 	
 	            	}
-					if(object.has("devicetime")) {
+					if(object.has("devicetime") && object.get("devicetime").toString() != "null") {
 
 
 						device.setDeviceTime(object.getString("devicetime"));
@@ -951,7 +951,7 @@ public class MongoPositionRepo {
 	
 					}
 					
-					if(object.has("deviceName")) {
+					if(object.has("deviceName") && object.get("deviceName").toString() != "null") {
 		            	
 						device.setDeviceName(object.getString("deviceName"));
 	
@@ -1012,7 +1012,7 @@ public class MongoPositionRepo {
 	            	
 	            	
 	            	device.setHours("0");
-	            	if(object.has("attributes")) {
+	            	if(object.has("attributes") && object.get("attributes").toString() != "null") {
 	                	device.setAttributes(object.get("attributes").toString());
 	
                         JSONObject attr = new JSONObject(device.getAttributes().toString());
@@ -1025,7 +1025,7 @@ public class MongoPositionRepo {
 	                	device.setDeviceId(object.getLong("deviceid"));
 	
 	            	}
-					if(object.has("devicetime")) {
+					if(object.has("devicetime") && object.get("devicetime").toString() != "null") {
 						
 						device.setDeviceTime(object.getString("devicetime"));
 
@@ -1038,10 +1038,10 @@ public class MongoPositionRepo {
 						}
 	
 					}
-					if(object.has("deviceName")) {
+					if(object.has("deviceName") && object.get("deviceName").toString() != "null") {
 		            	device.setDeviceName(object.getString("deviceName"));    		
 	                }
-					if(object.has("driverName")) {
+					if(object.has("driverName") && object.get("driverName").toString() != "null") {
 		            	device.setDriverName(object.getString("driverName"));    		
 	                }
 					
@@ -1096,7 +1096,7 @@ public class MongoPositionRepo {
 
 	            	device.setHours("0");
 	            	
-	            	if(object.has("attributes")) {
+	            	if(object.has("attributes") && object.get("attributes").toString() != "null") {
                     	
 	                	device.setAttributes(object.get("attributes").toString());
 	                	
@@ -1112,7 +1112,7 @@ public class MongoPositionRepo {
 	                	device.setDeviceId(object.getLong("deviceid"));
 	
 	            	}
-					if(object.has("devicetime")) {
+					if(object.has("devicetime") && object.get("devicetime").toString() != "null") {
 						
 						device.setDeviceTime(object.getString("devicetime"));
 
@@ -1126,7 +1126,7 @@ public class MongoPositionRepo {
 	
 					}
 					
-					if(object.has("deviceName")) {
+					if(object.has("deviceName") && object.get("deviceName").toString() != "null") {
 		            	
 						device.setDeviceName(object.getString("deviceName"));
 	
@@ -1184,7 +1184,7 @@ public class MongoPositionRepo {
 	            	DriverWorkingHours device = new DriverWorkingHours();
 	            	
 	            	device.setHours("0");
-	            	if(object.has("attributes")) {
+	            	if(object.has("attributes") && object.get("attributes").toString() != "null") {
 	                	device.setAttributes(object.get("attributes").toString());
 	
                         JSONObject attr = new JSONObject(device.getAttributes().toString());
@@ -1197,7 +1197,7 @@ public class MongoPositionRepo {
 	                	device.setDeviceId(object.getLong("deviceid"));
 	
 	            	}
-					if(object.has("devicetime")) {
+					if(object.has("devicetime") && object.get("devicetime").toString() != "null") {
 						device.setDeviceTime(object.getString("devicetime"));
 
 	                }
@@ -1208,10 +1208,10 @@ public class MongoPositionRepo {
 						}
 	
 					}
-					if(object.has("deviceName")) {
+					if(object.has("deviceName") && object.get("deviceName").toString() != "null") {
 		            	device.setDeviceName(object.getString("deviceName"));    		
 	                }
-					if(object.has("driverName")) {
+					if(object.has("driverName") && object.get("driverName").toString() != "null") {
 		            	device.setDriverName(object.getString("driverName"));    		
 	                }
 	            	
@@ -1329,7 +1329,7 @@ public class MongoPositionRepo {
 		
 	    Aggregation aggregation = newAggregation(
 	            match(Criteria.where("deviceid").in(deviceId)),
-	            project("speed","longitude","latitude","attributes").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime")
+	            project("speed","longitude","latitude","attributes","weight").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime")
 	            .and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("devicetime").and("fixtime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("fixtime"),
 	            sort(Sort.Direction.DESC, "fixtime"),
 	            skip(0),
@@ -1350,7 +1350,7 @@ public class MongoPositionRepo {
 	            while (iterator.hasNext()) {
 	            	JSONObject object = (JSONObject) iterator.next();
 	            	
-	            	if(object.has("servertime")) {
+	            	if(object.has("servertime") && object.get("servertime").toString() != "null") {
 	            		
 						Date dateTime = null;
 						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -1374,7 +1374,7 @@ public class MongoPositionRepo {
 	            		
 	            		
 	            	}  
-                    if(object.has("devicetime")) {
+                    if(object.has("devicetime") && object.get("devicetime").toString() != "null") {
                     	
 						Date dateTime = null;
 						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -1399,7 +1399,7 @@ public class MongoPositionRepo {
 	            		
 	            		
 	            	}
-                    if(object.has("fixtime")) {
+                    if(object.has("fixtime") && object.get("fixtime").toString() != "null") {
 	            		
                     	
 						Date dateTime = null;
@@ -1424,7 +1424,7 @@ public class MongoPositionRepo {
 	            		
 
 	            	}
-	            	if(object.has("attributes")) {
+	            	if(object.has("attributes") && object.get("attributes").toString() != "null") {
 	            		position.setAttributes(object.get("attributes").toString());
 	
 	            	}
@@ -1440,7 +1440,10 @@ public class MongoPositionRepo {
 	            	}
                     
 	            	if(object.has("speed")) {
-	            		position.setSpeed(object.getFloat("speed"));    		
+	            		position.setSpeed(object.getDouble("speed"));    		
+	                }
+	            	if(object.has("weight")) {
+	            		position.setWeight(object.getDouble("weight"));    		
 	                }
 					
 	            	
@@ -1460,7 +1463,7 @@ public class MongoPositionRepo {
 		
 	    Aggregation aggregation = newAggregation(
 	            match(Criteria.where("deviceid").in(deviceId).and("speed").in(0)),
-	            project("speed","longitude","latitude","attributes").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime")
+	            project("speed","longitude","latitude","attributes","weight").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime")
 	            .and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("devicetime").and("fixtime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("fixtime"),
 	            sort(Sort.Direction.DESC, "fixtime"),
 	            skip(0),
@@ -1481,7 +1484,7 @@ public class MongoPositionRepo {
 	            while (iterator.hasNext()) {
 	            	JSONObject object = (JSONObject) iterator.next();
 	            	LastPositionData position = new LastPositionData();
-	            	if(object.has("servertime")) {
+	            	if(object.has("servertime") && object.get("servertime").toString() != "null") {
 	            		
 						Date dateTime = null;
 						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -1505,7 +1508,7 @@ public class MongoPositionRepo {
 	            		
 	            		
 	            	}  
-                    if(object.has("devicetime")) {
+                    if(object.has("devicetime") && object.get("devicetime").toString() != "null") {
                     	
 						Date dateTime = null;
 						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -1530,7 +1533,7 @@ public class MongoPositionRepo {
 	            		
 	            		
 	            	}
-                    if(object.has("fixtime")) {
+                    if(object.has("fixtime") && object.get("fixtime").toString() != "null") {
 	            		
                     	
 						Date dateTime = null;
@@ -1555,7 +1558,7 @@ public class MongoPositionRepo {
 	            		
 
 	            	}
-	            	if(object.has("attributes")) {
+	            	if(object.has("attributes") && object.get("attributes").toString() != "null") {
 	            		position.setAttributes(object.get("attributes").toString());
 	
 	            	}
@@ -1571,7 +1574,11 @@ public class MongoPositionRepo {
 	            	}
                     
 	            	if(object.has("speed")) {
-	            		position.setSpeed(object.getFloat("speed"));    		
+	            		position.setSpeed(object.getDouble("speed"));    		
+	                }
+	            	
+	            	if(object.has("weight")) {
+	            		position.setWeight(object.getDouble("weight"));    		
 	                }
 					
 	            	positions.add(position);
@@ -1591,7 +1598,7 @@ public class MongoPositionRepo {
 		
 	    Aggregation aggregation = newAggregation(
 	            match(Criteria.where("deviceid").in(deviceId).and("speed").gt(0)),
-	            project("speed","longitude","latitude","attributes").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime")
+	            project("speed","longitude","latitude","attributes","weight").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime")
 	            .and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("devicetime").and("fixtime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("fixtime"),
 	            sort(Sort.Direction.DESC, "fixtime"),
 	            skip(0),
@@ -1612,7 +1619,7 @@ public class MongoPositionRepo {
 	            while (iterator.hasNext()) {
 	            	JSONObject object = (JSONObject) iterator.next();
 	            	LastPositionData position = new LastPositionData();
-                    if(object.has("servertime")) {
+                    if(object.has("servertime") && object.get("servertime").toString() != "null") {
 	            		
 						Date dateTime = null;
 						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -1636,7 +1643,7 @@ public class MongoPositionRepo {
 	            		
 	            		
 	            	}  
-                    if(object.has("devicetime")) {
+                    if(object.has("devicetime") && object.get("devicetime").toString() != "null") {
                     	
 						Date dateTime = null;
 						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -1661,7 +1668,7 @@ public class MongoPositionRepo {
 	            		
 	            		
 	            	}
-                    if(object.has("fixtime")) {
+                    if(object.has("fixtime") && object.get("fixtime").toString() != "null") {
 	            		
                     	
 						Date dateTime = null;
@@ -1686,7 +1693,7 @@ public class MongoPositionRepo {
 	            		
 
 	            	}
-	            	if(object.has("attributes")) {
+	            	if(object.has("attributes") && object.get("attributes").toString() != "null") {
 	            		position.setAttributes(object.get("attributes").toString());
 	
 	            	}
@@ -1702,9 +1709,13 @@ public class MongoPositionRepo {
 	            	}
                     
 	            	if(object.has("speed")) {
-	            		position.setSpeed(object.getFloat("speed"));    		
+	            		position.setSpeed(object.getDouble("speed"));    		
 	                }
-					
+	            	
+	            	if(object.has("weight")) {
+	            		position.setWeight(object.getDouble("weight"));    		
+	                }
+	            	
 	            	positions.add(position);
 	            	
 	            }
@@ -1742,21 +1753,21 @@ public class MongoPositionRepo {
 	            while (iterator.hasNext()) {
 	            	JSONObject object = (JSONObject) iterator.next();
 	            	LastElmData position = new LastElmData();
-	            	if(object.has("sendtime")) {
+	            	if(object.has("sendtime") && object.get("sendtime").toString() != "null") {
 	            		position.setSendtime( object.getString("sendtime"));
 	            		
 	            	}  
-                    if(object.has("elm_data")) {
+                    if(object.has("elm_data") && object.get("elm_data").toString() != "null") {
 	            		position.setElm_data(object.get("elm_data").toString());
 
 	            		
 	            	}
-                    if(object.has("vehiclename")) {
+                    if(object.has("vehiclename") && object.get("vehiclename").toString() != "null") {
 	            		
 	            		position.setVehiclename(object.getString("vehiclename"));
 
 	            	}
-	            	if(object.has("drivername")) {
+	            	if(object.has("drivername") && object.get("drivername").toString() != "null") {
 	            		position.setDrivername(object.getString("drivername"));
 	
 	            	}
@@ -1799,21 +1810,21 @@ public class MongoPositionRepo {
 	            while (iterator.hasNext()) {
 	            	JSONObject object = (JSONObject) iterator.next();
 	            	LastElmData position = new LastElmData();
-	            	if(object.has("sendtime")) {
+	            	if(object.has("sendtime") && object.get("sendtime").toString() != "null") {
 	            		position.setSendtime( object.getString("sendtime"));
 	            		
 	            	}  
-                    if(object.has("elm_data")) {
+                    if(object.has("elm_data") && object.get("elm_data").toString() != "null") {
 	            		position.setElm_data(object.get("elm_data").toString());
 
 	            		
 	            	}
-                    if(object.has("vehiclename")) {
+                    if(object.has("vehiclename") && object.get("vehiclename").toString() != "null") {
 	            		
 	            		position.setVehiclename(object.getString("vehiclename"));
 
 	            	}
-	            	if(object.has("drivername")) {
+	            	if(object.has("drivername") && object.get("drivername").toString() != "null") {
 	            		position.setDrivername(object.getString("drivername"));
 	
 	            	}
@@ -2068,11 +2079,11 @@ public class MongoPositionRepo {
 	            		position.setId(object.getLong("deviceid"));
 	
 	            	}
-	            	if(object.has("deviceName")) {
+	            	if(object.has("deviceName") && object.get("deviceName").toString() != "null") {
 	            		position.setDeviceName(object.getString("deviceName"));
 	
 	            	}
-	            	if(object.has("servertime")) {
+	            	if(object.has("servertime") && object.get("servertime").toString() != "null") {
 	            		
 						Date dateTime = null;
 						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -2212,11 +2223,11 @@ public class MongoPositionRepo {
 	            		position.setId(object.getLong("deviceid"));
 	
 	            	}
-	            	if(object.has("deviceName")) {
+	            	if(object.has("deviceName") && object.get("deviceName").toString() != "null") {
 	            		position.setDeviceName(object.getString("deviceName"));
 	
 	            	}
-	            	if(object.has("servertime")) {
+	            	if(object.has("servertime") && object.get("servertime").toString() != "null") {
 	            		
 						Date dateTime = null;
 						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -2357,11 +2368,11 @@ public class MongoPositionRepo {
  	            		position.setId(object.getLong("deviceid"));
  	
  	            	}
- 	            	if(object.has("deviceName")) {
+ 	            	if(object.has("deviceName") && object.get("deviceName").toString() != "null") {
  	            		position.setDeviceName(object.getString("deviceName"));
  	
  	            	}
- 	            	if(object.has("servertime")) {
+ 	            	if(object.has("servertime") && object.get("servertime").toString() != "null") {
  	            		
 						Date dateTime = null;
 						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");

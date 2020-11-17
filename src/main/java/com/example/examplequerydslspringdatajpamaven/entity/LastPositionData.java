@@ -14,7 +14,10 @@ public class LastPositionData {
 	
 	private Double longitude;
 	
-	private Float speed;
+	private Double speed;
+	
+	private Double weight;
+
 		
 	private Object attributes;
 	
@@ -75,12 +78,12 @@ public class LastPositionData {
 	}
 
 
-	public Float getSpeed() {
+	public Double getSpeed() {
 		return speed;
 	}
 
 
-	public void setSpeed(Float speed) {
+	public void setSpeed(Double speed) {
 		this.speed = speed;
 	}
 
@@ -95,8 +98,18 @@ public class LastPositionData {
 	}
 
 
+	public Double getWeight() {
+		return weight;
+	}
+
+
+	public void setWeight(Double weight) {
+		this.weight = weight;
+	}
+
+
 	public LastPositionData(String servertime, String devicetime, String fixtime, Double latitude, Double longitude,
-			Float speed, Object attributes) {
+			Double speed,Double weight, Object attributes) {
 		super();
 		this.servertime = servertime;
 		this.devicetime = devicetime;
@@ -104,6 +117,7 @@ public class LastPositionData {
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.speed = speed;
+		this.weight = weight;
 		this.attributes = attributes;
 	}
 
