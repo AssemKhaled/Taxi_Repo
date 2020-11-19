@@ -1,16 +1,18 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
-
+/**
+ * Save data in ElmLastLocation collection in Mongo DB
+ * @author fuinco
+ *
+ */
 public class LastElmData {
 
 
 	private Object elm_data;
-	
 	private String sendtime;
-	
 	private String vehiclename;
-
 	private String drivername;
+	
 
 	public LastElmData() {
 		super();

@@ -1,18 +1,22 @@
 package com.example.examplequerydslspringdatajpamaven.repository;
 
 import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.example.examplequerydslspringdatajpamaven.entity.Attribute;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
-import com.example.examplequerydslspringdatajpamaven.entity.Notification;;
 
+/**
+ * Queries on table tc_attributes
+ * @author fuinco
+ *
+ */
+@Component
 public interface ComputedRepository  extends  JpaRepository<Attribute, Long>, QueryDslPredicateExecutor<Attribute>{
 
 	@Query(value = "SELECT tc_attributes.* FROM tc_attributes INNER JOIN tc_user_attribute ON tc_user_attribute.attributeid = tc_attributes.id"

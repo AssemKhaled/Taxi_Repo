@@ -12,6 +12,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+/**
+ * Decode photos and icons to get name only saving in DB
+ * @author fuinco
+ *
+ */
 public class DecodePhoto {
 	
 	

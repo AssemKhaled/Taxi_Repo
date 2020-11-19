@@ -1,9 +1,12 @@
 package com.example.examplequerydslspringdatajpamaven.exceptions;
 
-import org.springframework.stereotype.Component;
 
+/**
+ * Handel Error Exceptions in returns 
+ * @author fuinco
+ *
+ */
 @SuppressWarnings("serial")
-
 public class UserExceptions extends Exception   {
 	
 	String description;

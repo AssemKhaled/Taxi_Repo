@@ -23,6 +23,11 @@ import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse
 import com.example.examplequerydslspringdatajpamaven.service.AppServiceImpl;
 import com.example.examplequerydslspringdatajpamaven.service.DeviceServiceImpl;;
 
+/**
+ * Services related to app
+ * @author fuinco
+ *
+ */
 @CrossOrigin
 @Component
 @RequestMapping(path = "/app")

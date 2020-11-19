@@ -5,6 +5,11 @@ import javax.persistence.Id;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+/**
+ * Collection to save elm data after sending
+ * @author fuinco
+ *
+ */
 @Document(collection = "tc_elm_last_locations_tbl")
 public class MongoElmLastLocations {
 

@@ -7,6 +7,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+/**
+ * Model of table tc_schedule in DB
+ * @author fuinco
+ *
+ */
 @Entity
 @Table(name = "tc_schedule")
 public class Schedule {

@@ -1,18 +1,17 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+/**
+ * Model of table tc_user_roles in DB
+ * @author fuinco
+ *
+ */
 @Entity
 @Table(name = "tc_user_roles")
 public class UserRole {

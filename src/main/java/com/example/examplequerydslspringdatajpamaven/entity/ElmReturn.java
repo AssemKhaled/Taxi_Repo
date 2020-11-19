@@ -2,8 +2,11 @@ package com.example.examplequerydslspringdatajpamaven.entity;
 
 import java.util.Map;
 
-import org.json.JSONObject;
-
+/**
+ * Model to return any action on elm services
+ * @author fuinco
+ *
+ */
 public class ElmReturn {
 
 	private Map body;
@@ -47,7 +50,7 @@ public class ElmReturn {
 		return message;
 	}
 	public void setMessage(String message) {
-		message = message;
+		this.message = message;
 	}
 	
 

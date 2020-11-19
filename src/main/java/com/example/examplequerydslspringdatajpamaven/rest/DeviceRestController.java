@@ -1,16 +1,13 @@
 package com.example.examplequerydslspringdatajpamaven.rest;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -18,21 +15,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
-import com.example.examplequerydslspringdatajpamaven.entity.Driver;
-import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
-import com.example.examplequerydslspringdatajpamaven.entity.User;
-
 import com.example.examplequerydslspringdatajpamaven.service.DeviceServiceImpl;
-import com.example.examplequerydslspringdatajpamaven.service.DriverServiceImpl;
 import com.example.examplequerydslspringdatajpamaven.service.GeofenceServiceImpl;
-import com.example.examplequerydslspringdatajpamaven.service.UserServiceImpl;
-
-import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 
-
+/**
+ * Services of Device Component
+ * @author fuinco
+ *
+ */
 @CrossOrigin
 @Component
 @RequestMapping(path = "/devices")
@@ -41,10 +33,7 @@ public class DeviceRestController {
 	@Autowired
 	private DeviceServiceImpl deviceService;
 	
-	
-	@Autowired
-	private DriverServiceImpl driverService;
-	//selection of all devices from user controller not device controller
+
 	@Autowired 
 	GeofenceServiceImpl geofenceService;
 	

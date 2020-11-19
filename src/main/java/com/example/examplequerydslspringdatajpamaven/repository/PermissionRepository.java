@@ -7,9 +7,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
-
-import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.Permission;
+
+/**
+ * Queries related to tc_permissions
+ * @author fuinco
+ *
+ */
 @Component
 public interface PermissionRepository extends  JpaRepository<Permission, Long>, QueryDslPredicateExecutor<Permission> {
 

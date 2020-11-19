@@ -1,6 +1,11 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
 
+/**
+ * Bind data of stop report in this model 
+ * @author fuinco
+ *
+ */
 public class StopReport {
 	
 	private String address;

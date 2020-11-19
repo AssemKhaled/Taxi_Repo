@@ -16,6 +16,11 @@ import com.example.examplequerydslspringdatajpamaven.service.GeofenceServiceImpl
 import com.example.examplequerydslspringdatajpamaven.service.UserServiceImpl;
 
 
+/**
+ * Services of geofence component
+ * @author fuinco
+ *
+ */
 @RestController
 @RequestMapping(path = "/geofences")
 @CrossOrigin

@@ -2,7 +2,6 @@ package com.example.examplequerydslspringdatajpamaven.entity;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.jdo.annotations.Column;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -13,9 +12,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * Model of table tc_attributes in DB
+ * @author fuinco
+ *
+ */
 @Entity
 @Table(name = "tc_attributes" )
 public class Attribute {

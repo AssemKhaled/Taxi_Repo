@@ -60,7 +60,6 @@ import com.example.examplequerydslspringdatajpamaven.entity.TripReport;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.DriverRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.EventRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.GroupRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoEventsRepo;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoEventsRepository;
@@ -92,8 +91,6 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	@Autowired
 	UserClientDeviceRepository userClientDeviceRepository;
 	
-	@Autowired
-	EventRepository eventRepository;
 	
 	@Autowired
 	DeviceRepository deviceRepository;

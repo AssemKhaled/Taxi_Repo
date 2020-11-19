@@ -6,6 +6,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+/**
+ *  
+ * Model of tc_user_client_device used in type 4 to save his devices
+ * @author fuinco
+ *
+ */
 @Entity
 @Table(name = "tc_user_client_device")
 public class userClientDevice {

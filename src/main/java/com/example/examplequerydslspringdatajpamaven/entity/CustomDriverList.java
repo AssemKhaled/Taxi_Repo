@@ -1,5 +1,10 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
+/**
+ * Initial Model to bind data with query
+ * @author fuinco
+ *
+ */
 public class CustomDriverList {
 
 	private Long id;

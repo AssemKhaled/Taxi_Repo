@@ -58,7 +58,6 @@ import com.example.examplequerydslspringdatajpamaven.entity.DeviceWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverWorkingHours;
-import com.example.examplequerydslspringdatajpamaven.entity.Event;
 import com.example.examplequerydslspringdatajpamaven.entity.EventReport;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 import com.example.examplequerydslspringdatajpamaven.entity.Group;
@@ -72,7 +71,6 @@ import com.example.examplequerydslspringdatajpamaven.entity.userClientPoint;
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.DriverRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.EventRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.GroupRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.ScheduledRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
@@ -98,9 +96,6 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 
 	@Autowired
 	private DriverRepository driverRepository;
-	
-	@Autowired
-	private EventRepository eventRepository;
 	
 	@Autowired
 	private DeviceRepository deviceRepository;

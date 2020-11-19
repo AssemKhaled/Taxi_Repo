@@ -7,11 +7,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
-
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Points;
-import com.example.examplequerydslspringdatajpamaven.entity.Schedule;;
 
+/**
+ * Queries related to tc_points
+ * @author fuinco
+ *
+ */
 @Service
 public interface PointsRepository  extends JpaRepository<Points, Long>, QueryDslPredicateExecutor<Points>{
 

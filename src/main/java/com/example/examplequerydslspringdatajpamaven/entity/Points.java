@@ -7,6 +7,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+
+/**
+ * Model of table tc_points in DB
+ * @author fuinco
+ *
+ */
 @Entity
 @Table(name = "tc_points")
 public class Points {

@@ -12,6 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Notification;
 
+/**
+ * Queries related to tc_notifications
+ * @author fuinco
+ *
+ */
 public interface NotificationRepository extends  JpaRepository<Notification, Long>, QueryDslPredicateExecutor<Notification>{
 	
 	

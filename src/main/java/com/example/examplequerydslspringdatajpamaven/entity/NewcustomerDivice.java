@@ -2,10 +2,11 @@ package com.example.examplequerydslspringdatajpamaven.entity;
 
 import java.util.Date;
 
-import javax.persistence.ColumnResult;
-import javax.persistence.ConstructorResult;
-import javax.persistence.SqlResultSetMapping;
-
+/**
+ * Bind data list on this model
+ * @author fuinco
+ *
+ */
 public class NewcustomerDivice {
 
 	public NewcustomerDivice(int id, String deviceName, Date lastUpdate, Integer positionId, String driverName,

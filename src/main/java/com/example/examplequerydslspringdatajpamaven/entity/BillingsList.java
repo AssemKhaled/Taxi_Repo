@@ -1,12 +1,14 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
-
+/**
+ * Initial Model to bind data with query
+ * @author fuinco
+ *
+ */
 public class BillingsList {
 	private Long deviceNumbers;
 	private String workingDate;
 	private String ownerName;
-	
-	
 	
 	public BillingsList(Long deviceNumbers, String workingDate, String ownerName) {
 		super();

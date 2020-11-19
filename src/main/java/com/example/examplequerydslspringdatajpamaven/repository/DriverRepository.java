@@ -1,7 +1,6 @@
 package com.example.examplequerydslspringdatajpamaven.repository;
 
 import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -9,12 +8,15 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDriverList;
-import com.example.examplequerydslspringdatajpamaven.entity.DeviceWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
-import com.example.examplequerydslspringdatajpamaven.entity.DriverWorkingHours;
+
+/**
+ * Queries on table tc_drivers
+ * @author fuinco
+ *
+ */
 @Component
 public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslPredicateExecutor<Driver> {
 
@@ -65,7 +67,6 @@ public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslP
 	@Query(nativeQuery = true, name = "getDriverListByIds")
 	public List<CustomDriverList> getAllDriversCustomByIds(@Param("driverIds") List<Long> driverIds,@Param("offset") int offset,@Param("search") String search);
 	
-	//added by maryam
 	@Query(value = "SELECT  * FROM tc_drivers as A " + 
 			" INNER JOIN tc_user_driver ON tc_user_driver.driverid =A.id " + 
 			" WHERE tc_user_driver.userid IN (:userIds) AND delete_date IS NULL " + 

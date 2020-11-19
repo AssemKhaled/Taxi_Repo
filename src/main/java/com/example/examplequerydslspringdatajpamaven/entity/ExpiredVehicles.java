@@ -1,5 +1,10 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
+/**
+ * Get expired vehicles to set in DB and prevent from sending to elm
+ * @author fuinco
+ *
+ */
 public class ExpiredVehicles {
 
 	private Long deviceId;
@@ -9,8 +14,6 @@ public class ExpiredVehicles {
 	private String deviceName;
 	private String userName;
 
-	
-	
 	
 	public ExpiredVehicles() {
 		super();

@@ -1,6 +1,5 @@
 package com.example.examplequerydslspringdatajpamaven.rest;
 
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +17,11 @@ import com.example.examplequerydslspringdatajpamaven.service.DriverServiceImpl;
 import com.example.examplequerydslspringdatajpamaven.service.UserServiceImpl;
 
 
-
+/**
+ * Service of driver component 
+ * @author fuinco
+ *
+ */
 @RestController
 @RequestMapping(path = "/drivers")
 @CrossOrigin

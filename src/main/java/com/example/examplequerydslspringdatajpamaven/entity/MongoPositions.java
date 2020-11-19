@@ -1,21 +1,16 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
 import java.util.Date;
-import java.util.Objects;
-
-import javax.jdo.annotations.Column;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
 import org.bson.types.ObjectId;
-import org.json.JSONObject;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.opencsv.bean.CsvBindByName;
-import com.opencsv.bean.CsvDate;
 
+/**
+ * Positions Collection in Mongo DB
+ * @author fuinco
+ *
+ */
 @Document(collection = "tc_positions")
 public class MongoPositions {
 	

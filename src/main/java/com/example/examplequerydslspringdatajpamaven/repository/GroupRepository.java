@@ -7,13 +7,18 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
-import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 import com.example.examplequerydslspringdatajpamaven.entity.Group;
 
+/**
+ * Queries related to table tc_groups
+ * @author fuinco
+ *
+ */
+@Component
 public interface GroupRepository extends  JpaRepository<Group, Long>, QueryDslPredicateExecutor<Group> {
 	
 	@Query(value = "SELECT tc_groups.* FROM tc_groups INNER JOIN tc_user_group ON tc_user_group.groupid = tc_groups.id"

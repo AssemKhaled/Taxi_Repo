@@ -1,9 +1,13 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Map;
 
+/**
+ * Initial Model to bind data with query
+ * @author fuinco
+ *
+ */
 public class CustomDeviceList{
 	
 	private int id;

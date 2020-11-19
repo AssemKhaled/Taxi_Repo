@@ -1,12 +1,10 @@
 package com.example.examplequerydslspringdatajpamaven.repository;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.count;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.limit;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.replaceRoot;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.skip;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.sort;
 
@@ -18,7 +16,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.xml.stream.events.Characters;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -36,6 +33,11 @@ import com.example.examplequerydslspringdatajpamaven.entity.MongoEvents;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoPositions;
 import com.mongodb.BasicDBObject;
 
+/**
+ * Mongo manual queries on event collection
+ * @author fuinco
+ *
+ */
 @Repository
 public class MongoEventsRepo {
 	
@@ -60,8 +62,6 @@ public class MongoEventsRepo {
 		
 		Integer size = 0;
 		
-		List<EventReport> events = new ArrayList<EventReport>();
-
 
 		BasicDBObject basicDBObject = new BasicDBObject();
 		
@@ -108,7 +108,6 @@ public class MongoEventsRepo {
 		
 		Integer size = 0;
 		
-		List<EventReport> events = new ArrayList<EventReport>();
 
 
 		BasicDBObject basicDBObject = new BasicDBObject();
@@ -917,7 +916,6 @@ public class MongoEventsRepo {
 		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
 		dateTo = calendarTo.getTime();
 		
-		List<EventReport> notifications = new ArrayList<EventReport>();
 
 
 		BasicDBObject basicDBObject = new BasicDBObject();
@@ -984,7 +982,6 @@ public class MongoEventsRepo {
 		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
 		dateTo = calendarTo.getTime();
 		
-		List<EventReport> notifications = new ArrayList<EventReport>();
 
 
 		BasicDBObject basicDBObject = new BasicDBObject();

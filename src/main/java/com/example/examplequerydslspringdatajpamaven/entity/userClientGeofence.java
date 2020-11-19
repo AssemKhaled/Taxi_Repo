@@ -6,6 +6,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+/**
+ * Model of tc_user_client_geofence used in type 4 to save his geofences
+ * @author fuinco
+ *
+ */
 @Entity
 @Table(name = "tc_user_client_geofence")
 public class userClientGeofence {

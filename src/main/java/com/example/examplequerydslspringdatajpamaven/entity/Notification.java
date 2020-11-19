@@ -16,6 +16,11 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * Model of table tc_notifications in DB
+ * @author fuinco
+ *
+ */
 @Entity
 @Table(name = "tc_notifications")
 public class Notification {

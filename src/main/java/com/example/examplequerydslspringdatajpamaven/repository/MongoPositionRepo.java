@@ -3,17 +3,13 @@ package com.example.examplequerydslspringdatajpamaven.repository;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
-import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -21,36 +17,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationExpression;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperationContext;
 import org.springframework.data.mongodb.core.aggregation.AggregationOptions;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.aggregation.ComparisonOperators.Gte;
-import org.springframework.data.mongodb.core.aggregation.DateOperators;
-import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
-
 import com.example.examplequerydslspringdatajpamaven.entity.CustomMapData;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverWorkingHours;
-import com.example.examplequerydslspringdatajpamaven.entity.EventReport;
 import com.example.examplequerydslspringdatajpamaven.entity.LastElmData;
 import com.example.examplequerydslspringdatajpamaven.entity.LastPositionData;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoElmLastLocations;
-import com.example.examplequerydslspringdatajpamaven.entity.MongoEvents;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.TripPositions;
-import com.mongodb.AggregationOutput;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
-import com.mongodb.client.MongoCursor;
-
-import ch.qos.logback.core.Context;
-
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
@@ -61,6 +41,11 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.limi
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.count;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.replaceRoot;
 
+/**
+ * Mongo manual queries on position collection
+ * @author fuinco
+ *
+ */
 @Repository
 public class MongoPositionRepo {
 
@@ -2348,7 +2333,6 @@ public class MongoPositionRepo {
  	            
  	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
 
- 	    System.out.println(aggregation);
 
 
  	        AggregationResults<MongoPositions> groupResults

@@ -1,6 +1,10 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
-
+/**
+ * Bind data to elm URL by sequence number
+ * @author fuinco
+ *
+ */
 public class LastPositionData {
 
 

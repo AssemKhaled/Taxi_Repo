@@ -1,10 +1,14 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
-import org.json.JSONObject;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+
+/**
+ * Bind data from position to be fit with this model
+ * @author fuinco
+ *
+ */
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DeviceWorkingHours {

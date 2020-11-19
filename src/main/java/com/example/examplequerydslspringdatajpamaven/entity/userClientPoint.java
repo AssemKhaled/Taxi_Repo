@@ -6,6 +6,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+/**
+ * Model of tc_user_client_point used in type 4 to save his points
+ * @author fuinco
+ *
+ */
 @Entity
 @Table(name = "tc_user_client_point")
 public class userClientPoint {

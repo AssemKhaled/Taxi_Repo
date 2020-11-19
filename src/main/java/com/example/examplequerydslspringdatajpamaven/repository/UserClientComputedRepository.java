@@ -13,6 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.userClientComputed;
 
+/**
+ * Queries related to type 3 and 4 for tc_user_client_computed
+ * @author fuinco
+ *
+ */
 @Component
 public interface UserClientComputedRepository extends JpaRepository<userClientComputed, Long>, QueryDslPredicateExecutor<userClientComputed>{
 

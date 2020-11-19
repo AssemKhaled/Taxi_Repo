@@ -1,5 +1,11 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
+
+/**
+ * Bind data of events or notifications from mongo by type on this model
+ * @author fuinco
+ *
+ */
 public class EventReportByCurl {
 	
 	private Long id;

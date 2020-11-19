@@ -7,6 +7,11 @@ import javax.persistence.Id;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+/**
+ * Events collection in Mongo DB
+ * @author fuinco
+ *
+ */
 @Document(collection = "tc_events")
 public class MongoEvents {
 
@@ -26,15 +31,19 @@ public class MongoEvents {
 	private Object attributes;
 	
 	private Long maintinanceid;
-
+	
+	private String deviceName;
+	
+	private Long driverid;
+	
+	private String driverName;
 	
 	public MongoEvents() {
 		
 	}
-	
+
 	public MongoEvents(ObjectId _id, String type, Date servertime, Long deviceid, String positionid, Long geofenceid,
-			Object attributes, Long maintinanceid) {
-		
+			Object attributes, Long maintinanceid, String deviceName, Long driverid, String driverName) {
 		super();
 		this._id = _id;
 		this.type = type;
@@ -44,9 +53,10 @@ public class MongoEvents {
 		this.geofenceid = geofenceid;
 		this.attributes = attributes;
 		this.maintinanceid = maintinanceid;
-		
+		this.deviceName = deviceName;
+		this.driverid = driverid;
+		this.driverName = driverName;
 	}
-
 
 	public ObjectId get_id() {
 		return _id;
@@ -112,6 +122,30 @@ public class MongoEvents {
 		this.maintinanceid = maintinanceid;
 	}
 
+	public String getDeviceName() {
+		return deviceName;
+	}
+
+	public void setDeviceName(String deviceName) {
+		this.deviceName = deviceName;
+	}
+
+	public Long getDriverid() {
+		return driverid;
+	}
+
+	public void setDriverid(Long driverid) {
+		this.driverid = driverid;
+	}
+
+	public String getDriverName() {
+		return driverName;
+	}
+
+	public void setDriverName(String driverName) {
+		this.driverName = driverName;
+	}
+	
 	
 	
 	

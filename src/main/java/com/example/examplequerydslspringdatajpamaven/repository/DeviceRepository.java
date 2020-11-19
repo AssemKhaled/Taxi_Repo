@@ -3,31 +3,26 @@ package com.example.examplequerydslspringdatajpamaven.repository;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-
 import javax.transaction.Transactional;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
-
-import com.example.examplequerydslspringdatajpamaven.entity.BillingsList;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceList;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceLiveData;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomMapData;
-import com.example.examplequerydslspringdatajpamaven.entity.CustomPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
-import com.example.examplequerydslspringdatajpamaven.entity.DeviceCalibrationData;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
-import com.example.examplequerydslspringdatajpamaven.entity.DeviceWorkingHours;
-import com.example.examplequerydslspringdatajpamaven.entity.EventReport;
 import com.example.examplequerydslspringdatajpamaven.entity.ExpiredVehicles;
 import com.example.examplequerydslspringdatajpamaven.entity.LastLocationsList;
-import com.example.examplequerydslspringdatajpamaven.entity.NewcustomerDivice;
 
+/**
+ * Queries on table tc_devices 
+ * @author fuinco
+ *
+ */
 @Component
 public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDslPredicateExecutor<Device> {
 	
@@ -136,9 +131,8 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 			+ " group by tc_devices.id ",nativeQuery = true )
 	public List<String> getAllPositionsObjectIdsByIds(@Param("deviceIds")List<Long> deviceIds);
 	
-	//here
+	
 	@Query(nativeQuery = true, name = "getDevicesLiveData")
-	//List<CustomDeviceLiveData> getAllDevicesLiveData(@Param("userIds")List<Long> userIds,@Param("offset") int offset);
     List<CustomDeviceLiveData> getAllDevicesLiveData(@Param("userIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
 
 	@Query(nativeQuery = true, name = "getDevicesData")
@@ -159,9 +153,7 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 			+ "  AND ( (tc_devices.uniqueid LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_devices.name LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))))" ,nativeQuery = true )
 	public Integer getAllDevicesLiveDataSizeByIds(@Param("deviceIds")List<Long> deviceIds,@Param("search") String search);
 	
-	//here
 	@Query(nativeQuery = true, name = "getDevicesLiveDataMap")
-	//List<CustomDeviceLiveData> getAllDevicesLiveDataMap(@Param("userIds")List<Long> userIds);
  	List<CustomDeviceLiveData> getAllDevicesLiveDataMap(@Param("userIds")List<Long> userIds);
 	
 	@Query(nativeQuery = true, name = "getDevicesDataMapNoPosition")
@@ -176,7 +168,8 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	@Query(nativeQuery = true, name = "getVehicleInfoData")
 	public List<CustomDeviceList> vehicleInfoData(@Param("deviceId")Long deviceId);
 
-	@Query(value = " SELECT count(*)"
+	@Query(value = " SELECT count(*) From ( "
+			+ "SELECT count(*) X "
      		+ " FROM tc_devices LEFT JOIN  tc_device_driver ON tc_devices.id=tc_device_driver.deviceid"
      		+ " LEFT JOIN  tc_drivers ON tc_drivers.id=tc_device_driver.driverid and tc_drivers.delete_date is null" 
      		+ " LEFT JOIN  tc_device_geofence ON tc_devices.id=tc_device_geofence.deviceid" 
@@ -186,11 +179,13 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
      		+ " where tc_user_device.userid IN(:userIds) and tc_devices.delete_date is null"
      		+ " AND ( tc_devices.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.uniqueid LIKE LOWER(CONCAT('%',:search, '%')) "
      		+ " OR tc_devices.reference_key LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.sequence_number LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))"
-     		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_users.name LIKE LOWER(CONCAT('%',:search, '%')) ) " ,nativeQuery = true )
+     		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_users.name LIKE LOWER(CONCAT('%',:search, '%')) ) "
+     		+ " GROUP BY tc_devices.id,tc_drivers.id,tc_users.id ) Y" ,nativeQuery = true )
 	public Integer getDevicesListSize(@Param("userIds")List<Long> userIds,@Param("search") String search);
 	
 	
-	@Query(value = " SELECT count(*)"
+	@Query(value = " SELECT count(*) From ( "
+			+ " SELECT count(*) X"
      		+ " FROM tc_devices LEFT JOIN  tc_device_driver ON tc_devices.id=tc_device_driver.deviceid"
      		+ " LEFT JOIN  tc_drivers ON tc_drivers.id=tc_device_driver.driverid and tc_drivers.delete_date is null" 
      		+ " LEFT JOIN  tc_device_geofence ON tc_devices.id=tc_device_geofence.deviceid" 
@@ -200,7 +195,8 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
      		+ " where tc_devices.id IN(:deviceIds) and tc_devices.delete_date is null"
      		+ " AND ( tc_devices.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.uniqueid LIKE LOWER(CONCAT('%',:search, '%')) "
      		+ " OR tc_devices.reference_key LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.sequence_number LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))"
-     		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_users.name LIKE LOWER(CONCAT('%',:search, '%')) ) " ,nativeQuery = true )
+     		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_users.name LIKE LOWER(CONCAT('%',:search, '%')) ) "
+     		+ " GROUP BY tc_devices.id,tc_drivers.id,tc_users.id ) Y " ,nativeQuery = true )
 	public Integer getDevicesListSizeByIds(@Param("deviceIds")List<Long> deviceIds,@Param("search") String search);
 	
 	
@@ -220,21 +216,6 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	@Query(value = "SELECT tc_devices.icon FROM tc_devices WHERE tc_devices.id=:deviceId AND tc_devices.delete_date IS NULL ",nativeQuery = true)
 	public String getIcon(@Param("deviceId")Long deviceId);
 	
-	/*@Query(nativeQuery = true, name = "getBillingsList")
-	public List<BillingsList> billingInfo(@Param("userId")Long userId,@Param("start")String start,@Param("end")String end,@Param("offset")int offset,@Param("search")String search);
-
-	@Query(value = "SELECT COUNT(*) from ("
-			+ " SELECT COUNT(distinct tc_devices.id) as deviceNumbers,tc_users.name as ownerName , " + 
-			" DATE_FORMAT(tc_positions.fixtime, '%Y-%m') as workingDate " + 
-			" from tc_positions " + 
-			" INNER JOIN tc_devices ON tc_positions.deviceid = tc_devices.id  " + 
-			" INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id  " + 
-			" INNER JOIN tc_users ON tc_users.id = tc_user_device.userid  " + 
-			" where (tc_positions.fixtime between :start and  :end ) and tc_positions.fixtime > '2018-01-01' " + 
-			" and ( (tc_devices.delete_date is null) or (tc_devices.delete_date > :start ) )" + 
-			" AND tc_users.id =:userId group by workingDate ) AS DATA ",nativeQuery = true )
-	public Integer getBillingInfotSize(@Param("userId")Long userId,@Param("start")String start,@Param("end")String end);
-	*/
 	@Query(value = "select tc_user_device.deviceid from tc_user_device where tc_user_device.userid in ( :userIds) ", nativeQuery = true)
 	public List<Long> getDevicesUsers(@Param("userIds")List<Long> userIds);
 	

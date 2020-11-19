@@ -20,36 +20,35 @@ import javax.persistence.NamedNativeQuery;
 import javax.persistence.SqlResultSetMapping;
 import javax.persistence.SqlResultSetMappings;
 import javax.persistence.Table;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @SqlResultSetMappings({
 	
 	@SqlResultSetMapping(
-	        name="DriverList",
-	        classes={
-	           @ConstructorResult(
-	                targetClass=CustomDriverList.class,
-	                  columns={
-	                     @ColumnResult(name="id",type=Long.class),
-	                     @ColumnResult(name="name",type=String.class),
-	                     @ColumnResult(name="uniqueid",type=String.class),
-	                     @ColumnResult(name="attributes",type=String.class),
-	                     @ColumnResult(name="mobile_num",type=String.class),
-	                     @ColumnResult(name="birth_date",type=String.class),
-	                     @ColumnResult(name="email",type=String.class),
-	                     @ColumnResult(name="reference_key",type=String.class),
-	                     @ColumnResult(name="is_deleted",type=String.class),
-	                     @ColumnResult(name="delete_date",type=String.class),
-	                     @ColumnResult(name="reject_reason",type=String.class),
-	                     @ColumnResult(name="date_type",type=String.class),
-	                     @ColumnResult(name="is_valid",type=String.class),
-	                     @ColumnResult(name="photo",type=String.class),
-	                     @ColumnResult(name="companyName",type=String.class)
-	                     }
-	           )
-	        }
+        name="DriverList",
+        classes={
+           @ConstructorResult(
+                targetClass=CustomDriverList.class,
+                  columns={
+                     @ColumnResult(name="id",type=Long.class),
+                     @ColumnResult(name="name",type=String.class),
+                     @ColumnResult(name="uniqueid",type=String.class),
+                     @ColumnResult(name="attributes",type=String.class),
+                     @ColumnResult(name="mobile_num",type=String.class),
+                     @ColumnResult(name="birth_date",type=String.class),
+                     @ColumnResult(name="email",type=String.class),
+                     @ColumnResult(name="reference_key",type=String.class),
+                     @ColumnResult(name="is_deleted",type=String.class),
+                     @ColumnResult(name="delete_date",type=String.class),
+                     @ColumnResult(name="reject_reason",type=String.class),
+                     @ColumnResult(name="date_type",type=String.class),
+                     @ColumnResult(name="is_valid",type=String.class),
+                     @ColumnResult(name="photo",type=String.class),
+                     @ColumnResult(name="companyName",type=String.class)
+                     }
+           )
+        }
 	)
 	
 	
@@ -92,7 +91,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 	
 })
 
-
+/**
+ * 
+ * Model of table tc_drivers in DB
+ * @author fuinco
+ *
+ */
 @Entity
 @Table(name = "tc_drivers")
 @JsonIgnoreProperties(value = { "device" })
@@ -129,7 +133,7 @@ public class Driver {
 	private Integer is_deleted=null;
 	
 	@Column(name = "delete_date")
-	private String delete_date;
+	private String delete_date=null;
 	
 	@Column(name = "reject_reason")
 	private String reject_reason;
@@ -148,7 +152,6 @@ public class Driver {
             cascade = {CascadeType.PERSIST, CascadeType.MERGE},
             mappedBy = "driver"
     )
-//    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Device> device = new HashSet<>();
 	
 	
@@ -290,7 +293,7 @@ public class Driver {
 		this.device = device;
 	}
 	
-	 @JsonIgnore
+	@JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE},
             mappedBy = "driverGroup")
     private Set<Group> groups = new HashSet<>();

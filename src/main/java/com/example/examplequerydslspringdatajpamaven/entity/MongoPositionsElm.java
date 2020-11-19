@@ -7,6 +7,11 @@ import javax.persistence.Id;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+/**
+ * Data Of Elm that sending from position live
+ * @author fuinco
+ *
+ */
 @Document(collection = "tc_positions_elm")
 public class MongoPositionsElm {
 

@@ -3,6 +3,11 @@ package com.example.examplequerydslspringdatajpamaven.responses;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Return data from any response of serviece get in this object
+ * @author fuinco
+ *
+ */
 public class GetObjectResponse {
 	
 	private Integer responseCode;

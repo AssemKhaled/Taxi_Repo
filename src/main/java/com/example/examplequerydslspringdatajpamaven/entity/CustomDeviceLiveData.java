@@ -7,15 +7,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 import java.util.TimeZone;
-
-import javax.persistence.ColumnResult;
-
-import org.json.JSONArray;
 import org.json.JSONObject;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * Initial Model to bind data with query
+ * @author fuinco
+ *
+ */
 public class CustomDeviceLiveData {
 	
 
@@ -43,8 +43,6 @@ public class CustomDeviceLiveData {
 	private String vehicleStatus;
 	private String positionId;
 	private JSONObject jsonAttributes;
-	//private Double sensor1;
-	//private Double sensor2;
 	private String hours;
 	private Boolean motion;
 	private Boolean valid;
@@ -92,12 +90,9 @@ public class CustomDeviceLiveData {
 	         
 	        Date currentDate = new Date();
 	        String deviceLastUpdate = FORMATTER.format(lastUpdate);
-	       
-	        System.out.println(FORMATTER.format(currentDate));  //Date in current timezone
-	         
+	       	         
 	        FORMATTER.setTimeZone(etTimeZone);
-	         String now = FORMATTER.format(currentDate);
-	         System.out.println(now);
+	        String now = FORMATTER.format(currentDate);
 	        try {
 				Date date1=new SimpleDateFormat("yyyy-MM-dd  HH:MM:ss").parse(now);
 				Date date2=new SimpleDateFormat("yyyy-MM-dd  HH:MM:ss").parse(deviceLastUpdate);
@@ -197,12 +192,7 @@ public class CustomDeviceLiveData {
 			if(jsonObject.has("ignition")) {
 				this.ignition = jsonObject.getBoolean("ignition");
 			}
-//			if(jsonObject.has("adc1")) {
-//				this.sensor1 = jsonObject.getDouble("adc1");
-//			}
-//			if(jsonObject.has("adc2")) {
-//				this.sensor2 = jsonObject.getDouble("adc2");
-//			}
+
 			
 		}else {
 			this.weight =0.0;
@@ -237,11 +227,9 @@ public class CustomDeviceLiveData {
 	        Date currentDate = new Date();
 	        String deviceLastUpdate = FORMATTER.format(lastUpdate);
 	       
-	        System.out.println(FORMATTER.format(currentDate));  //Date in current timezone
 	         
 	        FORMATTER.setTimeZone(etTimeZone);
-	         String now = FORMATTER.format(currentDate);
-	         System.out.println(now);
+	        String now = FORMATTER.format(currentDate);
 	        try {
 				Date date1=new SimpleDateFormat("yyyy-MM-dd  HH:MM:ss").parse(now);
 				Date date2=new SimpleDateFormat("yyyy-MM-dd  HH:MM:ss").parse(deviceLastUpdate);
@@ -340,12 +328,7 @@ public class CustomDeviceLiveData {
 			if(jsonObject.has("ignition")) {
 				this.ignition = jsonObject.getBoolean("ignition");
 			}
-//			if(jsonObject.has("adc1")) {
-//				this.sensor1 = jsonObject.getDouble("adc1");
-//			}
-//			if(jsonObject.has("adc2")) {
-//				this.sensor2 = jsonObject.getDouble("adc2");
-//			}
+
 			
 		}else {
 			this.weight =0.0;
@@ -619,26 +602,6 @@ public class CustomDeviceLiveData {
 	public void setJsonAttributes(JSONObject jsonAttributes) {
 		this.jsonAttributes = jsonAttributes;
 	}
-
-
-//	public Double getSensor1() {
-//		return sensor1;
-//	}
-//
-//
-//	public void setSensor1(Double sensor1) {
-//		this.sensor1 = sensor1;
-//	}
-//
-//
-//	public Double getSensor2() {
-//		return sensor2;
-//	}
-//
-//
-//	public void setSensor2(Double sensor2) {
-//		this.sensor2 = sensor2;
-//	}
 
 
 	public String getHours() {

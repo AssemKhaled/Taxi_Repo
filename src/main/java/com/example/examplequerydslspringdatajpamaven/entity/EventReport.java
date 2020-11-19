@@ -1,6 +1,10 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
-
+/**
+ * Bind data of events or notifications from mongo on this model
+ * @author fuinco
+ *
+ */
 public class EventReport {
 
 	private String eventId;

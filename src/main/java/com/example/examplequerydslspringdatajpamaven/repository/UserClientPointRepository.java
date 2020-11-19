@@ -11,9 +11,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
-import com.example.examplequerydslspringdatajpamaven.entity.userClientDevice;
 import com.example.examplequerydslspringdatajpamaven.entity.userClientPoint;
 
+/**
+ * Queries related to type 3 and 4 for tc_user_client_point
+ * @author fuinco
+ *
+ */
 @Component
 public interface UserClientPointRepository extends JpaRepository<userClientPoint, Long>, QueryDslPredicateExecutor<userClientPoint>{
 

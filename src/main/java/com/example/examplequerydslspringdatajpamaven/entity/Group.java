@@ -16,6 +16,11 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * Model of table tc_groups in DB
+ * @author fuinco
+ *
+ */
 @Entity
 @Table(name = "tc_groups")
 public class Group {
@@ -34,7 +39,7 @@ public class Group {
 	private String attributes;
 	
 	@Column(name = "is_deleted")
-	private String is_deleted;
+	private String is_deleted=null;
 
 	@Column(name = "type")
 	private String type;

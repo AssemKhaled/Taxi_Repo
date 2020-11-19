@@ -40,7 +40,6 @@ import com.example.examplequerydslspringdatajpamaven.entity.MongoPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.SummaryReport;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.EventRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoEventsRepo;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionRepo;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionsRepository;
@@ -66,8 +65,6 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 	@Autowired 
 	DeviceRepository deviceRepository;
 	
-	@Autowired
-	EventRepository eventRepository;
 	
 	@Autowired
 	private DriverServiceImpl driverService;

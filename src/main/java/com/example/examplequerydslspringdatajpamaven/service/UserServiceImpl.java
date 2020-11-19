@@ -261,7 +261,7 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 					 Set<User> parentClients = user.getUsersOfUser();
 					 if(parentClients.isEmpty()) {
 						
-						 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get geofences of this user",null);
+						 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get users of this user",null);
 						 logger.info("************************ getAllUserDevices ENDED ***************************");
 						return  ResponseEntity.status(404).body(getObjectResponse);
 					 }else {

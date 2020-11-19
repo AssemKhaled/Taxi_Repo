@@ -17,7 +17,6 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
@@ -64,7 +63,6 @@ import com.example.examplequerydslspringdatajpamaven.entity.userClientDriver;
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.DriverRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.EventRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.GeofenceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.GroupRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoEventsRepo;
@@ -125,8 +123,6 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	@Autowired
 	ProfileServiceImpl profileServiceImpl;
 
-	@Autowired
-	EventRepository eventRepository;
 	
 	@Autowired
 	private MongoPositionsRepository mongoPositionsRepository;
@@ -434,7 +430,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			}
 			Device device = deviceServiceImpl.findById(deviceId);
 			if(device != null ) {
-				if(device.getDeleteDate()==null) {
+				if(device.getDelete_date()==null) {
 					boolean isParent = false;
 					   if(loggedUser.getAccountType().equals(4)) {
 						    Set<User>parentClient = loggedUser.getUsersOfUser();
@@ -2108,7 +2104,6 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 	@Override
 	public ResponseEntity<?> viewTripApp(String TOKEN, Long deviceId, String from , String to) {
-		
 		logger.info("************************ getviewTrip STARTED ***************************");
 
 		List<TripPositions> positions = new ArrayList<TripPositions>();
@@ -2130,7 +2125,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 		SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 		SimpleDateFormat inputFormat2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS SSSS");
-		SimpleDateFormat inputFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat inputFormat1 = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
 		inputFormat1.setLenient(false);
 		inputFormat.setLenient(false);
 		outputFormat.setLenient(false);
@@ -3733,12 +3728,12 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		}
 		
 		if(device.getName() == null ||device.getName().equals("")
-				|| device.getUniqueId() == null|| device.getUniqueId() == null
-				|| device.getSequenceNumber() == null || device.getSequenceNumber().equals("")
-				|| device.getPlateNum() == null|| device.getPlateNum().equals("")
-				|| device.getLeftLetter() == null || device.getLeftLetter().equals("")
-                || device.getMiddleLetter() == null|| device.getMiddleLetter().equals("")
-                || device.getRightLetter() == null|| device.getRightLetter().equals("")) {
+				|| device.getUniqueid() == null|| device.getUniqueid() == null
+				|| device.getSequence_number() == null || device.getSequence_number().equals("")
+				|| device.getPlate_num() == null|| device.getPlate_num().equals("")
+				|| device.getLeft_letter() == null || device.getLeft_letter().equals("")
+                || device.getMiddle_letter() == null|| device.getMiddle_letter().equals("")
+                || device.getRight_letter() == null|| device.getRight_letter().equals("")) {
 			
 			List<Device> devices = null;
 			
@@ -3865,12 +3860,12 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		}
 	
 		if(device.getId() == null || device.getName() == null ||device.getName().equals("") 
-			|| device.getUniqueId() == null || device.getUniqueId().equals("")
-			|| device.getSequenceNumber() == null || device.getSequenceNumber().equals("")
-			|| device.getPlateNum() == null || device.getPlateNum().equals("")
-			|| device.getLeftLetter() == null || device.getLeftLetter() == null
-			|| device.getRightLetter() == null || device.getRightLetter().equals("")
-			|| device.getMiddleLetter() == null || device.getMiddleLetter().equals("")	) {
+			|| device.getUniqueid() == null || device.getUniqueid().equals("")
+			|| device.getSequence_number() == null || device.getSequence_number().equals("")
+			|| device.getPlate_num() == null || device.getPlate_num().equals("")
+			|| device.getLeft_letter() == null || device.getLeft_letter() == null
+			|| device.getRight_letter() == null || device.getRight_letter().equals("")
+			|| device.getMiddle_letter() == null || device.getMiddle_letter().equals("")	) {
 			
 			
 			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "Atrributes[id ,name, trackerImei , sequence" + 
@@ -4083,7 +4078,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		     int month = cal.get(Calendar.MONTH) + 1;
 		     int year = cal.get(Calendar.YEAR);
 		     String date =  Integer.toString(year)+"-"+ Integer.toString(month)+"-"+ Integer.toString(day);
-		     device.setDeleteDate(date);
+		     device.setDelete_date(date);
 		     Set<Driver> drivers =new HashSet<>() ;
 		     drivers = device.getDriver();
 		     Set<Driver> oldDrivers =new HashSet<>() ;
@@ -4137,7 +4132,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			return ResponseEntity.status(404).body(getObjectResponse);
 		}
 		else {
-			if(device.getDeleteDate() != null) {
+			if(device.getDelete_date() != null) {
 				//throw not found 
 				List<Device> devices = null;
 				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",devices);

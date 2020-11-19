@@ -2,6 +2,11 @@ package com.example.examplequerydslspringdatajpamaven.entity;
 
 import java.util.Date;
 
+/**
+ * Bind data from mysql and mongo together to send for elm
+ * @author fuinco
+ *
+ */
 public class LastLocationsList {
 
 

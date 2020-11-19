@@ -15,11 +15,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.example.examplequerydslspringdatajpamaven.entity.Attribute;
-import com.example.examplequerydslspringdatajpamaven.entity.Notification;
 import com.example.examplequerydslspringdatajpamaven.service.ComputedServiceImpl;
 
+/**
+ * Services of Computed attributes component 
+ * @author fuinco
+ *
+ */
 @CrossOrigin
 @Component
 @RequestMapping(path = "/computed")

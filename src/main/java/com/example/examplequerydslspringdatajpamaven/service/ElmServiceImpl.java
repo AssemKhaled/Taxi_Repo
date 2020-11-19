@@ -1805,9 +1805,9 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	
 		  device_data.put("sequenceNumber", device.getSequence_number());
 		  device_data.put("plateType", device.getPlate_type());
-		  device_data.put("imeiNumber", device.getUniqueId());
+		  device_data.put("imeiNumber", device.getUniqueid());
 
-		  vehiclePlate.put("number", device.getPlateNum());
+		  vehiclePlate.put("number", device.getPlate_num());
 		  vehiclePlate.put("rightLetter", device.getRight_letter());
 		  vehiclePlate.put("middleLetter", device.getMiddle_letter());
 		  vehiclePlate.put("leftLetter", device.getLeft_letter());
@@ -4433,7 +4433,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 	     Map deviceData= new HashMap();
 	     deviceData.put("Name", device.getName());
-	     deviceData.put("Unique Id", device.getUniqueId());
+	     deviceData.put("Unique Id", device.getUniqueid());
 	     deviceData.put("Sequence Number", device.getSequence_number());
 	     
 	     List<Map> calibrationData=new ArrayList<Map>();

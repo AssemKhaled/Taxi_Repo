@@ -7,7 +7,11 @@ import javax.persistence.Id;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-
+/**
+ * Collection to save any action in service elm
+ * @author fuinco
+ *
+ */
 @Document(collection = "tc_elmLogs")
 public class MongoElmLogs {
 

@@ -13,6 +13,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.examplequerydslspringdatajpamaven.service.ChartServiceImpl;
 
+/**
+ * Services related to charts component
+ * @author fuinco
+ *
+ */
 @CrossOrigin
 @Component
 @RequestMapping(path = "/charts")

@@ -16,11 +16,14 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+/**
+ * Model of table tc_geofences in DB
+ * @author fuinco
+ *
+ */
 @Entity
 @Table(name = "tc_geofences")
 @JsonIgnoreProperties(value = { "device" })
-//@JsonIgnoreProperties(value = { "hibernateLazyInitializer", "handler" })
-
 public class Geofence {
 	
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -49,14 +52,13 @@ public class Geofence {
 	private Integer is_deleted=null;
 	
 	@Column(name = "delete_date")
-	private String delete_date;
+	private String delete_date=null;
 	
 	@ManyToMany(
             fetch = FetchType.LAZY,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE},
             mappedBy = "geofence"
     )
-//    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Device> device = new HashSet<>();
 	
 	public Geofence() {
@@ -157,19 +159,8 @@ public class Geofence {
 		this.device = device;
 	}
 	
-	/*@OneToMany(mappedBy="geofence", fetch=FetchType.EAGER)
-	private Set<Event> events;
 
-	public Set<Event> getEvents() {
-		return events;
-	}
-
-	public void setEvents(Set<Event> events) {
-		this.events = events;
-	}*/
-	
-	
-	 @JsonIgnore
+	@JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE},
             mappedBy = "geofenceGroup")
     private Set<Group> groups = new HashSet<>();

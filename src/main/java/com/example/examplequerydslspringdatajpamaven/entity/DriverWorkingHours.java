@@ -1,5 +1,10 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
+/**
+ * Bind data from position to fit model
+ * @author fuinco
+ *
+ */
 public class DriverWorkingHours {
 
 	private String deviceTime;

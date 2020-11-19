@@ -1,7 +1,6 @@
 package com.example.examplequerydslspringdatajpamaven.repository;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.transaction.Transactional;
 
@@ -11,12 +10,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-
-import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.entity.UserSelect;
 
+/**
+ * Queries related to tc_users
+ * @author fuinco
+ *
+ */
 @Component
 public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredicateExecutor<User> {
 

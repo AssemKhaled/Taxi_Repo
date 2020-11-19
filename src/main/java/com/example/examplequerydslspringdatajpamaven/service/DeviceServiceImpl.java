@@ -284,12 +284,12 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		}
 		
 		if(device.getName() == null ||device.getName().equals("")
-				|| device.getUniqueId() == null|| device.getUniqueId() == null
-				|| device.getSequenceNumber() == null || device.getSequenceNumber().equals("")
-				|| device.getPlateNum() == null|| device.getPlateNum().equals("")
-				|| device.getLeftLetter() == null || device.getLeftLetter().equals("")
-                || device.getMiddleLetter() == null|| device.getMiddleLetter().equals("")
-                || device.getRightLetter() == null|| device.getRightLetter().equals("")) {
+				|| device.getUniqueid() == null|| device.getUniqueid() == null
+				|| device.getSequence_number() == null || device.getSequence_number().equals("")
+				|| device.getPlate_num() == null|| device.getPlate_num().equals("")
+				|| device.getLeft_letter() == null || device.getLeft_letter().equals("")
+                || device.getMiddle_letter() == null|| device.getMiddle_letter().equals("")
+                || device.getRight_letter() == null|| device.getRight_letter().equals("")) {
 			
 			List<Device> devices = null;
 			
@@ -361,7 +361,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			    	if(userCreater.getAccountType().equals(4)) {
 			    		userClientDevice saveData = new userClientDevice();
 				        
-				        Long devId = deviceRepository.getDeviceIdByName(parent.getId(),device.getName(),device.getUniqueId());
+				        Long devId = deviceRepository.getDeviceIdByName(parent.getId(),device.getName(),device.getUniqueid());
 			    		if(devId != null) {
 				    		saveData.setUserid(userId);
 				    		saveData.setDeviceid(devId);
@@ -419,12 +419,12 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		}
 	
 		if(device.getId() == null || device.getName() == null ||device.getName().equals("") 
-			|| device.getUniqueId() == null || device.getUniqueId().equals("")
-			|| device.getSequenceNumber() == null || device.getSequenceNumber().equals("")
-			|| device.getPlateNum() == null || device.getPlateNum().equals("")
-			|| device.getLeftLetter() == null || device.getLeftLetter() == null
-			|| device.getRightLetter() == null || device.getRightLetter().equals("")
-			|| device.getMiddleLetter() == null || device.getMiddleLetter().equals("")	) {
+			|| device.getUniqueid() == null || device.getUniqueid().equals("")
+			|| device.getSequence_number() == null || device.getSequence_number().equals("")
+			|| device.getPlate_num() == null || device.getPlate_num().equals("")
+			|| device.getLeft_letter() == null || device.getLeft_letter() == null
+			|| device.getRight_letter() == null || device.getRight_letter().equals("")
+			|| device.getMiddle_letter() == null || device.getMiddle_letter().equals("")	) {
 			
 			
 			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "Atrributes[id ,name, trackerImei , sequence" + 
@@ -560,12 +560,12 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		else
 		{
 			String deviceName = device.getName();
-			String deviceUniqueId = device.getUniqueId();
-			String deviceSequenceNumber = device.getSequenceNumber();
-			String devicePlateNum = device.getPlateNum();
-			String deviceLeftLetter = device.getLeftLetter();
-			String deviceMiddleLetter = device.getMiddleLetter();
-			String deviceRightLetter = device.getRightLetter();
+			String deviceUniqueId = device.getUniqueid();
+			String deviceSequenceNumber = device.getSequence_number();
+			String devicePlateNum = device.getPlate_num();
+			String deviceLeftLetter = device.getLeft_letter();
+			String deviceMiddleLetter = device.getMiddle_letter();
+			String deviceRightLetter = device.getRight_letter();
 		    List<Device>duplicatedDevices = deviceRepository.checkDeviceDuplication(deviceName,deviceUniqueId,deviceSequenceNumber,devicePlateNum,deviceLeftLetter,deviceMiddleLetter,deviceRightLetter);
 		    List<Integer>duplicationCodes = new ArrayList<Integer>();
 		    for (Device matchedDevice : duplicatedDevices) 
@@ -579,22 +579,22 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				        	duplicationCodes.add(1);
 				        }
 			    	}
-			    	if(matchedDevice.getUniqueId() != null) {
-			    		if(matchedDevice.getUniqueId().equals(device.getUniqueId()) ) {
+			    	if(matchedDevice.getUniqueid() != null) {
+			    		if(matchedDevice.getUniqueid().equals(device.getUniqueid()) ) {
 				        	duplicationCodes.add(2);
 				        }
 			    	}
-			        if(matchedDevice.getSequenceNumber() != null) {
-			        	if(matchedDevice.getSequenceNumber().equals(device.getSequenceNumber()) ) {
+			        if(matchedDevice.getSequence_number() != null) {
+			        	if(matchedDevice.getSequence_number().equals(device.getSequence_number()) ) {
 				        	duplicationCodes.add(3);
 				        }
 			        }
-			        if(matchedDevice.getPlateNum() != null || matchedDevice.getLeftLetter() != null
-			        	|| matchedDevice.getMiddleLetter() != null || matchedDevice.getRightLetter() != null) {
-			        	if(matchedDevice.getPlateNum().equals(device.getPlateNum())  
-			 		           && matchedDevice.getLeftLetter().equals(device.getLeftLetter())
-			 		           && matchedDevice.getMiddleLetter().equals(device.getMiddleLetter())
-			 		           && matchedDevice.getRightLetter().equals(device.getRightLetter())) {
+			        if(matchedDevice.getPlate_num() != null || matchedDevice.getLeft_letter() != null
+			        	|| matchedDevice.getMiddle_letter() != null || matchedDevice.getRight_letter() != null) {
+			        	if(matchedDevice.getPlate_num().equals(device.getPlate_num())  
+			 		           && matchedDevice.getLeft_letter().equals(device.getLeft_letter())
+			 		           && matchedDevice.getMiddle_letter().equals(device.getMiddle_letter())
+			 		           && matchedDevice.getRight_letter().equals(device.getRight_letter())) {
 			 		        	duplicationCodes.add(4);
 			 		        }
 			        }
@@ -708,7 +708,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		     int month = cal.get(Calendar.MONTH) + 1;
 		     int year = cal.get(Calendar.YEAR);
 		     String date =  Integer.toString(year)+"-"+ Integer.toString(month)+"-"+ Integer.toString(day);
-		     device.setDeleteDate(date);
+		     device.setDelete_date(date);
 		     Set<Driver> drivers =new HashSet<>() ;
 		     drivers = device.getDriver();
 		     Set<Driver> oldDrivers =new HashSet<>() ;
@@ -751,7 +751,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		if(device == null ) {
 			return null;
 		}
-		if(device.getDeleteDate() != null) {
+		if(device.getDelete_date() != null) {
 			//throw not found 
 			return null;
 		}
@@ -793,7 +793,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			return ResponseEntity.status(404).body(getObjectResponse);
 		}
 		else {
-			if(device.getDeleteDate() != null) {
+			if(device.getDelete_date() != null) {
 				//throw not found 
 				List<Device> devices = null;
 				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",devices);
@@ -2180,7 +2180,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			}
 			Device device = findById(deviceId);
 			if(device != null ) {
-				if(device.getDeleteDate()==null) {
+				if(device.getDelete_date()==null) {
 					boolean isParent = false;
 					   if(loggedUser.getAccountType().equals(4)) {
 						    Set<User>parentClient = loggedUser.getUsersOfUser();

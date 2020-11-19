@@ -1,7 +1,10 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
-import java.util.Date;
-
+/**
+ * Set token authorization in this model
+ * @author fuinco
+ *
+ */
 public class Token {
 	private Long userId;
 	private String token;

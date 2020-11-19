@@ -6,8 +6,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.json.JSONObject;
-
+/**
+ * Model tc_permissions in DB
+ * @author fuinco
+ *
+ */
 @Entity
 @Table(name = "tc_permissions")
 public class Permission {

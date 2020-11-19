@@ -12,6 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 
+/**
+ * queries on table tc_geofences
+ * @author fuinco
+ *
+ */
 @Component
 public interface GeofenceRepository extends JpaRepository<Geofence, Long>, QueryDslPredicateExecutor<Geofence>{
 

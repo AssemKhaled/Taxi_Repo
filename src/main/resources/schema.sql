@@ -529,6 +529,25 @@ PREPARE stmt FROM @stmt;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 ----------------------------------------------------------------
+set @col_exists = 0;
+SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME='tc_devices'
+AND column_name='position_id'
+and table_schema = database()
+into @col_exists;
+
+set @stmt = case @col_exists
+when 0 then CONCAT(
+'alter table tc_devices'
+, ' ADD COLUMN `position_id` text NULL DEFAULT NULL'
+,';')
+else 'select ''column already exists, no op'''
+end;
+
+PREPARE stmt FROM @stmt;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+----------------------------------------------------------------
 --ALTER TABLE `tc_devices` MODIFY `calibrationData` VARCHAR(1080);
 --ALTER TABLE `tc_devices` DROP `positionid`;
 --ALTER TABLE `tc_devices` ADD COLUMN `positionid` text NULL DEFAULT NULL;

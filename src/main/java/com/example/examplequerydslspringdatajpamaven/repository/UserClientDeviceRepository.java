@@ -9,11 +9,14 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
-import com.example.examplequerydslspringdatajpamaven.entity.userClientComputed;
 import com.example.examplequerydslspringdatajpamaven.entity.userClientDevice;
 
+/**
+ * Queries related to type 3 and 4 for tc_user_client_device
+ * @author fuinco
+ *
+ */
 @Component
 public interface UserClientDeviceRepository extends JpaRepository<userClientDevice, Long>, QueryDslPredicateExecutor<userClientDevice>{
 

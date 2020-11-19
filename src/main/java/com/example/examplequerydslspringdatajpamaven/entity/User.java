@@ -10,12 +10,16 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.JoinColumn;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * Model of table tc_users in DB
+ * @author fuinco
+ *
+ */
 @Entity
 @Table(name ="tc_users")
 public class User {
@@ -31,11 +35,9 @@ public class User {
 	@Column(name = "email")
 	private String email;
 	
-//	@JsonIgnore
 	@Column (name = "hashedpassword")
 	private String password;
 	
-//	@JsonProperty
 	@Column(name = "phone")
 	private String phone;
 	
@@ -101,43 +103,35 @@ public class User {
 
 	 @JsonIgnore
 	 @ManyToMany(
-	            fetch = FetchType.LAZY,
-	            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
-	            mappedBy = "user"
-	    )
-//	    @OnDelete(action = OnDeleteAction.CASCADE)
-	    private Set<Device> devices = new HashSet<>();
+	        fetch = FetchType.LAZY,
+	        cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+	        mappedBy = "user"
+    )
+    private Set<Device> devices = new HashSet<>();
 	    
-		@ManyToMany(
-	            fetch = FetchType.LAZY,
-	            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
-	    )
-	    @JoinTable(
-	            name = "tc_user_user",
-	            joinColumns = { @JoinColumn(name = "manageduserid") },
-	            inverseJoinColumns = { @JoinColumn(name = "userid") }
-	    )
-//	    @OnDelete(action = OnDeleteAction.CASCADE)
-		private Set<User> usersOfUser = new HashSet<>();
+	@ManyToMany(
+            fetch = FetchType.LAZY,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+    )
+    @JoinTable(
+            name = "tc_user_user",
+            joinColumns = { @JoinColumn(name = "manageduserid") },
+            inverseJoinColumns = { @JoinColumn(name = "userid") }
+    )
+	private Set<User> usersOfUser = new HashSet<>();
 	    
-	    @JsonIgnore
-	    @ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE},
-	            mappedBy = "userDriver")
-	    private Set<Driver> drivers = new HashSet<>();
-	    
-	    @JsonIgnore
-	    @ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE},
-	            mappedBy = "userGeofence")
-	    private Set<Geofence> geofences = new HashSet<>();
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            mappedBy = "userDriver")
+    private Set<Driver> drivers = new HashSet<>();
+    
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            mappedBy = "userGeofence")
+    private Set<Geofence> geofences = new HashSet<>();
 	    
 	    
-	  
 
-	/*@Column(name="active")
-	@CsvBindByName
-	private Boolean active;
-	@Enumerated(EnumType.STRING)
-	private UsersTypes type;*/
 	public User() {
 		
 	}
@@ -201,25 +195,7 @@ public class User {
 		this.devices = devices;
 	}
 	
-
-	/*public Boolean getActive() {
-		return active;
-	}
-
-	public void setActive(Boolean active) {
-		this.active = active;
-	}
-
-	public UsersTypes getType() {
-		return type;
-	}
-
-	public void setType(UsersTypes type) {
-		this.type = type;
-	}*/
-
 	
-
 	public Set<Driver> getDrivers() {
 		return drivers;
 	}
@@ -228,9 +204,6 @@ public class User {
 	}
 
 	
-	
-
-
 	public Set<Geofence> getGeofences() {
 		return geofences;
 	}
@@ -238,9 +211,6 @@ public class User {
 		this.geofences = geofences;
 	}
 	
-	
-
-
 	public Set<User> getUsersOfUser() {
 		return usersOfUser;
 	}

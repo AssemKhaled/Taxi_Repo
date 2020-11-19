@@ -8,8 +8,13 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 
-import com.example.examplequerydslspringdatajpamaven.entity.Permission;
 import com.example.examplequerydslspringdatajpamaven.entity.UserRole;
+
+/**
+ * Queries related to tc_user_roles
+ * @author fuinco
+ *
+ */
 @Component
 public interface UserRoleRepository extends  JpaRepository<UserRole, Long>, QueryDslPredicateExecutor<UserRole>{
 

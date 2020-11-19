@@ -1,5 +1,10 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
+/**
+ * Bind data of trip report in this model
+ * @author fuinco
+ *
+ */
 public class TripReport {
 	
 	private String averageSpeed;

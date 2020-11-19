@@ -7,6 +7,11 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoPositionsElm;
 
+/**
+ * Built-in queries related to Mongo collection
+ * @author fuinco
+ *
+ */
 public interface MongoPositionsElmRepository extends MongoRepository<MongoPositionsElm,String>{
 
 	@Query("{ 'deviceid' : { $in: ?0 }}")
