@@ -574,6 +574,9 @@ public class Device {
 	@Column(name = "positionid")
 	private String positionid;
 	
+	@Column(name = "position_id")
+	private String position_id;
+	
 	@Column(name = "attributes")
 	private String attributes;
 	
@@ -858,7 +861,7 @@ public class Device {
 
 
 
-	public void setUniqueId(String uniqueid) {
+	public void setUniqueid(String uniqueid) {
 		this.uniqueid = uniqueid;
 	}
 
@@ -870,7 +873,7 @@ public class Device {
 
 
 
-	public void setLastUpdate(String lastupdate) {
+	public void setLastupdate(String lastupdate) {
 		this.lastupdate = lastupdate;
 	}
 
@@ -1384,6 +1387,18 @@ public class Device {
 
 	public void setUpdate_date_in_elm(Date update_date_in_elm) {
 		this.update_date_in_elm = update_date_in_elm;
+	}
+
+
+
+	public String getPosition_id() {
+		return position_id;
+	}
+
+
+
+	public void setPosition_id(String position_id) {
+		this.position_id = position_id;
 	}
 
 	

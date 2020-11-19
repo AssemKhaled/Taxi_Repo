@@ -1317,7 +1317,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			  else if(resp.containsKey("resultCode")) {
 				  if(resp.get("success").equals(true)) {
 					  device.setReject_reason(null);
-					  device.setUniqueId(dataObject.get("imeiNumber"));
+					  device.setUniqueid(dataObject.get("imeiNumber"));
 					  device.setSequence_number(dataObject.get("sequenceNumber"));
 					  device.setUpdate_date_in_elm(dateRegUpdate);
 					  device.setExpired(0);
