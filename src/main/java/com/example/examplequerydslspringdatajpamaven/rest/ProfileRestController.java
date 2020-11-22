@@ -15,6 +15,11 @@ import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.service.ProfileServiceImpl;
 import com.example.examplequerydslspringdatajpamaven.service.UserServiceImpl;
 
+/**
+ * Services of profile component
+ * @author fuinco
+ *
+ */
 @CrossOrigin
 @RestController
 @RequestMapping(path = "/profile")

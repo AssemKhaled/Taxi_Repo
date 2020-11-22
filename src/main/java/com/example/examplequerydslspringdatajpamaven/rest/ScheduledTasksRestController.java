@@ -2,7 +2,6 @@ package com.example.examplequerydslspringdatajpamaven.rest;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -24,6 +23,11 @@ import com.example.examplequerydslspringdatajpamaven.repository.ScheduledReposit
 import com.example.examplequerydslspringdatajpamaven.service.DeviceServiceImpl;
 import com.example.examplequerydslspringdatajpamaven.service.ScheduledServiceImpl;
 
+/**
+ * Handling of schedule timing
+ * @author fuinco
+ *
+ */
 @Configuration
 @EnableScheduling
 public class ScheduledTasksRestController implements SchedulingConfigurer,DisposableBean{

@@ -19,7 +19,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +30,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -80,7 +80,13 @@ import com.example.examplequerydslspringdatajpamaven.tokens.TokenSecurity;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * services functionality related to app
+ * @author fuinco
+ *
+ */
 @Component
+@Service
 public class AppServiceImpl extends RestServiceController implements AppService{
 
 	private static final Log logger = LogFactory.getLog(AppServiceImpl.class);
@@ -127,8 +133,6 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	@Autowired
 	private MongoPositionsRepository mongoPositionsRepository;
 	
-	@Autowired
-	private MongoPositionRepo mongoPositionsRepo;
 	 
 	 @Autowired
 	 private GeofenceRepository geofenceRepository;
@@ -166,8 +170,6 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	@Autowired
 	private UserRoleService userRoleService;
 	
-	@Autowired
-	private ReportServiceImpl reportServiceImpl;
 	
 	@Override
 	public ResponseEntity<?> loginApp(String authtorization) {
@@ -643,20 +645,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		 List<CustomDeviceList> devices = new ArrayList<CustomDeviceList>();
 		 Integer size= 0;
 		 if(loggedUser.getAccountType().equals(4)) {
-			 /*Set<User> parentClients = loggedUser.getUsersOfUser();
-			 if(parentClients.isEmpty()) {
-				
-				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get devices of this user",null);
-				 logger.info("************************ getDevicesListApp ENDED ***************************");
-				return  ResponseEntity.status(404).body(getObjectResponse);
-			 }else {
-				 User parentClient = new User() ;
-				 for(User object : parentClients) {
-					 parentClient = object;
-				 }
-				 usersIds.add(parentClient.getId());
-
-			 }*/
+			 
 
              List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(userId);
 			 
@@ -804,27 +793,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				}
 				   userServiceImpl.resetChildernArray();
 					if(user.getAccountType().equals(4)) {
-						/*Set<User>parentClients = user.getUsersOfUser();
-						if(parentClients.isEmpty()) {
-							getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get drivers of this user",null);
-							 logger.info("************************ getAllUserDrivers ENDED ***************************");
-							return  ResponseEntity.status(404).body(getObjectResponse);
-						}else {
-							User parent = null;
-							for(User object : parentClients) {
-								parent = object;
-							}
-							List<Long>usersIds= new ArrayList<>();
-						    usersIds.add(parent.getId());
-						     
-							//drivers = driverRepository.getAllDrivers(usersIds,offset,search);
-						    customDrivers= driverRepository.getAllDriversCustom(usersIds,offset,search);
-						    Integer size= driverRepository.getAllDriversSize(usersIds,search);
-							
-							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",customDrivers,size);
-							logger.info("************************ getAllDrivers ENDED ***************************");
-							return ResponseEntity.ok().body(getObjectResponse);
-						}*/
+						
 						List<Long> driverIds = userClientDriverRepository.getDriverIds(id);
 						Integer size = 0;
 						if(driverIds.size()>0) {
@@ -848,7 +817,6 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 							 usersIds.add(object.getId());
 						 }
 					 }
-					//drivers = driverRepository.getAllDrivers(usersIds,offset,search);
 				    customDrivers= driverRepository.getAllDriversCustom(usersIds,offset,search);
 
 					Integer size= driverRepository.getAllDriversSize(usersIds,search);
@@ -2243,26 +2211,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 					
 				    userServiceImpl.resetChildernArray();
 				    if(user.getAccountType().equals(4)) {
-						 /*Set<User> parentClients = user.getUsersOfUser();
-						 if(parentClients.isEmpty()) {
-							
-							 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get geofences of this user",null);
-							 logger.info("************************ getAllUserDevices ENDED ***************************");
-							return  ResponseEntity.status(404).body(getObjectResponse);
-						 }else {
-							 User parentClient = new User() ;
-							 for(User object : parentClients) {
-								 parentClient = object;
-							 }
-							 List<Long>usersIds= new ArrayList<>();
-							 usersIds.add(parentClient.getId());
-							 geofences = geofenceRepository.getAllGeofences(usersIds,offset,search);
-							 Integer size=geofenceRepository.getAllGeofencesSize(usersIds);
-							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",geofences,size);
-							logger.info("************************ getAllUserGeofences ENDED ***************************");
-							return  ResponseEntity.ok().body(getObjectResponse);
-						 }*/
-				    	
+						 
 				    	List<Long> geofenceIds = userClientGeofenceRepository.getGeofneceIds(id);
 				    	Integer size = 0;
 						 if(geofenceIds.size()>0) {
@@ -2811,32 +2760,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	    		if(user.getDelete_date() == null) {
 	    			
 	    			if(user.getAccountType().equals(4)) {
-	   				/* Set<User>parentClient = user.getUsersOfUser();
-	   					if(parentClient.isEmpty()) {
-	   						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
-	   						logger.info("************************ getGeofenceSelect ENDED ***************************");
-	   						return ResponseEntity.badRequest().body(getObjectResponse);
-	   					}else {
-	   					  
-	   						User parent =null;
-	   						for(User object : parentClient) {
-	   							parent = object;
-	   						}
-	   						if(parent != null) {
-
-					   			List<Long>usersIds= new ArrayList<>();
-			   					usersIds.add(parent.getId());
-	   							drivers = geofenceRepository.getGeofenceSelect(usersIds);
-	   							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
-	   							logger.info("************************ getGeofenceSelect ENDED ***************************");
-	   							return ResponseEntity.ok().body(getObjectResponse);
-	   						}
-	   						else {
-	   							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "No parent for this type 4",null);
-	   							return ResponseEntity.badRequest().body(getObjectResponse);
-	   						}
-	   						
-	   					}*/
+	   				
 	    				
 	    				List<Long> geofenceIds = userClientGeofenceRepository.getGeofneceIds(userId);
 
@@ -3509,32 +3433,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			}
 			else {
 				if(user.getAccountType().equals(4)) {
-					 /*Set<User>parentClient = user.getUsersOfUser();
-						if(parentClient.isEmpty()) {
-							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
-							logger.info("************************ editDevice ENDED ***************************");
-							return ResponseEntity.badRequest().body(getObjectResponse);
-						}else {
-						  
-							User parent =null;
-							for(User object : parentClient) {
-								parent = object;
-							}
-							if(parent != null) {
-								List<Long>usersIds= new ArrayList<>();
-							    usersIds.add(parent.getId());
-								List<Driver> unAssignedDrivers = driverRepository.getUnassignedDrivers(usersIds);
-								
-								getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",unAssignedDrivers);
-								logger.info("************************ getUnassignedDrivers ENDED ***************************");
-								return ResponseEntity.ok().body(getObjectResponse);
-							}
-							else {
-								getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "No parent for this type 4",null);
-								return ResponseEntity.badRequest().body(getObjectResponse);
-							}
-							
-						}*/
+					 
 
 					List<Long>usersIds= new ArrayList<>();
 				    usersIds.add(userId);
@@ -3592,33 +3491,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	    		if(user.getDelete_date() == null) {
 	    			
 	    			if(user.getAccountType().equals(4)) {
-	   				 /*Set<User>parentClient = user.getUsersOfUser();
-	   					if(parentClient.isEmpty()) {
-	   						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
-	   						logger.info("************************ getDriverSelect ENDED ***************************");
-	   						return ResponseEntity.badRequest().body(getObjectResponse);
-	   					}else {
-	   					  
-	   						User parent =null;
-	   						for(User object : parentClient) {
-	   							parent = object;
-	   						}
-	   						if(parent != null) {
-
-					   			List<Long>usersIds= new ArrayList<>();
-			   					usersIds.add(parent.getId());
-	   							drivers = driverRepository.getDriverSelect(usersIds);
-	   							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
-	   							logger.info("************************ getDriverSelect ENDED ***************************");
-	   							return ResponseEntity.ok().body(getObjectResponse);
-	   						}
-	   						else {
-	   							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "No parent for this type 4",null);
-	   							return ResponseEntity.badRequest().body(getObjectResponse);
-	   						}
-	   						
-	   					}*/
-	    				
+	   				 
 	    				 List<Long> driverIds = userClientDriverRepository.getDriverIds(userId);
 
 	    				 if(driverIds.size()>0) {
@@ -4133,7 +4006,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		}
 		else {
 			if(device.getDelete_date() != null) {
-				//throw not found 
+
 				List<Device> devices = null;
 				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",devices);
 				logger.info("************************ getDeviceById ENDED ***************************");
@@ -4295,7 +4168,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 						return ResponseEntity.status(404).body(getObjectResponse);
 			        }
 			        else {
-			        	//check if parent in drivers
+
 			        	Set<Driver> oldDrivers =new HashSet<>() ;
 			        	oldDrivers= drivers;
 			        	drivers.removeAll(oldDrivers);
@@ -4399,14 +4272,12 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",devices);
 			logger.info("************************ assignDeviceToGeofences ENDED ***************************");
 			return ResponseEntity.badRequest().body(getObjectResponse);
-//			return ResponseEntity.status(404).body(getObjectResponse);
 		}else {
 			 Device device = deviceServiceImpl.findById(deviceId);
 			 if(device == null) {
 				  List<Device> devices = null;
 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",devices);
 					logger.info("************************ assignDeviceToGeofences ENDED ***************************");
-//					return ResponseEntity.ok().body(getObjectResponse);
 					return ResponseEntity.status(404).body(getObjectResponse);
 			 }
 			 else {
@@ -4454,7 +4325,6 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			   }
 			}
 			if(geoIds.length == 0) {
-				//if device has geofences remove it 
                 Set<Geofence> geofences = device.getGeofence();
                 if(geofences.isEmpty()) {
                 	 List<Device> devices = null;
@@ -4463,7 +4333,6 @@ public class AppServiceImpl extends RestServiceController implements AppService{
  					return ResponseEntity.status(404).body(getObjectResponse);
                 }
                 else {
-                	// else if device hasn't geofences return error
     				
                 	Set<Geofence> oldGeofences = geofences;
                 	geofences.removeAll(oldGeofences);
@@ -4546,7 +4415,6 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 					List<Driver> deviceDriver = new ArrayList<>();
 					for(Driver driver : drivers ) {
-						//hint only one driver assigned to device
 
 						deviceDriver.add(driver);
 					}
@@ -4603,7 +4471,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				else {
 					List<Geofence> deviceGeofences = new ArrayList<>();
 					for(Geofence geofence : geofences ) {
-						//hint only one driver assigned to device
+
 						deviceGeofences.add(geofence);
 					}
 					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",deviceGeofences);
@@ -4875,21 +4743,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		userServiceImpl.resetChildernArray();
 		 List<Long>usersIds= new ArrayList<>();
 		 if(loggedUser.getAccountType().equals(4)) {
-			 /*Set<User> parentClients = loggedUser.getUsersOfUser();
-			 if(parentClients.isEmpty()) {
-				
-				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get devices of this user",null);
-				 logger.info("************************ getAllUserDevices ENDED ***************************");
-				return  ResponseEntity.status(404).body(getObjectResponse);
-			 }else {
-				 User parentClient = new User() ;
-				 for(User object : parentClients) {
-					 parentClient = object;
-				 }
-				 usersIds.add(parentClient.getId());
-				 
-
-			 }*/
+			 
 			List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(userId);
 
 			
@@ -4930,8 +4784,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				 }
 			 }
 			 
-			//Integer onlineDevices = deviceRepository.getNumberOfOnlineDevices(usersIds);
-			//Integer outOfNetworkDevices = deviceRepository.getNumberOfOutOfNetworkDevices(usersIds);
+
 
 			
 			List<String> onlineDeviceIds = deviceRepository.getNumberOfOnlineDevicesList(usersIds);
@@ -6366,47 +6219,14 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				if(deviceHours.size()>0) {
    				    size=mongoPositionRepo.getDeviceWorkingHoursSize(allDevices,dateFrom, dateTo);
 
-					/*for(int i=0;i<deviceHours.size();i++) {
-						
-						Device device = deviceRepository.findOne(deviceHours.get(i).getDeviceId());
-						deviceHours.get(i).setDeviceName(device.getName());
-
-                    	JSONObject obj = new JSONObject(deviceHours.get(i).getAttributes());
-                    	
-						if(obj.has("todayHoursString")) {
-							deviceHours.get(i).setHours(obj.getString("todayHoursString"));
-						}
-						else {
-							deviceHours.get(i).setHours("0");
-
-						}
-						
-					}*/
+					
 				
 				}
 			}
 			else {
 				deviceHours = mongoPositionRepo.getDeviceWorkingHoursScheduled(allDevices,dateFrom,dateTo);			
 
-				/*if(deviceHours.size()>0) {
-					for(int i=0;i<deviceHours.size();i++) {
-						
-						Device device = deviceRepository.findOne(deviceHours.get(i).getDeviceId());
-						deviceHours.get(i).setDeviceName(device.getName());
-
-                    	JSONObject obj = new JSONObject(deviceHours.get(i).getAttributes());
-                    	
-						if(obj.has("todayHoursString")) {
-							deviceHours.get(i).setHours(obj.getString("todayHoursString"));
-						}
-						else {
-							deviceHours.get(i).setHours("0");
-
-						}
-						
-					}
 				
-				}*/
 			}
 				
 			
@@ -6720,36 +6540,14 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				if(deviceHours.size()>0) {
 					size=mongoPositionRepo.getDeviceCustomSize(allDevices,dateFrom, dateTo,custom,value);
 
-					/*for(int i=0;i<deviceHours.size();i++) {
-						
-						Device device = deviceRepository.findOne(deviceHours.get(i).getDeviceId());
-						deviceHours.get(i).setDeviceName(device.getName());
-											
-						JSONObject obj = new JSONObject(deviceHours.get(i).getAttributes().toString());
-						deviceHours.get(i).setAttributes(custom +":"+obj.get(custom));
-
-						
-					}*/
+					
 				
 				}
 			}
 			else {
 
 				deviceHours = mongoPositionRepo.getDeviceCustomScheduled(allDevices,dateFrom,dateFrom,custom,value);
-				/*if(deviceHours.size()>0) {
-					
-					for(int i=0;i<deviceHours.size();i++) {
-						
-						Device device = deviceRepository.findOne(deviceHours.get(i).getDeviceId());
-						deviceHours.get(i).setDeviceName(device.getName());
-						
-						JSONObject obj = new JSONObject(deviceHours.get(i).getAttributes().toString());
-						deviceHours.get(i).setAttributes(custom +":"+obj.get(custom));
-
-						
-					}
 				
-				}*/
 			}
 				
 			
@@ -7054,29 +6852,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				if(driverHours.size()>0) {
   				    size=mongoPositionRepo.getDriverWorkingHoursSize(allDevices,dateFrom,dateTo);
 
-					/*for(int i=0;i<driverHours.size();i++) {
-						for(int j=0;j<allDevicesList.size();j++) {
-							Long id1 = driverHours.get(i).getDeviceId().longValue();
-							Long id2 = allDevicesList.get(j).getId();
-
-							if(id1.equals(id2)) {
-								driverHours.get(i).setDriverName(allDevicesList.get(j).getName());
-							}
-						}
-						
-						Device device = deviceRepository.findOne(driverHours.get(i).getDeviceId());
-						driverHours.get(i).setDeviceName(device.getName());
-						
-						JSONObject obj = new JSONObject(driverHours.get(i).getAttributes());
-						if(obj.has("todayHoursString")) {
-							driverHours.get(i).setHours(obj.getString("todayHoursString"));
-						}
-						else {
-							driverHours.get(i).setHours("0");
-
-						}
-						
-					}*/
+					
 				
 				}
 				
@@ -7084,32 +6860,6 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			else {
 				driverHours = mongoPositionRepo.getDriverWorkingHoursScheduled(allDevices,dateFrom,dateFrom);			
 
-				/*if(driverHours.size()>0) {
-					for(int i=0;i<driverHours.size();i++) {
-						for(int j=0;j<allDevicesList.size();j++) {
-							Long id1 = driverHours.get(i).getDeviceId().longValue();
-							Long id2 = allDevicesList.get(j).getId();
-
-							if(id1.equals(id2)) {
-								driverHours.get(i).setDriverName(allDevicesList.get(j).getName());
-							}
-						}
-						
-						Device device = deviceRepository.findOne(driverHours.get(i).getDeviceId());
-						driverHours.get(i).setDeviceName(device.getName());
-						
-						JSONObject obj = new JSONObject(driverHours.get(i).getAttributes());
-						if(obj.has("todayHoursString")) {
-							driverHours.get(i).setHours(obj.getString("todayHoursString"));
-						}
-						else {
-							driverHours.get(i).setHours("0");
-
-						}
-						
-					}
-				
-				}*/
 			}
 				
 			
@@ -8237,55 +7987,12 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			if(positionsList.size()>0) {
 				    size=mongoPositionRepo.getSensorsListSize(allDevices,dateFrom, dateTo);
 
-				/*for(int i=0;i<positionsList.size();i++) {
-					
-					Device device = deviceRepository.findOne(positionsList.get(i).getDeviceId());
-					positionsList.get(i).setDeviceName(device.getName());
-					
-					JSONObject obj = new JSONObject(positionsList.get(i).getAttributes());
-					if(obj.has("weight")) {
-						positionsList.get(i).setWeight(obj.get("weight").toString());
-					}
-					if(obj.has("adc1")) {
-						positionsList.get(i).setSensor1(obj.get("adc1").toString());
-					}
-					if(obj.has("adc2")) {
-						positionsList.get(i).setSensor2(obj.get("adc2").toString());
-					}
-
-					
-					
-				}*/
-			
 			}
 			
 		}
 		else {
 			positionsList = mongoPositionRepo.getPositionsListScheduled(allDevices,dateFrom, dateTo);
 
-			/*if(positionsList.size()>0) {
-				
-				for(int i=0;i<positionsList.size();i++) {
-					
-					Device device = deviceRepository.findOne(positionsList.get(i).getDeviceId());
-					positionsList.get(i).setDeviceName(device.getName());
-					
-					JSONObject obj = new JSONObject(positionsList.get(i).getAttributes());
-					if(obj.has("weight")) {
-						positionsList.get(i).setWeight(obj.get("weight").toString());
-					}
-					if(obj.has("adc1")) {
-						positionsList.get(i).setSensor1(obj.get("adc1").toString());
-					}
-					if(obj.has("adc2")) {
-						positionsList.get(i).setSensor2(obj.get("adc2").toString());
-					}
-
-					
-					
-				}
-				
-			}*/
 		}
 		getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",positionsList,size);
 		 logger.info("************************ getSensorsReport ENDED ***************************");
@@ -10323,18 +10030,10 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 							  if(driverH.getDriverName() != null) {
 								  devicesStatus.put("driverName", driverH.getDriverName());
 							  }
-//							  devicesStatus.put("driverUniqueId",null);
+
 						      devicesStatus.put("totalHours", totalHours);
 							  
-//							  Device device= deviceServiceImpl.findById(driverH.getDeviceId());
-//							 
-//							  Set<Driver>  drivers = device.getDriver();
-//							  for(Driver driver : drivers ) {
-//
-//								  devicesStatus.put("driverUniqueId", driver.getUniqueid());
-//								  devicesStatus.put("driverName", driver.getName());
-//
-//							  }
+
 						      
 							JSONObject obj = new JSONObject(driverH.getAttributes().toString());
 
@@ -10399,32 +10098,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	    		}
 	    	}
 	    	if(user.getAccountType().equals(4)) {
-			    /*Set<User>parentClient = user.getUsersOfUser();
-				if(parentClient.isEmpty()) {
-					getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
-					logger.info("************************ editDevice ENDED ***************************");
-					return ResponseEntity.badRequest().body(getObjectResponse);
-				}else {
-				  
-					User parent =null;
-					for(User object : parentClient) {
-						parent = object;
-					}
-					if(parent != null) {
-			   			List<Long>usersIds= new ArrayList<>();
-	   					usersIds.add(parent.getId());
-
-						devices = deviceRepository.getDeviceSelect(usersIds);
-						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
-						logger.info("************************ getDeviceSelect ENDED ***************************");
-						return ResponseEntity.ok().body(getObjectResponse);
-					}
-					else {
-						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "No parent for this type 4",null);
-						return ResponseEntity.badRequest().body(getObjectResponse);
-					}
-					
-				}*/
+			   
 	    		 List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(userId);
 				 
 				 if(deviceIds.size()>0) {

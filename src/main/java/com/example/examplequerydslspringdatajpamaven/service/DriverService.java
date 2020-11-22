@@ -2,8 +2,11 @@ package com.example.examplequerydslspringdatajpamaven.service;
 
 import java.util.List;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 
+@Service
 public interface DriverService {
 	
 	public ResponseEntity<?> getAllDrivers(String TOKEN,Long id,int offset,String search);
@@ -25,12 +28,10 @@ public interface DriverService {
 	
 	public ResponseEntity<?> editDriver(String TOKEN,Driver driver,Long id);
 	
-	// added by maryam 
 	public ResponseEntity<?> getUnassignedDrivers(String TOKEN,Long loggedUserId,Long userId,Long deviceId);
 	
 	public Integer getTotalNumberOfUserDrivers(List<Long> userId);
 	
-	// added by maryam
 	public ResponseEntity<?> assignDriverToUser(String TOKEN,Long userId,Long driverId , Long toUserId);
 
 

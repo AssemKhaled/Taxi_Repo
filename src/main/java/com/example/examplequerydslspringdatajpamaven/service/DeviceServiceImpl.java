@@ -3,23 +3,17 @@ package com.example.examplequerydslspringdatajpamaven.service;
 import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
-//import static org.mockito.Matchers.eq;
-import java.io.File;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-
 import java.util.*;
-import com.fasterxml.jackson.databind.*;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -31,55 +25,30 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
-import java.util.TimeZone;
 import javax.net.ssl.SSLContext;
-
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
-import org.apache.commons.collections.ListUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
-
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceList;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceLiveData;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomMapData;
-import com.example.examplequerydslspringdatajpamaven.entity.CustomPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
-import com.example.examplequerydslspringdatajpamaven.entity.DeviceCalibrationData;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
-import com.example.examplequerydslspringdatajpamaven.entity.Group;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoPositions;
-import com.example.examplequerydslspringdatajpamaven.entity.NewcustomerDivice;
-import com.example.examplequerydslspringdatajpamaven.entity.StopReport;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
-import com.example.examplequerydslspringdatajpamaven.entity.UserSelect;
-import com.example.examplequerydslspringdatajpamaven.entity.userClientComputed;
 import com.example.examplequerydslspringdatajpamaven.entity.userClientDevice;
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
@@ -92,10 +61,13 @@ import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongodb.client.model.geojson.Position;
-import com.mongodb.connection.Stream;
 
 
+/**
+ * services functionality related to devices
+ * @author fuinco
+ *
+ */
 
 @Component
 @Service
@@ -180,20 +152,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		 Integer size=0;
 		 List<CustomDeviceList> devices = new ArrayList<CustomDeviceList>();
 		 if(loggedUser.getAccountType().equals(4)) {
-			 /*Set<User> parentClients = loggedUser.getUsersOfUser();
-			 if(parentClients.isEmpty()) {
-				
-				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get devices of this user",null);
-				 logger.info("************************ getAllUserDevices ENDED ***************************");
-				return  ResponseEntity.status(404).body(getObjectResponse);
-			 }else {
-				 User parentClient = new User() ;
-				 for(User object : parentClients) {
-					 parentClient = object;
-				 }
-				 usersIds.add(parentClient.getId());
-
-			 }*/
+			 
 			 List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(userId);
 			 
 			 if(deviceIds.size()>0) {
@@ -570,7 +529,6 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		    List<Integer>duplicationCodes = new ArrayList<Integer>();
 		    for (Device matchedDevice : duplicatedDevices) 
 		    { 
-//		        Set<User> userCreater = device.getUser();
 		    	if(!matchedDevice.getId().equals(device.getId())) {
 		    		if(matchedDevice.getName() != null) {
 				        if(matchedDevice.getName().equals(device.getName()))
@@ -752,7 +710,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			return null;
 		}
 		if(device.getDelete_date() != null) {
-			//throw not found 
+
 			return null;
 		}
 		else
@@ -794,7 +752,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		}
 		else {
 			if(device.getDelete_date() != null) {
-				//throw not found 
+
 				List<Device> devices = null;
 				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",devices);
 				logger.info("************************ getDeviceById ENDED ***************************");
@@ -957,7 +915,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 						return ResponseEntity.status(404).body(getObjectResponse);
 			        }
 			        else {
-			        	//check if parent in drivers
+
 			        	Set<Driver> oldDrivers =new HashSet<>() ;
 			        	oldDrivers= drivers;
 			        	drivers.removeAll(oldDrivers);
@@ -1061,14 +1019,14 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",devices);
 			logger.info("************************ assignDeviceToGeofences ENDED ***************************");
 			return ResponseEntity.badRequest().body(getObjectResponse);
-//			return ResponseEntity.status(404).body(getObjectResponse);
+
 		}else {
 			 Device device = findById(deviceId);
 			 if(device == null) {
 				  List<Device> devices = null;
 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",devices);
 					logger.info("************************ assignDeviceToGeofences ENDED ***************************");
-//					return ResponseEntity.ok().body(getObjectResponse);
+
 					return ResponseEntity.status(404).body(getObjectResponse);
 			 }
 			 else {
@@ -1116,7 +1074,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			   }
 			}
 			if(geoIds.length == 0) {
-				//if device has geofences remove it 
+
                 Set<Geofence> geofences = device.getGeofence();
                 if(geofences.isEmpty()) {
                 	 List<Device> devices = null;
@@ -1125,7 +1083,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
  					return ResponseEntity.status(404).body(getObjectResponse);
                 }
                 else {
-                	// else if device hasn't geofences return error
+
     				
                 	Set<Geofence> oldGeofences = geofences;
                 	geofences.removeAll(oldGeofences);
@@ -1242,32 +1200,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	    		}
 	    	}
 	    	if(user.getAccountType().equals(4)) {
-			    /*Set<User>parentClient = user.getUsersOfUser();
-				if(parentClient.isEmpty()) {
-					getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
-					logger.info("************************ editDevice ENDED ***************************");
-					return ResponseEntity.badRequest().body(getObjectResponse);
-				}else {
-				  
-					User parent =null;
-					for(User object : parentClient) {
-						parent = object;
-					}
-					if(parent != null) {
-			   			List<Long>usersIds= new ArrayList<>();
-	   					usersIds.add(parent.getId());
-
-						devices = deviceRepository.getDeviceSelect(usersIds);
-						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
-						logger.info("************************ getDeviceSelect ENDED ***************************");
-						return ResponseEntity.ok().body(getObjectResponse);
-					}
-					else {
-						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "No parent for this type 4",null);
-						return ResponseEntity.badRequest().body(getObjectResponse);
-					}
-					
-				}*/
+			    
 	    		 List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(userId);
 				 
 				 if(deviceIds.size()>0) {
@@ -1373,32 +1306,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	    		}
 	    	}
 	    	if(user.getAccountType().equals(4)) {
-			    /*Set<User>parentClient = user.getUsersOfUser();
-				if(parentClient.isEmpty()) {
-					getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
-					logger.info("************************ editDevice ENDED ***************************");
-					return ResponseEntity.badRequest().body(getObjectResponse);
-				}else {
-				  
-					User parent =null;
-					for(User object : parentClient) {
-						parent = object;
-					}
-					if(parent != null) {
-			   			List<Long>usersIds= new ArrayList<>();
-	   					usersIds.add(parent.getId());
-
-						devices = deviceRepository.getDeviceSelect(usersIds);
-						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
-						logger.info("************************ getDeviceSelect ENDED ***************************");
-						return ResponseEntity.ok().body(getObjectResponse);
-					}
-					else {
-						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "No parent for this type 4",null);
-						return ResponseEntity.badRequest().body(getObjectResponse);
-					}
-					
-				}*/
+			    
 	    		 List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(userId);
 				 
 				 if(deviceIds.size()>0) {
@@ -1491,7 +1399,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 
 					List<Driver> deviceDriver = new ArrayList<>();
 					for(Driver driver : drivers ) {
-						//hint only one driver assigned to device
+
 
 						deviceDriver.add(driver);
 					}
@@ -1546,7 +1454,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				else {
 					List<Geofence> deviceGeofences = new ArrayList<>();
 					for(Geofence geofence : geofences ) {
-						//hint only one driver assigned to device
+
 						deviceGeofences.add(geofence);
 					}
 					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",deviceGeofences);
@@ -1603,20 +1511,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		Integer drivers =0;
 			
 		 if(loggedUser.getAccountType().equals(4)) {
-			 /*Set<User> parentClients = loggedUser.getUsersOfUser();
-			 if(parentClients.isEmpty()) {
-				
-				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get devices of this user",null);
-				 logger.info("************************ getAllUserDevices ENDED ***************************");
-				return  ResponseEntity.status(404).body(getObjectResponse);
-			 }else {
-				 User parentClient = new User() ;
-				 for(User object : parentClients) {
-					 parentClient = object;
-				 }
-				 usersIds.add(parentClient.getId());
-				 
-			 }*/
+			 
 			 List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(userId);
 
 
@@ -1741,20 +1636,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	    userService.resetChildernArray();
 		List<Long>usersIds= new ArrayList<>();
 	    if(loggedUser.getAccountType().equals(4)) {
-			 /*Set<User> parentClients = loggedUser.getUsersOfUser();
-			 if(parentClients.isEmpty()) {
-				
-				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get devices of this user",null);
-				 logger.info("************************ getAllUserDevices ENDED ***************************");
-				return  ResponseEntity.status(404).body(getObjectResponse);
-			 }else {
-				 User parentClient = new User() ;
-				 for(User object : parentClients) {
-					 parentClient = object;
-				 }
-				 
-				 usersIds.add(parentClient.getId());
-			 }*/
+			 
 			List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(userId);
 			List<CustomDeviceLiveData> allDevicesLiveData = new ArrayList<CustomDeviceLiveData>();
 			Integer size=0;
@@ -2443,7 +2325,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					    		 }
 					    		 if(isParent) {
 					    			 
-					    			// assign user to another user
+
 					    			 Set<User> deviceOldUser = device.getUser();
 					    			 Set<User> temp = deviceOldUser;
 					    			 deviceOldUser.removeAll(temp);
@@ -2904,25 +2786,6 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 							}
 							
 
-//							List<DeviceFuel> calibrationData = new ArrayList<DeviceFuel>();
-//                            calibrationData=deviceRepository.getFuelData(deviceId);
-//							List<Map> data=new ArrayList<Map>();
-//							if(calibrationData.get(0) != null) {
-//
-//								 String str = calibrationData.get(0).toString(); 
-//							     String arrOfStr[] = str.split(" "); 
-//							     for (String a : arrOfStr) {
-//							    	 JSONObject obj =new JSONObject(a);
-//									 Map list   = new HashMap<>();
-//									 list.put("s1",obj.getInt("s1"));
-//									 list.put("s2",obj.getInt("s2"));
-//									 list.put("w",obj.getInt("w"));
-//							         data.add(list);
-//
-//							     }
-//								
-//								 
-//							}
 
 							String data = deviceRepository.getFuelData(deviceId);
 							List<Map> dataMap=new ArrayList<Map>();
@@ -3093,9 +2956,6 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 							while(keys.hasNext()) {
 							    String key = keys.next();
 
-//							    if(obj.get(key) instanceof JSONObject) {
-//									
-//							    }
 							    list.put(key , obj.get(key).toString());
 							}
 							dataMap.add(list);
@@ -3698,10 +3558,10 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	        .add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
 		  
 	  
-		// build the request
+
 		  HttpEntity<Map<String, Object>> request = new HttpEntity<>(objectData, headers);
 
-		  // send POST request
+
 		  ResponseEntity<String> response = restTemplate.postForEntity(sendCommand, request, String.class);
 
 		if (response.getStatusCode() == HttpStatus.ACCEPTED) {

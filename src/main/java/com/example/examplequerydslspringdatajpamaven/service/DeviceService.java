@@ -1,16 +1,14 @@
 package com.example.examplequerydslspringdatajpamaven.service;
 
 import java.util.List;
+
 import java.util.Map;
-import java.util.Set;
 
 import org.json.JSONArray;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
-import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 @Service
 public interface DeviceService {
 	

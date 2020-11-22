@@ -3,20 +3,21 @@ package com.example.examplequerydslspringdatajpamaven.Validator;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
-
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.crypto.MacProvider;
 
+/**
+ * Create JWK token for logged user
+ * @author fuinco
+ *
+ */
 @Component
 public class JWKValidator {
 	
@@ -49,8 +50,6 @@ public class JWKValidator {
 	
 	public String createJWT(String string, Long ttlMillis) {
 
-
-
 		// The JWT signature algorithm we will be using to sign the token
 		SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
@@ -78,27 +77,22 @@ public class JWKValidator {
 		// Builds the JWT and serializes it to a compact, URL-safe string
 		return builder.compact();
 	}
-	// Sample method to validate and read the JWT
-		public Claims validateJWT(String jwt) {
+	//Sample method to validate and read the JWT
+	public Claims validateJWT(String jwt) {
 
-			try {
-				// This line will throw an exception if it is not
-				// a signed JWS (as expected)
-				Claims claims = Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(base64SecretBytes))
-						.parseClaimsJws(jwt).getBody();
+		try {
+			// This line will throw an exception if it is not
+			// a signed JWS (as expected)
+			Claims claims = Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(base64SecretBytes))
+					.parseClaimsJws(jwt).getBody();
 
-				System.out.println("ID: " + claims.getId());
-				System.out.println("Subject: " + claims.getSubject());
-				System.out.println("Issuer: " + claims.getIssuer());
-				System.out.println("Expiration: " + claims.getExpiration());
-				System.out.println("UserName: " + claims.get("userName"));
 
-				return claims;
+			return claims;
 
-			} catch (Exception e) {
-				e.printStackTrace();
-				return null;
-			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
 		}
+	}
 	
 }

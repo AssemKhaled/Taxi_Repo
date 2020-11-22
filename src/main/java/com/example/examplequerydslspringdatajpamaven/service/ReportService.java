@@ -3,7 +3,9 @@ package com.example.examplequerydslspringdatajpamaven.service;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
+@Service
 public interface ReportService {
 	
 	

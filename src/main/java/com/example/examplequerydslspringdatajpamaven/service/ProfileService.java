@@ -3,9 +3,11 @@ package com.example.examplequerydslspringdatajpamaven.service;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 
+@Service
 public interface ProfileService {
 	
 	public ResponseEntity<?> getUserInfo(String TOKEN,Long userId);

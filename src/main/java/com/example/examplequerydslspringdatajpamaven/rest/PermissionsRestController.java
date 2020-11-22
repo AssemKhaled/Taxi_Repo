@@ -9,11 +9,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.Permission;
 import com.example.examplequerydslspringdatajpamaven.service.PermissionService;
 
+/**
+ * Service of permission component
+ * @author fuinco
+ *
+ */
 @CrossOrigin
 @Component
 @RequestMapping(path = "/permissions")

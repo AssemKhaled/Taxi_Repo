@@ -3,7 +3,9 @@ package com.example.examplequerydslspringdatajpamaven.service;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
+@Service
 public interface ElmService {
 	
 	public ResponseEntity<?> companyRegistrtaion(String TOKEN,Long userId,Long loggedUserId);

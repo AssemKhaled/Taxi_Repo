@@ -2,18 +2,22 @@ package com.example.examplequerydslspringdatajpamaven.service;
 
 import java.util.Calendar;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-
-import com.example.examplequerydslspringdatajpamaven.entity.Device;
+import org.springframework.stereotype.Service;
 import com.example.examplequerydslspringdatajpamaven.entity.Permission;
 import com.example.examplequerydslspringdatajpamaven.repository.PermissionRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 
+/**
+ * services functionality related to permissions
+ * @author fuinco
+ *
+ */
 @Component
+@Service
 public class PermissionServiceImpl  implements PermissionService{
 
 	@Autowired

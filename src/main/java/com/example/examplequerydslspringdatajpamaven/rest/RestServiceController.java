@@ -9,6 +9,11 @@ import org.springframework.http.ResponseEntity;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.tokens.TokenSecurity;
 
+/**
+ * Service check authorized
+ * @author fuinco
+ *
+ */
 public class RestServiceController {
  
 	GetObjectResponse getObjectResponse;

@@ -1,13 +1,11 @@
 package com.example.examplequerydslspringdatajpamaven.service;
 
-import java.util.Date;
 import java.util.List;
-
 import org.springframework.http.ResponseEntity;
-
+import org.springframework.stereotype.Service;
 import com.example.examplequerydslspringdatajpamaven.entity.Schedule;
-import com.example.examplequerydslspringdatajpamaven.entity.UserRole;;
 
+@Service
 public interface ScheduledService {
 	
 	public ResponseEntity<?> createScheduled(String TOKEN,Schedule schedule,Long userId);

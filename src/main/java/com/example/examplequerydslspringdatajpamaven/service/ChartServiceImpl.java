@@ -1,22 +1,17 @@
 package com.example.examplequerydslspringdatajpamaven.service;
 
 import java.nio.charset.Charset;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,29 +23,30 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.example.examplequerydslspringdatajpamaven.entity.CustomPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.EventReport;
-import com.example.examplequerydslspringdatajpamaven.entity.MongoPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.SummaryReport;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoEventsRepo;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionRepo;
-import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionsRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserClientDeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-
+/**
+ * service functionality related to charts
+ * @author fuinco
+ *
+ */
 @Component
+@Service
 public class ChartServiceImpl extends RestServiceController implements ChartService{
 	
 	private static final Log logger = LogFactory.getLog(ChartServiceImpl.class);
@@ -64,16 +60,9 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 	
 	@Autowired 
 	DeviceRepository deviceRepository;
-	
-	
-	@Autowired
-	private DriverServiceImpl driverService;
-	
+
 	@Autowired
 	UserClientDeviceRepository userClientDeviceRepository;
-	
-	@Autowired
-	private MongoPositionsRepository mongoPositionsRepository;
 	
 	@Value("${summaryUrl}")
 	private String summaryUrl;
@@ -122,21 +111,7 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 		 userService.resetChildernArray();
 		 List<Long>usersIds= new ArrayList<>();
 		 if(loggedUser.getAccountType().equals(4)) {
-			 /*Set<User> parentClients = loggedUser.getUsersOfUser();
-			 if(parentClients.isEmpty()) {
-				
-				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get devices of this user",null);
-				 logger.info("************************ getAllUserDevices ENDED ***************************");
-				return  ResponseEntity.status(404).body(getObjectResponse);
-			 }else {
-				 User parentClient = new User() ;
-				 for(User object : parentClients) {
-					 parentClient = object;
-				 }
-				 usersIds.add(parentClient.getId());
-				 
-
-			 }*/
+			
 			List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(userId);
 
 			
@@ -176,10 +151,6 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 					 usersIds.add(object.getId());
 				 }
 			 }
-			 
-			//Integer onlineDevices = deviceRepository.getNumberOfOnlineDevices(usersIds);
-			//Integer outOfNetworkDevices = deviceRepository.getNumberOfOutOfNetworkDevices(usersIds);
-
 			
 			List<String> onlineDeviceIds = deviceRepository.getNumberOfOnlineDevicesList(usersIds);
 			List<String> OutDeviceIds = deviceRepository.getNumberOfOutOfNetworkDevicesList(usersIds);
@@ -575,18 +546,7 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 				 List<Long>usersIds= new ArrayList<>();
 
 				 if(user.getAccountType() == 4) {
-					 /*Set<User> parentClients = user.getUsersOfUser();
-					 if(parentClients.isEmpty()) {
-						
-						 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get devices of this user",null);
-						 logger.info("************************ getAllUserDevices ENDED ***************************");
-						return  ResponseEntity.status(404).body(getObjectResponse);
-					 }else {
-						 User parentClient = new User() ;
-						 for(User object : parentClients) {
-							 parentClient = object;
-						 }
-					 }*/
+					 
 					List<Long> allDevices = userClientDeviceRepository.getDevicesIds(userId);
 					List<Map> data = new ArrayList<>();
 
@@ -764,17 +724,6 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 				 }
 				 else {
 					 usersIds.add(userId);
-
-					 /*List<User>childernUsers = userService.getAllChildernOfUser(userId);
-					 if(childernUsers.isEmpty()) {
-						 usersIds.add(userId);
-					 }
-					 else {
-						 usersIds.add(userId);
-						 for(User object : childernUsers) {
-							 usersIds.add(object.getId());
-						 }
-					 }*/
 					 
 					 List<Long> allDevices = deviceRepository.getDevicesUsers(usersIds);
 

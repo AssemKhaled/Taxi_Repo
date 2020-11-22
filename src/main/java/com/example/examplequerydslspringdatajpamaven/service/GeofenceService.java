@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 
+@Service
 public interface GeofenceService {
 
 	public ResponseEntity<?> getAllGeofences(String TOKEN,Long id,int offset,String search);

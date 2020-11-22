@@ -22,7 +22,6 @@ import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Group;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.entity.userClientComputed;
-import com.example.examplequerydslspringdatajpamaven.entity.userClientDevice;
 import com.example.examplequerydslspringdatajpamaven.repository.ComputedRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.GroupRepository;
@@ -32,6 +31,11 @@ import com.example.examplequerydslspringdatajpamaven.repository.UserClientGroupR
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 
+/**
+ * service functionality related to computeds
+ * @author fuinco
+ *
+ */
 @Component
 @Service
 public class ComputedServiceImpl extends RestServiceController implements ComputedService{
@@ -249,25 +253,8 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 						
 						userService.resetChildernArray();
 					    if(user.getAccountType().equals(4)) {
-							 /*Set<User> parentClients = user.getUsersOfUser();
-							 if(parentClients.isEmpty()) {
-								
-								 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get attrbuites of this user",null);
-								 logger.info("************************ getAllComputed ENDED ***************************");
-								return  ResponseEntity.status(404).body(getObjectResponse);
-							 }else {
-								 User parentClient = new User() ;
-								 for(User object : parentClients) {
-									 parentClient = object;
-								 }
-								 List<Long>usersIds= new ArrayList<>();
-								 usersIds.add(parentClient.getId());
-								 attrbuites = computedRepository.getAllComputed(usersIds,offset,search);
-								 Integer size=computedRepository.getAllComputedSize(usersIds);
-								getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",attrbuites,size);
-								logger.info("************************ getAllComputed ENDED ***************************");
-								return  ResponseEntity.ok().body(getObjectResponse);
-							 }*/
+							 
+
 					    	List<Long> computedIds = userClientComputedRepository.getComputedsIds(id);
 					    	Integer size=0;
 					    	if(computedIds.size() > 0) {
@@ -827,7 +814,6 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 							return ResponseEntity.status(404).body(getObjectResponse);
 				        }
 				        else {
-				        	//check if parent in drivers
 				        	Set<Attribute> oldAttributes=new HashSet<>() ;
 				        	oldAttributes= attributes;
 				        	attributes.removeAll(oldAttributes);
@@ -982,7 +968,6 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 							return ResponseEntity.status(404).body(getObjectResponse);
 				        }
 				        else {
-				        	//check if parent in drivers
 				        	Set<Attribute> oldAttribute=new HashSet<>() ;
 				        	oldAttribute= attributes;
 				        	attributes.removeAll(oldAttribute);
@@ -1096,32 +1081,7 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 	    		if(user.getDelete_date() == null) {
 	    			
 	    			if(user.getAccountType().equals(4)) {
-	   				    /*Set<User>parentClient = user.getUsersOfUser();
-	   					if(parentClient.isEmpty()) {
-	   						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
-	   						logger.info("************************ getComputedSelect ENDED ***************************");
-	   						return ResponseEntity.badRequest().body(getObjectResponse);
-	   					}else {
-	   					  
-	   						User parent =null;
-	   						for(User object : parentClient) {
-	   							parent = object;
-	   						}
-	   						if(parent != null) {
-
-					   			List<Long>usersIds= new ArrayList<>();
-			   					usersIds.add(parent.getId());
-	   							drivers = computedRepository.getComputedSelect(usersIds);
-	   							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
-	   							logger.info("************************ getComputedSelect ENDED ***************************");
-	   							return ResponseEntity.ok().body(getObjectResponse);
-	   						}
-	   						else {
-	   							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "No parent for this type 4",null);
-	   							return ResponseEntity.badRequest().body(getObjectResponse);
-	   						}
-	   						
-	   					}*/
+	   				    
 	    				List<Long> computedIds = userClientComputedRepository.getComputedsIds(userId);
 				    	Integer size=0;
 				    	if(computedIds.size() > 0) {

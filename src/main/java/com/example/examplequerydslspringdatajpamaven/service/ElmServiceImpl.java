@@ -8,58 +8,43 @@ import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.TimeZone;
-
 import javax.net.ssl.SSLContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import com.example.examplequerydslspringdatajpamaven.entity.Attribute;
-import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceList;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
-import com.example.examplequerydslspringdatajpamaven.entity.SummaryReport;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.ElmReturn;
 import com.example.examplequerydslspringdatajpamaven.entity.ExpiredVehicles;
-import com.example.examplequerydslspringdatajpamaven.entity.Group;
 import com.example.examplequerydslspringdatajpamaven.entity.LastElmData;
-import com.example.examplequerydslspringdatajpamaven.entity.LastLocationsList;
 import com.example.examplequerydslspringdatajpamaven.entity.LastPositionData;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoElmLastLocations;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoElmLogs;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoPositionsElm;
-import com.example.examplequerydslspringdatajpamaven.entity.StopReport;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.DriverRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoElmLastLocationsRepository;
@@ -74,7 +59,13 @@ import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * services functionality related to elm
+ * @author fuinco
+ *
+ */
 @Component
+@Service
 public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 
@@ -371,7 +362,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  response.put("statusCode", elmReturn.getStatusCode());
 		  response.put("message", elmReturn.getMessage());
 
-          // send Logs
+
 		  MongoElmLogs elmLogs = new MongoElmLogs(null,userId,user.getName(),null,null,null,null,time,type,requet,response);
 		  elmLogsRepository.save(elmLogs);
 		  
@@ -684,7 +675,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  response.put("statusCode", elmReturn.getStatusCode());
 		  response.put("message", elmReturn.getMessage());
 
-          // send Logs
+
 		  MongoElmLogs elmLogs = new MongoElmLogs(null,userId,user.getName(),null,null,null,null,time,type,requet,response);
 		  elmLogsRepository.save(elmLogs);
 		  
@@ -992,7 +983,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			  response.put("statusCode", elmReturn.getStatusCode());
 			  response.put("message", elmReturn.getMessage());
 
-	          // send Logs
+
 			  MongoElmLogs elmLogs = new MongoElmLogs(null,userId,user.getName(),null,null,null,null,time,type,requet,response);
 			  elmLogsRepository.save(elmLogs);
 			  
@@ -1295,7 +1286,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			  response.put("statusCode", elmReturn.getStatusCode());
 			  response.put("message", elmReturn.getMessage());
 
-	          // send Logs
+
 			  MongoElmLogs elmLogs = new MongoElmLogs(null,parent.getId(),parent.getName(),null,null,deviceId,device.getName(),time,type,requet,response);
 			  elmLogsRepository.save(elmLogs);
 			  
@@ -1588,7 +1579,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  response.put("statusCode", elmReturn.getStatusCode());
 		  response.put("message", elmReturn.getMessage());
 
-          // send Logs
+
 		  MongoElmLogs elmLogs = new MongoElmLogs(null,parent.getId(),parent.getName(),null,null,deviceId,device.getName(),time,type,requet,response);
 		  elmLogsRepository.save(elmLogs);
 		  
@@ -1888,7 +1879,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  response.put("statusCode", elmReturn.getStatusCode());
 		  response.put("message", elmReturn.getMessage());
 
-          // send Logs
+
 		  MongoElmLogs elmLogs = new MongoElmLogs(null,parent.getId(),parent.getName(),null,null,deviceId,device.getName(),time,type,requet,response);
 		  elmLogsRepository.save(elmLogs);
 		  
@@ -2184,7 +2175,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  response.put("statusCode", elmReturn.getStatusCode());
 		  response.put("message", elmReturn.getMessage());
 
-          // send Logs
+
 		  MongoElmLogs elmLogs = new MongoElmLogs(null,parent.getId(),parent.getName(),driverId,driver.getName(),null,null,time,type,requet,response);
 		  elmLogsRepository.save(elmLogs);
 		  
@@ -2451,7 +2442,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  response.put("statusCode", elmReturn.getStatusCode());
 		  response.put("message", elmReturn.getMessage());
 
-          // send Logs
+
 		  MongoElmLogs elmLogs = new MongoElmLogs(null,parent.getId(),parent.getName(),null,null,deviceId,device.getName(),time,type,requet,response);
 		  elmLogsRepository.save(elmLogs);
 		  
@@ -2731,7 +2722,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  response.put("statusCode", elmReturn.getStatusCode());
 		  response.put("message", elmReturn.getMessage());
 
-          // send Logs
+
 		  MongoElmLogs elmLogs = new MongoElmLogs(null,userId,user.getName(),null,null,null,null,time,type,requet,response);
 		  elmLogsRepository.save(elmLogs);
 		  
@@ -2993,7 +2984,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  response.put("statusCode", elmReturn.getStatusCode());
 		  response.put("message", elmReturn.getMessage());
 
-          // send Logs
+
 		  MongoElmLogs elmLogs = new MongoElmLogs(null,parent.getId(),parent.getName(),driverId,driver.getName(),null,null,time,type,requet,response);
 		  elmLogsRepository.save(elmLogs);
 		  
@@ -3261,7 +3252,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  response.put("statusCode", elmReturn.getStatusCode());
 		  response.put("message", elmReturn.getMessage());
 
-          // send Logs
+
 		  MongoElmLogs elmLogs = new MongoElmLogs(null,parent.getId(),parent.getName(),driverId,driver.getName(),null,null,time,type,requet,response);
 		  elmLogsRepository.save(elmLogs);
 		  
@@ -3535,7 +3526,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  response.put("statusCode", elmReturn.getStatusCode());
 		  response.put("message", elmReturn.getMessage());
 
-          // send Logs
+
 		  MongoElmLogs elmLogs = new MongoElmLogs(null,parent.getId(),parent.getName(),driverId,driver.getName(),null,null,time,type,requet,response);
 		  elmLogsRepository.save(elmLogs);
 		  
@@ -3608,43 +3599,13 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		 
 		 List<Long> deviceIds = new ArrayList<Long>();
 
-//		List<LastLocationsList> locations = new ArrayList<LastLocationsList>();
-//		List<LastLocationsList> locationsList = new ArrayList<LastLocationsList>();
+
 		List<MongoElmLastLocations> elm_connection_logs = new ArrayList<MongoElmLastLocations>();
 		List<MongoPositionsElm> positions_elm = new ArrayList<MongoPositionsElm>();
 
 		
 		deviceIds = deviceRepository.getAllDevicesIdsToSendLocationIds();
 		positions_elm = mongoPositionsElmRepository.findByDeviceIdIn(deviceIds,new PageRequest(0, 1000));
-		
-		/*for(MongoPositionsElm posElm:positions_elm) {
-			
-			LastLocationsList location = new LastLocationsList();
-		
-			location.setId(posElm.get_id().toString());
-			location.setLasttime(posElm.getServertime());
-			location.setDeviceid(posElm.getDeviceid());
-			location.setLatitude(posElm.getLatitude());
-			location.setLongitude(posElm.getLongitude());
-			location.setSpeed(posElm.getSpeed());
-			location.setWeight(posElm.getWeight());
-			location.setAttributes(posElm.getAttributes());
-			location.setDevicetime(posElm.getDevicetime());
-			location.setAddress(posElm.getAddress());
-			location.setDevicetime(posElm.getDevicetime());
-			location.setDeviceRK(posElm.getDeviceReferenceKey());
-			location.setDriver_RK(posElm.getDriverReferenceKey());
-			location.setDriverid(posElm.getDriverid());
-			location.setDrivername(posElm.getDriverName());
-			location.setDevicename(posElm.getDeviceName());
-
-
-		
-			locations.add(location);
-
-		}*/
-		
-		
 		
     	 Map body = new HashMap();
 
@@ -3656,7 +3617,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 
 				if(location.getAttributes().toString().startsWith("{")) {
-					//obj = new JSONObject(location.getAttributes());	
+
 					objectMap = (Map<Object, Object>) location.getAttributes();
 					ObjectMapper objectMapper = new ObjectMapper();
 
@@ -3918,9 +3879,8 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
       	elmLastLocationsRepository.save(elm_connection_logs);  
       	mongoPositionsElmRepository.deleteByIdIn(ids);
-        /*if(resp.containsKey("resultCode")) {
-        	
-        }*/
+
+
         
 	    getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",data);
 		logger.info("************************ lastLocations ENDED ***************************");
@@ -4353,7 +4313,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				  response.put("statusCode", elmReturn.getStatusCode());
 				  response.put("message", elmReturn.getMessage());
 
-		          // send Logs
+
 				  MongoElmLogs elmLogs = new MongoElmLogs(null,ExpiredDevice.getUserId(),ExpiredDevice.getUserName(),null,null,ExpiredDevice.getDeviceId(),ExpiredDevice.getDeviceName(),currentDate,type,requet,response);
 				  elmLogsRepository.save(elmLogs);
 				  
@@ -4734,7 +4694,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  response.put("statusCode", elmReturn.getStatusCode());
 		  response.put("message", elmReturn.getMessage());
 
-         // send Logs
+
 		  MongoElmLogs elmLogs = new MongoElmLogs(null,parent.getId(),parent.getName(),null,null,deviceId,device.getName(),time,type,requet,response);
 		  elmLogsRepository.save(elmLogs);
 		  

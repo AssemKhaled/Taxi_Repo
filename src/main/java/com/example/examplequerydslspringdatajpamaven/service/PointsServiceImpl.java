@@ -12,13 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-
-import com.example.examplequerydslspringdatajpamaven.entity.Attribute;
+import org.springframework.stereotype.Service;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Points;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
-import com.example.examplequerydslspringdatajpamaven.entity.userClientComputed;
-import com.example.examplequerydslspringdatajpamaven.entity.userClientDevice;
 import com.example.examplequerydslspringdatajpamaven.entity.userClientPoint;
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
 import com.example.examplequerydslspringdatajpamaven.repository.PointsRepository;
@@ -27,7 +24,14 @@ import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 
+/**
+ * services functionality related to points
+ * @author fuinco
+ *
+ */
+
 @Component
+@Service
 public class PointsServiceImpl extends RestServiceController implements PointsService{
 
 	private static final Log logger = LogFactory.getLog(PointsServiceImpl.class);
@@ -86,19 +90,7 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 
 					userServiceImpl.resetChildernArray();
 				    if(user.getAccountType().equals(4)) {
-						 /*Set<User> parentClients = user.getUsersOfUser();
-						 if(parentClients.isEmpty()) {
-							
-							 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get pointD of this user",null);
-							 logger.info("************************ getPointsList ENDED ***************************");
-							return  ResponseEntity.status(404).body(getObjectResponse);
-						 }else {
-							 User parentClient = new User() ;
-							 for(User object : parentClients) {
-								 parentClient = object;
-							 }
-							 usersIds.add(parentClient.getId());
-						 }*/
+						 
 				    	 List<Long> pointIds = userClientPointRepository.getPointIds(id);
 						 Integer size = 0;
 						 List<Map> data = new ArrayList<>();
@@ -759,19 +751,7 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 
 					userServiceImpl.resetChildernArray();
 				    if(user.getAccountType().equals(4)) {
-						 /*Set<User> parentClients = user.getUsersOfUser();
-						 if(parentClients.isEmpty()) {
-							
-							 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get pointD of this user",null);
-							 logger.info("************************ getPointsList ENDED ***************************");
-							return  ResponseEntity.status(404).body(getObjectResponse);
-						 }else {
-							 User parentClient = new User() ;
-							 for(User object : parentClients) {
-								 parentClient = object;
-							 }
-							 usersIds.add(parentClient.getId());
-						 }*/
+						
 						List<Map> data = new ArrayList<>();
 				    	List<Long> pointIds = userClientPointRepository.getPointIds(id);
 
@@ -897,30 +877,7 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 	    		if(user.getDelete_date() == null) {
 	    			
 	    			if(user.getAccountType().equals(4)) {
-	   				 /*Set<User>parentClient = user.getUsersOfUser();
-	   					if(parentClient.isEmpty()) {
-	   						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
-	   						logger.info("************************ getNotificationSelect ENDED ***************************");
-	   						return ResponseEntity.badRequest().body(getObjectResponse);
-	   					}else {
-	   					  
-	   						User parent =null;
-	   						for(User object : parentClient) {
-	   							parent = object;
-	   						}
-	   						if(parent != null) {
-
-					   			List<Long>usersIds= new ArrayList<>();
-			   					usersIds.add(parent.getId());
-	   							drivers = pointsRepository.getPointSelect(usersIds);
-	   							
-	   						}
-	   						else {
-	   							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "No parent for this type 4",null);
-	   							return ResponseEntity.badRequest().body(getObjectResponse);
-	   						}
-	   						
-	   					}*/
+	   				 
 	    				 List<Long> pointIds = userClientPointRepository.getPointIds(userId);
 						 if(pointIds.size()>0) {
 							 drivers = pointsRepository.getPointSelectByIds(pointIds);

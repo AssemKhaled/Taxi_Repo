@@ -9,6 +9,11 @@ import java.util.TimeZone;
 
 import com.example.examplequerydslspringdatajpamaven.entity.Token;
 
+/**
+ * Create token and expire time
+ * @author fuinco
+ *
+ */
 public class TokenSecurity {
 
 	  
@@ -84,7 +89,7 @@ public class TokenSecurity {
     		
     		if(user.getToken().equals(token)) {
     			SimpleDateFormat FORMATTER = new SimpleDateFormat("yyyy-MM-dd  HH:MM:ss");
-    	    	TimeZone etTimeZone = TimeZone.getTimeZone("Asia/Riyadh"); //Target timezone
+    	    	TimeZone etTimeZone = TimeZone.getTimeZone("Asia/Riyadh"); 
     	         
     	        Date currentDate = new Date();
     	        String requestLastUpdate = FORMATTER.format(currentDate);

@@ -8,6 +8,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
@@ -16,6 +18,13 @@ import com.example.examplequerydslspringdatajpamaven.repository.ProfileRepositor
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 
+/**
+ * services functionality related to profile
+ * @author fuinco
+ *
+ */
+@Component
+@Service
 public class ProfileServiceImpl extends RestServiceController implements ProfileService{
 
 	@Autowired
@@ -349,7 +358,7 @@ public class ProfileServiceImpl extends RestServiceController implements Profile
 			return null;
 		}
 		if(user.getDelete_date() != null) {
-			//throw not found 
+
 			return null;
 		}
 		else

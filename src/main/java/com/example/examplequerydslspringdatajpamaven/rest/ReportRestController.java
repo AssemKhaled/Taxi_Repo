@@ -1,6 +1,5 @@
 package com.example.examplequerydslspringdatajpamaven.rest;
 
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.examplequerydslspringdatajpamaven.service.DeviceServiceImpl;
 import com.example.examplequerydslspringdatajpamaven.service.ReportServiceImpl;
 
-
+/**
+ * Service of reports component
+ * @author fuinco
+ *
+ */
 @RestController
 @RequestMapping(path = "/reports")
 @CrossOrigin

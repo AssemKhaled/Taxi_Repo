@@ -1,11 +1,5 @@
 package com.example.examplequerydslspringdatajpamaven.rest;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -18,27 +12,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 import com.example.examplequerydslspringdatajpamaven.entity.Schedule;
-import com.example.examplequerydslspringdatajpamaven.service.DeviceServiceImpl;
 import com.example.examplequerydslspringdatajpamaven.service.ScheduledServiceImpl;
 
+/**
+ * Service of schedule component
+ * @author fuinco
+ *
+ */
 @CrossOrigin
 @Component
 @RequestMapping(path = "/scheduled")
 public class ScheduledCRUDRestController {
 
-	private static final Log logger = LogFactory.getLog(DeviceServiceImpl.class);
-
 	@Autowired
 	private ScheduledServiceImpl scheduledServiceImpl;
 	
-	@Autowired
-	private ScheduledTasksRestController scheduledTasksRestController;
-	
-	
-	
+
 	@PostMapping(path ="/createScheduled")
 	public ResponseEntity<?> createScheduled(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 			                              @RequestParam (value = "userId",defaultValue = "0") Long userId,
@@ -84,36 +74,6 @@ public class ScheduledCRUDRestController {
 		
 		return scheduledServiceImpl.editScheduled(TOKEN,schedule,id);
 
-	}
-	
-	@GetMapping(path = "/test")
-	public ResponseEntity<?> testtSch() {
-		
-		Date date = new Date();
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd"); 
-		String currentDate=formatter.format(date);
-    	String from ="";
-    	String to ="";
-    		
-    		Date referenceDate = new Date();
-    		Calendar c = Calendar.getInstance(); 
-    		c.setTime(referenceDate); 
-    		c.add(Calendar.DATE, -7);	    		
-    		
-    		
-    		String fromDate=formatter.format(c.getTime());
-
-    		
-    		from = fromDate;
-    		to = currentDate;
-    		
-    		logger.info(fromDate);
-    		logger.info(to);
-
-    	
-		
-		return null;
-	
 	}
 	
 	@RequestMapping(value = "/getScheduledSelect", method = RequestMethod.GET)

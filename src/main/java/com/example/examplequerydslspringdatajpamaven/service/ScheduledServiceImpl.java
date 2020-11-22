@@ -4,24 +4,16 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.ss.usermodel.Cell;
@@ -37,48 +29,36 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
-
+import org.springframework.stereotype.Service;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomPositions;
-import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceWorkingHours;
-import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.EventReport;
-import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
-import com.example.examplequerydslspringdatajpamaven.entity.Group;
-import com.example.examplequerydslspringdatajpamaven.entity.Points;
 import com.example.examplequerydslspringdatajpamaven.entity.Schedule;
 import com.example.examplequerydslspringdatajpamaven.entity.StopReport;
 import com.example.examplequerydslspringdatajpamaven.entity.SummaryReport;
 import com.example.examplequerydslspringdatajpamaven.entity.TripReport;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
-import com.example.examplequerydslspringdatajpamaven.entity.userClientPoint;
-import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
-import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.DriverRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.GroupRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.ScheduledRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 import com.example.examplequerydslspringdatajpamaven.rest.ScheduledTasksRestController;
 
+/**
+ * services functionality related to schedules
+ * @author fuinco
+ *
+ */
 @Component
+@Service
 public class ScheduledServiceImpl extends RestServiceController implements ScheduledService{
 
 	private static final Log logger = LogFactory.getLog(ScheduledServiceImpl.class);
@@ -93,12 +73,6 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 	
 	@Autowired
 	private ScheduledRepository scheduledRepository;
-
-	@Autowired
-	private DriverRepository driverRepository;
-	
-	@Autowired
-	private DeviceRepository deviceRepository;
 	
 	@Autowired
 	private UserRepository userRepository;
@@ -106,9 +80,6 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 	@Autowired
 	private ScheduledTasksRestController scheduledTasksRestController;
 	
-	
-	@Autowired
-	private GroupRepository groupRepository;
 	
 	@Autowired
 	private ReportServiceImpl reportServiceImpl;
@@ -201,11 +172,7 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 							schedule.setExpression(exp);
 						}
 						
-						//only for test
-						/*else if(schedule.getDate_type().equals("every")) {
-							String exp = "0 "+ "0/"+obj.get("min") +" * * * *";
-							schedule.setExpression(exp);
-						}*/
+
 						else {
 							getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date Type should be everyDay ,everyWeek or everyMonth",null);
 							return  ResponseEntity.badRequest().body(getObjectResponse);
@@ -700,11 +667,7 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 					}
 					
 					
-					//only for test
-					/*else if(schedule.getDate_type().equals("every")) {
-						String exp = "0 "+ "0/"+obj.get("min") +" * * * *";
-						schedule.setExpression(exp);
-					}*/
+
 					
 					
 					else {
@@ -788,11 +751,7 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 			}
 			
 			
-			//only for test
-			/*else if(schedule.getDate_type().equals("every")) {
-				String exp = "0 "+ "0/"+obj.get("min") +" * * * *";
-				schedule.setExpression(exp);
-			}*/
+
 			
 			
 			else {
@@ -1393,7 +1352,6 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 
 		}
 
-//		List<Device> devices = (List<Device>) entity;
 		
 		Workbook workbook = new XSSFWorkbook();
 		
@@ -1404,24 +1362,18 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 		
         
 
-        /* CreationHelper helps us create instances of various things like DataFormat, 
-           Hyperlink, RichTextString etc, in a format (HSSF, XSSF) independent way */
         CreationHelper createHelper = workbook.getCreationHelper();
 
-        // Create a Font for styling header cells
         Font headerFont = workbook.createFont();
         headerFont.setBold(true);
         headerFont.setFontHeightInPoints((short) 14);
         headerFont.setColor(IndexedColors.BLUE_GREY.getIndex());
 
-        // Create a CellStyle with the font
         CellStyle headerCellStyle = workbook.createCellStyle();
         headerCellStyle.setFont(headerFont);
 
-        // Create a Row
         Row headerRow = sheet.createRow(0);
 
-        // Create cells
         
         for(int i = 0; i < columns.length; i++) {
             Cell cell = headerRow.createCell(i);
@@ -1430,7 +1382,7 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
         }
         
 
-        // Create Other rows and cells with employees data
+
         int rowNum = 1;
         if(reportType.equals("sensorWeight")) {
         	for(CustomPositions sensorWeight: sensorWeightReport) {
@@ -2846,12 +2798,12 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
             }
         }
 
-		// Resize all columns to fit the content size
+
         for(int i = 0; i < columns.length; i++) {
             sheet.autoSizeColumn(i);
         }
 
-        // Write the output to a file
+
         FileOutputStream fileOut = null;
         String path ="/var/www/html/sareb_sheets/";
         
@@ -2874,7 +2826,7 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 			e.printStackTrace();
 		}
 
-        // Closing the workbook
+
         try {
 			workbook.close();
 		} catch (IOException e) {

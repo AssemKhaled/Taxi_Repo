@@ -1,8 +1,10 @@
 package com.example.examplequerydslspringdatajpamaven.service;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import com.example.examplequerydslspringdatajpamaven.entity.Points;
 
+@Service
 public interface PointsService {
 
 	public ResponseEntity<?> getPointsMap(String TOKEN,Long id);

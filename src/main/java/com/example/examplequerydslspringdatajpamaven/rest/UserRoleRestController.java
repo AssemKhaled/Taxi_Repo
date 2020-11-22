@@ -10,11 +10,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import com.example.examplequerydslspringdatajpamaven.entity.Permission;
 import com.example.examplequerydslspringdatajpamaven.entity.UserRole;
 import com.example.examplequerydslspringdatajpamaven.service.UserRoleService;
 
+
+/**
+ * Service of role component
+ * @author fuinco
+ *
+ */
 @CrossOrigin
 @Component
 @RequestMapping(path = "/roles")

@@ -11,29 +11,29 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDriverList;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
-import com.example.examplequerydslspringdatajpamaven.entity.userClientDevice;
 import com.example.examplequerydslspringdatajpamaven.entity.userClientDriver;
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
 import com.example.examplequerydslspringdatajpamaven.repository.DriverRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.GroupRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.UserClientDeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserClientDriverRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 
+/**
+ * services functionality related to drivers
+ * @author fuinco
+ *
+ */
 @Component
 public class DriverServiceImpl extends RestServiceController implements DriverService{
 
@@ -66,8 +66,6 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 	@Override
 	public ResponseEntity<?> getAllDrivers(String TOKEN,Long id,int offset,String search) {
 		
-		//User user=userRepository.getUserData(id);
-		//Set<Driver> drivers = user.getDrivers();
 		
 		logger.info("************************ getAllDrivers STARTED ***************************");
 		List<Driver> drivers = new ArrayList<Driver>();
@@ -98,27 +96,7 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 				}
 				   userServiceImpl.resetChildernArray();
 					if(user.getAccountType().equals(4)) {
-						/*Set<User>parentClients = user.getUsersOfUser();
-						if(parentClients.isEmpty()) {
-							getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get drivers of this user",null);
-							 logger.info("************************ getAllUserDrivers ENDED ***************************");
-							return  ResponseEntity.status(404).body(getObjectResponse);
-						}else {
-							User parent = null;
-							for(User object : parentClients) {
-								parent = object;
-							}
-							List<Long>usersIds= new ArrayList<>();
-						    usersIds.add(parent.getId());
-						     
-							//drivers = driverRepository.getAllDrivers(usersIds,offset,search);
-						    customDrivers= driverRepository.getAllDriversCustom(usersIds,offset,search);
-						    Integer size= driverRepository.getAllDriversSize(usersIds,search);
-							
-							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",customDrivers,size);
-							logger.info("************************ getAllDrivers ENDED ***************************");
-							return ResponseEntity.ok().body(getObjectResponse);
-						}*/
+						
 						List<Long> driverIds = userClientDriverRepository.getDriverIds(id);
 						Integer size = 0;
 						if(driverIds.size()>0) {
@@ -142,7 +120,7 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 							 usersIds.add(object.getId());
 						 }
 					 }
-					//drivers = driverRepository.getAllDrivers(usersIds,offset,search);
+
 				    customDrivers= driverRepository.getAllDriversCustom(usersIds,offset,search);
 
 					Integer size= driverRepository.getAllDriversSize(usersIds,search);
@@ -828,8 +806,6 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 				drivers = device.getDriver();
 				if(!drivers.isEmpty()) {
 					for(Driver driver : drivers ) {
-						//hint only one driver assigned to device
-
 						deviceDriver.add(driver);
 					}
 
@@ -884,32 +860,7 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 			}
 			else {
 				if(user.getAccountType().equals(4)) {
-					 /*Set<User>parentClient = user.getUsersOfUser();
-						if(parentClient.isEmpty()) {
-							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
-							logger.info("************************ editDevice ENDED ***************************");
-							return ResponseEntity.badRequest().body(getObjectResponse);
-						}else {
-						  
-							User parent =null;
-							for(User object : parentClient) {
-								parent = object;
-							}
-							if(parent != null) {
-								List<Long>usersIds= new ArrayList<>();
-							    usersIds.add(parent.getId());
-								List<Driver> unAssignedDrivers = driverRepository.getUnassignedDrivers(usersIds);
-								
-								getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",unAssignedDrivers);
-								logger.info("************************ getUnassignedDrivers ENDED ***************************");
-								return ResponseEntity.ok().body(getObjectResponse);
-							}
-							else {
-								getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "No parent for this type 4",null);
-								return ResponseEntity.badRequest().body(getObjectResponse);
-							}
-							
-						}*/
+					 
 
 					List<Long>usersIds= new ArrayList<>();
 				    usersIds.add(userId);
@@ -960,7 +911,7 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 			return null;
 		}
 		if(driver.getDelete_date() != null) {
-			//throw not found 
+
 			return null;
 		}
 		else
@@ -1014,32 +965,8 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 	    		if(user.getDelete_date() == null) {
 	    			
 	    			if(user.getAccountType().equals(4)) {
-	   				 /*Set<User>parentClient = user.getUsersOfUser();
-	   					if(parentClient.isEmpty()) {
-	   						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
-	   						logger.info("************************ getDriverSelect ENDED ***************************");
-	   						return ResponseEntity.badRequest().body(getObjectResponse);
-	   					}else {
-	   					  
-	   						User parent =null;
-	   						for(User object : parentClient) {
-	   							parent = object;
-	   						}
-	   						if(parent != null) {
+	   				 
 
-					   			List<Long>usersIds= new ArrayList<>();
-			   					usersIds.add(parent.getId());
-	   							drivers = driverRepository.getDriverSelect(usersIds);
-	   							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
-	   							logger.info("************************ getDriverSelect ENDED ***************************");
-	   							return ResponseEntity.ok().body(getObjectResponse);
-	   						}
-	   						else {
-	   							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "No parent for this type 4",null);
-	   							return ResponseEntity.badRequest().body(getObjectResponse);
-	   						}
-	   						
-	   					}*/
 	    				
 	    				 List<Long> driverIds = userClientDriverRepository.getDriverIds(userId);
 
@@ -1153,33 +1080,8 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 	    		if(user.getDelete_date() == null) {
 	    			
 	    			if(user.getAccountType().equals(4)) {
-	   				 /*Set<User>parentClient = user.getUsersOfUser();
-	   					if(parentClient.isEmpty()) {
-	   						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
-	   						logger.info("************************ getDriverSelect ENDED ***************************");
-	   						return ResponseEntity.badRequest().body(getObjectResponse);
-	   					}else {
-	   					  
-	   						User parent =null;
-	   						for(User object : parentClient) {
-	   							parent = object;
-	   						}
-	   						if(parent != null) {
+	   				 
 
-					   			List<Long>usersIds= new ArrayList<>();
-			   					usersIds.add(parent.getId());
-	   							drivers = driverRepository.getDriverSelect(usersIds);
-	   							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
-	   							logger.info("************************ getDriverSelect ENDED ***************************");
-	   							return ResponseEntity.ok().body(getObjectResponse);
-	   						}
-	   						else {
-	   							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "No parent for this type 4",null);
-	   							return ResponseEntity.badRequest().body(getObjectResponse);
-	   						}
-	   						
-	   					}*/
-	    				
 	    				 List<Long> driverIds = userClientDriverRepository.getDriverIds(userId);
 
 	    				 if(driverIds.size()>0) {
@@ -1329,7 +1231,7 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 								  return ResponseEntity.status(404).body(getObjectResponse);
 					    	  }
 					    	  
-					    	  //to make user assign driver to himself
+
 					    	  else if(loggedUser.getAccountType().equals(toUser.getAccountType())) {
 					    		  if(loggedUser.getId() == toUser.getId()) {
 					    			  Set<User> driverOldUser = driver.getUserDriver();
@@ -1365,7 +1267,7 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 					    		 }
 					    		 if(isParent) {
 					    			 
-					    			// assign user to another user
+
 					    			 Set<User> driverOldUser = driver.getUserDriver();
 					    			 Set<User> temp = driverOldUser;
 					    			 driverOldUser.removeAll(temp);

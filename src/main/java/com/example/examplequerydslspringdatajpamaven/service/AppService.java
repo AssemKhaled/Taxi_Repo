@@ -4,11 +4,18 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 
+/**
+ * Interface of function of app
+ * @author fuinco
+ *
+ */
+@Service
 public interface AppService {
 	
 	public ResponseEntity<?> loginApp(String authtorization);

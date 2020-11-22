@@ -2,7 +2,6 @@ package com.example.examplequerydslspringdatajpamaven.service;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,22 +15,23 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
-import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Group;
 import com.example.examplequerydslspringdatajpamaven.entity.Notification;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
-import com.example.examplequerydslspringdatajpamaven.entity.userClientDevice;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.GroupRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.NotificationRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.UserClientDeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 
+/**
+ * services functionality related to notifications
+ * @author fuinco
+ *
+ */
 @Component
 @Service
 public class NotificationServiceImpl extends RestServiceController implements NotificationService{
@@ -633,7 +633,7 @@ public class NotificationServiceImpl extends RestServiceController implements No
 							return ResponseEntity.status(404).body(getObjectResponse);
 				        }
 				        else {
-				        	//check if parent in drivers
+
 				        	Set<Notification> oldNotifications=new HashSet<>() ;
 				        	oldNotifications= notifications;
 				        	notifications.removeAll(oldNotifications);
@@ -782,7 +782,7 @@ public class NotificationServiceImpl extends RestServiceController implements No
 							return ResponseEntity.status(404).body(getObjectResponse);
 				        }
 				        else {
-				        	//check if parent in drivers
+
 				        	Set<Notification> oldNotifications=new HashSet<>() ;
 				        	oldNotifications= notifications;
 				        	notifications.removeAll(oldNotifications);

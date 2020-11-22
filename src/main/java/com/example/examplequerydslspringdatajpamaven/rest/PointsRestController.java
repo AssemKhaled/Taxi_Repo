@@ -12,12 +12,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.example.examplequerydslspringdatajpamaven.entity.Points;
-import com.example.examplequerydslspringdatajpamaven.entity.Schedule;
-import com.example.examplequerydslspringdatajpamaven.service.PointsService;
 import com.example.examplequerydslspringdatajpamaven.service.PointsServiceImpl;
 
+/**
+ * service of point component
+ * @author fuinco
+ *
+ */
 @CrossOrigin
 @Component
 @RequestMapping(path = "/points")

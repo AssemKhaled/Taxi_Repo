@@ -8,26 +8,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONObject;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 import com.example.examplequerydslspringdatajpamaven.entity.Group;
-import com.example.examplequerydslspringdatajpamaven.entity.Points;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
-import com.example.examplequerydslspringdatajpamaven.entity.userClientDevice;
 import com.example.examplequerydslspringdatajpamaven.entity.userClientGroup;
 import com.example.examplequerydslspringdatajpamaven.repository.GeofenceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.GroupRepository;
@@ -41,7 +35,11 @@ import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 
-
+/**
+ * services functionality related to groups
+ * @author fuinco
+ *
+ */
 @Component
 @Service
 public class GroupsServiceImpl extends RestServiceController implements GroupsService{
@@ -267,66 +265,8 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 					
 					userService.resetChildernArray();
 				    if(user.getAccountType().equals(4)) {
-						 /*Set<User> parentClients = user.getUsersOfUser();
-						 if(parentClients.isEmpty()) {
-							
-							 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get geofences of this user",null);
-							 logger.info("************************ getAllUserDevices ENDED ***************************");
-							return  ResponseEntity.status(404).body(getObjectResponse);
-						 }else {
-							 User parentClient = new User() ;
-							 for(User object : parentClients) {
-								 parentClient = object;
-							 }
-							 List<Long>usersIds= new ArrayList<>();
-							 usersIds.add(parentClient.getId());
-							 groups = groupRepository.getAllGroups(usersIds,offset,search);
-							List<Map> data = new ArrayList<>();
-							Integer size=0;
+						 
 
-							
-							if(groups.size()>0) {
-								size=groupRepository.getAllGroupsSize(usersIds);
-
-								for(Group group:groups) {
-								     Map PointsList= new HashMap();
-								     
-									 PointsList.put("id", group.getId());
-									 PointsList.put("name", group.getName());
-									 PointsList.put("attributes", group.getAttributes());
-									 PointsList.put("groupid", group.getGroupid());
-									 PointsList.put("is_deleted", group.getIs_deleted());
-									 PointsList.put("type", group.getType());
-									 PointsList.put("companyName",null);
-									 PointsList.put("companyId",null);
-
-									 
-									 
-									 Set<User>groupParents = group.getUserGroup();
-										if(groupParents.isEmpty()) {
-											
-
-										}else {
-											for(User parentObject : groupParents) {
-												 PointsList.put("companyId",parentObject.getId());
-												 User us = userRepository.findOne(parentObject.getId());
-												 if(us != null) {
-													 PointsList.put("companyName", us.getName());
-
-												 }
-												break;
-												
-											}
-										}
-										data.add(PointsList);
-
-								}	 
-									
-							}
-							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",groups,size);
-							logger.info("************************ getAllUserGeofences ENDED ***************************");
-							return  ResponseEntity.ok().body(getObjectResponse);
-						 }*/
 				    	
 				    	List<Long> groupIds = userClientGroupRepository.getGroupsIds(id);
 						Integer size=0;
@@ -993,7 +933,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 							return ResponseEntity.status(404).body(getObjectResponse);
 				        }
 				        else {
-				        	//check if parent in drivers
+
 				        	Set<Driver> oldDrivers =new HashSet<>() ;
 				        	oldDrivers= drivers;
 				        	drivers.removeAll(oldDrivers);
@@ -1153,7 +1093,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 							return ResponseEntity.status(404).body(getObjectResponse);
 				        }
 				        else {
-				        	//check if parent in drivers
+
 				        	Set<Geofence> oldGeofences =new HashSet<>() ;
 				        	oldGeofences= geofences;
 				        	geofences.removeAll(oldGeofences);
@@ -1316,7 +1256,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 							return ResponseEntity.status(404).body(getObjectResponse);
 				        }
 				        else {
-				        	//check if parent in drivers
+
 				        	Set<Device> oldDevices =new HashSet<>() ;
 				        	oldDevices= devices;
 				        	devices.removeAll(oldDevices);
@@ -1494,32 +1434,8 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 	    		if(user.getDelete_date() == null) {
 	    			
 	    			if(user.getAccountType().equals(4)) {
-	   				 /*Set<User>parentClient = user.getUsersOfUser();
-	   					if(parentClient.isEmpty()) {
-	   						getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to edit this user ",null);
-	   						logger.info("************************ getDriverSelect ENDED ***************************");
-	   						return ResponseEntity.badRequest().body(getObjectResponse);
-	   					}else {
-	   					  
-	   						User parent =null;
-	   						for(User object : parentClient) {
-	   							parent = object;
-	   						}
-	   						if(parent != null) {
+	   				 
 
-					   			List<Long>usersIds= new ArrayList<>();
-			   					usersIds.add(parent.getId());
-				    			drivers = groupRepository.getGroupSelect(usersIds);
-	   							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
-	   							logger.info("************************ getDriverSelect ENDED ***************************");
-	   							return ResponseEntity.ok().body(getObjectResponse);
-	   						}
-	   						else {
-	   							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "No parent for this type 4",null);
-	   							return ResponseEntity.badRequest().body(getObjectResponse);
-	   						}
-	   						
-	   					}*/
 
 				    	List<Long> groupIds = userClientGroupRepository.getGroupsIds(userId);
 

@@ -1,17 +1,15 @@
 package com.example.examplequerydslspringdatajpamaven.service;
 
 import java.util.List;
-import java.util.Set;
-
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
-import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 
+@Service
 public interface IUserService {
 
 	public User getName();
-//	public ResponseEntity<?> UserDevice(Long userId,int offset, String search);
 	public User findById(Long userId);
 	public ResponseEntity<?> findUserById(String TOKEN,Long userId,Long loggedUserId);
 	public ResponseEntity<?> usersOfUser(String TOKEN,Long userId,Long loggedUserId,int offset,String search,int active);

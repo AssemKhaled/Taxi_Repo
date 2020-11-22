@@ -7,29 +7,30 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.json.CDL;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-
-import com.example.examplequerydslspringdatajpamaven.entity.Attribute;
-import com.example.examplequerydslspringdatajpamaven.entity.Device;
-import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
+import org.springframework.stereotype.Service;
 import com.example.examplequerydslspringdatajpamaven.entity.Permission;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.entity.UserRole;
-import com.example.examplequerydslspringdatajpamaven.entity.userClientComputed;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRoleRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 import com.example.examplequerydslspringdatajpamaven.tokens.TokenSecurity;
 
+
+/**
+ * services functionality related to roles
+ * @author fuinco
+ *
+ */
 @Component
+@Service
 public class UserRoleServiceImpl extends RestServiceController implements UserRoleService {
 
 	@Autowired
@@ -587,7 +588,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 	     int year = cal.get(Calendar.YEAR);
 	     String date =  Integer.toString(year)+"-"+ Integer.toString(month)+"-"+ Integer.toString(day);
 	     role.setDelete_date(date);
-		 //Boolean removeCretedBy = TokenSecurity.getInstance().removeActiveUserById(role.getUserId());
+
 	     userRoleRepository.save(role);
 	     getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "role deleted successfully",null);
 		 return  ResponseEntity.ok().body(getObjectResponse);
@@ -750,9 +751,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
     					   if(ParentRolePerm.getJSONArray("permissions").getJSONObject(j).getJSONObject("functionality").has(keyChild)) { 
     						   if(ParentRolePerm.getJSONArray("permissions").getJSONObject(j).getJSONObject("functionality").getBoolean(keyChild) == false) {
     							   if(valueChild != false ) {
-    								   System.out.println("ssacssac");
-    								   //ChildRolePerm.getJSONArray("permissions").getJSONObject(i).getJSONObject("functionality").remove(keyChild);
-    								   System.out.println("wqwweewewqeeqqqe");
+
     								   ChildRolePerm.getJSONArray("permissions").getJSONObject(i).getJSONObject("functionality").put(keyChild, false);
 
     							   }    							  
@@ -1197,34 +1196,8 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 		
 		return ResponseEntity.ok().body(getObjectResponse);
 	}
-	
-//	@Override
-//	public ResponseEntity<?> getRolePageContent(Long userId) {
-//		// TODO Auto-generated method stub
-//		if(userId == 0) {
-//			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "  userId is required",null);
-//			 return  ResponseEntity.badRequest().body(getObjectResponse);
-//		}
-//		User user = userService.findById(userId);
-//		if(user == null) {
-//			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "this user not found ",null);
-//			 return  ResponseEntity.status(404).body(getObjectResponse);
-//		}
-//		List<Permission> permissions = permissionService.getPermissionsList();
-//		if(permissions.isEmpty()) {
-//			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "no permissions to add ",null);
-//			 return  ResponseEntity.status(404).body(getObjectResponse);
-//		}
-//		List<UserRole> role = userRoleRepository.getUserRole(userId);
-//		Map content = new HashMap();
-//		content.put("permissions", permissions);
-//		content.put("role" ,role);
-//		List<Map> pageContent = new ArrayList<>();
-//		pageContent.add(content);
-//		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",pageContent);
-//		
-//		return ResponseEntity.ok().body(getObjectResponse);
-//	}
+
+
 	@Override
 	public Boolean checkUserHasPermission(Long userId, String module, String functionality) {
 		
@@ -1242,18 +1215,15 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 			JSONObject permissions = new JSONObject(role.getPermissions());
 			 if(permissions.has("permissions")) {
 				 JSONArray the_json_array = permissions.getJSONArray("permissions");
-					//System.out.println("myJson"+the_json_array);
-					
-					
+
 					for(Object object : the_json_array) {	
-						//System.out.println("myJson"+object);
+
 						JSONObject permissionObject = new JSONObject(object.toString());
 						
 
-						
 						if( permissionObject.has("name")) {
 							if(permissionObject.getString("name").equals(module)) {
-								//System.out.println("get here");
+
 								JSONObject serviceFunctionalities= permissionObject.getJSONObject("functionality");
 								
 								
@@ -1271,7 +1241,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 						 
 					}
 				 return false;
-//				 
+			 
 			 }else {
 				 return false;
 			 }
@@ -1305,7 +1275,7 @@ public ResponseEntity<?> getRolePageContent(String TOKEN,Long userId) {
 			 return  ResponseEntity.status(404).body(getObjectResponse);	
 		}else {
 			if(loggedUser.getAccountType() == 1) {
-				//getAllPermissions
+
 				List<Permission> permissions = permissionService.getPermissionsList();
 				if(permissions.isEmpty()) {
 					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "no permissions to add",null);
@@ -1461,12 +1431,12 @@ public ResponseEntity<?> removeRoleFromUser(String TOKEN, Long roleId, Long user
 		 Set<User> loggedParent = loggedUser.getUsersOfUser();
 		 if(loggedParent.isEmpty()) {
 			 getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to remove role from this user ",null);
-//				logger.info("************************ editDevice ENDED ***************************");
+
 				return ResponseEntity.badRequest().body(getObjectResponse);
 		 }else {
 			if(assignedToUser.getAccountType() != 4) {
 				getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to remove role from this user ",null);
-//				logger.info("************************ editDevice ENDED ***************************");
+
 				return ResponseEntity.badRequest().body(getObjectResponse);
 			}
 			 User parent =null;
@@ -1476,7 +1446,7 @@ public ResponseEntity<?> removeRoleFromUser(String TOKEN, Long roleId, Long user
 			Set<User> assignedToParents = assignedToUser.getUsersOfUser();
 			if(assignedToParents.isEmpty()) {
 				getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to remove role from this user ",null);
-//				logger.info("************************ editDevice ENDED ***************************");
+
 				return ResponseEntity.badRequest().body(getObjectResponse);
 			}
 			for(User object :assignedToParents ) {
@@ -1505,7 +1475,7 @@ public ResponseEntity<?> removeRoleFromUser(String TOKEN, Long roleId, Long user
 		 Long role = assignedToUser.getRoleId();
 		 if(role == null) {
 			 getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "this user does not have role to remove  ",null);
-//				logger.info("************************ editDevice ENDED ***************************");
+
 				return ResponseEntity.badRequest().body(getObjectResponse);
 		 }
 		 else {
@@ -1516,7 +1486,7 @@ public ResponseEntity<?> removeRoleFromUser(String TOKEN, Long roleId, Long user
 		 }
 	 }else {
 		 getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to remove role from this user ",null);
-//			logger.info("************************ editDevice ENDED ***************************");
+
 			return ResponseEntity.badRequest().body(getObjectResponse);
 	 }
 	 

@@ -2,12 +2,11 @@ package com.example.examplequerydslspringdatajpamaven.service;
 
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.http.ResponseEntity;
-
-import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
+import org.springframework.stereotype.Service;
 import com.example.examplequerydslspringdatajpamaven.entity.Group;
 
+@Service
 public interface GroupsService {
 	
 	public ResponseEntity<?> createGroup(String TOKEN,Group group,Long userId);

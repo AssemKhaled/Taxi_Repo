@@ -13,35 +13,24 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import java.util.Arrays;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.bson.Document;
-import org.bson.conversions.Bson;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOptions;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.StringHttpMessageConverter;
-
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
-
 import com.example.examplequerydslspringdatajpamaven.entity.CustomPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceWorkingHours;
@@ -51,8 +40,6 @@ import com.example.examplequerydslspringdatajpamaven.entity.DriverWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.EventReport;
 import com.example.examplequerydslspringdatajpamaven.entity.EventReportByCurl;
 import com.example.examplequerydslspringdatajpamaven.entity.Group;
-import com.example.examplequerydslspringdatajpamaven.entity.MongoEvents;
-import com.example.examplequerydslspringdatajpamaven.entity.MongoPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.StopReport;
 import com.example.examplequerydslspringdatajpamaven.entity.SummaryReport;
 import com.example.examplequerydslspringdatajpamaven.entity.TripPositions;
@@ -62,7 +49,6 @@ import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository
 import com.example.examplequerydslspringdatajpamaven.repository.DriverRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.GroupRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoEventsRepo;
-import com.example.examplequerydslspringdatajpamaven.repository.MongoEventsRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionRepo;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionsRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserClientDeviceRepository;
@@ -70,10 +56,15 @@ import com.example.examplequerydslspringdatajpamaven.repository.UserClientDriver
 import com.example.examplequerydslspringdatajpamaven.repository.UserClientGroupRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * services functionality related to reports
+ * @author fuinco
+ *
+ */
 @Component
+@Service
 public class ReportServiceImpl extends RestServiceController implements ReportService {
 	
 	 @Value("${stopsUrl}")
@@ -431,60 +422,14 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 					eventReport = mongoEventsRepo.getEventsWithoutType(allDevices, offset, dateFrom, dateTo);
 					if(eventReport.size()>0) {
 						size = mongoEventsRepo.getEventsWithoutTypeSize(allDevices, dateFrom, dateTo);
-						/*for(int i=0;i<eventReport.size();i++) {
-							
-							MongoPositions pos = mongoPositionsRepository.findById(eventReport.get(i).getPositionId());
-							
-							if(pos != null) {
-								eventReport.get(i).setLatitude(pos.getLatitude());
-								eventReport.get(i).setLongitude(pos.getLongitude());
-								
-							}
-							
-							Device device = deviceRepository.getOne(eventReport.get(i).getDeviceId());
-							eventReport.get(i).setDeviceName(device.getName());
-							Set<Driver> drivers = device.getDriver();
-							for(Driver driver : drivers) {
-								eventReport.get(i).setDriverId(driver.getId());
-								eventReport.get(i).setDriverName(driver.getName());
-							}
-							
-							if(eventReport.get(i).getEventType().equals("alarm")) {
-								JSONObject obj = new JSONObject(eventReport.get(i).getAttributes().toString());
-								eventReport.get(i).setEventType(obj.getString("alarm"));
-							}
-						}*/
+						
 						
 					}
 				}
 				else {
 					eventReport = mongoEventsRepo.getEventsScheduled(allDevices, dateFrom, dateTo);
-					/*if(eventReport.size()>0) {
-						for(int i=0;i<eventReport.size();i++) {
-							
-							MongoPositions pos = mongoPositionsRepository.findById(eventReport.get(i).getPositionId());
-							
-							if(pos != null) {
-								eventReport.get(i).setLatitude(pos.getLatitude());
-								eventReport.get(i).setLongitude(pos.getLongitude());
-								
-							}
-							
-							Device device = deviceRepository.getOne(eventReport.get(i).getDeviceId());
-							eventReport.get(i).setDeviceName(device.getName());
-							Set<Driver> drivers = device.getDriver();
-							for(Driver driver : drivers) {
-								eventReport.get(i).setDriverId(driver.getId());
-								eventReport.get(i).setDriverName(driver.getName());
-							}
-							
-							if(eventReport.get(i).getEventType().equals("alarm")) {
-								JSONObject obj = new JSONObject(eventReport.get(i).getAttributes());
-								eventReport.get(i).setEventType(obj.getString("alarm"));
-							}
-						}
-						
-					}*/
+					
+
 				}
 				
 			}
@@ -493,55 +438,13 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 					eventReport = mongoEventsRepo.getEventsWithType(allDevices, offset, dateFrom, dateTo, type);
 					if(eventReport.size()>0) {
 						size = mongoEventsRepo.getEventsWithTypeSize(allDevices, dateFrom, dateTo, type);
-						/*for(int i=0;i<eventReport.size();i++) {
-							MongoPositions pos = mongoPositionsRepository.findById(eventReport.get(i).getPositionId());
-							
-							if(pos != null) {
-								eventReport.get(i).setLatitude(pos.getLatitude());
-								eventReport.get(i).setLongitude(pos.getLongitude());
-								
-							}
-							Device device = deviceRepository.getOne(eventReport.get(i).getDeviceId());
-							eventReport.get(i).setDeviceName(device.getName());
-							Set<Driver> drivers = device.getDriver();
-							for(Driver driver : drivers) {
-								eventReport.get(i).setDriverId(driver.getId());
-								eventReport.get(i).setDriverName(driver.getName());
-							}
-							if(eventReport.get(i).getEventType().equals("alarm")) {
-								JSONObject obj = new JSONObject(eventReport.get(i).getAttributes());
-								eventReport.get(i).setEventType(obj.getString("alarm"));
-							}
-						}*/
+						
 						
 					}
 				}
 				else {
 					eventReport = mongoEventsRepo.getEventsScheduled(allDevices, dateFrom, dateTo);
-					/*if(eventReport.size()>0) {
-						for(int i=0;i<eventReport.size();i++) {
-							
-							MongoPositions pos = mongoPositionsRepository.findById(eventReport.get(i).getPositionId());
-							
-							if(pos != null) {
-								eventReport.get(i).setLatitude(pos.getLatitude());
-								eventReport.get(i).setLongitude(pos.getLongitude());
-								
-							}
-							Device device = deviceRepository.getOne(eventReport.get(i).getDeviceId());
-							eventReport.get(i).setDeviceName(device.getName());
-							Set<Driver> drivers = device.getDriver();
-							for(Driver driver : drivers) {
-								eventReport.get(i).setDriverId(driver.getId());
-								eventReport.get(i).setDriverName(driver.getName());
-							}
-							if(eventReport.get(i).getEventType().equals("alarm")) {
-								JSONObject obj = new JSONObject(eventReport.get(i).getAttributes());
-								eventReport.get(i).setEventType(obj.getString("alarm"));
-							}
-						}
-						
-					}*/
+					
 				}
 				
 			}
@@ -847,47 +750,14 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				if(deviceHours.size()>0) {
    				    size=mongoPositionRepo.getDeviceWorkingHoursSize(allDevices,dateFrom, dateTo);
 
-					/*for(int i=0;i<deviceHours.size();i++) {
-						
-						Device device = deviceRepository.findOne(deviceHours.get(i).getDeviceId());
-						deviceHours.get(i).setDeviceName(device.getName());
-
-                    	JSONObject obj = new JSONObject(deviceHours.get(i).getAttributes());
-                    	
-						if(obj.has("todayHoursString")) {
-							deviceHours.get(i).setHours(obj.getString("todayHoursString"));
-						}
-						else {
-							deviceHours.get(i).setHours("0");
-
-						}
-						
-					}*/
+					
 				
 				}
 			}
 			else {
 				deviceHours = mongoPositionRepo.getDeviceWorkingHoursScheduled(allDevices,dateFrom,dateTo);			
 
-				/*if(deviceHours.size()>0) {
-					for(int i=0;i<deviceHours.size();i++) {
-						
-						Device device = deviceRepository.findOne(deviceHours.get(i).getDeviceId());
-						deviceHours.get(i).setDeviceName(device.getName());
 
-                    	JSONObject obj = new JSONObject(deviceHours.get(i).getAttributes());
-                    	
-						if(obj.has("todayHoursString")) {
-							deviceHours.get(i).setHours(obj.getString("todayHoursString"));
-						}
-						else {
-							deviceHours.get(i).setHours("0");
-
-						}
-						
-					}
-				
-				}*/
 			}
 				
 			
@@ -1204,36 +1074,14 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				if(deviceHours.size()>0) {
 					size=mongoPositionRepo.getDeviceCustomSize(allDevices,dateFrom, dateTo,custom,value);
 
-					/*for(int i=0;i<deviceHours.size();i++) {
-						
-						Device device = deviceRepository.findOne(deviceHours.get(i).getDeviceId());
-						deviceHours.get(i).setDeviceName(device.getName());
-											
-						JSONObject obj = new JSONObject(deviceHours.get(i).getAttributes().toString());
-						deviceHours.get(i).setAttributes(custom +":"+obj.get(custom));
 
-						
-					}*/
-				
 				}
 			}
 			else {
 
 				deviceHours = mongoPositionRepo.getDeviceCustomScheduled(allDevices,dateFrom,dateFrom,custom,value);
-				/*if(deviceHours.size()>0) {
-					
-					for(int i=0;i<deviceHours.size();i++) {
-						
-						Device device = deviceRepository.findOne(deviceHours.get(i).getDeviceId());
-						deviceHours.get(i).setDeviceName(device.getName());
-						
-						JSONObject obj = new JSONObject(deviceHours.get(i).getAttributes().toString());
-						deviceHours.get(i).setAttributes(custom +":"+obj.get(custom));
-
-						
-					}
 				
-				}*/
+
 			}
 				
 			
@@ -1538,29 +1386,6 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				if(driverHours.size()>0) {
    				    size=mongoPositionRepo.getDriverWorkingHoursSize(allDevices,dateFrom,dateTo);
 
-					/*for(int i=0;i<driverHours.size();i++) {
-						for(int j=0;j<allDevicesList.size();j++) {
-							Long id1 = driverHours.get(i).getDeviceId().longValue();
-							Long id2 = allDevicesList.get(j).getId();
-
-							if(id1.equals(id2)) {
-								driverHours.get(i).setDriverName(allDevicesList.get(j).getName());
-							}
-						}
-						
-						Device device = deviceRepository.findOne(driverHours.get(i).getDeviceId());
-						driverHours.get(i).setDeviceName(device.getName());
-						
-						JSONObject obj = new JSONObject(driverHours.get(i).getAttributes());
-						if(obj.has("todayHoursString")) {
-							driverHours.get(i).setHours(obj.getString("todayHoursString"));
-						}
-						else {
-							driverHours.get(i).setHours("0");
-
-						}
-						
-					}*/
 				
 				}
 				
@@ -1568,32 +1393,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			else {
 				driverHours = mongoPositionRepo.getDriverWorkingHoursScheduled(allDevices,dateFrom,dateFrom);			
 
-				/*if(driverHours.size()>0) {
-					for(int i=0;i<driverHours.size();i++) {
-						for(int j=0;j<allDevicesList.size();j++) {
-							Long id1 = driverHours.get(i).getDeviceId().longValue();
-							Long id2 = allDevicesList.get(j).getId();
 
-							if(id1.equals(id2)) {
-								driverHours.get(i).setDriverName(allDevicesList.get(j).getName());
-							}
-						}
-						
-						Device device = deviceRepository.findOne(driverHours.get(i).getDeviceId());
-						driverHours.get(i).setDeviceName(device.getName());
-						
-						JSONObject obj = new JSONObject(driverHours.get(i).getAttributes());
-						if(obj.has("todayHoursString")) {
-							driverHours.get(i).setHours(obj.getString("todayHoursString"));
-						}
-						else {
-							driverHours.get(i).setHours("0");
-
-						}
-						
-					}
-				
-				}*/
 			}
 				
 			
@@ -1628,19 +1428,8 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				 List<Long>usersIds= new ArrayList<>();
 
 				 if(user.getAccountType() == 4) {
-					 /*Set<User> parentClients = user.getUsersOfUser();
-					 if(parentClients.isEmpty()) {
-						
-						 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "you cannot get devices of this user",null);
-							logger.info("************************ getNotifications ENDED ***************************");
-						return  ResponseEntity.status(404).body(getObjectResponse);
-					 }else {
-						 User parentClient = new User() ;
-						 for(User object : parentClients) {
-							 parentClient = object;
-						 }
-						 usersIds.add(parentClient.getId());
-					 }*/
+					
+
 					 List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(userId);
 				     Integer size=0;
 					 if(deviceIds.size()>0) {
@@ -4000,25 +3789,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			if(positionsList.size()>0) {
 				    size=mongoPositionRepo.getSensorsListSize(allDevices,dateFrom, dateTo);
 
-				/*for(int i=0;i<positionsList.size();i++) {
-					
-					Device device = deviceRepository.findOne(positionsList.get(i).getDeviceId());
-					positionsList.get(i).setDeviceName(device.getName());
-					
-					JSONObject obj = new JSONObject(positionsList.get(i).getAttributes());
-					if(obj.has("weight")) {
-						positionsList.get(i).setWeight(obj.get("weight").toString());
-					}
-					if(obj.has("adc1")) {
-						positionsList.get(i).setSensor1(obj.get("adc1").toString());
-					}
-					if(obj.has("adc2")) {
-						positionsList.get(i).setSensor2(obj.get("adc2").toString());
-					}
 
-					
-					
-				}*/
 			
 			}
 			
@@ -4026,29 +3797,6 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		else {
 			positionsList = mongoPositionRepo.getPositionsListScheduled(allDevices,dateFrom, dateTo);
 
-			if(positionsList.size()>0) {
-				
-				/*for(int i=0;i<positionsList.size();i++) {
-					
-					Device device = deviceRepository.findOne(positionsList.get(i).getDeviceId());
-					positionsList.get(i).setDeviceName(device.getName());
-					
-					JSONObject obj = new JSONObject(positionsList.get(i).getAttributes());
-					if(obj.has("weight")) {
-						positionsList.get(i).setWeight(obj.get("weight").toString());
-					}
-					if(obj.has("adc1")) {
-						positionsList.get(i).setSensor1(obj.get("adc1").toString());
-					}
-					if(obj.has("adc2")) {
-						positionsList.get(i).setSensor2(obj.get("adc2").toString());
-					}
-
-					
-					
-				}*/
-				
-			}
 		}
 		getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",positionsList,size);
 		 logger.info("************************ getSensorsReport ENDED ***************************");
@@ -6309,19 +6057,11 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 							  if(driverH.getDriverName() != null) {
 								  devicesStatus.put("driverName", driverH.getDriverName());
 							  }
-//							  devicesStatus.put("driverUniqueId",null);
+
 						      devicesStatus.put("totalHours", totalHours);
 							  
-//							  Device device= deviceServiceImpl.findById(driverH.getDeviceId());
-//							 
-//							  Set<Driver>  drivers = device.getDriver();
-//							  for(Driver driver : drivers ) {
-//
-//								  devicesStatus.put("driverUniqueId", driver.getUniqueid());
-//								  devicesStatus.put("driverName", driver.getName());
-//
-//							  }
-						      
+
+
 							JSONObject obj = new JSONObject(driverH.getAttributes().toString());
 
 							if(obj.has("todayHours")) {
