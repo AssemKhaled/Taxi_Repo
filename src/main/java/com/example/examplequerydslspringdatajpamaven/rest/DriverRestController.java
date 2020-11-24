@@ -87,7 +87,7 @@ public class DriverRestController {
 
 	}	
 	
-	// added by Maryam
+
 	@GetMapping(path = "/getUnassignedDrivers")
 	public ResponseEntity<?> getUnassignedDrivers(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
                                                   @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,                                              

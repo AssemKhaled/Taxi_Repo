@@ -61,6 +61,9 @@ public class NotificationServiceImpl extends RestServiceController implements No
 	@Autowired 
 	DeviceServiceImpl deviceServiceImpl;
 	
+	/**
+	 * create notification using data in body
+	 */
 	@Override
 	public ResponseEntity<?> createNotification(String TOKEN, Notification notification, Long userId) {
 		logger.info("************************ createNotification STARTED ***************************");
@@ -168,6 +171,9 @@ public class NotificationServiceImpl extends RestServiceController implements No
 		}
 	}
 
+	/**
+	 * get list of notifications limit 10
+	 */
 	@Override
 	public ResponseEntity<?> getAllNotifications(String TOKEN, Long id,int offset,String search) {
        logger.info("************************ getAllNotifications STARTED ***************************");
@@ -252,6 +258,9 @@ public class NotificationServiceImpl extends RestServiceController implements No
 		}
 	}
 
+	/**
+	 * get notification by id
+	 */
 	@Override
 	public ResponseEntity<?> getNotificationById(String TOKEN, Long notificationId, Long userId) {
 		logger.info("************************ getNotificationById STARTED ***************************");
@@ -343,6 +352,9 @@ public class NotificationServiceImpl extends RestServiceController implements No
 		   return false;
 	  }
 
+	/**
+	 * edit notification by id in body mandatory
+	 */
 	@Override
 	public ResponseEntity<?> editNotification(String TOKEN, Notification notification, Long id) {
 		logger.info("************************ editGeofence STARTED ***************************");
@@ -452,6 +464,9 @@ public class NotificationServiceImpl extends RestServiceController implements No
 		}
 	}
 
+	/**
+	 * delete notification by id
+	 */
 	@Override
 	public ResponseEntity<?> deleteNotification(String TOKEN, Long notificationId, Long userId) {
 		logger.info("************************ deleteNotification STARTED ***************************");
@@ -536,6 +551,9 @@ public class NotificationServiceImpl extends RestServiceController implements No
 		}
 	}
 
+	/**
+	 * assign notifications to group
+	 */
 	@Override
 	public ResponseEntity<?> assignNotificationToGroup(String TOKEN, Long groupId, Map<String, List> data,
 			Long userId) {
@@ -683,6 +701,9 @@ public class NotificationServiceImpl extends RestServiceController implements No
 		}
 	}
 
+	/**
+	 * assign notifications to device
+	 */
 	@Override
 	public ResponseEntity<?> assignNotificationToDevice(String TOKEN, Long deviceId, Map<String, List> data,
 			Long userId) {
@@ -832,6 +853,9 @@ public class NotificationServiceImpl extends RestServiceController implements No
 		}
 	}
 
+	/**
+	 * get select list of notifications 
+	 */
 	@Override
 	public ResponseEntity<?> getNotificationSelect(String TOKEN, Long userId,Long deviceId,Long groupId) {
 		logger.info("************************ getNotificationSelect STARTED ***************************");

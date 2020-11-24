@@ -37,6 +37,10 @@ public class ProfileServiceImpl extends RestServiceController implements Profile
 
 	private static final Log logger = LogFactory.getLog(ProfileServiceImpl.class);
 
+	
+	/**
+	 * get user profile info to edit
+	 */
 	@Override
 	public ResponseEntity<?> getUserInfo(String TOKEN,Long userId) {
 		
@@ -87,6 +91,9 @@ public class ProfileServiceImpl extends RestServiceController implements Profile
 	}
 
 
+	/**
+	 * update profile of user by data in body and userId
+	 */
 	@Override
 	public ResponseEntity<?>  updateProfileInfo(String TOKEN,User user,Long userId) {
 		
@@ -176,6 +183,9 @@ public class ProfileServiceImpl extends RestServiceController implements Profile
 
 	}
 
+	/**
+	 * change password with data in body (oldPassword,newPassword) and check if in edit user or in profile by value check ""
+	 */
 	@Override
 	public ResponseEntity<?> updateProfilePassword(String TOKEN,Map<String, String> data,String check,Long userId) {
 		
@@ -272,6 +282,9 @@ public class ProfileServiceImpl extends RestServiceController implements Profile
 		
 	}
 	
+	/**
+	 * update photo by data in body (photo) if "" remove and put not_available.png if valid add it and return name
+	 */
 	@Override
 	public ResponseEntity<?> updateProfilePhoto(String TOKEN,Map<String, String> data,Long userId){
 		
@@ -369,6 +382,9 @@ public class ProfileServiceImpl extends RestServiceController implements Profile
 	}
 
 
+	/**
+	 * reset password only for admin as loggedUserId with data in body (password)
+	 */
 	@Override
 	public ResponseEntity<?> restPassword(String TOKEN, Long loggedUserId, Long userId, Map<String, String> data) {
 		// TODO Auto-generated method stub

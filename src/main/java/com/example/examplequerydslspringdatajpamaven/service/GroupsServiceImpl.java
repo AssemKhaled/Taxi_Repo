@@ -88,6 +88,9 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 	@Autowired 
 	GroupRepository groupRepository;
 	
+	/**
+	 * create group with data in body
+	 */
 	@Override
 	public ResponseEntity<?> createGroup(String TOKEN, Group group,Long userId) {
 		
@@ -230,6 +233,9 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 		}
 	}
 
+	/**
+	 * get group list with limit 10
+	 */
 	@Override
 	public ResponseEntity<?> getAllGroups(String TOKEN, Long id, int offset, String search) {
 		logger.info("************************ getAllUserGroups STARTED ***************************");
@@ -399,6 +405,9 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 
 	}
 
+	/**
+	 * get group by id
+	 */
 	@Override
 	public ResponseEntity<?> getGroupById(String TOKEN, Long groupId, Long userId) {
 		
@@ -530,6 +539,9 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 		   return false;
 	  }
 
+	/**
+	 * edit group by id in body mandatory
+	 */
 	@Override
 	public ResponseEntity<?> editGroup(String TOKEN, Group group, Long id) {
 		logger.info("************************ editGeofence STARTED ***************************");
@@ -708,6 +720,9 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 		}
 	}
 
+	/**
+	 * delete group by id
+	 */
 	@Override
 	public ResponseEntity<?> deleteGroup(String TOKEN, Long groupId, Long userId) {
 		logger.info("************************ deleteGroup STARTED ***************************");
@@ -827,6 +842,9 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 		}
 	}
 
+	/**
+	 * assign driver to group
+	 */
 	@Override
 	public ResponseEntity<?> assignGroupToDriver(String TOKEN, Long groupId,Map<String, List> data, Long userId) {
 		logger.info("************************ groupAssignDriver STARTED ***************************");
@@ -989,6 +1007,9 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 		}
 	}
 
+	/**
+	 * assign geofences to group
+	 */
 	@Override
 	public ResponseEntity<?> assignGroupToGeofence(String TOKEN, Long groupId, Map<String, List> data, Long userId) {
 		logger.info("************************ groupAssignGeofence STARTED ***************************");
@@ -1149,6 +1170,9 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 		}
 	}
 
+	/**
+	 * assign devices to group
+	 */
 	@Override
 	public ResponseEntity<?> assignGroupToDevice(String TOKEN, Long groupId, Map<String, List> data, Long userId) {
 		logger.info("************************ groupAssignDevice STARTED ***************************");
@@ -1312,6 +1336,9 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 		}
 	}
 
+	/**
+	 * get selected items for group
+	 */
 	@Override
 	public ResponseEntity<?> getGroupDevices(String TOKEN, Long groupId,String type) {
 		// TODO Auto-generated method stub
@@ -1388,6 +1415,9 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 		
 	}
 
+	/**
+	 * get group list selection
+	 */
 	@Override
 	public ResponseEntity<?> getGroupSelect(String TOKEN,Long loggedUserId, Long userId) {
 		logger.info("************************ getDriverSelect STARTED ***************************");
@@ -1488,6 +1518,9 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 	
 	}
 	
+	/**
+	 * get unassigned groups to any user type 4
+	 */
 	@Override
 	public ResponseEntity<?> getGroupUnSelectOfCient(String TOKEN,Long loggedUserId, Long userId) {
 		logger.info("************************ getDriverSelect STARTED ***************************");
@@ -1576,6 +1609,9 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 	}
 	
 	
+	/**
+	 * assign group to user type 4 from type 3
+	 */
 	@Override
 	public ResponseEntity<?> assignClientGroups(String TOKEN, Long loggedUserId, Long userId, Long[] groupIds) {
 		// TODO Auto-generated method stub
@@ -1770,6 +1806,9 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 		}
 	}
 
+	/**
+	 * get selected group for type 4
+	 */
 	@Override
 	public ResponseEntity<?> getClientGroups(String TOKEN, Long loggedUserId, Long userId) {
 		// TODO Auto-generated method stub

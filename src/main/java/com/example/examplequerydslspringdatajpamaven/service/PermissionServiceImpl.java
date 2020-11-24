@@ -25,6 +25,9 @@ public class PermissionServiceImpl  implements PermissionService{
 	
 	GetObjectResponse getObjectResponse;
 	
+	/**
+	 * add permission in body data
+	 */
 	@Override
 	public ResponseEntity<?> addPermission(Permission permission) {
 		// TODO Auto-generated method stub
@@ -47,6 +50,9 @@ public class PermissionServiceImpl  implements PermissionService{
 		 return  ResponseEntity.ok().body(getObjectResponse);
 	}
 
+	/**
+	 * get pemission  by id 
+	 */
 	@Override
 	public Permission findById(Long Id) {
 		// TODO Auto-generated method stub
@@ -61,6 +67,9 @@ public class PermissionServiceImpl  implements PermissionService{
 		return permission;
 	}
 
+	/**
+	 * edit permission by id in body mandatory
+	 */
 	@Override
 	public ResponseEntity<?> editPermission(Permission permission) {
 		// TODO Auto-generated method stub
@@ -92,6 +101,9 @@ public class PermissionServiceImpl  implements PermissionService{
 		 return  ResponseEntity.ok().body(getObjectResponse);
 	}
 
+	/**
+	 * delete permission by id
+	 */
 	@Override
 	public ResponseEntity<?> deletePermission(Long PermissionId) {
 		// TODO Auto-generated method stub
@@ -115,6 +127,9 @@ public class PermissionServiceImpl  implements PermissionService{
 		 return  ResponseEntity.ok().body(getObjectResponse);
 	}
 
+	/**
+	 * get list of all permissions
+	 */
 	@Override
 	public List<Permission> getPermissionsList() {
 		// TODO Auto-generated method stub

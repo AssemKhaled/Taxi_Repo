@@ -73,6 +73,11 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 	@Autowired
 	MongoEventsRepo mongoEventsRepo;
 	
+	
+	
+	/**
+	 * get chart of status (online,offline,out of network) and total devices
+	 */
 	@Override
 	public ResponseEntity<?> getStatus(String TOKEN, Long userId) {
 		logger.info("************************ getDevicesStatusAndDrives STARTED ***************************");
@@ -177,6 +182,10 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 	}
 
 
+	/**
+	 * get chart of distance and fuel from summary report traccar for top 10 today
+	 *  
+	 */
 	@Override
 	public ResponseEntity<?> getDistanceFuelEngine(String TOKEN, Long userId) {
 		logger.info("************************ getDistanceFuelEngine STARTED ***************************");
@@ -523,6 +532,9 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 	}
 
 
+	/**
+	 * get number notification type chart for each one (offline,online,alarm ..etc)
+	 */
 	@Override
 	public ResponseEntity<?> getNotificationsChart(String TOKEN, Long userId) {
 		logger.info("************************ getNotifications STARTED ***************************");
@@ -917,6 +929,9 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 	}
 
 
+	/**
+	 * get top 10 device and driver working hours and ignition on off for today
+	 */
 	@Override
 	public ResponseEntity<?> getMergeHoursIgnition(String TOKEN, Long userId) {
 		logger.info("************************ getIgnitionMotion STARTED ***************************");

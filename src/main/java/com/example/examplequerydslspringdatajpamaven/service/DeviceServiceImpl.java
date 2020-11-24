@@ -110,6 +110,9 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	@Value("${sendCommand}")
 	private String sendCommand;
 	
+	/**
+	 * get list device by limit 10
+	 */
 	@Override
 	public ResponseEntity<?> getAllUserDevices(String TOKEN,Long userId , int offset, String search) {
 		// TODO Auto-generated method stub
@@ -187,6 +190,9 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		 return  ResponseEntity.ok().body(getObjectResponse);
 	}
 
+	/**
+	 * create device with data in body
+	 */
 	@Override
 	public ResponseEntity<?> createDevice(String TOKEN,Device device,Long userId) {
 		// TODO Auto-generated method stub
@@ -339,6 +345,10 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		}
 		
 	}
+	
+	/**
+	 * edit device by id in body mandatory
+	 */
 	@Override
 	public ResponseEntity<?> editDevice(String TOKEN,Device device, Long userId) {
 		logger.info("************************ editDevice STARTED ***************************");
@@ -569,6 +579,9 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		
 	}
 
+	/**
+	 * delete device by id
+	 */
 	@Override
 	public  ResponseEntity<?> deleteDevice(String TOKEN,Long userId,Long deviceId) {
 		 logger.info("************************ deleteDevice ENDED ***************************");
@@ -720,6 +733,9 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		
 	}
 
+	/**
+	 * get device by id
+	 */
 	@Override
 	public ResponseEntity<?>  findDeviceById(String TOKEN,Long deviceId, Long userId) {
 		// TODO Auto-generated method stub
@@ -813,6 +829,9 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		
 	}
 
+	/**
+	 * assign driver to device
+	 */
 	@Override
 	public ResponseEntity<?> assignDeviceToDriver(String TOKEN,Long deviceId,Long driverId,Long userId) {
 		logger.info("************************ assignDeviceToDriver STARTED ***************************");
@@ -982,6 +1001,9 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		}
 	}
 
+	/**
+	 * assgin multi geofences to device
+	 */
 	@Override
 	public ResponseEntity<?> assignDeviceToGeofences(String TOKEN,Long deviceId , Long [] geoIds,Long userId) {
 		logger.info("************************ assignDeviceToGeofences STARTED ***************************");
@@ -1121,18 +1143,10 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		
 	}
 
-	@Override
-	public ResponseEntity<?> testgetDeviceById() {
-		// TODO Auto-generateds method stub
-		Device device ;
-		 device = deviceRepository.findOne((long) 73);
-		List<Device> devices = new ArrayList<>();
-		devices.add(device);
 	
-		 getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "login successfully",devices);
-		return  ResponseEntity.ok().body(getObjectResponse) ;
-	}
-	
+	/**
+	 * get selected devices for group
+	 */
 	@Override
 	public  ResponseEntity<?> getDeviceSelectGroup(String TOKEN,Long loggedUserId,Long userId,Long groupId) {
 
@@ -1248,7 +1262,10 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		
 
 	}
-	
+
+	/**
+	 * get select device list
+	 */
 	@Override
 	public  ResponseEntity<?> getDeviceSelect(String TOKEN,Long loggedUserId,Long userId) {
 
@@ -1353,6 +1370,9 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 
 	}
 
+	/**
+	 * get assigned driver
+	 */
 	@Override
 	public ResponseEntity<?> getDeviceDriver(String TOKEN,Long deviceId) {
 		// TODO Auto-generated method stub
@@ -1413,6 +1433,10 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		
 		
 	}
+	
+	/**
+	 * get assigned geofence
+	 */
 	@Override
 	public ResponseEntity<?> getDeviceGeofences(String TOKEN,Long deviceId) {
 		// TODO Auto-generated method stub
@@ -1468,6 +1492,9 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		
 	}
 
+	/**
+	 * get numbers of status (online,offline,out of network,ignitionON,ignitionOFF,moving,stopped,totalDevices,drivers)
+	 */
 	@Override
 	public ResponseEntity<?> getDeviceStatus(String TOKEN,Long userId) {
 		logger.info("************************ getDevicesStatusAndDrives STARTED ***************************");
@@ -1605,6 +1632,9 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		 }
 	}
 
+	/**
+	 * get data of devices by limit 10 if it has position get data from mongo if no get only intial data
+	 */
 	@Override
 	public ResponseEntity<?> getAllDeviceLiveData(String TOKEN,Long userId,int offset,String search) {
 		// TODO Auto-generated method stub
@@ -1908,6 +1938,9 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	}
 
 	
+	/**
+	 * get all devices of user if has position or not and check for if it online get status of it moving or stopped 
+	 */
 	@Override
 	public ResponseEntity<?> getAllDeviceLiveDataMap(String TOKEN,Long userId) {
 		// TODO Auto-generated method stub
@@ -2039,7 +2072,10 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	}
 		
 		
-
+	/**
+	 * get vehicle info if has position or not
+	 */
+    @Override
 	public ResponseEntity<?> vehicleInfo(String TOKEN,Long deviceId,Long userId) {
 		logger.info("************************ vehicleInfo STARTED ***************************");
 
@@ -2235,6 +2271,9 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 
 	}
 
+    /**
+     * assign device to another user only admin or client
+     */
 	@Override
 	public ResponseEntity<?> assignDeviceToUser(String TOKEN,Long userId, Long deviceId, Long toUserId) {
 		// TODO Auto-generated method stub
@@ -2393,6 +2432,10 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	   return false;
    }
 
+   
+   /**
+    * get calibration data of device
+    */
     @Override
 	public ResponseEntity<?> getCalibrationData(String TOKEN,Long userId, Long deviceId) {
 	// TODO Auto-generated method stub
@@ -2498,6 +2541,10 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				}
 			}
    }
+    
+    /**
+     * add calibration dat in body for device "calibrationData"
+     */
     @Override
 	public ResponseEntity<?> addDataToCaliberation(String TOKEN,Long userId, Long deviceId,Map<String, List> data) {
 	// TODO Auto-generated method stub
@@ -2608,6 +2655,9 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		}
    }
     
+    /**
+     * add fuel data to device in body "fuel"
+     */
     @Override
 	public ResponseEntity<?> addDataToFuel(String TOKEN,Long userId, Long deviceId,Map<String, Object> data) {
 	// TODO Auto-generated method stub
@@ -2712,6 +2762,10 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				}
 			}
    }
+    
+    /**
+     * get fuel data of device
+     */
     @Override
 	public ResponseEntity<?> getFuelData(String TOKEN,Long userId, Long deviceId) {
 	// TODO Auto-generated method stub
@@ -2871,6 +2925,9 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			}
    }
 
+    /**
+     * get sensor setting of device
+     */
 	@Override
 	public ResponseEntity<?> getSensorSettings(String TOKEN, Long userId, Long deviceId) {
 		// TODO Auto-generated method stub
@@ -2978,6 +3035,10 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			}
 		}
 	}
+	
+	/**
+	 * get icon name of device
+	 */
 	@Override
 	public ResponseEntity<?> getIcon(String TOKEN, Long userId, Long deviceId) {
 		// TODO Auto-generated method stub
@@ -3091,6 +3152,10 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		}
 	}
 
+	
+	/**
+	 * add data of sensor setting to device in body "sensorSettings"
+	 */
 	@Override
 	public ResponseEntity<?> addSensorSettings(String TOKEN, Long userId, Long deviceId, Map<String, Object> data) {
 		// TODO Auto-generated method stub
@@ -3194,7 +3259,13 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			}
 		}
 	}
+	
+	
+	
 
+	/**
+	 * get selected items of device for notification , attributes
+	 */
 	@Override
 	public ResponseEntity<?> getDeviceDataSelected(String TOKEN, Long deviceId, String type) {
 		// TODO Auto-generated method stub
@@ -3268,6 +3339,9 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
         return timeUnit.convert(diffInMillies, TimeUnit.MILLISECONDS);
     }
 
+	/**
+	 * add icon to device by "icon" in body
+	 */
 	@Override
 	public ResponseEntity<?> addIcon(String TOKEN, Long userId, Long deviceId, Map<String, Object> data) {
 		// TODO Auto-generated method stub
@@ -3372,8 +3446,13 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				
 			}
 		}
+		
 	}
 
+	
+	/**
+	 * send command to traccar 
+	 */
 	@Override
 	public ResponseEntity<?> sendCommand(String TOKEN, Long userId, Long deviceId, Map<String, Object> data) {
 		// TODO Auto-generated method stub
@@ -3574,6 +3653,10 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 
 	}
 
+	
+	/**
+	 * assign device to user type 4 from type 3
+	 */
 	@Override
 	public ResponseEntity<?> assignClientDevices(String TOKEN, Long loggedUserId, Long userId, Long[] deviceIds) {
 		// TODO Auto-generated method stub
@@ -3697,6 +3780,9 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		}
 	}
 
+	/**
+	 * get devices of type 4
+	 */
 	@Override
 	public ResponseEntity<?> getClientDevices(String TOKEN, Long loggedUserId, Long userId) {
 		// TODO Auto-generated method stub
@@ -3770,7 +3856,11 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		logger.info("************************ assignClientUsers ENDED ***************************");
 		return ResponseEntity.ok().body(getObjectResponse);
 	}
-
+	
+	
+	/**
+	 * list of unassigned devices to type 4
+	 */
 	@Override
 	public ResponseEntity<?> getDeviceUnSelect(String TOKEN,Long loggedUserId, Long userId) {
 		// TODO Auto-generated method stub
@@ -3915,6 +4005,9 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		return null;
 	}
 
+	/**
+	 * update devices have calibration and no line data 
+	 */
 	@Override
 	public ResponseEntity<?> updateLineData() {
 		// TODO Auto-generated method stub

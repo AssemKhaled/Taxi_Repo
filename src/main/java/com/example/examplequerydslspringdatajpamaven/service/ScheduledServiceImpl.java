@@ -104,6 +104,9 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 	 private String emaiFrom;
 	 
 	 
+	 /**
+	  * create schedule by data in body 
+	  */
 	@Override
 	public ResponseEntity<?> createScheduled(String TOKEN, Schedule schedule, Long userId) {
 		logger.info("************************ createScheduled STARTED ***************************");
@@ -228,6 +231,9 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 		}	
 	}
 
+	/**
+	 * get list of schedule with limit 10
+	 */
 	@Override
 	public ResponseEntity<?> getScheduledList(String TOKEN, Long id, int offset, String search) {
         logger.info("************************ getScheduledList STARTED ***************************");
@@ -363,6 +369,9 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 		}
 	}
 
+	/**
+	 * get schedule by id
+	 */
 	@Override
 	public ResponseEntity<?> getScheduledById(String TOKEN, Long scheduledId, Long userId) {
 		
@@ -450,6 +459,10 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 
 	}
 
+	
+	/**
+	 * delete schedule by id
+	 */
 	@Override
 	public ResponseEntity<?> deleteScheduled(String TOKEN, Long scheduledId, Long userId) {
 		// TODO Auto-generated method stub
@@ -587,6 +600,10 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 		return  ResponseEntity.ok().body(getObjectResponse);
 	}
 
+	
+	/**
+	 * edit schedule by data in body and id is mandatory
+	 */
 	@Override
 	public ResponseEntity<?> editScheduled(String TOKEN, Schedule schedule, Long userId) {
 		// TODO Auto-generated method stub
@@ -2839,6 +2856,9 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 		return true;
 	}
 
+	/**
+	 * get select list of schedule
+	 */
 	@Override
 	public ResponseEntity<?> getScheduledSelect(String TOKEN, Long userId) {
 		// TODO Auto-generated method stub

@@ -830,12 +830,13 @@ public class MongoPositionRepo {
                 	position.put("hours","0");
 
                     if(object.has("todayHours")) {
-                    	                    	
+                    	System.out.println( object.getString("todayHoursString"));
+
+                    	System.out.println((long) object.getDouble("todayHours"));
                     	long min = TimeUnit.MILLISECONDS.toMinutes((long) object.getDouble("todayHours"));
                     	
                     	Double hours = (double) min;
 						double roundOffDistance = Math.round(hours * 100.0) / 100.0;
-
                     	position.put("hours",hours/60);
 
 	            	}

@@ -36,14 +36,12 @@ public interface DeviceService {
 	
 	public ResponseEntity<?> assignDeviceToGeofences(String TOKEN,Long deviceId,Long [] geoIds,Long userId );
 
-	public ResponseEntity<?> testgetDeviceById();
-
 	public ResponseEntity<?> getDeviceDriver(String TOKEN,Long deviceId);
 		
 	public ResponseEntity<?> getDeviceGeofences(String TOKEN,Long deviceId);
 	
 	public ResponseEntity<?> getDeviceStatus(String TOKEN,Long userId);
-	//here
+	
 	public ResponseEntity<?> getAllDeviceLiveData(String TOKEN,Long userId,int offset,String search);
 	
 	public ResponseEntity<?> vehicleInfo(String TOKEN,Long deviceId,Long userId);

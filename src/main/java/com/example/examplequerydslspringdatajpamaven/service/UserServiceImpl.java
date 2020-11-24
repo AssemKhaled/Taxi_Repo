@@ -79,6 +79,9 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 		
 	}
 	
+	/**
+	 * get user by id
+	 */
 	@Override
 	public  ResponseEntity<?> findUserById(String TOKEN,Long userId,Long loggedUserId) {
 		// TODO Auto-generated method stub
@@ -198,6 +201,10 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 		
 	}
 
+	
+	/**
+	 * get user list with limit 10 of userId and active or not
+	 */
 	@Override
 	public ResponseEntity<?> usersOfUser(String TOKEN,Long userId,Long loggedUserId,int offset,String search,int active) {
 		logger.info("************************ getAllUsersOfUser STARTED ***************************");
@@ -305,6 +312,10 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	}
 
 
+	
+	/**
+	 * create user with data in body
+	 */
 	@Override
 	public ResponseEntity<?> createUser(String TOKEN,User user,Long userId) {
 		
@@ -534,6 +545,10 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 		
 		return null;
 	}
+	
+	/**
+	 * edit user with data in body and id is mandatory
+	 */
 	@Override
 	public ResponseEntity<?> editUser(String TOKEN,User user,Long userId) {
 		
@@ -964,6 +979,9 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 
 
 
+	/**
+	 * get user roles to view
+	 */
 	@Override
 	public ResponseEntity<?> getUserRole(Long userId) {
 		// TODO Auto-generated method stub
@@ -1132,6 +1150,9 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 		return parents;
 	}
 
+	/**
+	 * delete user by deleteUserId
+	 */
 	@Override
 	public ResponseEntity<?> deleteUser(String TOKEN, Long userId, Long deleteUserId) {
 		// TODO Auto-generated method stub
@@ -1234,6 +1255,9 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 		
 	}
 
+	/**
+	 * active user with activeUserId 
+	 */
 	@Override
 	public ResponseEntity<?> activeUser(String TOKEN, Long userId, Long activeUserId) {
 		// TODO Auto-generated method stub
@@ -1481,6 +1505,9 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 		return childernUsers;
 	}
 	
+	/**
+	 * get childs of user to select in reports or another
+	 */
 	@Override
 	public  ResponseEntity<?> getUserSelectWithChild(String TOKEN,Long userId) {
 
@@ -1560,6 +1587,10 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 
 	}
 	
+	/**
+	 * get vendor select to chose 
+	 */
+	@Override
 	public  ResponseEntity<?> getVendorSelect(String TOKEN,Long userId) {
 
 		logger.info("************************ getVendorSelect STARTED ***************************");
@@ -1614,7 +1645,10 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 		
 
 	}
-	
+	/**
+	 * get client list to chose
+	 */
+	@Override
 	public  ResponseEntity<?> getClientSelect(String TOKEN,Long vendorId) {
 
 		logger.info("************************ getClientSelect STARTED ***************************");
@@ -1669,6 +1703,10 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 
 	}
 
+	/**
+	 * get data of user select
+	 */
+	@Override
 	public  ResponseEntity<?> getUserSelect(String TOKEN,Long userId) {
 
 		logger.info("************************ getDeviceSelect STARTED ***************************");

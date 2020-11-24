@@ -171,6 +171,10 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	private UserRoleService userRoleService;
 	
 	
+	
+	/**
+	 * login of app
+	 */
 	@Override
 	public ResponseEntity<?> loginApp(String authtorization) {
 		
@@ -246,6 +250,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		 }
 	}
 
+	/**
+	 * logout of app
+	 */
 	@Override
 	public ResponseEntity<?> logoutApp(String TOKEN) {
 		
@@ -278,6 +285,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				
 	}
 
+	/**
+	 * get data of all devices on map
+	 */
 	@Override
 	public ResponseEntity<?> getAllDeviceLiveDataMapApp(String TOKEN, Long userId) {
 
@@ -409,6 +419,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
         return timeUnit.convert(diffInMillies, TimeUnit.MILLISECONDS);
     }
 
+	/**
+	 * get summary info by device
+	 */
 	@Override
 	public ResponseEntity<?> vehicleInfoApp(String TOKEN, Long deviceId, Long userId) {
 		logger.info("************************ vehicleInfo STARTED ***************************");
@@ -603,6 +616,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		
 	}
 
+	/**
+	 * get device list with limit 3
+	 */
 	@Override
 	public ResponseEntity<?> getDevicesListApp(String TOKEN, Long userId, int offset, String search) {
 		// TODO Auto-generated method stub
@@ -762,6 +778,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		 return  ResponseEntity.ok().body(getObjectResponse);
 	}
 
+	/**
+	 * get driver list
+	 */
 	@Override
 	public ResponseEntity<?> getAllDriversApp(String TOKEN, Long id, int offset, String search) {
 		logger.info("************************ getAllDrivers STARTED ***************************");
@@ -839,7 +858,11 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		
 		
 	}
+	
 
+	/**
+	 * get data of stops of one or more device and group from traccar
+	 */
 	@Override
 	public ResponseEntity<?> getStopsReportApp(String TOKEN, Long [] deviceIds, Long [] groupIds, String type, String from,
 			String to, int page, int start, int limit, Long userId) {
@@ -1218,6 +1241,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		
 	}
 
+	/**
+	 * get data of trips of one or more device and group from traccar
+	 */
 	@Override
 	public ResponseEntity<?> getTripsReportApp(String TOKEN,  Long [] deviceIds,  Long [] groupIds, String type, String from,
 			String to, int page, int start, int limit, Long userId) {
@@ -1706,6 +1732,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	     return null;
 	}
 	
+	/**
+	 * get data of summary of one or more device and group from traccar
+	 */
 	@Override
 	public ResponseEntity<?> getSummaryReportApp(String TOKEN, Long [] deviceIds, Long [] groupIds, String type, String from,
 			String to, int page, int start, int limit, Long userId) {
@@ -2070,6 +2099,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			return  ResponseEntity.ok().body(getObjectResponse);
 	}
 
+	/**
+	 * get lat and long of trip or location by id and time from ,to from mongo collection tc_positions
+	 */
 	@Override
 	public ResponseEntity<?> viewTripApp(String TOKEN, Long deviceId, String from , String to) {
 		logger.info("************************ getviewTrip STARTED ***************************");
@@ -2175,6 +2207,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		
 	}
 
+	/**
+	 * get geofence list by limit 10
+	 */
 	@Override
 	public ResponseEntity<?> getGeoListApp(String TOKEN, Long id, int offset, String search) {
 		
@@ -2262,6 +2297,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		
 	}
 
+	/**
+	 * get geofence by id 
+	 */
 	@Override
 	public ResponseEntity<?> getGeofenceByIdApp(String TOKEN, Long geofenceId, Long userId) {
 		logger.info("************************ getGeofenceById STARTED ***************************");
@@ -2358,6 +2396,10 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 	}
 
+
+	/**
+	 * delete geofence by id
+	 */
 	@Override
 	public ResponseEntity<?> deleteGeofenceApp(String TOKEN, Long geofenceId, Long userId) {
 
@@ -2473,6 +2515,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 	}
 
+	/**
+	 * add geofence by data in body
+	 */
 	@Override
 	public ResponseEntity<?> addGeofenceApp(String TOKEN, Geofence geofence, Long id) {
 		logger.info("************************ addGeofence STARTED ***************************");
@@ -2586,6 +2631,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		
 	}
 
+	/**
+	 * edit geofence by id in body is mandatory
+	 */
 	@Override
 	public ResponseEntity<?> editGeofenceApp(String TOKEN, Geofence geofence, Long id) {
 		logger.info("************************ editGeofence STARTED ***************************");
@@ -2737,6 +2785,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		}
 	}
 
+	/**
+	 * get geofence select list
+	 */
 	@Override
 	public ResponseEntity<?> getGeofenceSelectApp(String TOKEN, Long userId) {
 		logger.info("************************ getGeofenceSelect STARTED ***************************");
@@ -2814,6 +2865,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	
 	}
 
+	/**
+	 * get driver by id to edit
+	 */
 	@Override
 	public ResponseEntity<?> getDriverByIdApp(String TOKEN, Long driverId, Long userId) {
 		logger.info("************************ getDriverById STARTED ***************************");
@@ -2909,6 +2963,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 	}
 
+	/**
+	 * delete driver by id
+	 */
 	@Override
 	public ResponseEntity<?> deleteDriverApp(String TOKEN, Long driverId, Long userId) {
 		
@@ -3020,6 +3077,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		
 	}
 
+	/**
+	 * add driver with data in body
+	 */
 	@Override
 	public ResponseEntity<?> addDriverApp(String TOKEN, Driver driver, Long id) {
 
@@ -3175,6 +3235,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 	}
 
+	/**
+	 * edit driver with id in body is mandatory
+	 */
 	@Override
 	public ResponseEntity<?> editDriverApp(String TOKEN, Driver driver, Long id) {
 		logger.info("************************ editDriver STARTED ***************************");
@@ -3396,6 +3459,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 	}
 
+	/**
+	 * get unassigned list to but in select list 
+	 */
 	@Override
 	public ResponseEntity<?> getUnassignedDriversApp(String TOKEN, Long userId) {
 		// TODO Auto-generated method stub
@@ -3466,7 +3532,10 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			
 		}
 	}
-
+	
+	/**
+	 * get driver list to put in selection
+	 */
 	@Override
 	public ResponseEntity<?> getDriverSelectApp(String TOKEN, Long userId) {
 		logger.info("************************ getDriverSelect STARTED ***************************");
@@ -3545,6 +3614,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	
 	}
 
+	/**
+	 * create device with data in body
+	 */
 	@Override
 	public ResponseEntity<?> createDeviceApp(String TOKEN, Device device, Long userId) {
 		// TODO Auto-generated method stub
@@ -3694,6 +3766,10 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		
 	}
 
+	
+	/**
+	 * edit device data by id of device in body is mandatory
+	 */
 	@Override
 	public ResponseEntity<?> editDeviceApp(String TOKEN, Device device, Long userId) {
 		logger.info("************************ editDevice STARTED ***************************");
@@ -3854,6 +3930,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		
 	}
 
+	/**
+	 * delete device by id
+	 */
 	@Override
 	public ResponseEntity<?> deleteDeviceApp(String TOKEN, Long userId, Long deviceId) {
 		 logger.info("************************ deleteDevice ENDED ***************************");
@@ -3974,6 +4053,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		 
 	}
 
+	/**
+	 * get device by id to edit
+	 */
 	@Override
 	public ResponseEntity<?> findDeviceByIdApp(String TOKEN, Long deviceId, Long userId) {
 		// TODO Auto-generated method stub
@@ -4066,6 +4148,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		
 	}
 
+	/**
+	 * assign driver to one device only
+	 */
 	@Override
 	public ResponseEntity<?> assignDeviceToDriverApp(String TOKEN, Long deviceId, Long driverId, Long userId) {
 		logger.info("************************ assignDeviceToDriver STARTED ***************************");
@@ -4235,6 +4320,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		}
 	}
 
+	/**
+	 * assign multi geofences to one device
+	 */
 	@Override
 	public ResponseEntity<?> assignGeofencesToDeviceApp(String TOKEN, Long deviceId, Long[] geoIds, Long userId) {
 		logger.info("************************ assignDeviceToGeofences STARTED ***************************");
@@ -4369,6 +4457,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		}
 	}
 
+	/**
+	 * get device driver to view in selected
+	 */
 	@Override
 	public ResponseEntity<?> getDeviceDriverApp(String TOKEN, Long deviceId) {
 		// TODO Auto-generated method stub
@@ -4430,6 +4521,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		
 	}
 
+	/**
+	 * get selected geofences to view
+	 */
 	@Override
 	public ResponseEntity<?> getDeviceGeofencesApp(String TOKEN, Long deviceId) {
 		// TODO Auto-generated method stub
@@ -4485,6 +4579,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		
 	}
 
+	/**
+	 * edit photo of user by data in body "photo"
+	 */
 	@Override
 	public ResponseEntity<?> updateProfilePhotoApp(String TOKEN, Map<String, String> data, Long userId) {
 		logger.info("************************ updateProfile STARTED ***************************");
@@ -4561,6 +4658,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		
 	}
 
+	/**
+	 * get info of user profile
+	 */
 	@Override
 	public ResponseEntity<?> getUserInfoApp(String TOKEN, Long userId) {
 		logger.info("************************ getUserInfo STARTED ***************************");
@@ -4609,6 +4709,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 	}
 
+	/**
+	 * cahnge password of user by data in body (oldPassword,newPassword) and check to get edit in profile or in user component
+	 */
 	@Override
 	public ResponseEntity<?> updateProfilePasswordApp(String TOKEN, Map<String, String> data, String check,
 			Long userId) {
@@ -4705,6 +4808,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		
 	}
 
+	/**
+	 * get chart number of status online , offline , out of network and total devices
+	 */
 	@Override
 	public ResponseEntity<?> getStatusApp(String TOKEN, Long userId) {
 		logger.info("************************ getDevicesStatusAndDrives STARTED ***************************");
@@ -4810,6 +4916,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		 }
 	}
 
+	/**
+	 * get chart of drier and device working hours today and number of ignition on off
+	 */
 	@Override
 	public ResponseEntity<?> getMergeHoursIgnitionApp(String TOKEN, Long userId) {
 		logger.info("************************ getIgnitionMotion STARTED ***************************");
@@ -4931,6 +5040,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		 }
 	}
 
+	/**
+	 * get chart of top 10 distance and fuel from traccar summary report
+	 */
 	@Override
 	public ResponseEntity<?> getDistanceFuelEngineApp(String TOKEN, Long userId) {
 		logger.info("************************ getDistanceFuelEngine STARTED ***************************");
@@ -5275,6 +5387,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		 }
 	}
 
+	/**
+	 * get chart of notifications number of each one (offline,online ..etc)
+	 */
 	@Override
 	public ResponseEntity<?> getNotificationsChartApp(String TOKEN, Long userId) {
         logger.info("************************ getNotifications STARTED ***************************");
@@ -5514,6 +5629,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		}
 	}
 
+	/**
+	 * get data of events of one or more device and group from mongo collection tc_events
+	 */
 	@Override
 	public ResponseEntity<?> getEventsReportApp(String TOKEN, Long[] deviceIds, Long[] groupIds, int offset, String start,
 			String end, String type, String search, Long userId) {
@@ -5928,6 +6046,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		
 	}
 
+	/**
+	 * get data of device hours for each day of one or more device and group from mongo collection tc_positions
+	 */
 	@Override
 	public ResponseEntity<?> getDeviceWorkingHoursApp(String TOKEN, Long[] deviceIds, Long[] groupIds, int offset,
 			String start, String end, String search, Long userId) {
@@ -6237,7 +6358,10 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		}		  
 				  
 	}
-
+	
+	/**
+	 * get data of custom attributes (ignition,motion ...etc) of one or more device and group from mongo collection tc_positions
+	 */
 	@Override
 	public ResponseEntity<?> getCustomReportApp(String TOKEN, Long[] deviceIds, Long[] groupIds, int offset, String start,
 			String end, String search, Long userId, String custom, String value) {
@@ -6558,6 +6682,10 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		}		    
 			
 	}
+	
+	/**
+	 * get data of driver hours for each day of one or more driver and group from mongo collection tc_positions
+	 */
 	@Override
 	public ResponseEntity<?> getDriverWorkingHoursApp(String TOKEN, Long[] driverIds, Long[] groupIds, int offset,
 			String start, String end, String search, Long userId) {
@@ -6869,6 +6997,10 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			return  ResponseEntity.ok().body(getObjectResponse);
 		}	
 	}
+	
+	/**
+	 * get data of driving more than 4 hours of one or more device , driver and group from traccar
+	 */
 	@Override
 	public ResponseEntity<?> getDriveMoreThanReportApp(String TOKEN, Long[] deviceIds, Long[] driverIds, Long[] groupIds,
 			String type, String from, String to, int page, int start, int limit, Long userId) {
@@ -7362,6 +7494,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			return  ResponseEntity.ok().body(getObjectResponse);
 	}
 	
+	/**
+	 * get data of events of one or more device and group from traccar
+	 */
 	@Override
 	public ResponseEntity<?> getEventsReportByTypeApp(String TOKEN, Long[] deviceIds, Long[] groupIds, String type,
 			String from, String to, int page, int start, int limit, Long userId) {
@@ -7695,6 +7830,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			return  ResponseEntity.ok().body(getObjectResponse);
 	}
 	
+	/**
+	 * get data of sensor (weight,sensor1,sensor2) of one or more device and group from mongo collection tc_positions
+	 */
 	@Override
 	public ResponseEntity<?> getSensorsReportApp(String TOKEN, Long[] deviceIds, Long[] groupIds, int offset, String start,
 			String end, String search, Long userId) {
@@ -8000,6 +8138,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	
 	}
 	
+	/**
+	 * get data of all trips number of one or more device, driver and group from traccar
+	 */
 	@Override
 	public ResponseEntity<?> getNumTripsReportApp(String TOKEN, Long[] deviceIds, Long[] driverIds, Long[] groupIds,
 			String type, String from, String to, int page, int start, int limit, Long userId) {
@@ -8395,6 +8536,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 	}
 
+	/**
+	 * get data of all stops number of one or more driver ,device and group from traccar
+	 */
 	@Override
 	public ResponseEntity<?> getNumStopsReportApp(String TOKEN, Long[] deviceIds, Long[] driverIds, Long[] groupIds,
 			String type, String from, String to, int page, int start, int limit, Long userId) {
@@ -8792,6 +8936,10 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			 logger.info("************************ getNumStopsReport ENDED ***************************");
 			return  ResponseEntity.ok().body(getObjectResponse);
 	}
+	
+	/**
+	 * get totalDrivingHours , totalDistance , totalSpentFuel for trips of driver , device and group from traccar
+	 */
 	@Override
 	public ResponseEntity<?> geTotalTripsReportApp(String TOKEN, Long[] deviceIds, Long[] driverIds, Long[] groupIds,
 			String type, String from, String to, int page, int start, int limit, Long userId) {
@@ -9243,7 +9391,11 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				 logger.info("************************ geTotalTripsReport ENDED ***************************");
 				return  ResponseEntity.ok().body(getObjectResponse);
 	}
+
 	
+	/**
+	 * get totalDuration , totalEngineHours , totalSpentFuel for stops of driver , device and group from traccar
+	 */
 	@Override
 	public ResponseEntity<?> getTotalStopsReportApp(String TOKEN, Long[] deviceIds, Long[] driverIds, Long[] groupIds,
 			String type, String from, String to, int page, int start, int limit, Long userId) {
@@ -9723,6 +9875,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				return  ResponseEntity.ok().body(getObjectResponse);
 	}
 
+	/**
+	 * number of drivering hours during period for driver and group from mongo collection tc_positions
+	 */
 	@Override
 	public ResponseEntity<?> getNumberDriverWorkingHoursApp(String TOKEN, Long[] driverIds, Long[] groupIds, int offset,
 			String start, String end, String search, Long userId) {
@@ -10064,6 +10219,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			
 	}
 
+	/**
+	 * get devices select list for selection
+	 */
 	@Override
 	public ResponseEntity<?> getDeviceSelectApp(String TOKEN, Long userId) {
 		// TODO Auto-generated method stub

@@ -116,7 +116,7 @@ public class GroupsRestController {
 			                                               @RequestParam (value = "type", defaultValue = "") String type) {
 		
 			
-			return groupsServiceImpl.getGroupDevices(TOKEN,groupId,type);
+		return groupsServiceImpl.getGroupDevices(TOKEN,groupId,type);
 
 	}
 	

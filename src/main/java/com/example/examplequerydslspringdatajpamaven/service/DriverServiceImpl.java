@@ -63,6 +63,10 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 	@Autowired
 	UserClientDriverRepository userClientDriverRepository;
 	
+	
+	/**
+	 * get drivers list with limit 10
+	 */
 	@Override
 	public ResponseEntity<?> getAllDrivers(String TOKEN,Long id,int offset,String search) {
 		
@@ -156,7 +160,10 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 		return driverRepository.checkDublicateDriverInAddUniqueMobile(uniqueId,mobileNum,email);
 
 	}
-	
+
+	/**
+	 * add driver by data in body
+	 */
 	@Override
 	public ResponseEntity<?> addDriver(String TOKEN,Driver driver,Long id) {
 
@@ -337,6 +344,9 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 
 	}
 	
+	/**
+	 * edit driver by id in body mandatory
+	 */
 	@Override
 	public ResponseEntity<?> editDriver(String TOKEN,Driver driver,Long id) {
 		logger.info("************************ editDriver STARTED ***************************");
@@ -566,6 +576,9 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 	}
 
 
+	/**
+	 * get driver by id
+	 */
 	@Override
 	public ResponseEntity<?> findById(String TOKEN,Long driverId,Long userId) {
 		logger.info("************************ getDriverById STARTED ***************************");
@@ -661,6 +674,9 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 
 	}
 	
+	/**
+	 * delete driver by id
+	 */
 	@Override
 	public ResponseEntity<?> deleteDriver(String TOKEN,Long driverId,Long userId) {
 		
@@ -779,6 +795,9 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 
 	}
 
+	/**
+	 * get unassigned drivers to any device
+	 */
 	@Override
 	public ResponseEntity<?> getUnassignedDrivers(String TOKEN,Long loggedUserId,Long userId,Long deviceId) {
 		// TODO Auto-generated method stub
@@ -920,6 +939,10 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 		}
 	}
 
+	/**
+	 * get driver select list
+	 */
+	@Override
 	public  ResponseEntity<?> getDriverSelect(String TOKEN,Long loggedUserId,Long userId) {
 
 		logger.info("************************ getDriverSelect STARTED ***************************");
@@ -1021,6 +1044,10 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 
 	}
 	
+	/**
+	 * get selected driver of group
+	 */
+	@Override
 	public  ResponseEntity<?> getDriverSelectGroup(String TOKEN,Long loggedUserId,Long userId,Long groupId) {
 
 		logger.info("************************ getDriverSelect STARTED ***************************");
@@ -1174,7 +1201,11 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 		   }
 		   return false;
 	   }
-
+	 
+	 
+    /**
+     * assign driver to user used by type admin or vendor only
+     */
 	@Override
 	public ResponseEntity<?> assignDriverToUser(String TOKEN,Long userId, Long driverId, Long toUserId) {
 		// TODO Auto-generated method stub
@@ -1300,6 +1331,9 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 	}
 	
 
+	/**
+	 * assign driver to type 4 from type 3
+	 */
 	@Override
 	public ResponseEntity<?> assignClientDrivers(String TOKEN, Long loggedUserId, Long userId, Long[] driverIds) {
 		// TODO Auto-generated method stub
@@ -1423,6 +1457,9 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 		}
 	}
 
+	/**
+	 * get drivers who selected to user type 4
+	 */
 	@Override
 	public ResponseEntity<?> getClientDrivers(String TOKEN, Long loggedUserId, Long userId) {
 		// TODO Auto-generated method stub
@@ -1497,6 +1534,9 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 		return ResponseEntity.ok().body(getObjectResponse);
 	}
 
+	/**
+	 * get unselect driver of type 3 to any type 4
+	 */
 	@Override
 	public ResponseEntity<?> getDriverUnSelectOfClient(String TOKEN, Long loggedUserId, Long userId) {
 		// TODO Auto-generated method stub

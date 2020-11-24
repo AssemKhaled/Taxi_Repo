@@ -129,7 +129,7 @@ public class AppRestController {
 			                                         @RequestParam(value = "userId" , defaultValue = "0")Long userId,
 			                                         @RequestParam (value = "geoIds", defaultValue = "")Long [] geoIds) {
 	
-				return appService.assignGeofencesToDeviceApp(TOKEN,deviceId,geoIds,userId);	
+		return appService.assignGeofencesToDeviceApp(TOKEN,deviceId,geoIds,userId);	
 				
 	}
 	
@@ -138,7 +138,7 @@ public class AppRestController {
 			                               @RequestParam (value = "deviceId",defaultValue = "0") Long deviceId,
 			                               @RequestParam(value = "userId",defaultValue = "0") Long userId) {
 
-			 return  appService.findDeviceByIdApp(TOKEN,deviceId,userId);
+		return  appService.findDeviceByIdApp(TOKEN,deviceId,userId);
 	}
 	
 	@GetMapping(value = "/getDeviceDriverApp")
@@ -152,7 +152,7 @@ public class AppRestController {
 			                                                  @RequestParam (value = "deviceId",defaultValue = "0") Long deviceId) {
 		
 			
-			return appService.getDeviceGeofencesApp(TOKEN,deviceId);
+		return appService.getDeviceGeofencesApp(TOKEN,deviceId);
 
 	}
 	

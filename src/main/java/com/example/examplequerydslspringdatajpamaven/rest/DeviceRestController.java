@@ -106,13 +106,10 @@ public class DeviceRestController {
 			                                         @RequestParam(value = "userId" , defaultValue = "0")Long userId,
 			                                         @RequestParam (value = "geoIds", defaultValue = "")Long [] geoIds) {
 	
-				return deviceService.assignDeviceToGeofences(TOKEN,deviceId,geoIds,userId);	
+	     return deviceService.assignDeviceToGeofences(TOKEN,deviceId,geoIds,userId);	
 				
 	}
-	@GetMapping(path = "/testResponse")
-	public ResponseEntity<?> testResponse(){
-		 return deviceService.testgetDeviceById();
-	 }
+
 	
 	@GetMapping(value = "/getDeviceDriver")
 	public @ResponseBody ResponseEntity<?> getDeviceDriver(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,

@@ -54,6 +54,9 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
     UserClientPointRepository userClientPointRepository;
 	
 	
+	/**
+	 * get list of points limit 10
+	 */
 	@Override
 	public ResponseEntity<?> getPointsList(String TOKEN, Long id, int offset, String search) {
 		 logger.info("************************ getPointsList STARTED ***************************");
@@ -200,6 +203,9 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 		}
 	}
 
+	/**
+	 * get points by id
+	 */
 	@Override
 	public ResponseEntity<?> getPointsById(String TOKEN, Long PointId, Long userId) {
 		// TODO Auto-generated method stub
@@ -306,6 +312,9 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 		return  ResponseEntity.ok().body(getObjectResponse);
 	}
 
+	/**
+	 * delete points by id 
+	 */
 	@Override
 	public ResponseEntity<?> deletePoints(String TOKEN, Long PointId, Long userId) {
 		// TODO Auto-generated method stub
@@ -426,6 +435,9 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 
 	}
 
+	/**
+	 * create points in body
+	 */
 	@Override
 	public ResponseEntity<?> createPoints(String TOKEN, Points point, Long userId) {
 		logger.info("************************ createPoints STARTED ***************************");
@@ -554,6 +566,9 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 		}	
 	}
 
+	/**
+	 * edit point in body id mandatory
+	 */
 	@Override
 	public ResponseEntity<?> editPoints(String TOKEN, Points point, Long userId) {
     	String newPhoto= point.getPhoto();
@@ -715,6 +730,9 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 			    
 	}
 
+	/**
+	 * get points on map
+	 */
 	@Override
 	public ResponseEntity<?> getPointsMap(String TOKEN, Long id) {
 	 logger.info("************************ getPointsList STARTED ***************************");
@@ -830,6 +848,9 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 		}
 	}
 
+	/**
+	 * get points select list
+	 */
 	@Override
 	public ResponseEntity<?> getPointSelect(String TOKEN,Long loggedUserId, Long userId) {
 		// TODO Auto-generated method stub
@@ -928,6 +949,10 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 	
 	
 	}
+	
+	/**
+	 * get unassigned points for type 3
+	 */
 	@Override
 	public ResponseEntity<?> getPointUnSelectOfClient(String TOKEN,Long loggedUserId, Long userId) {
 		// TODO Auto-generated method stub
@@ -1018,6 +1043,11 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 	
 	
 	}
+	
+	
+	/**
+	 * assign points to type 4 from type 3
+	 */
 	@Override
 	public ResponseEntity<?> assignClientPoints(String TOKEN, Long loggedUserId, Long userId, Long[] pointIds) {
 		// TODO Auto-generated method stub
@@ -1141,6 +1171,9 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 		}
 	}
 
+	/**
+	 * get points of user type 4
+	 */
 	@Override
 	public ResponseEntity<?> getClientPoints(String TOKEN, Long loggedUserId, Long userId) {
 		// TODO Auto-generated method stub

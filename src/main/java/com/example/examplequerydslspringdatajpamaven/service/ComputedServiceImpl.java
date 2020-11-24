@@ -72,7 +72,10 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 	
 	@Autowired
 	UserClientGroupRepository userClientGroupRepository;
-	
+
+	/**
+	 * create attributes by body data 
+	 */
 	@Override
 	public ResponseEntity<?> createComputed(String TOKEN, Attribute attribute, Long userId) {
 		logger.info("************************ createComputed STARTED ***************************");
@@ -219,6 +222,9 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 		
 	}
 
+	/**
+	 * get attributes list with limit 10
+	 */
 	@Override
 	public ResponseEntity<?> getAllComputed(String TOKEN, Long id,int offset,String search) {
 		    logger.info("************************ getAllComputed STARTED ***************************");
@@ -308,6 +314,9 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 			}
 	}
 
+	/**
+	 * get attribute by id 
+	 */
 	@Override
 	public ResponseEntity<?> getComputedById(String TOKEN, Long attributeId, Long userId) {
 		logger.info("************************ getComputedById STARTED ***************************");
@@ -431,6 +440,9 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 		   return false;
 	  }
 
+	/**
+	 * edit attribute by id in body mandatory
+	 */
 	@Override
 	public ResponseEntity<?> editComputed(String TOKEN, Attribute attribute, Long id) {
 		logger.info("************************ editGeofence STARTED ***************************");
@@ -589,6 +601,9 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 		}
 	}
 
+	/**
+	 * delete attribute by id 
+	 */
 	@Override
 	public ResponseEntity<?> deleteComputed(String TOKEN, Long attributeId, Long userId) {
 		logger.info("************************ deleteComputed STARTED ***************************");
@@ -711,6 +726,9 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 		}
 	}
 
+	/**
+	 * assign attributes to group
+	 */
 	@Override
 	public ResponseEntity<?> assignComputedToGroup(String TOKEN, Long groupId, Map<String, List> data, Long userId) {
 		logger.info("************************ assignComputedToGroup STARTED ***************************");
@@ -863,6 +881,9 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 		}
 	}
 
+	/**
+	 * assign attributes to device
+	 */
 	@Override
 	public ResponseEntity<?> assignComputedToDevice(String TOKEN, Long deviceId, Map<String, List> data, Long userId) {
 		logger.info("************************ assignComputedToDevice STARTED ***************************");
@@ -1017,6 +1038,9 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 		}
 	}
 
+	/**
+	 * select list of attributes
+	 */
 	@Override
 	public ResponseEntity<?> getComputedSelect(String TOKEN,Long loggedUserId, Long userId ,Long deviceId, Long groupId) {
 		logger.info("************************ getComputedSelect STARTED ***************************");
@@ -1138,6 +1162,9 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 	
 	}
 	
+	/**
+	 * assign attributes to user type 4 from type 3
+	 */
 	@Override
 	public ResponseEntity<?> assignClientComputeds(String TOKEN, Long loggedUserId, Long userId, Long[] computedIds) {
 		// TODO Auto-generated method stub
@@ -1261,6 +1288,9 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 		}
 	}
 
+	/**
+	 * get attributes related to type 4
+	 */
 	@Override
 	public ResponseEntity<?> getClientComputeds(String TOKEN, Long loggedUserId, Long userId) {
 		// TODO Auto-generated method stub
@@ -1335,6 +1365,9 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 		return ResponseEntity.ok().body(getObjectResponse);
 	}
 
+	/**
+	 * get unselect attributes to chose from them 
+	 */
 	@Override
 	public ResponseEntity<?> getComputedUnSelect(String TOKEN,Long loggedUserId, Long userId) {
 		// TODO Auto-generated method stub

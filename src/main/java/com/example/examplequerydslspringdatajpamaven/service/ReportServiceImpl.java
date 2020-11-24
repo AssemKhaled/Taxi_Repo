@@ -129,6 +129,9 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	MongoPositionRepo mongoPositionRepo;
 	
 	
+	/**
+	 * get data of events of one or more device and group from mongo collection tc_events
+	 */
 	@Override
 	public ResponseEntity<?> getEventsReport(String TOKEN,Long [] deviceIds,Long [] groupIds,int offset,String start,String end,String type,String search,Long userId) {
 	{
@@ -458,6 +461,9 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			
     }
 	
+	/**
+	 * get data of device hours for each day of one or more device and group from mongo collection tc_positions
+	 */
 	@Override
 	public ResponseEntity<?> getDeviceWorkingHours(String TOKEN, Long[] deviceIds, Long[] groupIds, int offset,
 			String start, String end, String search, Long userId) {
@@ -772,6 +778,9 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 	}
 	
+	/**
+	 * get data of custom attributes (ignition,motion ...etc) of one or more device and group from mongo collection tc_positions
+	 */
 	@Override
 	public ResponseEntity<?> getCustomReport(String TOKEN, Long[] deviceIds, Long[] groupIds, int offset, String start,
 			String end, String search, Long userId, String custom, String value) {
@@ -1092,6 +1101,10 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		}		  
 			
 	}
+	
+	/**
+	 * get data of driver hours for each day of one or more driver and group from mongo collection tc_positions
+	 */
 	@Override
 	public ResponseEntity<?> getDriverWorkingHours(String TOKEN, Long[] driverIds, Long[] groupIds, int offset,
 			String start, String end, String search, Long userId) {
@@ -1404,7 +1417,9 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		}	
 	}
 
-
+	/**
+	 * get today notifications from mongo collection tc_events
+	 */
 	@Override
 	public ResponseEntity<?> getNotifications(String TOKEN,Long userId, int offset,String search) {
 		logger.info("************************ getNotifications STARTED ***************************");
@@ -1526,6 +1541,9 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 	}
 
+	/**
+	 * get data of stops of one or more device and group from traccar
+	 */
 	@Override
 	public ResponseEntity<?> getStopsReport(String TOKEN, Long[] deviceIds, Long[] groupIds, String type, String from,
 			String to, int page, int start, int limit, Long userId) {
@@ -1903,6 +1921,9 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		  return  ResponseEntity.ok().body(getObjectResponse);
 	}
 	
+	/**
+	 * get data of trips of one or more device and group from traccar
+	 */
 	@Override
 	public ResponseEntity<?> getTripsReport(String TOKEN, Long[] deviceIds, Long[] groupIds, String type, String from,
 			String to, int page, int start, int limit, Long userId) {
@@ -2309,6 +2330,10 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		return  ResponseEntity.ok().body(getObjectResponse);
 		
 	}
+	
+	/**
+	 * get data of driving more than 4 hours of one or more device , driver and group from traccar
+	 */
 	@Override
 	public ResponseEntity<?> getDriveMoreThanReport(String TOKEN, Long[] deviceIds, Long[] driverIds, Long[] groupIds,
 			String type, String from, String to, int page, int start, int limit, Long userId) {
@@ -2801,6 +2826,11 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			logger.info("************************ getDriveMoreThanReport ENDED ***************************");
 			return  ResponseEntity.ok().body(getObjectResponse);
 	}
+	
+	
+	/**
+	 * get data of events of one or more device and group from traccar
+	 */
 	@Override
 	public ResponseEntity<?> getEventsReportByType(String TOKEN, Long[] deviceIds, Long[] groupIds, String type,
 			String from, String to, int page, int start, int limit, Long userId) {
@@ -3134,6 +3164,9 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	}
 	
 
+	/**
+	 * get data of summary of one or more device and group from traccar
+	 */
 	@Override
 	public ResponseEntity<?> getSummaryReport(String TOKEN, Long[] deviceIds, Long[] groupIds, String type, String from,
 			String to, int page, int start, int limit, Long userId) {
@@ -3497,6 +3530,11 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			 logger.info("************************ getSummaryReport ENDED ***************************");
 			return  ResponseEntity.ok().body(getObjectResponse);
 	}
+	
+	
+	/**
+	 * get data of sensor (weight,sensor1,sensor2) of one or more device and group from mongo collection tc_positions
+	 */
 	@Override
 	public ResponseEntity<?> getSensorsReport(String TOKEN, Long[] deviceIds, Long[] groupIds, int offset, String start,
 			String end, String search, Long userId) {
@@ -3918,6 +3956,10 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	     return null;
 	}
 
+	
+	/**
+	 * get data of all stops number of one or more driver ,device and group from traccar
+	 */
 	@Override
 	public ResponseEntity<?> getNumStopsReport(String TOKEN, Long[] deviceIds, Long[] driverIds, Long[] groupIds,
 			String type, String from, String to, int page, int start, int limit, Long userId) {
@@ -4317,6 +4359,9 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	}
 
 	
+	/**
+	 * get totalDuration , totalEngineHours , totalSpentFuel for stops of driver , device and group from traccar
+	 */
 	@Override
 	public ResponseEntity<?> getTotalStopsReport(String TOKEN, Long[] deviceIds, Long[] driverIds, Long[] groupIds,
 			String type, String from, String to, int page, int start, int limit, Long userId) {
@@ -4796,6 +4841,9 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	}
 
 	
+	/**
+	 * get totalDrivingHours , totalDistance , totalSpentFuel for trips of driver , device and group from traccar
+	 */
 	@Override
 	public ResponseEntity<?> geTotalTripsReport(String TOKEN, Long[] deviceIds, Long[] driverIds, Long[] groupIds,
 			String type, String from, String to, int page, int start, int limit, Long userId) {
@@ -5248,6 +5296,10 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			return  ResponseEntity.ok().body(getObjectResponse);
 	}
 
+	
+	/**
+	 * get data of all trips number of one or more device, driver and group from traccar
+	 */
 	@Override
 	public ResponseEntity<?> getNumTripsReport(String TOKEN, Long[] deviceIds, Long[] driverIds, Long[] groupIds,
 			String type, String from, String to, int page, int start, int limit, Long userId) {
@@ -5645,6 +5697,9 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 	
 	
+	/**
+	 * get lat and long of trip or location by id and time from ,to from mongo collection tc_positions
+	 */
 	@Override
 	public ResponseEntity<?> getviewTrip(String TOKEN, Long deviceId, String from, String to) {
 		logger.info("************************ getviewTrip STARTED ***************************");
@@ -5750,6 +5805,10 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		
 	}
 
+	
+	/**
+	 * number of drivering hours during period for driver and group from mongo collection tc_positions
+	 */
 	@Override
 	public ResponseEntity<?> getNumberDriverWorkingHours(String TOKEN, Long[] driverIds, Long[] groupIds, int offset,
 			String start, String end, String search, Long userId) {

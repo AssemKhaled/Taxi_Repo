@@ -134,6 +134,9 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	@Autowired
 	private DriverServiceImpl driverServiceImpl;
 	
+	/**
+	 * delete company from elm using id to get reference key
+	 */
 	@Override
 	public ResponseEntity<?> companyDelete(String TOKEN, Long userId,Long loggedUserId) {
 		logger.info("************************ companyDelete STARTED ***************************");
@@ -415,7 +418,9 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 
 
-	
+	/**
+	 * register company in elm using id to get data
+	 */
 	@Override
 	public ResponseEntity<?> companyRegistrtaion(String TOKEN, Long userId, Long loggedUserId) {
 		// TODO Auto-generated method stub
@@ -736,6 +741,10 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			
 	}
 
+
+	/**
+	 * update company in elm using  data in body (identityNumber,commercialRecordNumber,managerPhoneNumber,managerName,managerMobileNumber)
+	 */
 	@Override
 	public ResponseEntity<?> companyUpdate(String TOKEN,Map<String, String> dataObject,Long userId,Long loggedUserId) {
 		
@@ -1048,7 +1057,10 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  }
 		
 	}
-	
+
+	/**
+	 * update device using data in body (sequenceNumber,imeiNumber)
+	 */
 	@Override
 	public ResponseEntity<?> deviceUpdate(String TOKEN, Map<String, String> dataObject, Long deviceId,Long userId) {
 		logger.info("************************ deviceUpdate STARTED ***************************");
@@ -1341,6 +1353,9 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 
 
+	/**
+	 * delete device from elm by id to get reference key
+	 */
 	@Override
 	public ResponseEntity<?> deviceDelete(String TOKEN, Long deviceId,Long userId) {
 
@@ -1634,6 +1649,9 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  }
 	}
 
+	/**
+	 * register device in elm using id to get data 
+	 */
 	@Override
 	public ResponseEntity<?> deviceRegistrtaion(String TOKEN, Long deviceId, Long userId) {
 		logger.info("************************ deviceUpdate STARTED ***************************");
@@ -1948,6 +1966,9 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  }
 	}
 
+	/**
+	 * register driver in elm using id to get data
+	 */
 	@Override
 	public ResponseEntity<?> driverRegistrtaion(String TOKEN, Long driverId,Long userId) {
 		logger.info("************************ driverRegistrtaion STARTED ***************************");
@@ -2235,6 +2256,9 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  }
 	}
 
+	/**
+	 * Verify data of device in elm by id to get reference key
+	 */
 	@Override
 	public ResponseEntity<?> deviceInquery(String TOKEN, Long deviceId,Long userId) {
 		logger.info("************************ deviceInquery STARTED ***************************");
@@ -2487,6 +2511,9 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 	}
 
+	/**
+	 * Verify company in elm with id to get reference key
+	 */
 	@Override
 	public ResponseEntity<?> companyInquery(String TOKEN, Long userId,Long loggedUserId) {
 		logger.info("************************ companyInquery STARTED ***************************");
@@ -2760,6 +2787,9 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	
 
 
+	/**
+	 * delete driver from elm using id to get reference key
+	 */
 	@Override
 	public ResponseEntity<?> driverDelete(String TOKEN, Long driverId,Long userId) {
 		logger.info("************************ driverDelete STARTED ***************************");
@@ -3036,6 +3066,9 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	}
 
 	
+	/**
+	 * Verify driver in elm using id to get reference key
+	 */
 	@Override
 	public ResponseEntity<?> driverInquery(String TOKEN, Long driverId, Long userId) {
 		logger.info("************************ driverInquery STARTED ***************************");
@@ -3297,6 +3330,9 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	}
 
 	
+	/**
+	 * update data of driver in elm by data in body (identityNumber,mobileNumber,email)
+	 */
 	@Override
 	public ResponseEntity<?> driverUpdate(String TOKEN, Map<String, String> dataObject, Long driverId, Long userId) {
 		logger.info("************************ driverUpdate STARTED ***************************");
@@ -3577,8 +3613,12 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			logger.info("************************ driverUpdate ENDED ***************************");
 			return  ResponseEntity.ok().body(getObjectResponse);	
 		  }
+          
 	}
 	
+	/**
+	 * send locations of devices from mongo collection tc_positions_elm
+	 */
 	@Override
 	public ResponseEntity<?> lastLocations() {
 		
@@ -3887,6 +3927,9 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		return  ResponseEntity.ok().body(getObjectResponse);
 	}
 
+	/**
+	 * get logs of driver company or device by ids
+	 */
 	@Override
 	public ResponseEntity<?> getLogs(String TOKEN, Long loggedUserId,Long userId,Long driverId,Long deviceId, int offset, String search) {
 		logger.info("************************ getLogs STARTED ***************************");
@@ -4222,6 +4265,9 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 
 
+	/**
+	 * set expired true if device is extend date without renew
+	 */
 	@Override
 	public ResponseEntity<?> getExpiredVehicles() {
 		// TODO Auto-generated method stub
@@ -4367,6 +4413,9 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 
 
+	/**
+	 * URL elm that get summary of data using sequenceNumber
+	 */
 	@Override
 	public ResponseEntity<?> checkBySequenceNumber(String sequenceNumber) {
 		// TODO Auto-generated method stub
@@ -4459,6 +4508,9 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 
 
+	/**
+	 * delete vehicle using data in body (companyReferenceKey,deviceReferenceKey)
+	 */
 	@Override
 	public ResponseEntity<?> deleteVehicleFromElm(String TOKEN, Long deviceId, Long userId, Map<String, String> dataObject) {
 		// TODO Auto-generated method stub

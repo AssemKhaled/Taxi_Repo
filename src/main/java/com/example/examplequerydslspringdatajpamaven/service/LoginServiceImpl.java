@@ -57,6 +57,9 @@ public class LoginServiceImpl extends RestServiceController implements LoginServ
 	GetObjectResponse getObjectResponse;
 	
 	
+	/**
+	 * login using email and password return data of user with token
+	 */
 	@Override
 	public ResponseEntity<?> login(String authorization) {
 		
@@ -137,6 +140,9 @@ public class LoginServiceImpl extends RestServiceController implements LoginServ
 	}
 
 
+	/**
+	 * logout and remove token of user 
+	 */
 	@Override
 	public ResponseEntity<?> logout(String token) {
 

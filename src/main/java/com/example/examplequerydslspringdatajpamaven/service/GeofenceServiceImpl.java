@@ -62,6 +62,9 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 	@Autowired
 	UserClientGeofenceRepository userClientGeofenceRepository;	
 	
+	/**
+	 * get list of geofences with limit 10
+	 */
 	@Override
 	public ResponseEntity<?> getAllGeofences(String TOKEN,Long id,int offset,String search) {
 
@@ -153,6 +156,10 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 	
 	}
 
+	/**
+	 * get geofence by id
+	 * 
+	 */
 	@Override
 	public ResponseEntity<?> getGeofenceById(String TOKEN,Long geofenceId,Long userId) {
 		logger.info("************************ getGeofenceById STARTED ***************************");
@@ -250,6 +257,9 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 
 	}
 
+	/**
+	 * delete geofence by id
+	 */
 	@Override
 	public ResponseEntity<?> deleteGeofence(String TOKEN,Long geofenceId,Long userId) {
 
@@ -378,6 +388,10 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 		
 	}
 	
+	
+	/**
+	 * add geofence by data in body 
+	 */
 	@Override
 	public ResponseEntity<?> addGeofence(String TOKEN,Geofence geofence,Long id) {
 		logger.info("************************ addGeofence STARTED ***************************");
@@ -511,6 +525,9 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 		
 	}
 
+	/**
+	 * edit geoefnece by id in body mandatory
+	 */
 	@Override
 	public ResponseEntity<?> editGeofence(String TOKEN,Geofence geofence,Long id) {
 
@@ -699,9 +716,12 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 		}
 	}
 
+	/**
+	 * get all geo list
+	 */
 	@Override
 	public ResponseEntity<?> getAllGeo(String TOKEN, Long id) {
-logger.info("************************ getAllUserGeofences STARTED ***************************");
+		logger.info("************************ getAllUserGeofences STARTED ***************************");
 		
 		List<Geofence> geofences = new ArrayList<Geofence>();
 		
@@ -795,6 +815,9 @@ logger.info("************************ getAllUserGeofences STARTED **************
 		   return false;
 	   }
 
+	 /**
+	  * get geofence select list
+	  */
 	@Override
 	public ResponseEntity<?> getGeofenceSelect(String TOKEN,Long loggedUserId, Long userId,Long deviceId, Long groupId) {
 		logger.info("************************ getGeofenceSelect STARTED ***************************");
@@ -937,6 +960,9 @@ logger.info("************************ getAllUserGeofences STARTED **************
 	
 	}
 	
+	/**
+	 * get unassigned geofence to any user type 4
+	 */
 	@Override
 	public ResponseEntity<?> getGeofenceUnSelectOfClient(String TOKEN,Long loggedUserId, Long userId) {
 		logger.info("************************ getGeofenceSelect STARTED ***************************");
@@ -1027,6 +1053,9 @@ logger.info("************************ getAllUserGeofences STARTED **************
 	
 	
 
+	/**
+	 * assign geofences to user type 4 from type 3
+	 */
 	@Override
 	public ResponseEntity<?> assignClientGeofences(String TOKEN, Long loggedUserId, Long userId, Long[] geofenceIds) {
 		// TODO Auto-generated method stub
@@ -1150,6 +1179,9 @@ logger.info("************************ getAllUserGeofences STARTED **************
 		}
 	}
 
+	/**
+	 * get geofneces assigned to type 4
+	 */
 	@Override
 	public ResponseEntity<?> getClientGeofences(String TOKEN, Long loggedUserId, Long userId) {
 		// TODO Auto-generated method stub
