@@ -49,9 +49,19 @@ public class CustomDeviceList{
 	private Double power;
 	private String driver_num;
 	private Long companyId;
+	private Boolean expired;
 
 	
-    public Long getCompanyId() {
+	
+    public Boolean getExpired() {
+		return expired;
+	}
+
+	public void setExpired(Boolean expired) {
+		this.expired = expired;
+	}
+
+	public Long getCompanyId() {
 		return companyId;
 	}
 
@@ -105,13 +115,14 @@ public class CustomDeviceList{
 		
 	}
 	
-	public CustomDeviceList(int id ,String deviceName,String uniqueId , String sequenceNumber,String lastUpdate, String referenceKey , String driverName ,String companyName, Long companyId,String geofenceName   ) {
+	public CustomDeviceList(int id ,String deviceName,String uniqueId , String sequenceNumber,String lastUpdate, String referenceKey , Boolean expired , String driverName ,String companyName, Long companyId,String geofenceName   ) {
 		this.id = id;
 		this.deviceName = deviceName;
 		this.uniqueId = uniqueId;
 		this.sequenceNumber = sequenceNumber;
 		this.geofenceName = geofenceName;
 		this.referenceKey = referenceKey;
+		this.expired = expired;
 		this.driverName = driverName;
 	    this.lastUpdate = lastUpdate;
 	    this.companyName = companyName;

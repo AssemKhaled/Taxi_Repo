@@ -71,6 +71,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
                      @ColumnResult(name="sequenceNumber",type=String.class),
                      @ColumnResult(name="lastUpdate",type=String.class),
                      @ColumnResult(name="referenceKey",type=String.class),
+                     @ColumnResult(name="expired",type=Boolean.class),
                      @ColumnResult(name="driverName",type=String.class),
                      @ColumnResult(name="companyName",type=String.class),
                      @ColumnResult(name="companyId",type=Long.class),
@@ -227,6 +228,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
                      @ColumnResult(name="deviceName",type=String.class),
                      @ColumnResult(name="uniqueId",type=String.class),
                      @ColumnResult(name="lastUpdate",type=String.class),
+                     @ColumnResult(name="expired",type=Boolean.class),
                      @ColumnResult(name="positionId",type=String.class),
                      @ColumnResult(name="photo",type=String.class)
 
@@ -327,7 +329,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 	     resultSetMapping="DevicesList", 
 	     query=" SELECT tc_devices.id as id ,tc_devices.name as deviceName, tc_devices.uniqueid as uniqueId,"
 	     		+ " tc_devices.sequence_number as sequenceNumber ,tc_devices.lastupdate as lastUpdate "
-	     		+ " ,tc_devices.reference_key as referenceKey, "
+	     		+ " ,tc_devices.reference_key as referenceKey, tc_devices.expired as expired, "
 	     		+ " tc_drivers.name as driverName,tc_users.name as companyName,tc_users.id as companyId ,GROUP_CONCAT(tc_geofences.name )AS geofenceName"
 	     		+ " FROM tc_devices LEFT JOIN  tc_device_driver ON tc_devices.id=tc_device_driver.deviceid"
 	     		+ " LEFT JOIN  tc_drivers ON tc_drivers.id=tc_device_driver.driverid and tc_drivers.delete_date is null" 
@@ -345,7 +347,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 	resultSetMapping="DevicesList", 
 	query=" SELECT tc_devices.id as id ,tc_devices.name as deviceName, tc_devices.uniqueid as uniqueId,"
 			+ " tc_devices.sequence_number as sequenceNumber ,tc_devices.lastupdate as lastUpdate "
-			+ " ,tc_devices.reference_key as referenceKey, "
+			+ " ,tc_devices.reference_key as referenceKey , tc_devices.expired as expired , "
 			+ " tc_drivers.name as driverName,tc_users.name as companyName,tc_users.id as companyId ,GROUP_CONCAT(tc_geofences.name )AS geofenceName"
 			+ " FROM tc_devices LEFT JOIN  tc_device_driver ON tc_devices.id=tc_device_driver.deviceid"
 			+ " LEFT JOIN  tc_drivers ON tc_drivers.id=tc_device_driver.driverid and tc_drivers.delete_date is null" 
@@ -414,7 +416,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 	@NamedNativeQuery(name="getDevicesData", 
 	resultSetMapping="DevicesData", 
 	query=" SELECT  tc_devices.id as id ,tc_devices.uniqueid as uniqueId ,tc_devices.name as deviceName ,"
-			+ " tc_devices.lastupdate as lastUpdate, " + 
+			+ " tc_devices.lastupdate as lastUpdate, tc_devices.expired as expired, " + 
 			"  tc_devices.positionid as positionId, " + 
 			" tc_devices.photo as photo  FROM tc_devices "
 			+ " INNER JOIN  tc_user_device ON tc_devices.id=tc_user_device.deviceid " 
@@ -425,7 +427,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 	@NamedNativeQuery(name="getDevicesDataByIds", 
 	resultSetMapping="DevicesData", 
 	query=" SELECT  tc_devices.id as id ,tc_devices.uniqueid as uniqueId ,tc_devices.name as deviceName ,"
-			+ " tc_devices.lastupdate as lastUpdate, " + 
+			+ " tc_devices.lastupdate as lastUpdate , tc_devices.expired as expired , " + 
 			"  tc_devices.positionid as positionId, " + 
 			" tc_devices.photo as photo  FROM tc_devices "
 			+ " where tc_devices.id IN (:deviceIds) and tc_devices.delete_date is null "

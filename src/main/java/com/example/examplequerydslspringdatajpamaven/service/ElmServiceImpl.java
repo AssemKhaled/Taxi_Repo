@@ -3643,6 +3643,8 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		List<MongoElmLastLocations> elm_connection_logs = new ArrayList<MongoElmLastLocations>();
 		List<MongoPositionsElm> positions_elm = new ArrayList<MongoPositionsElm>();
 
+		//List<Map> positions= new ArrayList<Map>();
+		//positions = mongoPositionRepo.getElmLiveLocation();
 		
 		deviceIds = deviceRepository.getAllDevicesIdsToSendLocationIds();
 		positions_elm = mongoPositionsElmRepository.findByDeviceIdIn(deviceIds,new PageRequest(0, 1000));

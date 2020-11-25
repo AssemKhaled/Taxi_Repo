@@ -57,6 +57,17 @@ public class CustomDeviceLiveData {
 	private String plate_num;
 	private String sequence_number;
 	private String owner_name;
+	private Boolean expired;
+
+	
+	
+	public Boolean getExpired() {
+		return expired;
+	}
+
+	public void setExpired(Boolean expired) {
+		this.expired = expired;
+	}
 
 	public CustomDeviceLiveData() {
 		// TODO Auto-generated constructor stub
@@ -418,11 +429,12 @@ public class CustomDeviceLiveData {
 		this.owner_name = owner_name;
 		
 	}
-	public CustomDeviceLiveData(int id ,String deviceName , String uniqueId,String lastUpdate ,String positionId,String photo) {
+	public CustomDeviceLiveData(int id ,String deviceName , String uniqueId,String lastUpdate,Boolean expired ,String positionId,String photo) {
 		this.id = id ;
 		this.uniqueId = uniqueId ;
 		this.deviceName = deviceName ;
 		this.lastUpdate = lastUpdate;
+		this.expired = expired;
 		this.positionId = positionId;
 		this.photo=photo;
 
