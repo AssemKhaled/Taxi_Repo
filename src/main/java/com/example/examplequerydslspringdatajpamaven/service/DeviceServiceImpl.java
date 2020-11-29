@@ -36,6 +36,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -48,6 +49,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoPositions;
+import com.example.examplequerydslspringdatajpamaven.entity.MongoPositionsElm;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.entity.userClientDevice;
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
@@ -4047,6 +4049,26 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	    }
 		
 		
+		return null;
+	}
+
+	/**
+	 * update positions with missing data
+	 */
+	@Override
+	public ResponseEntity<?> updatePositionData() {
+		// TODO Auto-generated method stub
+		
+		/*List<Long> deviceIds = deviceRepository.getAllDeviceIds();
+		List<Device> devices= deviceRepository.findAll();
+		System.out.println(devices.size());
+		List<MongoPositions> positions = new ArrayList<MongoPositions>();
+		positions = mongoPositionsRepository.findByDeviceIdIn(deviceIds, new PageRequest(0, 1000));
+		System.out.println(positions.get(0));
+		System.out.println(positions.get(0).getDeviceid());
+		System.out.println(positions.get(0).getDeviceName());
+		System.out.println(positions.size());*/
+
 		return null;
 	}
 }

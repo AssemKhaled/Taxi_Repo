@@ -1,6 +1,8 @@
 package com.example.examplequerydslspringdatajpamaven.repository;
 
 import java.util.List;
+
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoPositions;
@@ -19,6 +21,10 @@ public interface MongoPositionsRepository extends MongoRepository<MongoPositions
 	
 	@Query("{ '_id' : ?0 }")
 	public MongoPositions findById(String positionId);
+	
+	
+	@Query("{ 'deviceid' : { $in: ?0 } , 'deviceName' : { $exists : false }}")
+	public List<MongoPositions> findByDeviceIdIn(List<Long> deviceIds,Pageable pageable);
 	
 
 	

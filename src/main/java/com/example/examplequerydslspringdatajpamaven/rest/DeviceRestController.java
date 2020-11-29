@@ -263,6 +263,11 @@ public class DeviceRestController {
 		return deviceService.updateLineData();
 	}
 	
+	@GetMapping("/updatePositionData")
+	public ResponseEntity<?> updatePositionData() {
+		return deviceService.updatePositionData();
+	}
+	
 	
 	
 }

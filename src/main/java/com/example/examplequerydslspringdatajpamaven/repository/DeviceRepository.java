@@ -266,5 +266,8 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	@Query(value = "Select * From tc_devices Where tc_devices.sequence_number=:sequenceNumber"
 			+ " and tc_devices.delete_date is null limit 0,1", nativeQuery = true)
 	public Device getDeviceBySequenceNumber(@Param("sequenceNumber") String sequenceNumber);
+	
+	@Query(value = "select tc_devices.id from tc_devices", nativeQuery = true)
+	public List<Long> getAllDeviceIds();
 }
 
