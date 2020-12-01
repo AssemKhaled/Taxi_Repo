@@ -514,7 +514,6 @@ public class NotificationServiceImpl extends RestServiceController implements No
 					 
 					    notification.setDelete_date(currentDate);
 
-					    notificationRepository.deleteNotificationId(notificationId);
 					    notificationRepository.deleteNotificationDeviceId(notificationId);
 					    notificationRepository.deleteNotificationGroupId(notificationId);
 					    

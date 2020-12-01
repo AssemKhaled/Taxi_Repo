@@ -48,10 +48,6 @@ public interface GroupRepository extends  JpaRepository<Group, Long>, QueryDslPr
 	@Query(value = "Update tc_groups Set tc_groups.is_deleted=1 where tc_groups.id=:groupId", nativeQuery = true)
 	public void deleteGroup(@Param("groupId") Long groupId);
 	
-	@Transactional
-    @Modifying
-	@Query(value = "Delete from tc_user_group where tc_user_group.groupid=:groupId", nativeQuery = true)
-	public void deleteGroupId(@Param("groupId") Long groupId);
 	
 	@Transactional
     @Modifying

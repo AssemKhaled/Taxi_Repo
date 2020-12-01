@@ -27,13 +27,13 @@ public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslP
 	
 	@Transactional
     @Modifying
-	@Query(value = "Delete from tc_user_driver where tc_user_driver.driverid=:driverId", nativeQuery = true)
-	public void deleteDriverId(@Param("driverId") Long driverId);
+	@Query(value = "Delete from tc_device_driver where tc_device_driver.driverid=:driverId", nativeQuery = true)
+	public void deleteDriverDeviceId(@Param("driverId") Long driverId);
 	
 	@Transactional
     @Modifying
-	@Query(value = "Delete from tc_device_driver where tc_device_driver.driverid=:driverId", nativeQuery = true)
-	public void deleteDriverDeviceId(@Param("driverId") Long driverId);
+	@Query(value = "Delete from tc_group_driver where tc_group_driver.driverid=:driverId", nativeQuery = true)
+	public void deleteDriverGroupId(@Param("driverId") Long driverId);
 	
 	
 	@Query(value = "select * from tc_drivers INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id"

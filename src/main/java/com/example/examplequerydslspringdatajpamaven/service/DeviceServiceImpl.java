@@ -48,6 +48,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
+import com.example.examplequerydslspringdatajpamaven.entity.Group;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoPositionsElm;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
@@ -682,18 +683,20 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		     int year = cal.get(Calendar.YEAR);
 		     String date =  Integer.toString(year)+"-"+ Integer.toString(month)+"-"+ Integer.toString(day);
 		     device.setDelete_date(date);
+		    
 		     Set<Driver> drivers =new HashSet<>() ;
 		     drivers = device.getDriver();
 		     Set<Driver> oldDrivers =new HashSet<>() ;
 	         oldDrivers= drivers;
 	         drivers.removeAll(oldDrivers);
 	         device.setDriver(drivers);
-			 Set<User> user =new HashSet<>() ;
-		     user = device.getUser();
-		     Set<User> oldUser =new HashSet<>() ;
-	         oldUser= user;
-	         user.removeAll(oldUser);
-	         device.setUser(user);
+
+	         Set<Group> groups =new HashSet<>() ;
+		     groups = device.getGroups();
+		     Set<Group> oldGroups =new HashSet<>() ;
+		     oldGroups= groups;
+		     groups.removeAll(oldGroups);
+	         device.setGroups(groups);
 	         
 	         
 	         

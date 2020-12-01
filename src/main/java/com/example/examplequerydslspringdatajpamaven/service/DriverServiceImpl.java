@@ -753,8 +753,8 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 						return ResponseEntity.badRequest().body(getObjectResponse);
 					}
 					driverRepository.deleteDriver(driverId,currentDate);
-					driverRepository.deleteDriverId(driverId);
 					driverRepository.deleteDriverDeviceId(driverId);
+					driverRepository.deleteDriverGroupId(driverId);
 					
 					List<Long> DataDelete = userClientDriverRepository.getDriversToDelete(driverId);
 					 if(DataDelete.size()>0) {

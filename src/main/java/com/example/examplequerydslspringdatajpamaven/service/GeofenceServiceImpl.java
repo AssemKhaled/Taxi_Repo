@@ -337,9 +337,9 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 							return ResponseEntity.badRequest().body(getObjectResponse);
 						}
 						geofenceRepository.deleteGeofence(geofenceId,currentDate);
-						geofenceRepository.deleteGeofenceId(geofenceId);
 						geofenceRepository.deleteGeofenceDeviceId(geofenceId);
-						
+						geofenceRepository.deleteGeofenceGroupId(geofenceId);
+
 						List<Long> DataDelete = userClientGeofenceRepository.getGeofToDelete(geofenceId);
 						if(DataDelete.size()>0) {
 							userClientGeofenceRepository.deleteGeofById(geofenceId);

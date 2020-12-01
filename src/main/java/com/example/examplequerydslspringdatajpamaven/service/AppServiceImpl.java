@@ -2477,8 +2477,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 							return ResponseEntity.badRequest().body(getObjectResponse);
 						}
 						geofenceRepository.deleteGeofence(geofenceId,currentDate);
-						geofenceRepository.deleteGeofenceId(geofenceId);
+						geofenceRepository.deleteGeofenceGroupId(geofenceId);
 						geofenceRepository.deleteGeofenceDeviceId(geofenceId);
+						
 						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Deleted Successfully",geofences);
 						logger.info("************************ deleteGeofence ENDED ***************************");
 						return  ResponseEntity.ok().body(getObjectResponse);
@@ -3042,8 +3043,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 						return ResponseEntity.badRequest().body(getObjectResponse);
 					}
 					driverRepository.deleteDriver(driverId,currentDate);
-					driverRepository.deleteDriverId(driverId);
 					driverRepository.deleteDriverDeviceId(driverId);
+					driverRepository.deleteDriverGroupId(driverId);
+
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Deleted Successfully",drivers);
 					logger.info("************************ deleteDriver ENDED ***************************");
 					return  ResponseEntity.ok().body(getObjectResponse);
@@ -4031,18 +4033,21 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		     int year = cal.get(Calendar.YEAR);
 		     String date =  Integer.toString(year)+"-"+ Integer.toString(month)+"-"+ Integer.toString(day);
 		     device.setDelete_date(date);
+		     
 		     Set<Driver> drivers =new HashSet<>() ;
 		     drivers = device.getDriver();
 		     Set<Driver> oldDrivers =new HashSet<>() ;
 	         oldDrivers= drivers;
 	         drivers.removeAll(oldDrivers);
 	         device.setDriver(drivers);
-			 Set<User> user =new HashSet<>() ;
-		     user = device.getUser();
-		     Set<User> oldUser =new HashSet<>() ;
-	         oldUser= user;
-	         user.removeAll(oldUser);
-	         device.setUser(user);
+
+	         Set<Group> groups =new HashSet<>() ;
+		     groups = device.getGroups();
+		     Set<Group> oldGroups =new HashSet<>() ;
+		     oldGroups= groups;
+		     groups.removeAll(oldGroups);
+	         device.setGroups(groups);
+	         
 			 deviceRepository.save(device);
 		     
 		     List<Device> devices = null;

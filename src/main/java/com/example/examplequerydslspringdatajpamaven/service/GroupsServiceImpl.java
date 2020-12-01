@@ -799,15 +799,14 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 							return ResponseEntity.badRequest().body(getObjectResponse);
 						}
 						groupRepository.deleteGroup(groupId);
-						groupRepository.deleteGroupId(groupId);
 						groupRepository.deleteGroupdriverId(groupId);
 						groupRepository.deleteGroupDeviceId(groupId);
 						groupRepository.deleteGroupgeoId(groupId);
 						
 						List<Long> DataDelete = userClientGroupRepository.getGroupsToDelete(groupId);
-						 if(DataDelete.size()>0) {
-							 userClientGroupRepository.deleteGroupById(groupId);
-						 }
+						if(DataDelete.size()>0) {
+							userClientGroupRepository.deleteGroupById(groupId);
+						}
 						
 						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Deleted Successfully",groups);
 						logger.info("************************ deleteGroup ENDED ***************************");

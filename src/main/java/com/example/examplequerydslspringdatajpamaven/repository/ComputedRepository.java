@@ -40,10 +40,6 @@ public interface ComputedRepository  extends  JpaRepository<Attribute, Long>, Qu
 			"  WHERE tc_attributes.id IN(:computedIds) and tc_attributes.delete_date is null", nativeQuery = true)
 	public Integer getAllComputedSizeByIds(@Param("computedIds")List<Long> computedIds);
 	
-	@Transactional
-    @Modifying
-	@Query(value = "Delete from tc_user_attribute where tc_user_attribute.attributeid=:attributeId", nativeQuery = true)
-	public void deleteAttributeId(@Param("attributeId") Long attributeId);
 	
 	@Transactional
     @Modifying
