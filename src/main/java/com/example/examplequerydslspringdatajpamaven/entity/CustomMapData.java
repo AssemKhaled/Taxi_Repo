@@ -11,6 +11,7 @@ public class CustomMapData {
 	private Long id;
 	private String deviceName;
 	private String lastUpdate;
+	private String lastUpdateApp;
 	private String positionId;
 	private Integer status;
 	private Integer vehicleStatus;
@@ -21,6 +22,8 @@ public class CustomMapData {
 	private Double latitude;
 	private Double longitude;
 	private Double speed ;
+	private String address;
+	
 
 	public CustomMapData() {
 		
@@ -62,6 +65,47 @@ public class CustomMapData {
 		this.speed = speed;
 	}
 
+	public CustomMapData(Long id, String deviceName, String lastUpdate, String positionId, Integer status,
+			Integer vehicleStatus, Integer valid, Integer ignition, Double power, Double operator, Double latitude,
+			Double longitude, Double speed, String address) {
+		super();
+		this.id = id;
+		this.deviceName = deviceName;
+		this.lastUpdate = lastUpdate;
+		this.positionId = positionId;
+		this.status = status;
+		this.vehicleStatus = vehicleStatus;
+		this.valid = valid;
+		this.ignition = ignition;
+		this.power = power;
+		this.operator = operator;
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.speed = speed;
+		this.address = address;
+	}
+	
+	
+	public CustomMapData(Long id, String deviceName, String lastUpdate, String lastUpdateApp, String positionId,
+			Integer status, Integer vehicleStatus, Integer valid, Integer ignition, Double power, Double operator,
+			Double latitude, Double longitude, Double speed, String address) {
+		super();
+		this.id = id;
+		this.deviceName = deviceName;
+		this.lastUpdate = lastUpdate;
+		this.lastUpdateApp = lastUpdateApp;
+		this.positionId = positionId;
+		this.status = status;
+		this.vehicleStatus = vehicleStatus;
+		this.valid = valid;
+		this.ignition = ignition;
+		this.power = power;
+		this.operator = operator;
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.speed = speed;
+		this.address = address;
+	}
 	public Long getId() {
 		return id;
 	}
@@ -164,6 +208,18 @@ public class CustomMapData {
 
 	public void setSpeed(Double speed) {
 		this.speed = speed;
+	}
+	public String getAddress() {
+		return address;
+	}
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	public String getLastUpdateApp() {
+		return lastUpdateApp;
+	}
+	public void setLastUpdateApp(String lastUpdateApp) {
+		this.lastUpdateApp = lastUpdateApp;
 	}
 
 

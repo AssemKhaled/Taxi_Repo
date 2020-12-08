@@ -2043,7 +2043,7 @@ public class MongoPositionRepo {
 	            match(Criteria.where("_id").in(ids)),
 	            project("deviceid","deviceName","servertime",
 	            		"valid","attributes.ignition","attributes.power",
-	            		"attributes.operator","latitude","longitude","speed").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime"),
+	            		"attributes.operator","latitude","longitude","speed","address").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime"),
 	            sort(Sort.Direction.DESC, "servertime")
 
 	            
@@ -2069,11 +2069,19 @@ public class MongoPositionRepo {
 	            		position.setId(object.getLong("deviceid"));
 	
 	            	}
+	            	
+	            	if(object.has("address") && object.get("address").toString() != "null") {
+ 	            		position.setAddress(object.getString("address"));
+ 	
+ 	            	}
+	            	
 	            	if(object.has("deviceName") && object.get("deviceName").toString() != "null") {
 	            		position.setDeviceName(object.getString("deviceName"));
 	
 	            	}
 	            	if(object.has("servertime") && object.get("servertime").toString() != "null") {
+	            		
+	            		position.setLastUpdateApp(object.getString("servertime"));
 	            		
 						Date dateTime = null;
 						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -2187,7 +2195,7 @@ public class MongoPositionRepo {
 	            match(Criteria.where("_id").in(ids)),
 	            project("deviceid","deviceName","servertime",
 	            		"valid","attributes.ignition","attributes.power",
-	            		"attributes.operator","latitude","longitude","speed").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime"),
+	            		"attributes.operator","latitude","longitude","speed","address").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime"),
 	            sort(Sort.Direction.DESC, "servertime")
 
 	            
@@ -2213,12 +2221,18 @@ public class MongoPositionRepo {
 	            		position.setId(object.getLong("deviceid"));
 	
 	            	}
+	            	if(object.has("address") && object.get("address").toString() != "null") {
+ 	            		position.setAddress(object.getString("address"));
+ 	
+ 	            	}
+ 	            	
 	            	if(object.has("deviceName") && object.get("deviceName").toString() != "null") {
 	            		position.setDeviceName(object.getString("deviceName"));
 	
 	            	}
 	            	if(object.has("servertime") && object.get("servertime").toString() != "null") {
-	            		
+	            		position.setLastUpdateApp(object.getString("servertime"));
+
 						Date dateTime = null;
 						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
@@ -2332,7 +2346,7 @@ public class MongoPositionRepo {
  	            match(Criteria.where("_id").in(ids)),
  	            project("deviceid","deviceName","servertime",
  	            		"valid","attributes.ignition","attributes.power",
- 	            		"attributes.operator","latitude","longitude","speed").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime"),
+ 	            		"attributes.operator","latitude","longitude","speed","address").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime"),
  	            sort(Sort.Direction.DESC, "servertime")
 
  	            
@@ -2361,8 +2375,14 @@ public class MongoPositionRepo {
  	            		position.setDeviceName(object.getString("deviceName"));
  	
  	            	}
+ 	            	if(object.has("address") && object.get("address").toString() != "null") {
+ 	            		position.setAddress(object.getString("address"));
+ 	
+ 	            	}
+ 	            	
  	            	if(object.has("servertime") && object.get("servertime").toString() != "null") {
- 	            		
+	            		position.setLastUpdateApp(object.getString("servertime"));
+
 						Date dateTime = null;
 						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
