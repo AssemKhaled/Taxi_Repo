@@ -244,12 +244,12 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 			" INNER JOIN tc_user_device ON tc_user_device.deviceid=tc_devices.id " + 
 			" INNER JOIN tc_users ON tc_user_device.userid=tc_users.id " + 
 			" where " + 
-			" tc_devices.is_deleted IS NULL " + 
+			" tc_devices.delete_date IS NULL " + 
 			" AND tc_devices.positionid Is NOT NULL " + 
 			" AND tc_devices.create_date Is NOT NULL " + 
 			" AND tc_devices.expired IS False " + 
-			" AND tc_drivers.is_deleted IS NULL " + 
-			" AND tc_users.is_deleted IS NULL " + 
+			" AND tc_drivers.delete_date IS NULL " + 
+			" AND tc_users.delete_date IS NULL " + 
 			" AND tc_devices.reference_key IS NOT NULL", nativeQuery = true)
 	public List<Long> getAllDevicesIdsToSendLocationIds();
 	

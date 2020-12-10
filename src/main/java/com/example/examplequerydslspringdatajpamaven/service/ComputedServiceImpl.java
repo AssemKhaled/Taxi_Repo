@@ -682,6 +682,8 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 					 
 					    attribute.setDelete_date(currentDate);
 
+					    computedRepository.save(attribute);
+					    
 					    computedRepository.deleteAttributeDeviceId(attributeId);
 					    computedRepository.deleteAttributeGroupId(attributeId);
 					    
