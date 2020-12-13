@@ -12,9 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
-import java.util.TimeZone;
 import javax.net.ssl.SSLContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,12 +40,12 @@ import com.example.examplequerydslspringdatajpamaven.entity.ElmReturn;
 import com.example.examplequerydslspringdatajpamaven.entity.ExpiredVehicles;
 import com.example.examplequerydslspringdatajpamaven.entity.LastElmData;
 import com.example.examplequerydslspringdatajpamaven.entity.LastPositionData;
-import com.example.examplequerydslspringdatajpamaven.entity.MongoElmLastLocations;
+import com.example.examplequerydslspringdatajpamaven.entity.MongoElmLiveLocation;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoElmLogs;
-import com.example.examplequerydslspringdatajpamaven.entity.MongoPositionsElm;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.DriverRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoElmLastLocationsRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.MongoElmLiveLocationRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoElmLogsRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionRepo;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionsElmRepository;
@@ -56,8 +54,6 @@ import com.example.examplequerydslspringdatajpamaven.repository.UserClientDriver
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * services functionality related to elm
@@ -88,12 +84,14 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	@Value("${middleWare}")
 	private String middleWare;
 	
-	
 	@Value("${elm}")
 	private String elm;
 	
 	@Autowired
 	MongoPositionsElmRepository mongoPositionsElmRepository;
+	
+	@Autowired
+	MongoElmLiveLocationRepository mongoElmLiveLocationRepository;
 	
 	@Autowired
 	MongoPositionRepo mongoPositionRepo;
@@ -3636,211 +3634,30 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		 List<Map> dataArray = new ArrayList<>();
 		 List<String> ids = new ArrayList<>();
 
-		 
-		 List<Long> deviceIds = new ArrayList<Long>();
 
-
-		List<MongoElmLastLocations> elm_connection_logs = new ArrayList<MongoElmLastLocations>();
-		List<MongoPositionsElm> positions_elm = new ArrayList<MongoPositionsElm>();
-
-		//List<Map> positions= new ArrayList<Map>();
-		//positions = mongoPositionRepo.getElmLiveLocation();
+		List<MongoElmLiveLocation> positions = mongoElmLiveLocationRepository.findByIdsIn(new PageRequest(0, 1000));
 		
-		deviceIds = deviceRepository.getAllDevicesIdsToSendLocationIds();
-		positions_elm = mongoPositionsElmRepository.findByDeviceIdIn(deviceIds,new PageRequest(0, 1000));
+		for(MongoElmLiveLocation position:positions) {
+			Map record = new HashMap();
+			
+			record.put("referenceKey", position.getReferenceKey());
+			record.put("driverReferenceKey", position.getDriverReferenceKey());
+			record.put("latitude", position.getLatitude());
+			record.put("longitude", position.getLongitude());
+			record.put("velocity", position.getVelocity());
+			record.put("weight", position.getWeight());
+			record.put("locationTime", position.getLocationTime());
+			record.put("vehicleStatus", position.getVehicleStatus());
+			record.put("address", position.getAddress());
+			record.put("roleCode", position.getRoleCode());
+
+			ids.add(position.get_id().toString());
+			
+			dataArray.add(record);
+		}
 		
     	 Map body = new HashMap();
 
-		 for(MongoPositionsElm location : positions_elm) {
-				Map record = new HashMap();
-				JSONObject obj =  new JSONObject();
-				Boolean set_status = false;
-				Map<Object,Object> objectMap = new HashMap<Object, Object>();
-
-
-				if(location.getAttributes().toString().startsWith("{")) {
-
-					objectMap = (Map<Object, Object>) location.getAttributes();
-					ObjectMapper objectMapper = new ObjectMapper();
-
-			        try {
-			            String json = objectMapper.writeValueAsString(objectMap);
-						obj = new JSONObject(json);	
-
-			        } catch (JsonProcessingException e) {
-			            e.printStackTrace();
-			        }
-				}
-				
-		        
-
-				
-				if(obj.has("power")) {
-					if( obj.getDouble("power") < 1 ) {
-						record.put("vehicleStatus", "DEVICE_NOT_WORKING");
-						set_status = true;
-					}
-				
-				}
-				
-				
-			   if(obj.has("adc1") && obj.has("adc2") && !set_status) {
-
-					Double avg = ( obj.getDouble("adc1") + obj.getDouble("adc2") ) /2 ;
-					if(avg == 0)
-	                {
-						record.put("vehicleStatus", "TAMPER_WEIGHT");
-						location.setWeight((double) 0);
-						set_status = true;
-	                }
-
-
-				}
-				
-			 if(obj.has("alarm") && !set_status) {
-
-				if(obj.has("alarm")) {
-					if(obj.getString("alarm").equals("crash")) {
-						record.put("vehicleStatus", "ACCIDENT");
-						set_status = true;
-					}
-				}
-				
-			}
-				if(obj.has("operator") && !set_status) {
-					if(obj.getDouble("operator") > 0) {
-						if(obj.has("ignition")) {
-							if(location.getSpeed() == 0 && obj.get("ignition").equals(true)) {
-								record.put("vehicleStatus", "PARKED_ENGINE_ON");
-								set_status = true;
-
-							}
-							else if(location.getSpeed() == 0 && obj.get("ignition").equals(false)){
-								record.put("vehicleStatus", "PARKED_ENGINE_OFF");
-								set_status = true;
-
-							}
-							else if(location.getSpeed() > 0 ){
-								record.put("vehicleStatus", "MOVING");
-								set_status = true;
-							}
-							else {
-								record.put("vehicleStatus", "PARKED_ENGINE_OFF");
-								set_status = true;
-
-							}
-						}
-						else {
-							record.put("vehicleStatus", "PARKED_ENGINE_OFF");
-							set_status = true;
-
-						}
-					}
-					else {
-						record.put("vehicleStatus", "DEVICE_NO_SIGNAL");
-						set_status = true;
-
-					}
-				}
-				
-				
-				if(!set_status) {
-					record.put("vehicleStatus", "DEVICE_NO_SIGNAL");
-				}
-				
-				
-				
-				if(obj.has("temp")) {
-					record.put("temperature", obj.get("temp"));
-				}
-				
-				if(obj.has("hum")) {
-					record.put("humidity", obj.get("hum"));
-				}
-				
-				
-	            String calcWeightInitial = "";
-				if( (location.getWeight() == null || location.getWeight() ==0 ) 
-						&& record.get("vehicleStatus") != "TAMPER_WEIGHT"  ) {
-					Float vehicle_initial_weight = deviceRepository.getWeight(location.getDeviceid());
-					
-					Float min = vehicle_initial_weight;
-					Float max = vehicle_initial_weight+1000;
-
-					Random r = new Random();
-					Double  weight =  min + (max - min) * r.nextDouble();	
-				    
-				    Double roundOffWeight= (double) (Math.round(weight * 100.0) / 100.0);
-				    location.setWeight(roundOffWeight);
-				    calcWeightInitial = "calc from initial";
-
-				
-				}
-				
-				if(location.getWeight() > 99000) {
-					
-					location.setWeight((double) 90000);
-				}
-
-				record.put("weight", location.getWeight());
-				record.put("referenceKey", location.getDeviceReferenceKey());
-				record.put("driverReferenceKey", location.getDriverReferenceKey());
-				record.put("latitude", location.getLatitude());
-				record.put("longitude", location.getLongitude());
-				
-				Double roundOffSpeed= Math.round((location.getSpeed()*2) * 100.0) / 100.0;
-				record.put("velocity", roundOffSpeed);
-
-				Date dt = location.getDevicetime();
-
-				SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'");
-				
-				String d = outputFormat.format(dt);
-
-				record.put("locationTime", d);
-
-				
-				if(location.getAddress() != null && location.getAddress() != "" ) {
-					record.put("address", location.getAddress());
-
-				}
-				else {
-					record.put("address", "Saudi Arabia");
-
-				}
-				record.put("roleCode", "T1");
-				
-				
-				Date now = new Date();
-				SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-				isoFormat.setTimeZone(TimeZone.getTimeZone("Asia/Riyadh"));
-				String nowTime = isoFormat.format(now);
-
-
-				
-				MongoElmLastLocations connection_log = new MongoElmLastLocations();  
-				
-				connection_log.setPositionid(location.get_id().toString());
-				connection_log.setElm_data(record);
-				connection_log.setSendtime(nowTime);
-				connection_log.setVehicleid(location.getDeviceid());
-				connection_log.setVehiclename(location.getDeviceName());
-				connection_log.setVehicleReferenceKey(location.getDeviceReferenceKey());
-				connection_log.setDriverid(location.getDriverid());
-				connection_log.setDrivername(location.getDriverName());
-				connection_log.setDriverReferenceKey(location.getDriverReferenceKey());
-				connection_log.setReason(calcWeightInitial);
-				connection_log.setResponsetime(nowTime);
-				connection_log.setResponsetype(1);
-				
-				elm_connection_logs.add(connection_log);
-			
-				dataArray.add(record);
-				ids.add(location.get_id().toString());
-				
-				location.setAttributes(obj.toString());
-
-		 }
 		 
 
 		  body.put("vehicleLocations", dataArray);
@@ -3919,11 +3736,9 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  elmLogsRepository.save(elmLogs);
 		  
 
-      	elmLastLocationsRepository.save(elm_connection_logs);  
-      	mongoPositionsElmRepository.deleteByIdIn(ids);
+      	mongoElmLiveLocationRepository.deleteByIdIn(ids);
 
 
-        
 	    getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",data);
 		logger.info("************************ lastLocations ENDED ***************************");
 		return  ResponseEntity.ok().body(getObjectResponse);

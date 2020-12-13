@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import org.bson.types.ObjectId;
 import org.json.JSONArray;
@@ -29,7 +28,6 @@ import com.example.examplequerydslspringdatajpamaven.entity.DriverWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.LastElmData;
 import com.example.examplequerydslspringdatajpamaven.entity.LastPositionData;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoElmLastLocations;
-import com.example.examplequerydslspringdatajpamaven.entity.MongoElmLiveLocation;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.TripPositions;
 import com.mongodb.BasicDBObject;
@@ -118,8 +116,7 @@ public class MongoPositionRepo {
 		
 	    Aggregation aggregation = newAggregation(
 	            match(Criteria.where("deviceid").in(deviceId).and("devicetime").gte(start).lte(end)),
-	            project("deviceid","latitude","longitude").and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("devicetime"),
-	            sort(Sort.Direction.DESC, "devicetime")
+	            project("deviceid","latitude","longitude").and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("devicetime")
 	            
 	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
 
@@ -2488,131 +2485,4 @@ public class MongoPositionRepo {
  		return positions;
  	}
     
-    
-    public List<Map> getElmLiveLocation(){
-
-		
-
-		
-		List<Map> positions = new ArrayList<Map>();
-		List<String> ids = new ArrayList<>();
-		List<MongoElmLastLocations> elm_connection_logs = new ArrayList<MongoElmLastLocations>();
-
-
-		BasicDBObject basicDBObject = new BasicDBObject();
-		
-
-		
-	    Aggregation aggregation = newAggregation(
-	            sort(Sort.Direction.DESC, "_id"),
-	    		skip(0),
-	            limit(1000)
-	            
-	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
-
-	    
-
-
-	        AggregationResults<MongoElmLiveLocation> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_elm_live_location", MongoElmLiveLocation.class);
-
-	        if(groupResults.getRawResults().containsField("cursor")) {
-	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
-	            
-			    JSONArray list = (JSONArray) obj.get("firstBatch");
-	            Iterator<Object> iterator = list.iterator();
-	            while (iterator.hasNext()) {
-
-	            	JSONObject object = (JSONObject) iterator.next();
-					Map record = new HashMap();
-
-					record.put("referenceKey", null);
-					record.put("driverReferenceKey", null);
-					record.put("latitude", null);
-					record.put("longitude", null);
-					record.put("velocity", null);
-					record.put("weight", null);
-					record.put("locationTime", null);
-					record.put("vehicleStatus", null);
-					record.put("address", null);
-					record.put("roleCode", null);
-
-					if(object.has("referenceKey") && object.get("referenceKey").toString() != "null") {
-						record.put("referenceKey", object.getString("referenceKey"));
-
-					}
-
-					if(object.has("driverReferenceKey") && object.get("driverReferenceKey").toString() != "null") {
-						record.put("driverReferenceKey", object.getString("driverReferenceKey"));
-
-					}
-					
-					if(object.has("latitude") && object.get("latitude").toString() != "null") {
-						record.put("latitude", object.getDouble("latitude"));
-					}
-					if(object.has("longitude") && object.get("longitude").toString() != "null") {
-						record.put("longitude", object.getDouble("longitude"));
-					}
-					if(object.has("velocity") && object.get("velocity").toString() != "null") {
-						record.put("velocity", object.getDouble("velocity"));
-					}
-					if(object.has("weight") && object.get("weight").toString() != "null") {
-						record.put("weight", object.getDouble("weight"));
-					}
-					
-					if(object.has("locationTime") && object.get("locationTime").toString() != "null") {
-						record.put("locationTime", object.getString("locationTime"));
-
-					}
-					if(object.has("vehicleStatus") && object.get("vehicleStatus").toString() != "null") {
-						record.put("vehicleStatus", object.getString("vehicleStatus"));
-
-					}
-					if(object.has("address") && object.get("address").toString() != "null") {
-						record.put("address", object.getString("address"));
-
-					}
-					if(object.has("roleCode") && object.get("roleCode").toString() != "null") {
-						record.put("roleCode", object.getString("roleCode"));
-
-					}
-					
-					MongoElmLastLocations connection_log = new MongoElmLastLocations();  
-
-					if(object.has("_id")) {
-		            	JSONObject objId = (JSONObject) object.get("_id");
-						ids.add(objId.getString("$oid"));
-						//System.out.println(objId.getString("$oid"));
-						connection_log.setPositionid(objId.getString("$oid"));
-
-					}
-
-					/*Date now = new Date();
-					SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-					isoFormat.setTimeZone(TimeZone.getTimeZone("Asia/Riyadh"));
-					String nowTime = isoFormat.format(now);
-					
-					connection_log.setElm_data(record);
-					connection_log.setSendtime(nowTime);
-					connection_log.setVehicleid(location.getDeviceid());
-					connection_log.setVehiclename(location.getDeviceName());
-					connection_log.setVehicleReferenceKey(record.get("referenceKey").toString());
-					connection_log.setDriverid(location.getDriverid());
-					connection_log.setDrivername(location.getDriverName());
-					connection_log.setDriverReferenceKey(record.get("driverReferenceKey").toString());
-					connection_log.setReason("");
-					connection_log.setResponsetime(nowTime);
-					connection_log.setResponsetype(1);
-					
-					elm_connection_logs.add(connection_log);
-					*/
-					
-					positions.add(record);
-
-	            }
-	        }
-	        
-	    //mongoElmLiveLocationRepository.deleteByIdIn(ids);
-		return positions;
-	}
 }
