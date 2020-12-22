@@ -1732,7 +1732,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		                    	JSONObject obj = new JSONObject(json);						
 								
 								allDevicesLiveData.get(i).setAttributes(mongoPosition.getAttributes());
-								allDevicesLiveData.get(i).setSpeed(mongoPosition.getSpeed());
+								allDevicesLiveData.get(i).setSpeed(mongoPosition.getSpeed() * (1.852));
 								allDevicesLiveData.get(i).setLatitude(mongoPosition.getLatitude());
 								allDevicesLiveData.get(i).setLongitude(mongoPosition.getLongitude());
 								
@@ -1872,7 +1872,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	                    	JSONObject obj = new JSONObject(json);						
 							
 							allDevicesLiveData.get(i).setAttributes(mongoPosition.getAttributes());
-							allDevicesLiveData.get(i).setSpeed(mongoPosition.getSpeed());
+							allDevicesLiveData.get(i).setSpeed(mongoPosition.getSpeed() * (1.852));
 							allDevicesLiveData.get(i).setLatitude(mongoPosition.getLatitude());
 							allDevicesLiveData.get(i).setLongitude(mongoPosition.getLongitude());
 							
@@ -2160,7 +2160,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 							if(mongoPosition != null) {
 								vehicleInfo.get(0).setLatitude(mongoPosition.getLatitude());
 			                    vehicleInfo.get(0).setLongitude(mongoPosition.getLongitude());
-			                    vehicleInfo.get(0).setSpeed(mongoPosition.getSpeed());
+			                    vehicleInfo.get(0).setSpeed(mongoPosition.getSpeed() * (1.852) );
 			                    vehicleInfo.get(0).setCarWeight(mongoPosition.getWeight());
 			                    vehicleInfo.get(0).setAddress(mongoPosition.getAddress());
 			                    vehicleInfo.get(0).setAttributes(mongoPosition.getAttributes());

@@ -604,7 +604,7 @@ public class MongoPositionRepo {
 	
 	            	}
 	            	if(object.has("speed")) {
-		            	device.setSpeed(object.getDouble("speed"));    		
+		            	device.setSpeed(object.getDouble("speed") * (1.852) );    		
 	                }
 					if(object.has("devicetime") && object.get("devicetime").toString() != "null") {
 						
@@ -709,7 +709,7 @@ public class MongoPositionRepo {
 	
 	            	}
 	            	if(object.has("speed")) {
-		            	device.setSpeed(object.getDouble("speed"));    		
+		            	device.setSpeed(object.getDouble("speed") * (1.852) );    		
 	                }
 					if(object.has("devicetime") && object.get("devicetime").toString() != "null") {
 						
@@ -1427,7 +1427,7 @@ public class MongoPositionRepo {
 	            	}
                     
 	            	if(object.has("speed")) {
-	            		position.setSpeed(object.getDouble("speed"));    		
+	            		position.setSpeed(object.getDouble("speed") * (1.852) );    		
 	                }
 	            	if(object.has("weight")) {
 	            		position.setWeight(object.getDouble("weight"));    		
@@ -1561,7 +1561,7 @@ public class MongoPositionRepo {
 	            	}
                     
 	            	if(object.has("speed")) {
-	            		position.setSpeed(object.getDouble("speed"));    		
+	            		position.setSpeed(object.getDouble("speed") * (1.852) );    		
 	                }
 	            	
 	            	if(object.has("weight")) {
@@ -1696,7 +1696,7 @@ public class MongoPositionRepo {
 	            	}
                     
 	            	if(object.has("speed")) {
-	            		position.setSpeed(object.getDouble("speed"));    		
+	            		position.setSpeed(object.getDouble("speed") * (1.852) );    		
 	                }
 	            	
 	            	if(object.has("weight")) {
@@ -2157,7 +2157,7 @@ public class MongoPositionRepo {
 	            	} 
 
 					if(object.has("speed")) {
-	            		position.setSpeed(object.getDouble("speed"));
+	            		position.setSpeed(object.getDouble("speed") * (1.852) );
 	
 	            	} 
 					
@@ -2308,7 +2308,7 @@ public class MongoPositionRepo {
 	            	} 
 
 					if(object.has("speed")) {
-	            		position.setSpeed(object.getDouble("speed"));
+	            		position.setSpeed(object.getDouble("speed") * (1.852) );
 	
 	            	} 
 					
@@ -2423,7 +2423,7 @@ public class MongoPositionRepo {
  	
  	            	}
  					if(object.has("speed")) {
- 	            		position.setSpeed(object.getDouble("speed"));
+ 	            		position.setSpeed(object.getDouble("speed") * (1.852) );
  	            		if(object.getDouble("speed") >0 ) {
          					position.setStatus(2);
          				}

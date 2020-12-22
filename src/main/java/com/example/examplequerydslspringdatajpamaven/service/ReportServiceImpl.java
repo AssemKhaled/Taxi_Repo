@@ -2274,14 +2274,14 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				  }
 				 
 				  if(tripReportOne.getAverageSpeed() != null && tripReportOne.getAverageSpeed() != "") {
-					  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getAverageSpeed())  );
+					  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getAverageSpeed())  * (1.852));
 					  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
 					  tripReportOne.setAverageSpeed(Double.toString(roundOffDistance));
 
 
 				  }
 				  if(tripReportOne.getMaxSpeed() != null && tripReportOne.getMaxSpeed() != "") {
-					  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getMaxSpeed())  );
+					  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getMaxSpeed())  * (1.852));
 					  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
 					  tripReportOne.setMaxSpeed(Double.toString(roundOffDistance));
 
@@ -2763,14 +2763,14 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 					  }
 					  
 					  if(tripReportOne.getAverageSpeed() != null && tripReportOne.getAverageSpeed() != "") {
-						  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getAverageSpeed())  );
+						  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getAverageSpeed()) * (1.852) );
 						  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
 						  tripReportOne.setAverageSpeed(Double.toString(roundOffDistance));
 
 
 					  }
 					  if(tripReportOne.getMaxSpeed() != null && tripReportOne.getMaxSpeed() != "") {
-						  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getMaxSpeed())  );
+						  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getMaxSpeed()) * (1.852) );
 						  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
 						  tripReportOne.setMaxSpeed(Double.toString(roundOffDistance));
 
@@ -3508,14 +3508,14 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				  }
 
 				  if(summaryReportOne.getAverageSpeed() != null && summaryReportOne.getAverageSpeed() != "") {
-					  totalDistance = Math.abs(  Double.parseDouble(summaryReportOne.getAverageSpeed())  );
+					  totalDistance = Math.abs(  Double.parseDouble(summaryReportOne.getAverageSpeed()) * (1.852) );
 					  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
 					  summaryReportOne.setAverageSpeed(Double.toString(roundOffDistance));
 
 
 				  }
 				  if(summaryReportOne.getMaxSpeed() != null && summaryReportOne.getMaxSpeed() != "") {
-					  totalDistance = Math.abs(  Double.parseDouble(summaryReportOne.getMaxSpeed())  );
+					  totalDistance = Math.abs(  Double.parseDouble(summaryReportOne.getMaxSpeed()) * (1.852) );
 					  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
 					  summaryReportOne.setMaxSpeed(Double.toString(roundOffDistance));
 

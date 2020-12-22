@@ -3644,7 +3644,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			record.put("driverReferenceKey", position.getDriverReferenceKey());
 			record.put("latitude", position.getLatitude());
 			record.put("longitude", position.getLongitude());
-			record.put("velocity", position.getVelocity());
+			record.put("velocity", position.getVelocity() * (1.852) );
 			record.put("weight", position.getWeight());
 			record.put("locationTime", position.getLocationTime());
 			record.put("vehicleStatus", position.getVehicleStatus());
@@ -3739,7 +3739,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
       	mongoElmLiveLocationRepository.deleteByIdIn(ids);
 
 
-	    getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",data);
+	    getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",data,dataArray.size());
 		logger.info("************************ lastLocations ENDED ***************************");
 		return  ResponseEntity.ok().body(getObjectResponse);
 	}

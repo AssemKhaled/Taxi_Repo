@@ -502,7 +502,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 							if(mongoPosition != null) {
 								vehicleInfo.get(0).setLatitude(mongoPosition.getLatitude());
 			                    vehicleInfo.get(0).setLongitude(mongoPosition.getLongitude());
-			                    vehicleInfo.get(0).setSpeed(mongoPosition.getSpeed());
+			                    vehicleInfo.get(0).setSpeed(mongoPosition.getSpeed() * (1.852) );
 			                    vehicleInfo.get(0).setAddress(mongoPosition.getAddress());
 			                    vehicleInfo.get(0).setAttributes(mongoPosition.getAttributes());
 			                    
@@ -733,7 +733,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 					
 					if(mongoPosition != null) {
 						devices.get(i).setAttributes(mongoPosition.getAttributes());
-						devices.get(i).setSpeed(mongoPosition.getSpeed());
+						devices.get(i).setSpeed(mongoPosition.getSpeed() * (1.852) );
 						devices.get(i).setLatitude(mongoPosition.getLatitude());
 						devices.get(i).setLongitude(mongoPosition.getLongitude());
 						devices.get(i).setAddress(mongoPosition.getAddress());
@@ -1197,7 +1197,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 					  stopReportOne.setEngineHours(totalEngineHours.toString());
 
 				  }
-				  if(stopReportOne.getStartTime() != null && stopReportOne.getStartTime() != "") {
+				  /*if(stopReportOne.getStartTime() != null && stopReportOne.getStartTime() != "") {
 					    Date dateTime = null;
 						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS+SSSS");
 						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
@@ -1228,7 +1228,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 						
 						stopReportOne.setEndTime(outputFormat.format(dateTime));
 
-				  }
+				  }*/
 			  }
 			  
 			  
@@ -1595,21 +1595,21 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				  }
 				 
 				  if(tripReportOne.getAverageSpeed() != null && tripReportOne.getAverageSpeed() != "") {
-					  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getAverageSpeed())  );
+					  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getAverageSpeed()) * (1.852)  );
 					  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
 					  tripReportOne.setAverageSpeed(Double.toString(roundOffDistance));
 
 
 				  }
 				  if(tripReportOne.getMaxSpeed() != null && tripReportOne.getMaxSpeed() != "") {
-					  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getMaxSpeed())  );
+					  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getMaxSpeed()) * (1.852) );
 					  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
 					  tripReportOne.setMaxSpeed(Double.toString(roundOffDistance));
 
 
 				  }
 				  
-				  if(tripReportOne.getStartTime() != null && tripReportOne.getStartTime() != "") {
+				  /*if(tripReportOne.getStartTime() != null && tripReportOne.getStartTime() != "") {
 					    Date dateTime = null;
 						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS+SSSS");
 						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
@@ -1640,7 +1640,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 						
 						tripReportOne.setEndTime(outputFormat.format(dateTime));
 
-				  }
+				  }*/
 				  
 				  
 
@@ -2076,14 +2076,14 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				  }
 
 				  if(summaryReportOne.getAverageSpeed() != null && summaryReportOne.getAverageSpeed() != "") {
-					  totalDistance = Math.abs(  Double.parseDouble(summaryReportOne.getAverageSpeed())  );
+					  totalDistance = Math.abs(  Double.parseDouble(summaryReportOne.getAverageSpeed())  * (1.852) );
 					  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
 					  summaryReportOne.setAverageSpeed(Double.toString(roundOffDistance));
 
 
 				  }
 				  if(summaryReportOne.getMaxSpeed() != null && summaryReportOne.getMaxSpeed() != "") {
-					  totalDistance = Math.abs(  Double.parseDouble(summaryReportOne.getMaxSpeed())  );
+					  totalDistance = Math.abs(  Double.parseDouble(summaryReportOne.getMaxSpeed())  * (1.852) );
 					  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
 					  summaryReportOne.setMaxSpeed(Double.toString(roundOffDistance));
 
@@ -7435,14 +7435,14 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 					  }
 					  
 					  if(tripReportOne.getAverageSpeed() != null && tripReportOne.getAverageSpeed() != "") {
-						  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getAverageSpeed())  );
+						  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getAverageSpeed()) * (1.852) );
 						  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
 						  tripReportOne.setAverageSpeed(Double.toString(roundOffDistance));
 
 
 					  }
 					  if(tripReportOne.getMaxSpeed() != null && tripReportOne.getMaxSpeed() != "") {
-						  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getMaxSpeed())  );
+						  totalDistance = Math.abs(  Double.parseDouble(tripReportOne.getMaxSpeed())  * (1.852) );
 						  roundOffDistance = Math.round(totalDistance * 100.0) / 100.0;
 						  tripReportOne.setMaxSpeed(Double.toString(roundOffDistance));
 
