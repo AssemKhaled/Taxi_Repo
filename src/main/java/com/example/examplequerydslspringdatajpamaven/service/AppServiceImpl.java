@@ -1197,38 +1197,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 					  stopReportOne.setEngineHours(totalEngineHours.toString());
 
 				  }
-				  /*if(stopReportOne.getStartTime() != null && stopReportOne.getStartTime() != "") {
-					    Date dateTime = null;
-						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS+SSSS");
-						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
-
-						try {
-							dateTime = inputFormat.parse(stopReportOne.getStartTime());
-
-						} catch (ParseException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						
-						stopReportOne.setStartTime(outputFormat.format(dateTime));
-
-				  }
-				  if(stopReportOne.getEndTime() != null && stopReportOne.getEndTime() != "") {
-					    Date dateTime = null;
-						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS+SSSS");
-						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
-
-						try {
-							dateTime = inputFormat.parse(stopReportOne.getEndTime());
-
-						} catch (ParseException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						
-						stopReportOne.setEndTime(outputFormat.format(dateTime));
-
-				  }*/
+				 
 			  }
 			  
 			  
@@ -1609,38 +1578,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 				  }
 				  
-				  /*if(tripReportOne.getStartTime() != null && tripReportOne.getStartTime() != "") {
-					    Date dateTime = null;
-						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS+SSSS");
-						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
-
-						try {
-							dateTime = inputFormat.parse(tripReportOne.getStartTime());
-
-						} catch (ParseException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						
-						tripReportOne.setStartTime(outputFormat.format(dateTime));
-
-				  }
-				  if(tripReportOne.getEndTime() != null && tripReportOne.getEndTime() != "") {
-					    Date dateTime = null;
-						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS+SSSS");
-						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
-
-						try {
-							dateTime = inputFormat.parse(tripReportOne.getEndTime());
-
-						} catch (ParseException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						
-						tripReportOne.setEndTime(outputFormat.format(dateTime));
-
-				  }*/
+				  
 				  
 				  
 
@@ -7449,38 +7387,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 					  }
 					  
-					  if(tripReportOne.getStartTime() != null && tripReportOne.getStartTime() != "") {
-						    Date dateTime = null;
-							SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS+SSSS");
-							SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
-
-							try {
-								dateTime = inputFormat.parse(tripReportOne.getStartTime());
-
-							} catch (ParseException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-							
-							tripReportOne.setStartTime(outputFormat.format(dateTime));
-
-					  }
-					  if(tripReportOne.getEndTime() != null && tripReportOne.getEndTime() != "") {
-						    Date dateTime = null;
-							SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS+SSSS");
-							SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
-
-							try {
-								dateTime = inputFormat.parse(tripReportOne.getEndTime());
-
-							} catch (ParseException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-							
-							tripReportOne.setEndTime(outputFormat.format(dateTime));
-
-					  }
+					  
 					  
 					  
 					  tripData.add(tripReportOne);
@@ -7809,21 +7716,6 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 					eventReportOne.setType(map.get("alarm"));
 				 }
 				  
-				  if(eventReportOne.getServerTime() != null && eventReportOne.getServerTime() != "") {
-					    Date dateTime = null;
-						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS+SSSS");
-						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
-
-						try {
-							dateTime = inputFormat.parse(eventReportOne.getServerTime());
-
-						} catch (ParseException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						
-						eventReportOne.setServerTime(outputFormat.format(dateTime));
-				  }
 				  
 
 				
