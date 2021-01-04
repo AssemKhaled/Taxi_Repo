@@ -51,6 +51,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 import com.example.examplequerydslspringdatajpamaven.entity.Group;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoPositionsElm;
+import com.example.examplequerydslspringdatajpamaven.entity.Notification;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.entity.userClientDevice;
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
@@ -64,6 +65,8 @@ import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import aj.org.objectweb.asm.Attribute;
 
 
 /**
@@ -459,6 +462,27 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			Set<User> userCreater=new HashSet<>();
 			userCreater = oldDevice.getUser();
 	        device.setUser(userCreater);
+	        
+			Set<Driver> driver=new HashSet<>();
+			driver = oldDevice.getDriver();
+	        device.setDriver(driver);
+
+			Set<com.example.examplequerydslspringdatajpamaven.entity.Attribute> attributeDevice=new HashSet<>();
+			attributeDevice = oldDevice.getAttributeDevice();
+	        device.setAttributeDevice(attributeDevice);
+	        
+	        Set<Geofence> geofences=new HashSet<>();
+	        geofences = oldDevice.getGeofence();
+	        device.setGeofence(geofences);
+	        
+	        Set<Group> groups=new HashSet<>();
+	        groups = oldDevice.getGroups();
+	        device.setGroups(groups);
+	        
+	        Set<Notification> notificationDevice=new HashSet<>();
+	        notificationDevice = oldDevice.getNotificationDevice();
+	        device.setNotificationDevice(notificationDevice);
+	        
 	        List<Integer> duplictionList = checkDeviceDuplication(device);
 	        if(duplictionList.size()>0)
 		    {
@@ -685,30 +709,23 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		     device.setDelete_date(date);
 		    
 		     Set<Driver> drivers =new HashSet<>() ;
-		     drivers = device.getDriver();
-		     Set<Driver> oldDrivers =new HashSet<>() ;
-	         oldDrivers= drivers;
-	         drivers.removeAll(oldDrivers);
 	         device.setDriver(drivers);
 
 	         Set<Group> groups =new HashSet<>() ;
-		     groups = device.getGroups();
-		     Set<Group> oldGroups =new HashSet<>() ;
-		     oldGroups= groups;
-		     groups.removeAll(oldGroups);
 	         device.setGroups(groups);
 	         
+	         Set<com.example.examplequerydslspringdatajpamaven.entity.Attribute> attributeDevice=new HashSet<>();
+	         device.setAttributeDevice(attributeDevice);
+	        
+	         Set<Geofence> geofences=new HashSet<>();
+	         device.setGeofence(geofences);
 	         
+	         Set<Notification> notificationDevice=new HashSet<>();
+	         device.setNotificationDevice(notificationDevice);
 	         
 			 deviceRepository.save(device);
 		     
 		     List<Device> devices = null;
-		     
-		     List<Long> DataDelete = userClientDeviceRepository.getDevicesToDelete(deviceId);
-			 if(DataDelete.size()>0) {
-				 userClientDeviceRepository.deleteDeviceById(deviceId);
-			 }
-		     
 		     
 		     
 			 getObjectResponse = new GetObjectResponse( HttpStatus.OK.value(), "success",devices);

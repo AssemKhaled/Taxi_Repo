@@ -19,6 +19,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
+import com.example.examplequerydslspringdatajpamaven.entity.Group;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.entity.userClientDriver;
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
@@ -516,17 +517,25 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 									
 									else {
 										
-										   Set<User> userDriver = new HashSet<>();
+									    Set<User> userDriver = new HashSet<>();
+									    userDriver = driverCheck.getUserDriver();
+									    driver.setUserDriver(userDriver);
+									
+									    Set<Device> device = new HashSet<>();
+									    device = driverCheck.getDevice();
+									    driver.setDevice(device);
+									    
+									    Set<Group> groups = new HashSet<>();
+									    groups = driverCheck.getGroups();
+									    driver.setGroups(groups);
+									    									    
+									    
+									    driverRepository.save(driver);
+									    drivers.add(driver);
 										
-									    	userDriver = driverCheck.getUserDriver();
-										
-										   driver.setUserDriver(userDriver);
-										
-											driverRepository.save(driver);
-											drivers.add(driver);
-											getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Updated Successfully",drivers);
-											logger.info("************************ editDriver ENDED ***************************");
-											return ResponseEntity.ok().body(getObjectResponse);
+										getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Updated Successfully",drivers);
+										logger.info("************************ editDriver ENDED ***************************");
+										return ResponseEntity.ok().body(getObjectResponse);
 
 										
 										
@@ -756,10 +765,6 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 					driverRepository.deleteDriverDeviceId(driverId);
 					driverRepository.deleteDriverGroupId(driverId);
 					
-					List<Long> DataDelete = userClientDriverRepository.getDriversToDelete(driverId);
-					 if(DataDelete.size()>0) {
-						 userClientDriverRepository.deleteDriverById(driverId);
-					 }
 					
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Deleted Successfully",drivers);
 					logger.info("************************ deleteDriver ENDED ***************************");

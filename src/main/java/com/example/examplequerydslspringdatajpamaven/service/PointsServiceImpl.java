@@ -422,13 +422,10 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 	    int year = cal.get(Calendar.YEAR);
 	    String date =  Integer.toString(year)+"-"+ Integer.toString(month)+"-"+ Integer.toString(day);
 	    point.setDelete_date(date);
-	     
+	    
+	    
 	    pointsRepository.save(point);
 	    
-	    List<Long> DataDelete = userClientPointRepository.getPointsToDelete(PointId);
-		 if(DataDelete.size()>0) {
-			 userClientPointRepository.deletePointsById(PointId);
-		 }
 	    
 		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",null);
 		return  ResponseEntity.ok().body(getObjectResponse);

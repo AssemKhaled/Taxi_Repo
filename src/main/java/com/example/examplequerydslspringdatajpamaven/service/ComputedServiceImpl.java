@@ -557,10 +557,14 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 		    					userCreater = attributeCheck.getUserAttribute();			    					
 								attribute.setUserAttribute(userCreater);
 								
+								Set<Device> devices=new HashSet<>();
+								devices = attributeCheck.getDevices();	
+								attribute.setDevices(devices);
 								
-								
-								
-								
+								Set<Group> groups=new HashSet<>();
+								groups = attributeCheck.getGroups();	
+								attribute.setGroups(groups);
+																
 								computedRepository.save(attribute);
 
 								getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Updated Successfully",null);
@@ -687,11 +691,6 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 					    computedRepository.deleteAttributeDeviceId(attributeId);
 					    computedRepository.deleteAttributeGroupId(attributeId);
 					    
-						 List<Long> DataDelete = userClientComputedRepository.getComputedsAttrbIds(attributeId);
-						 if(DataDelete.size()>0) {
-							   userClientComputedRepository.deleteAttributeById(attributeId);
-						 }
-						
 					    
 					    
 						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Deleted Successfully",attributes);

@@ -15,12 +15,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+
+import com.example.examplequerydslspringdatajpamaven.entity.Attribute;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 import com.example.examplequerydslspringdatajpamaven.entity.Group;
+import com.example.examplequerydslspringdatajpamaven.entity.Notification;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.entity.userClientGroup;
 import com.example.examplequerydslspringdatajpamaven.repository.GeofenceRepository;
@@ -667,8 +670,29 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 			    					userCreater = groupCheck.getUserGroup();			    					
 			    					group.setUserGroup(userCreater);
 
-									groupRepository.save(group);
+									Set<Attribute> attributeGroup=new HashSet<>();
+									attributeGroup = groupCheck.getAttributeGroup();
+			    					group.setAttributeGroup(attributeGroup);
+			    					
+									Set<Device> deviceGroup=new HashSet<>();
+									deviceGroup = groupCheck.getDeviceGroup();
+			    					group.setDeviceGroup(deviceGroup);
+			    					
+									Set<Driver> driverGroup=new HashSet<>();
+									driverGroup = groupCheck.getDriverGroup();
+			    					group.setDriverGroup(driverGroup);
+			    					
+									Set<Geofence> geofenceGroup=new HashSet<>();
+									geofenceGroup = groupCheck.getGeofenceGroup();
+			    					group.setGeofenceGroup(geofenceGroup);
+			    					
+									Set<Notification> notificationGroup=new HashSet<>();
+									notificationGroup = groupCheck.getNotificationGroup();
+			    					group.setNotificationGroup(notificationGroup);
+
+			    					groupRepository.save(group);
 									groups.add(group);
+									
 									getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Updated Successfully",null);
 									logger.info("************************ editGeofence ENDED ***************************");
 									return ResponseEntity.ok().body(getObjectResponse);
@@ -803,10 +827,6 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 						groupRepository.deleteGroupDeviceId(groupId);
 						groupRepository.deleteGroupgeoId(groupId);
 						
-						List<Long> DataDelete = userClientGroupRepository.getGroupsToDelete(groupId);
-						if(DataDelete.size()>0) {
-							userClientGroupRepository.deleteGroupById(groupId);
-						}
 						
 						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Deleted Successfully",groups);
 						logger.info("************************ deleteGroup ENDED ***************************");

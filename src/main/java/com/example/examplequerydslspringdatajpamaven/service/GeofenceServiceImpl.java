@@ -19,6 +19,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
+import com.example.examplequerydslspringdatajpamaven.entity.Group;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.entity.userClientGeofence;
 import com.example.examplequerydslspringdatajpamaven.repository.GeofenceRepository;
@@ -340,11 +341,6 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 						geofenceRepository.deleteGeofenceDeviceId(geofenceId);
 						geofenceRepository.deleteGeofenceGroupId(geofenceId);
 
-						List<Long> DataDelete = userClientGeofenceRepository.getGeofToDelete(geofenceId);
-						if(DataDelete.size()>0) {
-							userClientGeofenceRepository.deleteGeofById(geofenceId);
-						}
-						
 						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Deleted Successfully",geofences);
 						logger.info("************************ deleteGeofence ENDED ***************************");
 						return  ResponseEntity.ok().body(getObjectResponse);
@@ -635,8 +631,17 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 				    					userCreater = geofneceCheck.getUserGeofence();
 										geofence.setUserGeofence(userCreater);
 										
+				    					Set<Device> device=new HashSet<>();
+				    					device = geofneceCheck.getDevice();
+										geofence.setDevice(device);
+
+				    					Set<Group> groups=new HashSet<>();
+				    					groups = geofneceCheck.getGroups();
+										geofence.setGroups(groups);
+
 										geofenceRepository.save(geofence);
 										geofences = null;
+										
 										getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Updated Successfully",geofences);
 										logger.info("************************ editGeofence ENDED ***************************");
 										return ResponseEntity.ok().body(getObjectResponse);

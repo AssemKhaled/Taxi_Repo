@@ -52,6 +52,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.EventReportByCurl;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 import com.example.examplequerydslspringdatajpamaven.entity.Group;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoPositions;
+import com.example.examplequerydslspringdatajpamaven.entity.Notification;
 import com.example.examplequerydslspringdatajpamaven.entity.StopReport;
 import com.example.examplequerydslspringdatajpamaven.entity.SummaryReport;
 import com.example.examplequerydslspringdatajpamaven.entity.TripPositions;
@@ -2670,8 +2671,17 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				    					userCreater = geofneceCheck.getUserGeofence();
 										geofence.setUserGeofence(userCreater);
 										
+										Set<Device> device=new HashSet<>();
+				    					device = geofneceCheck.getDevice();
+										geofence.setDevice(device);
+
+				    					Set<Group> groups=new HashSet<>();
+				    					groups = geofneceCheck.getGroups();
+										geofence.setGroups(groups);
+										
 										geofenceRepository.save(geofence);
 										geofences.add(geofence);
+										
 										getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Updated Successfully",geofences);
 										logger.info("************************ editGeofence ENDED ***************************");
 										return ResponseEntity.ok().body(getObjectResponse);
@@ -3341,17 +3351,24 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 									
 									else {
 										
-										   Set<User> userDriver = new HashSet<>();
-										
-									    	userDriver = driverCheck.getUserDriver();
-										
-										   driver.setUserDriver(userDriver);
-										
-											driverRepository.save(driver);
-											drivers.add(driver);
-											getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Updated Successfully",drivers);
-											logger.info("************************ editDriver ENDED ***************************");
-											return ResponseEntity.ok().body(getObjectResponse);
+									    Set<User> userDriver = new HashSet<>();
+								    	userDriver = driverCheck.getUserDriver();
+									    driver.setUserDriver(userDriver);
+									
+									    Set<Device> device = new HashSet<>();
+									    device = driverCheck.getDevice();
+									    driver.setDevice(device);
+									    
+									    Set<Group> groups = new HashSet<>();
+									    groups = driverCheck.getGroups();
+									    driver.setGroups(groups);
+									    							
+									    
+										driverRepository.save(driver);
+										drivers.add(driver);
+										getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Updated Successfully",drivers);
+										logger.info("************************ editDriver ENDED ***************************");
+										return ResponseEntity.ok().body(getObjectResponse);
 
 										
 										
@@ -3814,9 +3831,31 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				logger.info("************************ editDevice ENDED ***************************");
 				return ResponseEntity.badRequest().body(getObjectResponse);
 			}
+			
 			Set<User> userCreater=new HashSet<>();
 			userCreater = oldDevice.getUser();
 	        device.setUser(userCreater);
+	        
+			Set<Driver> driver=new HashSet<>();
+			driver = oldDevice.getDriver();
+	        device.setDriver(driver);
+
+			Set<com.example.examplequerydslspringdatajpamaven.entity.Attribute> attributeDevice=new HashSet<>();
+			attributeDevice = oldDevice.getAttributeDevice();
+	        device.setAttributeDevice(attributeDevice);
+	        
+	        Set<Geofence> geofences=new HashSet<>();
+	        geofences = oldDevice.getGeofence();
+	        device.setGeofence(geofences);
+	        
+	        Set<Group> groups=new HashSet<>();
+	        groups = oldDevice.getGroups();
+	        device.setGroups(groups);
+	        
+	        Set<Notification> notificationDevice=new HashSet<>();
+	        notificationDevice = oldDevice.getNotificationDevice();
+	        device.setNotificationDevice(notificationDevice);
+	        
 	        List<Integer> duplictionList = deviceServiceImpl.checkDeviceDuplication(device);
 	        if(duplictionList.size()>0)
 		    {
@@ -3973,18 +4012,19 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		     device.setDelete_date(date);
 		     
 		     Set<Driver> drivers =new HashSet<>() ;
-		     drivers = device.getDriver();
-		     Set<Driver> oldDrivers =new HashSet<>() ;
-	         oldDrivers= drivers;
-	         drivers.removeAll(oldDrivers);
 	         device.setDriver(drivers);
 
 	         Set<Group> groups =new HashSet<>() ;
-		     groups = device.getGroups();
-		     Set<Group> oldGroups =new HashSet<>() ;
-		     oldGroups= groups;
-		     groups.removeAll(oldGroups);
 	         device.setGroups(groups);
+	         
+	         Set<com.example.examplequerydslspringdatajpamaven.entity.Attribute> attributeDevice=new HashSet<>();
+	         device.setAttributeDevice(attributeDevice);
+	        
+	         Set<Geofence> geofences=new HashSet<>();
+	         device.setGeofence(geofences);
+	         
+	         Set<Notification> notificationDevice=new HashSet<>();
+	         device.setNotificationDevice(notificationDevice);
 	         
 			 deviceRepository.save(device);
 		     

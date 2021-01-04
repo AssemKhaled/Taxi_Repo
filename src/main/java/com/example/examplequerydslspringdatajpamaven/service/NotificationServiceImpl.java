@@ -410,11 +410,15 @@ public class NotificationServiceImpl extends RestServiceController implements No
 			    					
 									Set<User> userCreater=new HashSet<>();
 									Set<Device> devices=new HashSet<>();
+									Set<Group> groups=new HashSet<>();
 
 			    					userCreater = notificationCheck.getUserNotification();	
 			    					devices = notificationCheck.getDevices();
+			    					groups = notificationCheck.getGroups();
+
 									notification.setUserNotification(userCreater);
 									notification.setDevices(devices);
+									notification.setGroups(groups);
 									
 									notificationRepository.save(notification);
 									notifications.add(notification);
