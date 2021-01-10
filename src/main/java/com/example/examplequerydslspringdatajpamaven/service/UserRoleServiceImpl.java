@@ -1136,7 +1136,7 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 	 * get roles created by user limit 10
 	 */
 	@Override
-	public ResponseEntity<?> getAllRolesCreatedByUser(String TOKEN,Long userId,int offset,String search) {
+	public ResponseEntity<?> getAllRolesCreatedByUser(String TOKEN,Long userId,int offset,String search, String exportData) {
 		// TODO Auto-generated method stub
 		if(TOKEN.equals("")) {
 			 List<UserRole> roles = null;
@@ -1213,8 +1213,21 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 
 			 }
 		 }
-		List<UserRole> roles = userRoleRepository.getAllRolesCreatedByUserOffset(usersIds,offset,search);
-		Integer size=userRoleRepository.getRolesSize(usersIds);
+		 List<UserRole> roles = new ArrayList<UserRole>();
+		 Integer size = 0;
+	     if(exportData.equals("exportData")) {
+	    	 roles = userRoleRepository.getAllRolesCreatedByUserOffsetExport(usersIds,search);
+	    	 
+	     }
+	     else{
+	    	 roles = userRoleRepository.getAllRolesCreatedByUserOffset(usersIds,offset,search);
+	    	 if(roles.size()>0) {
+	 	 		size=userRoleRepository.getRolesSize(usersIds);
+
+	    	 }
+	     }
+
+		
 		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",roles,size);
 		
 		return ResponseEntity.ok().body(getObjectResponse);

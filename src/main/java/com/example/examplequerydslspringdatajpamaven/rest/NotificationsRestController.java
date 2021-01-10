@@ -41,11 +41,12 @@ public class NotificationsRestController {
 	
 	@RequestMapping(value = "/getAllNotifications", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getAllNotifications(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                            @RequestParam (value = "userId", defaultValue = "0") Long id,
-														@RequestParam (value = "offset", defaultValue = "0") int offset,
-														@RequestParam (value = "search", defaultValue = "") String search) {
-		
-    	return  notificationServiceImpl.getAllNotifications(TOKEN,id,offset,search);
+		                                                       @RequestParam (value = "exportData", defaultValue = "") String exportData,
+					                                            @RequestParam (value = "userId", defaultValue = "0") Long id,
+																@RequestParam (value = "offset", defaultValue = "0") int offset,
+																@RequestParam (value = "search", defaultValue = "") String search) {
+				
+    	return  notificationServiceImpl.getAllNotifications(TOKEN,id,offset,search,exportData);
 
 	}
 	

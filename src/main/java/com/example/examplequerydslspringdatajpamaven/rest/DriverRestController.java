@@ -35,11 +35,12 @@ public class DriverRestController {
 
 	@RequestMapping(value = "/getAllDrivers", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getDrivers(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                          @RequestParam (value = "userId", defaultValue = "0") Long id,
+											          @RequestParam (value = "exportData", defaultValue = "") String exportData,                                          
+													  @RequestParam (value = "userId", defaultValue = "0") Long id,
 													  @RequestParam (value = "offset", defaultValue = "0") int offset,
 													  @RequestParam (value = "search", defaultValue = "") String search) {
 		
-    	return  driverServiceImpl.getAllDrivers(TOKEN,id,offset,search);
+    	return  driverServiceImpl.getAllDrivers(TOKEN,id,offset,search,exportData);
 
 	}
 	

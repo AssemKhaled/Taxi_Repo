@@ -175,7 +175,7 @@ public class NotificationServiceImpl extends RestServiceController implements No
 	 * get list of notifications limit 10
 	 */
 	@Override
-	public ResponseEntity<?> getAllNotifications(String TOKEN, Long id,int offset,String search) {
+	public ResponseEntity<?> getAllNotifications(String TOKEN, Long id,int offset,String search,String exportData) {
        logger.info("************************ getAllNotifications STARTED ***************************");
 		
 		List<Notification> notifications = new ArrayList<Notification>();
@@ -206,36 +206,40 @@ public class NotificationServiceImpl extends RestServiceController implements No
 					}
 				}
 				if(user.getDelete_date() == null) {
-					
-					userService.resetChildernArray();
+					 List<Long>usersIds= new ArrayList<>();
+
 				    if(user.getAccountType().equals(4)) {
 						 
-							 
-							 List<Long>usersIds= new ArrayList<>();
-							 usersIds.add(user.getId());
-							 notifications = notificationRepository.getAllNotifications(usersIds,offset,search);
-							 Integer size=notificationRepository.getAllNotificationsSize(usersIds);
-							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",notifications,size);
-							logger.info("************************ getAllNotifications ENDED ***************************");
-							return  ResponseEntity.ok().body(getObjectResponse);
+						usersIds.add(user.getId());
 						 
-					 }
-				     List<User>childernUsers = userService.getActiveAndInactiveChildern(id);
-					 List<Long>usersIds= new ArrayList<>();
-					 if(childernUsers.isEmpty()) {
-						 usersIds.add(id);
-					 }
-					 else {
-						 usersIds.add(id);
-						 for(User object : childernUsers) {
-							 usersIds.add(object.getId());
+					}
+				    else {
+				    	List<User>childernUsers = userService.getActiveAndInactiveChildern(id);
+						 if(childernUsers.isEmpty()) {
+							 usersIds.add(id);
 						 }
-					 }
+						 else {
+							 usersIds.add(id);
+							 for(User object : childernUsers) {
+								 usersIds.add(object.getId());
+							 }
+						 }
+				    }
+				     
+
+				    Integer size = 0;
+					
+					if(exportData.equals("exportData")) {
+						notifications = notificationRepository.getAllNotificationsExport(usersIds,search);
+
+					}
+					else {
+
+						notifications = notificationRepository.getAllNotifications(usersIds,offset,search);
+						size = notificationRepository.getAllNotificationsSize(usersIds); 
+					}
 
 					
-					
-					notifications = notificationRepository.getAllNotifications(usersIds,offset,search);
-					Integer size=notificationRepository.getAllNotificationsSize(usersIds);
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",notifications,size);
 					logger.info("************************ getAllNotifications ENDED ***************************");
 					return  ResponseEntity.ok().body(getObjectResponse);

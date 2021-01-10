@@ -69,7 +69,7 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 	 * get drivers list with limit 10
 	 */
 	@Override
-	public ResponseEntity<?> getAllDrivers(String TOKEN,Long id,int offset,String search) {
+	public ResponseEntity<?> getAllDrivers(String TOKEN,Long id,int offset,String search,String exportData) {
 		
 		
 		logger.info("************************ getAllDrivers STARTED ***************************");
@@ -105,9 +105,16 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 						List<Long> driverIds = userClientDriverRepository.getDriverIds(id);
 						Integer size = 0;
 						if(driverIds.size()>0) {
+							if(exportData.equals("exportData")) {
+								customDrivers= driverRepository.getAllDriversCustomByIdsExport(driverIds,search);
 
-							customDrivers= driverRepository.getAllDriversCustomByIds(driverIds,offset,search);
-						    size= driverRepository.getAllDriversSizeByIds(driverIds,search);
+							}
+							else {
+
+								customDrivers= driverRepository.getAllDriversCustomByIds(driverIds,offset,search);
+							    size= driverRepository.getAllDriversSizeByIds(driverIds,search);
+							}
+
 						}
 						 
 						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",customDrivers,size);
@@ -125,10 +132,16 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 							 usersIds.add(object.getId());
 						 }
 					 }
+					Integer size = 0;
+					
+					if(exportData.equals("exportData")) {
+					    customDrivers= driverRepository.getAllDriversCustomExport(usersIds,search);
 
-				    customDrivers= driverRepository.getAllDriversCustom(usersIds,offset,search);
-
-					Integer size= driverRepository.getAllDriversSize(usersIds,search);
+					}
+					else {
+					    customDrivers= driverRepository.getAllDriversCustom(usersIds,offset,search);
+						size= driverRepository.getAllDriversSize(usersIds,search);
+					}
 					
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",customDrivers,size);
 					logger.info("************************ getAllDrivers ENDED ***************************");

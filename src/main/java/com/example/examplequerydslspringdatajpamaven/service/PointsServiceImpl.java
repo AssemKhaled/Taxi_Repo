@@ -58,7 +58,7 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 	 * get list of points limit 10
 	 */
 	@Override
-	public ResponseEntity<?> getPointsList(String TOKEN, Long id, int offset, String search) {
+	public ResponseEntity<?> getPointsList(String TOKEN, Long id, int offset, String search,String exportData) {
 		 logger.info("************************ getPointsList STARTED ***************************");
 			
 		List<Points> points = new ArrayList<Points>();
@@ -98,64 +98,20 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 						 Integer size = 0;
 						 List<Map> data = new ArrayList<>();
 						 if(pointIds.size()>0) {
-					    	
-					    	points = pointsRepository.getAllPointsByIds(pointIds,offset,search);
+							 
+							 if(exportData.equals("exportData")) {
+								 points = pointsRepository.getAllPointsByIdsExport(pointIds,search);
 
-							 if(points.size() >0) {
-								 size = pointsRepository.getAllPointsSizeByIds(pointIds,search);
-		
-								 for(Points point:points) {
-								     Map PointsList= new HashMap();
-		
-								     
-									 PointsList.put("id", point.getId());
-									 PointsList.put("name", point.getName());
-									 PointsList.put("latitude", point.getLatitude());
-									 PointsList.put("longitude", point.getLongitude());
-									 PointsList.put("delete_date", point.getDelete_date());
-									 PointsList.put("photo", point.getPhoto());
-									 PointsList.put("userId", point.getUserId());
-									 PointsList.put("userName", null);
-		
-									 User us = userRepository.findOne(point.getUserId());
-									 if(us != null) {
-										 PointsList.put("userName", us.getName());
-		
-									 }
-									 data.add(PointsList);
-		
+							 }
+							 else {
+								 points = pointsRepository.getAllPointsByIds(pointIds,offset,search);
+
+								 if(points.size() >0) {
+									 size = pointsRepository.getAllPointsSizeByIds(pointIds,search);
 								 }
-								
-		
 							 }
-							
-						 }
-						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",data,size);
-						logger.info("************************ getPointsList ENDED ***************************");
-						return  ResponseEntity.ok().body(getObjectResponse);
-					}
-					else {
-						List<User>childernUsers = userServiceImpl.getActiveAndInactiveChildern(id);
-						 if(childernUsers.isEmpty()) {
-							 usersIds.add(id);
-						 }
-						 else {
-							 usersIds.add(id);
-							 for(User object : childernUsers) {
-								 usersIds.add(object.getId());
-							 }
-						 }
-						
-					    
-	
-						
-						
-						 points = pointsRepository.getAllPoints(usersIds,offset,search);
-						 Integer size = 0;
-						 List<Map> data = new ArrayList<>();
-						 if(points.size() >0) {
-							 size = pointsRepository.getAllPointsSize(usersIds,search);
-	
+
+					    	
 							 for(Points point:points) {
 							     Map PointsList= new HashMap();
 	
@@ -178,7 +134,60 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 	
 							 }
 							
-	
+						 }
+						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",data,size);
+						logger.info("************************ getPointsList ENDED ***************************");
+						return  ResponseEntity.ok().body(getObjectResponse);
+					}
+					else {
+						List<User>childernUsers = userServiceImpl.getActiveAndInactiveChildern(id);
+						 if(childernUsers.isEmpty()) {
+							 usersIds.add(id);
+						 }
+						 else {
+							 usersIds.add(id);
+							 for(User object : childernUsers) {
+								 usersIds.add(object.getId());
+							 }
+						 }
+						
+						 Integer size = 0;
+						 List<Map> data = new ArrayList<>();
+						 if(exportData.equals("exportData")) {
+							 points = pointsRepository.getAllPointsExport(usersIds,search);
+
+						 }
+						 else {
+							 points = pointsRepository.getAllPoints(usersIds,offset,search);
+							 
+							 if(points.size() >0) {
+								 size = pointsRepository.getAllPointsSize(usersIds,search);
+
+							 } 
+						 }
+
+						
+						
+						 
+						 for(Points point:points) {
+						     Map PointsList= new HashMap();
+     
+							 PointsList.put("id", point.getId());
+							 PointsList.put("name", point.getName());
+							 PointsList.put("latitude", point.getLatitude());
+							 PointsList.put("longitude", point.getLongitude());
+							 PointsList.put("delete_date", point.getDelete_date());
+							 PointsList.put("photo", point.getPhoto());
+							 PointsList.put("userId", point.getUserId());
+							 PointsList.put("userName", null);
+
+							 User us = userRepository.findOne(point.getUserId());
+							 if(us != null) {
+								 PointsList.put("userName", us.getName());
+
+							 }
+							 data.add(PointsList);
+
 						 }
 						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",data,size);
 						logger.info("************************ getPointsList ENDED ***************************");

@@ -67,7 +67,7 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 	 * get list of geofences with limit 10
 	 */
 	@Override
-	public ResponseEntity<?> getAllGeofences(String TOKEN,Long id,int offset,String search) {
+	public ResponseEntity<?> getAllGeofences(String TOKEN,Long id,int offset,String search,String exportData) {
 
 
 		logger.info("************************ getAllUserGeofences STARTED ***************************");
@@ -110,8 +110,15 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 				    	Integer size = 0;
 						 if(geofenceIds.size()>0) {
 
-							 geofences = geofenceRepository.getAllGeofencesByIds(geofenceIds,offset,search);
-							 size=geofenceRepository.getAllGeofencesSizeByIds(geofenceIds,search);
+							 if(exportData.equals("exportData")) {
+								 geofences = geofenceRepository.getAllGeofencesByIdsExport(geofenceIds,search);
+								
+							 }
+							 else {
+								 geofences = geofenceRepository.getAllGeofencesByIds(geofenceIds,offset,search);
+								 size=geofenceRepository.getAllGeofencesSizeByIds(geofenceIds,search);
+							 }
+
 						 }
 						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",geofences,size);
 						logger.info("************************ getAllUserGeofences ENDED ***************************");
@@ -129,10 +136,17 @@ public class GeofenceServiceImpl extends RestServiceController implements Geofen
 						 }
 					 }
 
+					Integer size = 0; 
+					if(exportData.equals("exportData")) {
+					    geofences = geofenceRepository.getAllGeofencesExport(usersIds,search);
+
+					}
+					else {
+
+					    geofences = geofenceRepository.getAllGeofences(usersIds,offset,search);
+						size=geofenceRepository.getAllGeofencesSize(usersIds,search);
+					}
 					
-					
-				    geofences = geofenceRepository.getAllGeofences(usersIds,offset,search);
-					Integer size=geofenceRepository.getAllGeofencesSize(usersIds,search);
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",geofences,size);
 					logger.info("************************ getAllUserGeofences ENDED ***************************");
 					return  ResponseEntity.ok().body(getObjectResponse);

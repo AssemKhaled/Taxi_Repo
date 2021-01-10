@@ -30,6 +30,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.LastPositionData;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoElmLastLocations;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.TripPositions;
+import com.fasterxml.jackson.databind.introspect.TypeResolutionContext.Basic;
 import com.mongodb.BasicDBObject;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
@@ -57,31 +58,24 @@ public class MongoPositionRepo {
 	
 	public ArrayList<Map<Object,Object>> getLastPoints(Long deviceId){
     	ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
-    	
-        BasicDBObject basicDBObject = new BasicDBObject();
-		
+    			
 	    Aggregation aggregation = newAggregation(
 	            match(Criteria.where("deviceid").in(deviceId)),
 	            project("deviceid","devicetime","latitude","longitude"),
 	            sort(Sort.Direction.DESC, "devicetime"),
 	            limit(5)
 	            
-	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+	        );
 
 	    
-	        AggregationResults<MongoPositions> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
     	
-	        
-
-
-	       if(groupResults.getRawResults().containsField("cursor")) {
-	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
-	            
-			    JSONArray list = (JSONArray) obj.get("firstBatch");
-	            Iterator<Object> iterator = list.iterator();
+           if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
 	            while (iterator.hasNext()) {
-	            	JSONObject object = (JSONObject) iterator.next();
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
 	            	
 	            	Map<Object,Object> points = new HashMap<Object, Object>();
 	            	points.put("lat", object.getDouble("latitude"));
@@ -111,27 +105,23 @@ public class MongoPositionRepo {
 		
 		
         List<TripPositions> positions = new ArrayList<TripPositions>();
-		
-		BasicDBObject basicDBObject = new BasicDBObject();
-		
+				
 	    Aggregation aggregation = newAggregation(
 	            match(Criteria.where("deviceid").in(deviceId).and("devicetime").gte(start).lte(end)),
 	            project("deviceid","latitude","longitude").and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("devicetime")
 	            
-	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+	        );
 
 	    
-	        AggregationResults<MongoPositions> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
 
 
-	       if(groupResults.getRawResults().containsField("cursor")) {
-	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
-	            
-			    JSONArray list = (JSONArray) obj.get("firstBatch");
-	            Iterator<Object> iterator = list.iterator();
+            if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
 	            while (iterator.hasNext()) {
-	            	JSONObject object = (JSONObject) iterator.next();
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
 	            	TripPositions pos = new TripPositions() {
 						
 						@Override
@@ -169,7 +159,6 @@ public class MongoPositionRepo {
 		
 		List<DeviceWorkingHours> deviceHours = new ArrayList<DeviceWorkingHours>();
 		
-		BasicDBObject basicDBObject = new BasicDBObject();
 		Aggregation aggregation;
 		Object v = null;
 		if(custom.equals("ignition") || custom.equals("motion")) {
@@ -184,7 +173,7 @@ public class MongoPositionRepo {
 		            skip(offset),
 		            limit(10)
 		            
-		        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+		        );
 		}
 		else {
 			
@@ -214,25 +203,23 @@ public class MongoPositionRepo {
 		            skip(offset),
 		            limit(10)
 		            
-		        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+		        );
 		}
 		
 
-	        AggregationResults<MongoPositions> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
 
 
-	       if(groupResults.getRawResults().containsField("cursor")) {
-	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
-	            
-			    JSONArray list = (JSONArray) obj.get("firstBatch");
-	            Iterator<Object> iterator = list.iterator();
+            if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
 	            while (iterator.hasNext()) {
-	            	JSONObject object = (JSONObject) iterator.next();
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
 	            	DeviceWorkingHours device = new DeviceWorkingHours();
 	            	
 	            	
-	            	if(object.has("attributes") && object.get("attributes").toString() != "null") {
+	            	if(object.containsField("attributes") && object.get("attributes") != null) {
 	                	device.setAttributes(object.get("attributes").toString());
 	                	
 	                	JSONObject attr = new JSONObject(device.getAttributes().toString());
@@ -243,11 +230,11 @@ public class MongoPositionRepo {
 
 
 	            	}
-	            	if(object.has("deviceid")) {
+	            	if(object.containsField("deviceid") && object.get("deviceid")  != null) {
 	                	device.setDeviceId(object.getLong("deviceid"));
 	
 	            	}
-					if(object.has("devicetime") && object.get("devicetime").toString() != "null") {
+					if(object.containsField("devicetime") && object.get("devicetime")  != null) {
 						
 						Date dateTime = null;
 						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -271,15 +258,12 @@ public class MongoPositionRepo {
 						device.setDeviceTime(outputFormat.format(dateTime));
 						   		
 	                }
-					if(object.has("_id")) {
-		            	JSONObject objId = (JSONObject) object.get("_id");
-		            	if(objId.has("$oid")) {
-			            	device.setPositionId(objId.getString("$oid"));
-						}
-	
+					if(object.containsField("_id") && object.get("_id") != null) {
+						device.setPositionId(object.getObjectId("_id").toString());
+
 					}
 					
-					if(object.has("deviceName") && object.get("deviceName").toString() != "null") {
+					if(object.containsField("deviceName") && object.get("deviceName") != null) {
 		            	device.setDeviceName(object.getString("deviceName"));    		
 	                }
 					
@@ -307,7 +291,6 @@ public class MongoPositionRepo {
 		
 		List<DeviceWorkingHours> deviceHours = new ArrayList<DeviceWorkingHours>();
 		
-		BasicDBObject basicDBObject = new BasicDBObject();
 		Object v = null;
 		Aggregation aggregation ;
 		if(custom.equals("ignition") || custom.equals("motion")) {
@@ -318,7 +301,7 @@ public class MongoPositionRepo {
 		            project("deviceid","attributes","deviceName").and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("devicetime"),
 		    		sort(Sort.Direction.DESC, "devicetime")
 		            
-		        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+		        );
 		}
 		else {
 			if(custom.equals("priority") || custom.equals("sat") || custom.equals("event") || custom.equals("rssi")
@@ -343,27 +326,23 @@ public class MongoPositionRepo {
 			            project("deviceid","attributes","deviceName").and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("devicetime"),
 			    		sort(Sort.Direction.DESC, "devicetime")
 			            
-			        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+			        );
 		}
 		
 	    
 
-	        AggregationResults<MongoPositions> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
 
 
-	       if(groupResults.getRawResults().containsField("cursor")) {
-	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
-	            
-			    JSONArray list = (JSONArray) obj.get("firstBatch");
-	            Iterator<Object> iterator = list.iterator();
+            if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
 	            while (iterator.hasNext()) {
-	            	JSONObject object = (JSONObject) iterator.next();
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
 	            	DeviceWorkingHours device = new DeviceWorkingHours();
 	            	
-	            	
-
-	            	if(object.has("attributes") && object.get("attributes").toString() != "null") {
+	            	if(object.containsField("attributes") && object.get("attributes") != null) {
 	                	device.setAttributes(object.get("attributes").toString());
 	                	
 	                	JSONObject attr = new JSONObject(device.getAttributes().toString());
@@ -374,11 +353,11 @@ public class MongoPositionRepo {
 
 
 	            	}
-	            	if(object.has("deviceid")) {
+	            	if(object.containsField("deviceid") && object.get("deviceid") != null) {
 	                	device.setDeviceId(object.getLong("deviceid"));
 	
 	            	}
-					if(object.has("devicetime") && object.get("devicetime").toString() != "null") {
+					if(object.containsField("devicetime") && object.get("devicetime") != null) {
 						
 						Date dateTime = null;
 						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -403,15 +382,12 @@ public class MongoPositionRepo {
 						
 
 	                }
-					if(object.has("_id")) {
-		            	JSONObject objId = (JSONObject) object.get("_id");
-		            	if(objId.has("$oid")) {
-			            	device.setPositionId(objId.getString("$oid"));
-						}
-	
+					if(object.containsField("_id") && object.get("_id") != null) {
+						device.setPositionId(object.getObjectId("_id").toString());
+
 					}
 					
-					if(object.has("deviceName") && object.get("deviceName").toString() != "null") {
+					if(object.containsField("deviceName") && object.get("deviceName")!= null) {
 		            	device.setDeviceName(object.getString("deviceName"));    		
 	                }
 					
@@ -438,7 +414,6 @@ public class MongoPositionRepo {
 		
 		Integer size = 0;
 
-		BasicDBObject basicDBObject = new BasicDBObject();
 		Object v = null;
 		Aggregation aggregation;
 		
@@ -450,7 +425,7 @@ public class MongoPositionRepo {
 		            project("deviceid","attributes","deviceName").and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("devicetime"),
 		    		sort(Sort.Direction.DESC, "devicetime"),
 		            count().as("size")
-		        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+		        );
 		}
 		else {
 			
@@ -477,25 +452,22 @@ public class MongoPositionRepo {
 		            project("deviceid","attributes","deviceName").and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("devicetime"),
 		    		sort(Sort.Direction.DESC, "devicetime"),
 		            count().as("size")
-		        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+		        );
 		}
 		
 
 
-	        AggregationResults<MongoPositions> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
 
 
-	        if(groupResults.getRawResults().containsField("cursor")) {
-	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
-	            
-			    JSONArray list = (JSONArray) obj.get("firstBatch");
-
-			    if(!list.isNull(0)) {
-			    	JSONObject object = (JSONObject) list.get(0);
+	        if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
+	            while (iterator.hasNext()) {
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
 	            	size = object.getInt("size");
-			    }
-	            
+	            }
 
 	        }
 		return size;
@@ -515,31 +487,26 @@ public class MongoPositionRepo {
 		Integer size = 0;
 
 		
-		BasicDBObject basicDBObject = new BasicDBObject();
 		
 	    Aggregation aggregation = newAggregation(
 	    		match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)),
 	            project("deviceid","attributes","speed","deviceName","weight").and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("devicetime"),
 	            sort(Sort.Direction.DESC, "devicetime"),
 	            count().as("size")
-	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+	        );
 
 
-	        AggregationResults<MongoPositions> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
 
 
-
-	        if(groupResults.getRawResults().containsField("cursor")) {
-	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
-	            
-			    JSONArray list = (JSONArray) obj.get("firstBatch");
-
-			    if(!list.isNull(0)) {
-			    	JSONObject object = (JSONObject) list.get(0);
+	        if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
+	            while (iterator.hasNext()) {
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
 	            	size = object.getInt("size");
-			    }
-	            
+	            }
 
 	        }
 		return size;
@@ -560,7 +527,6 @@ public class MongoPositionRepo {
 		List<CustomPositions> positions = new ArrayList<CustomPositions>();
 
 				
-		BasicDBObject basicDBObject = new BasicDBObject();
 		
 	    Aggregation aggregation = newAggregation(
 	            match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)),
@@ -569,25 +535,23 @@ public class MongoPositionRepo {
 	            skip(offset),
 	            limit(10)
 	            
-	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+	        );
 
 	    
-	        AggregationResults<MongoPositions> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
 
 	        
-	       if(groupResults.getRawResults().containsField("cursor")) {
-	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
-	            
-			    JSONArray list = (JSONArray) obj.get("firstBatch");
-	            Iterator<Object> iterator = list.iterator();
+            if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
 	            while (iterator.hasNext()) {
-	            	JSONObject object = (JSONObject) iterator.next();
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
 	            	CustomPositions device = new CustomPositions();
 	            	
 	            	
 	            	
-	            	if(object.has("attributes") && object.get("attributes").toString() != "null") {
+	            	if(object.containsField("attributes") && object.get("attributes") != null) {
 	                	device.setAttributes(object.get("attributes").toString());
 	
                        JSONObject attr = new JSONObject(device.getAttributes().toString());
@@ -599,14 +563,14 @@ public class MongoPositionRepo {
 							device.setSensor2(attr.getDouble("adc2"));
 						}
 	            	}
-	            	if(object.has("deviceid")) {
+	            	if(object.containsField("deviceid") && object.get("deviceid") != null) {
 	                	device.setDeviceId(object.getLong("deviceid"));
 	
 	            	}
-	            	if(object.has("speed")) {
+	            	if(object.containsField("speed") && object.get("speed") != null) {
 		            	device.setSpeed(object.getDouble("speed") * (1.852) );    		
 	                }
-					if(object.has("devicetime") && object.get("devicetime").toString() != "null") {
+					if(object.containsField("devicetime") && object.get("devicetime") != null) {
 						
 						Date dateTime = null;
 						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -631,17 +595,14 @@ public class MongoPositionRepo {
 						
 						
 	                }
-					if(object.has("_id")) {
-		            	JSONObject objId = (JSONObject) object.get("_id");
-		            	if(objId.has("$oid")) {
-			            	device.setId(objId.getString("$oid"));
-						}
-	
+					if(object.containsField("_id") && object.get("_id") != null) {
+						device.setId(object.getObjectId("_id").toString());
+
 					}
-					if(object.has("deviceName") && object.get("deviceName").toString() != "null") {
+					if(object.containsField("deviceName") && object.get("deviceName") != null) {
 		            	device.setDeviceName(object.getString("deviceName"));    		
 	                }
-					if(object.has("weight")) {
+					if(object.containsField("weight") && object.get("weight") != null) {
 		            	device.setWeight(object.getDouble("weight"));    		
 	                }
 	            	
@@ -668,31 +629,27 @@ public class MongoPositionRepo {
 		
 		List<CustomPositions> positions = new ArrayList<CustomPositions>();
 
-				
-		BasicDBObject basicDBObject = new BasicDBObject();
-		
+						
 	    Aggregation aggregation = newAggregation(
 	            match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)),
 	            project("deviceid","attributes","speed","deviceName","weight").and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("devicetime"),
 	            sort(Sort.Direction.DESC, "devicetime")
 	            
-	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+	        );
 
 	    
-	        AggregationResults<MongoPositions> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
 
 	        
-	       if(groupResults.getRawResults().containsField("cursor")) {
-	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
-	            
-			    JSONArray list = (JSONArray) obj.get("firstBatch");
-	            Iterator<Object> iterator = list.iterator();
+            if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
 	            while (iterator.hasNext()) {
-	            	JSONObject object = (JSONObject) iterator.next();
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
 	            	CustomPositions device = new CustomPositions();
 	            	
-	            	if(object.has("attributes") && object.get("attributes").toString() != "null") {
+	            	if(object.containsField("attributes") && object.get("attributes").toString() != null) {
 	                	device.setAttributes(object.get("attributes").toString());
 	
                        JSONObject attr = new JSONObject(device.getAttributes().toString());
@@ -704,14 +661,14 @@ public class MongoPositionRepo {
 							device.setSensor2(attr.getDouble("adc2"));
 						}
 	            	}
-	            	if(object.has("deviceid")) {
+	            	if(object.containsField("deviceid") && object.get("deviceid") != null) {
 	                	device.setDeviceId(object.getLong("deviceid"));
 	
 	            	}
-	            	if(object.has("speed")) {
+	            	if(object.containsField("speed") && object.get("speed") != null) {
 		            	device.setSpeed(object.getDouble("speed") * (1.852) );    		
 	                }
-					if(object.has("devicetime") && object.get("devicetime").toString() != "null") {
+					if(object.containsField("devicetime") && object.get("devicetime") != null) {
 						
 						Date dateTime = null;
 						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -736,17 +693,15 @@ public class MongoPositionRepo {
 						
 						
 	                }
-					if(object.has("_id")) {
-		            	JSONObject objId = (JSONObject) object.get("_id");
-		            	if(objId.has("$oid")) {
-			            	device.setId(objId.getString("$oid"));
-						}
-	
+					
+					if(object.containsField("_id") && object.get("_id") != null) {
+						device.setId(object.getObjectId("_id").toString());
+
 					}
-					if(object.has("deviceName") && object.get("deviceName").toString() != "null") {
+					if(object.containsField("deviceName") && object.get("deviceName") != null) {
 		            	device.setDeviceName(object.getString("deviceName"));    		
 	                }
-					if(object.has("weight")) {
+					if(object.containsField("weight") && object.get("weight") != null) {
 		            	device.setWeight(object.getDouble("weight"));    		
 	                }
 					
@@ -792,8 +747,6 @@ public class MongoPositionRepo {
 		
 		List<Map> positions = new ArrayList<Map>();
 
-
-		BasicDBObject basicDBObject = new BasicDBObject();
 		List<ObjectId> ids = new ArrayList<ObjectId>();
 
 		for(String id:positionIds) {
@@ -810,30 +763,23 @@ public class MongoPositionRepo {
 	            limit(10)
 	            
 
-	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+	        );
 
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
 
-
-	        AggregationResults<MongoPositions> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
-
-	        if(groupResults.getRawResults().containsField("cursor")) {
-	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
-	            
-			    JSONArray list = (JSONArray) obj.get("firstBatch");
-	            Iterator<Object> iterator = list.iterator();
+	        if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
 	            while (iterator.hasNext()) {
-
-	            	JSONObject object = (JSONObject) iterator.next();
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
 	            	Map position = new HashMap();
 	            	
 
                 	position.put("hours","0");
 
-                    if(object.has("todayHours")) {
-                    	System.out.println( object.getString("todayHoursString"));
+                    if(object.containsField("todayHours")) {
 
-                    	System.out.println((long) object.getDouble("todayHours"));
                     	long min = TimeUnit.MILLISECONDS.toMinutes((long) object.getDouble("todayHours"));
                     	
                     	Double hours = (double) min;
@@ -841,12 +787,12 @@ public class MongoPositionRepo {
                     	position.put("hours",hours/60);
 
 	            	}
-	            	if(object.has("deviceName") && object.get("deviceName").toString() != "null") {
+	            	if(object.containsField("deviceName") && object.get("deviceName") != null) {
                     	
                     	position.put("deviceName",object.get("deviceName").toString());
 
 	            	}
-					if(object.has("driverName") && object.get("driverName").toString() != "null") {
+					if(object.containsField("driverName") && object.get("driverName") != null) {
 						
 						position.put("driverName",object.get("driverName").toString());
 					
@@ -877,7 +823,6 @@ public class MongoPositionRepo {
 		List<DeviceWorkingHours> deviceHours = new ArrayList<DeviceWorkingHours>();
 
 
-		BasicDBObject basicDBObject = new BasicDBObject();
 		
 	    Aggregation aggregation = newAggregation(
 	            match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)), 
@@ -888,26 +833,24 @@ public class MongoPositionRepo {
 	            skip(offset),
 	            limit(10)
 	            
-	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+	        );
 
 
-	        AggregationResults<MongoPositions> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
 
 
-	       if(groupResults.getRawResults().containsField("cursor")) {
-	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
-	            
-			    JSONArray list = (JSONArray) obj.get("firstBatch");
-	            Iterator<Object> iterator = list.iterator();
+            if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
 	            while (iterator.hasNext()) {
-	            	JSONObject object = (JSONObject) iterator.next();
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
 	            	DeviceWorkingHours device = new DeviceWorkingHours();
 	            	
 	            	
 	            	device.setHours("0");
 	            	
-	            	if(object.has("attributes") && object.get("attributes").toString() != "null") {
+	            	if(object.containsField("attributes") && object.get("attributes") != null) {
                     	
 	                	device.setAttributes(object.get("attributes").toString());
 	                	
@@ -919,35 +862,29 @@ public class MongoPositionRepo {
 						
 
 	            	}
-	            	if(object.has("deviceid")) {
+	            	if(object.containsField("deviceid") && object.get("deviceid") != null) {
 	                	device.setDeviceId(object.getLong("deviceid"));
 	
 	            	}
-					if(object.has("devicetime") && object.get("devicetime").toString() != "null") {
+					if(object.containsField("devicetime") && object.get("devicetime") != null) {
 
 
 						device.setDeviceTime(object.getString("devicetime"));
 						
 						
 	                }
-					if(object.has("_id")) {
-		            	JSONObject objId = (JSONObject) object.get("_id");
-		            	if(objId.has("$oid")) {
-			            	device.setPositionId(objId.getString("$oid"));
-						}
-	
+					if(object.containsField("_id") && object.get("_id") != null) {
+						device.setPositionId(object.getObjectId("_id").toString());
+
 					}
 					
-					if(object.has("deviceName") && object.get("deviceName").toString() != "null") {
+					if(object.containsField("deviceName") && object.get("deviceName") != null) {
 		            	
 						device.setDeviceName(object.getString("deviceName"));
 	
 					}
 					
-					
-					
-	            	
-	            	
+				
 	            	deviceHours.add(device);
 	            }
 	        }
@@ -969,9 +906,7 @@ public class MongoPositionRepo {
 		
 		List<DriverWorkingHours> driverHours = new ArrayList<DriverWorkingHours>();
 
-				
-		BasicDBObject basicDBObject = new BasicDBObject();
-		
+						
 	    Aggregation aggregation = newAggregation(
 	            match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)),
 	            project("deviceid","attributes","deviceName","driverName").and("devicetime").dateAsFormattedString("%Y-%m-%d").as("devicetime"),
@@ -981,25 +916,23 @@ public class MongoPositionRepo {
 	            skip(offset),
 	            limit(10)
 	            
-	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+	        );
 
 	    
-	        AggregationResults<MongoPositions> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
 
 
-	       if(groupResults.getRawResults().containsField("cursor")) {
-	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
-	            
-			    JSONArray list = (JSONArray) obj.get("firstBatch");
-	            Iterator<Object> iterator = list.iterator();
+	        if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
 	            while (iterator.hasNext()) {
-	            	JSONObject object = (JSONObject) iterator.next();
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
 	            	DriverWorkingHours device = new DriverWorkingHours();
 	            	
 	            	
 	            	device.setHours("0");
-	            	if(object.has("attributes") && object.get("attributes").toString() != "null") {
+	            	if(object.containsField("attributes") && object.get("attributes") != null) {
 	                	device.setAttributes(object.get("attributes").toString());
 	
                         JSONObject attr = new JSONObject(device.getAttributes().toString());
@@ -1008,27 +941,25 @@ public class MongoPositionRepo {
 							device.setHours(attr.getString("todayHoursString"));
 						}
 	            	}
-	            	if(object.has("deviceid")) {
+	            	if(object.containsField("deviceid") && object.get("deviceid") != null) {
 	                	device.setDeviceId(object.getLong("deviceid"));
 	
 	            	}
-					if(object.has("devicetime") && object.get("devicetime").toString() != "null") {
+					if(object.containsField("devicetime") && object.get("devicetime") != null) {
 						
 						device.setDeviceTime(object.getString("devicetime"));
 
 						
 	                }
-					if(object.has("_id")) {
-		            	JSONObject objId = (JSONObject) object.get("_id");
-		            	if(objId.has("$oid")) {
-			            	device.setPositionId(objId.getString("$oid"));
-						}
-	
+					if(object.containsField("_id") && object.get("_id") != null) {
+						device.setPositionId(object.getObjectId("_id").toString());
+
 					}
-					if(object.has("deviceName") && object.get("deviceName").toString() != "null") {
+					
+					if(object.containsField("deviceName") && object.get("deviceName") != null) {
 		            	device.setDeviceName(object.getString("deviceName"));    		
 	                }
-					if(object.has("driverName") && object.get("driverName").toString() != "null") {
+					if(object.containsField("driverName") && object.get("driverName") != null) {
 		            	device.setDriverName(object.getString("driverName"));    		
 	                }
 					
@@ -1055,35 +986,32 @@ public class MongoPositionRepo {
 		
 		List<DeviceWorkingHours> deviceHours = new ArrayList<DeviceWorkingHours>();
 
-				
-		BasicDBObject basicDBObject = new BasicDBObject();
-		
+						
 	    Aggregation aggregation = newAggregation(
 	            match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)), 
 	            project("deviceid","attributes","deviceName").and("devicetime").dateAsFormattedString("%Y-%m-%d").as("devicetime"),
 	            group("deviceid","devicetime").last("$$ROOT").as("test"),
 	            replaceRoot("test"),
 	            sort(Sort.Direction.DESC, "devicetime")
-	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+	        );
 
 	    
-	        AggregationResults<MongoPositions> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
 
 
-	       if(groupResults.getRawResults().containsField("cursor")) {
-	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
-	            
-			    JSONArray list = (JSONArray) obj.get("firstBatch");
-	            Iterator<Object> iterator = list.iterator();
+
+	        if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
 	            while (iterator.hasNext()) {
-	            	JSONObject object = (JSONObject) iterator.next();
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
 	            	DeviceWorkingHours device = new DeviceWorkingHours();
 	            	
 
 	            	device.setHours("0");
 	            	
-	            	if(object.has("attributes") && object.get("attributes").toString() != "null") {
+	            	if(object.containsField("attributes") && object.get("attributes") != null) {
                     	
 	                	device.setAttributes(object.get("attributes").toString());
 	                	
@@ -1095,33 +1023,29 @@ public class MongoPositionRepo {
 						
 
 	            	}
-	            	if(object.has("deviceid")) {
+	            	if(object.containsField("deviceid") && object.get("deviceid") != null) {
 	                	device.setDeviceId(object.getLong("deviceid"));
 	
 	            	}
-					if(object.has("devicetime") && object.get("devicetime").toString() != "null") {
+					if(object.containsField("devicetime") && object.get("devicetime") != null) {
 						
 						device.setDeviceTime(object.getString("devicetime"));
 
 						
 	                }
-					if(object.has("_id")) {
-		            	JSONObject objId = (JSONObject) object.get("_id");
-		            	if(objId.has("$oid")) {
-			            	device.setPositionId(objId.getString("$oid"));
-						}
+					if(object.containsField("_id") && object.get("_id") != null) {
+		            	
+		            	device.setPositionId(object.getObjectId("_id").toString());
+
 	
 					}
 					
-					if(object.has("deviceName") && object.get("deviceName").toString() != "null") {
+					if(object.containsField("deviceName") && object.get("deviceName") != null) {
 		            	
 						device.setDeviceName(object.getString("deviceName"));
 	
 					}
 					
-					
-					
-	            	
 	            	
 	            	deviceHours.add(device);
 	            }
@@ -1131,6 +1055,7 @@ public class MongoPositionRepo {
 	}
 	
 	public List<DriverWorkingHours> getDriverWorkingHoursScheduled(List<Long> allDevices,Date start,Date end){
+
 
 		Calendar calendarFrom = Calendar.getInstance();
 		calendarFrom.setTime(start);
@@ -1144,8 +1069,6 @@ public class MongoPositionRepo {
 		
 		List<DriverWorkingHours> driverHours = new ArrayList<DriverWorkingHours>();
 
-				
-		BasicDBObject basicDBObject = new BasicDBObject();
 		
 	    Aggregation aggregation = newAggregation(
 	            match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)),
@@ -1154,24 +1077,24 @@ public class MongoPositionRepo {
 	            replaceRoot("test"),
 	            sort(Sort.Direction.DESC, "devicetime")
 	            
-	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+	        );
 
 	    
-	        AggregationResults<MongoPositions> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
 
 
-	       if(groupResults.getRawResults().containsField("cursor")) {
-	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
-	            
-			    JSONArray list = (JSONArray) obj.get("firstBatch");
-	            Iterator<Object> iterator = list.iterator();
+
+	        if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
 	            while (iterator.hasNext()) {
-	            	JSONObject object = (JSONObject) iterator.next();
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
 	            	DriverWorkingHours device = new DriverWorkingHours();
 	            	
+	            	
 	            	device.setHours("0");
-	            	if(object.has("attributes") && object.get("attributes").toString() != "null") {
+	            	if(object.containsField("attributes") && object.get("attributes") != null) {
 	                	device.setAttributes(object.get("attributes").toString());
 	
                         JSONObject attr = new JSONObject(device.getAttributes().toString());
@@ -1180,30 +1103,31 @@ public class MongoPositionRepo {
 							device.setHours(attr.getString("todayHoursString"));
 						}
 	            	}
-	            	if(object.has("deviceid")) {
+	            	if(object.containsField("deviceid") && object.get("deviceid") !=null) {
 	                	device.setDeviceId(object.getLong("deviceid"));
 	
 	            	}
-					if(object.has("devicetime") && object.get("devicetime").toString() != "null") {
+					if(object.containsField("devicetime") && object.get("devicetime") !=null) {
+						
 						device.setDeviceTime(object.getString("devicetime"));
 
+						
 	                }
-					if(object.has("_id")) {
-		            	JSONObject objId = (JSONObject) object.get("_id");
-		            	if(objId.has("$oid")) {
-			            	device.setPositionId(objId.getString("$oid"));
-						}
-	
+					if(object.containsField("_id") && object.get("_id") !=null) {
+		            	
+		            	device.setPositionId(object.getObjectId("_id").toString());
+
 					}
-					if(object.has("deviceName") && object.get("deviceName").toString() != "null") {
+					if(object.containsField("deviceName") && object.get("deviceName") !=null) {
 		            	device.setDeviceName(object.getString("deviceName"));    		
 	                }
-					if(object.has("driverName") && object.get("driverName").toString() != "null") {
+					if(object.containsField("driverName") && object.get("driverName") !=null) {
 		            	device.setDriverName(object.getString("driverName"));    		
 	                }
+					
 	            	
 	            	
-					driverHours.add(device);
+	            	driverHours.add(device);
 	            }
 	        }
         
@@ -1224,9 +1148,6 @@ public class MongoPositionRepo {
 		end = calendarTo.getTime();
 		
 		Integer size = 0;
-
-		
-		BasicDBObject basicDBObject = new BasicDBObject();
 		
 	    Aggregation aggregation = newAggregation(
 	            match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)), 
@@ -1236,24 +1157,20 @@ public class MongoPositionRepo {
 	            sort(Sort.Direction.DESC, "devicetime"),
 	            count().as("size")
 	            
-	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+	        );
 
 
-	        AggregationResults<MongoPositions> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
 
 
-
-	        if(groupResults.getRawResults().containsField("cursor")) {
-	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
-	            
-			    JSONArray list = (JSONArray) obj.get("firstBatch");
-
-            	if(!list.isNull(0)) {
-			    	JSONObject object = (JSONObject) list.get(0);
+            if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
+	            while (iterator.hasNext()) {
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
 	            	size = object.getInt("size");
-			    }
-	            
+	            }
 
 	        }
 		return size;
@@ -1271,9 +1188,6 @@ public class MongoPositionRepo {
 		end = calendarTo.getTime();
 		
 		Integer size = 0;
-
-		
-		BasicDBObject basicDBObject = new BasicDBObject();
 		
 	    Aggregation aggregation = newAggregation(
 	            match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)),
@@ -1283,24 +1197,19 @@ public class MongoPositionRepo {
 	            sort(Sort.Direction.DESC, "devicetime"),
 	            count().as("size")
 	            
-	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+	        );
 
 
-	        AggregationResults<MongoPositions> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
 
-
-
-	        if(groupResults.getRawResults().containsField("cursor")) {
-	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
-	            
-			    JSONArray list = (JSONArray) obj.get("firstBatch");
-			    
-			    if(!list.isNull(0)) {
-			    	JSONObject object = (JSONObject) list.get(0);
+	        if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
+	            while (iterator.hasNext()) {
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
 	            	size = object.getInt("size");
-			    }
-	            
+	            }
 
 	        }
 		return size;

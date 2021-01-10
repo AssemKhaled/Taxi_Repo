@@ -43,11 +43,12 @@ public class GroupsRestController {
 	
 	@RequestMapping(value = "/getAllGroups", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getGroups(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                            @RequestParam (value = "userId", defaultValue = "0") Long id,
-														@RequestParam (value = "offset", defaultValue = "0") int offset,
-														@RequestParam (value = "search", defaultValue = "") String search) {
+										             @RequestParam (value = "exportData", defaultValue = "") String exportData,                                         
+													 @RequestParam (value = "userId", defaultValue = "0") Long id,
+												     @RequestParam (value = "offset", defaultValue = "0") int offset,
+													 @RequestParam (value = "search", defaultValue = "") String search) {
 		
-    	return  groupsServiceImpl.getAllGroups(TOKEN,id,offset,search);
+    	return  groupsServiceImpl.getAllGroups(TOKEN,id,offset,search,exportData);
 
 	}
 	

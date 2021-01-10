@@ -54,6 +54,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 	
 })
 @NamedNativeQueries({
+	
 	@NamedNativeQuery(name="getDriverList", 
 			resultSetMapping="DriverList", 
 			query="SELECT tc_drivers.id as id,tc_drivers.name as name ,tc_drivers.uniqueid as uniqueid,"
@@ -71,6 +72,22 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 					+ " (tc_drivers.mobile_num Like LOWER(CONCAT('%',:search, '%'))) OR (tc_drivers.birth_date Like LOWER(CONCAT('%',:search, '%')))) " + 
 					" LIMIT :offset,10"),
 	
+	@NamedNativeQuery(name="getDriverListExport", 
+	resultSetMapping="DriverList", 
+	query="SELECT tc_drivers.id as id,tc_drivers.name as name ,tc_drivers.uniqueid as uniqueid,"
+			+ " tc_drivers.attributes as attributes," + 
+			" tc_drivers.mobile_num as mobile_num,tc_drivers.birth_date as birth_date,"
+			+ " tc_drivers.email as email,tc_drivers.reference_key as reference_key, " + 
+			" tc_drivers.is_deleted as is_deleted,tc_drivers.delete_date as delete_date,"
+			+ " tc_drivers.reject_reason as reject_reason,tc_drivers.date_type as date_type,tc_drivers.is_valid as is_valid, " + 
+			" tc_drivers.photo as photo,tc_users.name as companyName  "
+			+ " FROM tc_drivers "
+			+ " INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id " +
+			" LEFT JOIN tc_users ON tc_user_driver.userid = tc_users.id " + 
+			" WHERE tc_user_driver.userid IN(:userIds) and tc_drivers.delete_date is null " 
+			+ " and ((tc_users.name Like LOWER(CONCAT('%',:search, '%'))) OR (tc_drivers.name Like LOWER(CONCAT('%',:search, '%'))) OR (tc_drivers.uniqueid Like LOWER(CONCAT('%',:search, '%'))) OR "
+			+ " (tc_drivers.mobile_num Like LOWER(CONCAT('%',:search, '%'))) OR (tc_drivers.birth_date Like LOWER(CONCAT('%',:search, '%')))) " ),
+	
 	@NamedNativeQuery(name="getDriverListByIds", 
 	resultSetMapping="DriverList", 
 	query="SELECT tc_drivers.id as id,tc_drivers.name as name ,tc_drivers.uniqueid as uniqueid,"
@@ -86,7 +103,23 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 			" WHERE tc_drivers.id IN(:driverIds) and tc_drivers.delete_date is null " 
 			+ " and ((tc_users.name Like LOWER(CONCAT('%',:search, '%'))) OR (tc_drivers.name Like LOWER(CONCAT('%',:search, '%'))) OR (tc_drivers.uniqueid Like LOWER(CONCAT('%',:search, '%'))) OR "
 			+ " (tc_drivers.mobile_num Like LOWER(CONCAT('%',:search, '%'))) OR (tc_drivers.birth_date Like LOWER(CONCAT('%',:search, '%')))) " + 
-			" LIMIT :offset,10")
+			" LIMIT :offset,10"),
+	
+	@NamedNativeQuery(name="getDriverListByIdsExport", 
+	resultSetMapping="DriverList", 
+	query="SELECT tc_drivers.id as id,tc_drivers.name as name ,tc_drivers.uniqueid as uniqueid,"
+			+ " tc_drivers.attributes as attributes," + 
+			" tc_drivers.mobile_num as mobile_num,tc_drivers.birth_date as birth_date,"
+			+ " tc_drivers.email as email,tc_drivers.reference_key as reference_key, " + 
+			" tc_drivers.is_deleted as is_deleted,tc_drivers.delete_date as delete_date,"
+			+ " tc_drivers.reject_reason as reject_reason,tc_drivers.date_type as date_type,tc_drivers.is_valid as is_valid, " + 
+			" tc_drivers.photo as photo,tc_users.name as companyName  "
+			+ " FROM tc_drivers "
+			+ " INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id " +
+			" LEFT JOIN tc_users ON tc_user_driver.userid = tc_users.id " + 
+			" WHERE tc_drivers.id IN(:driverIds) and tc_drivers.delete_date is null " 
+			+ " and ((tc_users.name Like LOWER(CONCAT('%',:search, '%'))) OR (tc_drivers.name Like LOWER(CONCAT('%',:search, '%'))) OR (tc_drivers.uniqueid Like LOWER(CONCAT('%',:search, '%'))) OR "
+			+ " (tc_drivers.mobile_num Like LOWER(CONCAT('%',:search, '%'))) OR (tc_drivers.birth_date Like LOWER(CONCAT('%',:search, '%')))) " )
 
 	
 })

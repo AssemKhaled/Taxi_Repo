@@ -206,7 +206,7 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	 * get user list with limit 10 of userId and active or not
 	 */
 	@Override
-	public ResponseEntity<?> usersOfUser(String TOKEN,Long userId,Long loggedUserId,int offset,String search,int active) {
+	public ResponseEntity<?> usersOfUser(String TOKEN,Long userId,Long loggedUserId,int offset,String search,int active,String exportData) {
 		logger.info("************************ getAllUsersOfUser STARTED ***************************");
 		if(TOKEN.equals("")) {
 			 List<User> users = null;
@@ -284,23 +284,46 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 					 }
 				}
 				
-
+				List<User> users = new ArrayList<User>();
+				Integer size = 0;
 				if(active  == 0) {
-					List<User> users = userRepository.getInactiveUsersOfUser(loggedUserId,userId,offset,search);
-					Integer size=userRepository.getInactiveUsersOfUserSize(userId);
-					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users,size);
-					logger.info("************************ getAllUsersOfUser ENDED ***************************");
-					return  ResponseEntity.ok().body(getObjectResponse);
+					
+					if(exportData.equals("exportData")) {
+						
+						users = userRepository.getInactiveUsersOfUserExport(loggedUserId,userId,search);
+						size=userRepository.getInactiveUsersOfUserSize(userId);
+					}
+					else {
+						users = userRepository.getInactiveUsersOfUser(loggedUserId,userId,offset,search);
+						size=userRepository.getInactiveUsersOfUserSize(userId);
+					}
+					
 				}
-				if(active == 2) {
-					List<User> users = userRepository.getAllUsersOfUser(loggedUserId,userId,offset,search);
-					Integer size=userRepository.getAllUsersOfUserSize(userId);
-					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users,size);
-					logger.info("************************ getAllUsersOfUser ENDED ***************************");
-					return  ResponseEntity.ok().body(getObjectResponse);
+				else if(active == 2) {
+					if(exportData.equals("exportData")) {
+						 
+						users = userRepository.getAllUsersOfUserExport(loggedUserId,userId,search);
+					}
+					else {
+						users = userRepository.getAllUsersOfUser(loggedUserId,userId,offset,search);
+						size=userRepository.getAllUsersOfUserSize(userId); 
+					}
+					
 				}
-				List<User> users = userRepository.getUsersOfUser(loggedUserId,userId,offset,search);
-				Integer size=userRepository.getUsersOfUserSize(userId);
+				else {
+					if(exportData.equals("exportData")) {
+						
+						users = userRepository.getUsersOfUserExport(loggedUserId,userId,search);
+
+					}
+					else {
+						users = userRepository.getUsersOfUser(loggedUserId,userId,offset,search);
+						size=userRepository.getUsersOfUserSize(userId);
+					}
+				    
+					
+				}
+				
 				getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",users,size);
 				logger.info("************************ getAllUsersOfUser ENDED ***************************");
 

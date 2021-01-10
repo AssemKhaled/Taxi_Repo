@@ -235,7 +235,7 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 	 * get list of schedule with limit 10
 	 */
 	@Override
-	public ResponseEntity<?> getScheduledList(String TOKEN, Long id, int offset, String search) {
+	public ResponseEntity<?> getScheduledList(String TOKEN, Long id, int offset, String search,String exportData) {
         logger.info("************************ getScheduledList STARTED ***************************");
 		
 		List<Schedule> schedules = new ArrayList<Schedule>();
@@ -272,32 +272,41 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 						
 							 List<Long>usersIds= new ArrayList<>();
 							 usersIds.add(user.getId());
-							 schedules = scheduledRepository.getAllScheduled(usersIds,offset,search);
 							 Integer size = 0;
 							 List<Map> data = new ArrayList<>();
 
-							 if(schedules.size() >0) {
-								 size = scheduledRepository.getAllScheduledSize(usersIds);
-								 for(Schedule schedule:schedules) {
-								     Map scheduleList= new HashMap();
+							 if(exportData.equals("exportData")) {
+								 schedules = scheduledRepository.getAllScheduledExport(usersIds,search);
 
-									 scheduleList.put("date", schedule.getDate());
-									 scheduleList.put("date_type", schedule.getDate_type());
-									 scheduleList.put("delete_date", schedule.getDelete_date());
-									 scheduleList.put("expression", schedule.getExpression());
-									 scheduleList.put("id", schedule.getId());
-									 scheduleList.put("task", schedule.getTask());
-									 scheduleList.put("userId", schedule.getUserId());
-									 scheduleList.put("userName", null);
+							 }
+							 else {
+								 schedules = scheduledRepository.getAllScheduled(usersIds,offset,search);
+								 if(schedules.size() >0) {
+									 size = scheduledRepository.getAllScheduledSize(usersIds);
+									 
+								 }
+							 }
 
-									 User us = userRepository.findOne(schedule.getUserId());
-									 if(us != null) {
-										 scheduleList.put("userName", us.getName());
+							 
+							 for(Schedule schedule:schedules) {
+							     Map scheduleList= new HashMap();
 
-									 }
-									 data.add(scheduleList);
+								 scheduleList.put("date", schedule.getDate());
+								 scheduleList.put("date_type", schedule.getDate_type());
+								 scheduleList.put("delete_date", schedule.getDelete_date());
+								 scheduleList.put("expression", schedule.getExpression());
+								 scheduleList.put("id", schedule.getId());
+								 scheduleList.put("task", schedule.getTask());
+								 scheduleList.put("userId", schedule.getUserId());
+								 scheduleList.put("userName", null);
+
+								 User us = userRepository.findOne(schedule.getUserId());
+								 if(us != null) {
+									 scheduleList.put("userName", us.getName());
 
 								 }
+								 data.add(scheduleList);
+
 							 }
 							getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",data,size);
 							logger.info("************************ getScheduledList ENDED ***************************");
@@ -317,34 +326,40 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 					 }
 
 					
-					
-					 schedules = scheduledRepository.getAllScheduled(usersIds,offset,search);
 					 Integer size = 0;
 					 List<Map> data = new ArrayList<>();
-					 if(schedules.size() >0) {
-						 size = scheduledRepository.getAllScheduledSize(usersIds);
+					 
+					 if(exportData.equals("exportData")) {
+						 schedules = scheduledRepository.getAllScheduledExport(usersIds,search);
 
-						 for(Schedule schedule:schedules) {
-						     Map scheduleList= new HashMap();
-
-							 scheduleList.put("date", schedule.getDate());
-							 scheduleList.put("date_type", schedule.getDate_type());
-							 scheduleList.put("delete_date", schedule.getDelete_date());
-							 scheduleList.put("expression", schedule.getExpression());
-							 scheduleList.put("id", schedule.getId());
-							 scheduleList.put("task", schedule.getTask());
-							 scheduleList.put("userId", schedule.getUserId());
-							 scheduleList.put("userName", null);
-
-							 User us = userRepository.findOne(schedule.getUserId());
-							 if(us != null) {
-								 scheduleList.put("userName", us.getName());
-
-							 }
-							 data.add(scheduleList);
+					 }
+					 else {
+						 schedules = scheduledRepository.getAllScheduled(usersIds,offset,search);
+						 if(schedules.size() >0) {
+							 size = scheduledRepository.getAllScheduledSize(usersIds);
 
 						 }
-						
+					 }
+
+					 
+					 for(Schedule schedule:schedules) {
+					     Map scheduleList= new HashMap();
+
+						 scheduleList.put("date", schedule.getDate());
+						 scheduleList.put("date_type", schedule.getDate_type());
+						 scheduleList.put("delete_date", schedule.getDelete_date());
+						 scheduleList.put("expression", schedule.getExpression());
+						 scheduleList.put("id", schedule.getId());
+						 scheduleList.put("task", schedule.getTask());
+						 scheduleList.put("userId", schedule.getUserId());
+						 scheduleList.put("userName", null);
+
+						 User us = userRepository.findOne(schedule.getUserId());
+						 if(us != null) {
+							 scheduleList.put("userName", us.getName());
+
+						 }
+						 data.add(scheduleList);
 
 					 }
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",data,size);
@@ -929,7 +944,7 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 		    	
                 if(reports.get(i).equals("sensorWeight")) {
 		    		
-		    		ResponseEntity<?> response = reportServiceImpl.getSensorsReport("Schedule", deviIds, grouIds, 0, from, to, "", userId);
+		    		ResponseEntity<?> response = reportServiceImpl.getSensorsReport("Schedule", deviIds, grouIds, 0, from, to, "", userId,"");
 		    		
 		    		getObjectResponse = (GetObjectResponse) response.getBody();
 		    		List<CustomPositions> sensorReports = (List<CustomPositions>) getObjectResponse.getEntity();
@@ -945,7 +960,7 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 		    	
 		    	if(reports.get(i).equals("events")) {
 		    		
-		    		ResponseEntity<?> response = reportServiceImpl.getEventsReport("Schedule", deviIds, grouIds, 0, from, to, "", "", userId);
+		    		ResponseEntity<?> response = reportServiceImpl.getEventsReport("Schedule", deviIds, grouIds, 0, from, to, "", "", userId,"");
 		    		
 		    		getObjectResponse = (GetObjectResponse) response.getBody();
 		    		List<EventReport> eventReports = (List<EventReport>) getObjectResponse.getEntity();
@@ -959,7 +974,7 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 		    	}
                 if(reports.get(i).equals("geofenceEnter")) {
 		    		
-		    		ResponseEntity<?> response = reportServiceImpl.getEventsReport("Schedule", deviIds, grouIds, 0, from, to, "geofenceEnter", "", userId);
+		    		ResponseEntity<?> response = reportServiceImpl.getEventsReport("Schedule", deviIds, grouIds, 0, from, to, "geofenceEnter", "", userId,"");
 		    		
 		    		getObjectResponse = (GetObjectResponse) response.getBody();
 		    		List<EventReport> geofenceEnterReports = (List<EventReport>) getObjectResponse.getEntity();
@@ -973,7 +988,7 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 		    	}
                 if(reports.get(i).equals("geofenceExit")) {
 		    		
-		    		ResponseEntity<?> response = reportServiceImpl.getEventsReport("Schedule", deviIds, grouIds, 0, from, to, "geofenceExit", "", userId);
+		    		ResponseEntity<?> response = reportServiceImpl.getEventsReport("Schedule", deviIds, grouIds, 0, from, to, "geofenceExit", "", userId,"");
 		    		
 		    		getObjectResponse = (GetObjectResponse) response.getBody();
 		    		List<EventReport> geofenceExitReports = (List<EventReport>) getObjectResponse.getEntity();
@@ -986,7 +1001,7 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 		    		
 		    	}
 		    	if(reports.get(i).equals("devicesHours")) {
-		    		ResponseEntity<?> response = reportServiceImpl.getDeviceWorkingHours("Schedule", deviIds, grouIds, 0,  from, to, "", userId);
+		    		ResponseEntity<?> response = reportServiceImpl.getDeviceWorkingHours("Schedule", deviIds, grouIds, 0,  from, to, "", userId,"");
 		    		
 		    		getObjectResponse = (GetObjectResponse) response.getBody();
 		    		List<DeviceWorkingHours> devicesHours = (List<DeviceWorkingHours>) getObjectResponse.getEntity();
@@ -999,7 +1014,7 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 		    	}
 		    	
 		    	if(reports.get(i).equals("customs")) {
-		    		ResponseEntity<?> response = reportServiceImpl.getCustomReport("Schedule", deviIds, grouIds, 0, from , to, "", userId,custom,value);
+		    		ResponseEntity<?> response = reportServiceImpl.getCustomReport("Schedule", deviIds, grouIds, 0, from , to, "", userId,custom,value,"");
 		    		
 		    		getObjectResponse = (GetObjectResponse) response.getBody();
 		    		List<DeviceWorkingHours> customs = (List<DeviceWorkingHours>) getObjectResponse.getEntity();
@@ -1011,7 +1026,7 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 				    sendMail("customs"+n+".xlsx",email);
 		    	}
 		    	if(reports.get(i).equals("driversHours")) {
-		    		ResponseEntity<?> response = reportServiceImpl.getDeviceWorkingHours("Schedule", drivIds, grouIds, 0, from, to, "", userId);
+		    		ResponseEntity<?> response = reportServiceImpl.getDeviceWorkingHours("Schedule", drivIds, grouIds, 0, from, to, "", userId,"");
 		    		
 		    		getObjectResponse = (GetObjectResponse) response.getBody();
 					List<DriverWorkingHours> driversHours = (List<DriverWorkingHours>) getObjectResponse.getEntity();
@@ -1102,7 +1117,7 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 		    	}
 		    	if(reports.get(i).equals("numDriveHours")) {
 
-		    		ResponseEntity<?> response = reportServiceImpl.getNumberDriverWorkingHours("Schedule",drivIds, grouIds, 0, from,to, "", userId);
+		    		ResponseEntity<?> response = reportServiceImpl.getNumberDriverWorkingHours("Schedule",drivIds, grouIds, 0, from,to, "", userId,"");
 		    		getObjectResponse = (GetObjectResponse) response.getBody();
 
 		   		    List<Map> numDriveHours = (List<Map>) getObjectResponse.getEntity();

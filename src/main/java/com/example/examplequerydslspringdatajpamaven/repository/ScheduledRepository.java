@@ -26,6 +26,11 @@ public interface ScheduledRepository extends JpaRepository<Schedule, Long>, Quer
 			" LIMIT :offset,10 ", nativeQuery = true)
 	public List<Schedule> getAllScheduled(@Param("userIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
 	
+	@Query(value = "SELECT tc_schedule.* FROM tc_schedule"
+			+ " WHERE tc_schedule.userId IN(:userIds) and tc_schedule.delete_date is null"
+			+ " and ( (tc_schedule.date_type Like %:search%) ) " , nativeQuery = true)
+	public List<Schedule> getAllScheduledExport(@Param("userIds")List<Long> userIds,@Param("search") String search);
+	
 
 	@Query(value = "SELECT distinct expression FROM tc_schedule" , nativeQuery = true)
 	public ArrayList<String> getDistinctExp();

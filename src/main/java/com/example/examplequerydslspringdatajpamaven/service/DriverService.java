@@ -9,7 +9,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 @Service
 public interface DriverService {
 	
-	public ResponseEntity<?> getAllDrivers(String TOKEN,Long id,int offset,String search);
+	public ResponseEntity<?> getAllDrivers(String TOKEN,Long id,int offset,String search,String exportData);
 	public Driver getDriverById(Long driverId);
 	
 	public ResponseEntity<?> getDriverSelect(String TOKEN,Long loggedUserId,Long userId);

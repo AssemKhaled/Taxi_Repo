@@ -22,16 +22,27 @@ import com.example.examplequerydslspringdatajpamaven.entity.Group;
 public interface GroupRepository extends  JpaRepository<Group, Long>, QueryDslPredicateExecutor<Group> {
 	
 	@Query(value = "SELECT tc_groups.* FROM tc_groups INNER JOIN tc_user_group ON tc_user_group.groupid = tc_groups.id"
-			+ " WHERE tc_user_group.userid IN(:userIds)and tc_groups.is_deleted is null"
+			+ " WHERE tc_user_group.userid IN(:userIds) and tc_groups.is_deleted is null"
 			+ " and ((tc_groups.name Like %:search%) )"
 			+ " LIMIT :offset,10", nativeQuery = true)
 	public List<Group> getAllGroups(@Param("userIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
 
+	@Query(value = "SELECT tc_groups.* FROM tc_groups INNER JOIN tc_user_group ON tc_user_group.groupid = tc_groups.id"
+			+ " WHERE tc_user_group.userid IN(:userIds) and tc_groups.is_deleted is null"
+			+ " and ((tc_groups.name Like %:search%) )", nativeQuery = true)
+	public List<Group> getAllGroupsExport(@Param("userIds")List<Long> userIds,@Param("search") String search);
+
+	
 	@Query(value = "SELECT tc_groups.* FROM tc_groups "
 			+ " WHERE tc_groups.id IN(:groupIds)and tc_groups.is_deleted is null"
 			+ " and ((tc_groups.name Like %:search%) )"
 			+ " LIMIT :offset,10", nativeQuery = true)
 	public List<Group> getAllGroupsByIds(@Param("groupIds")List<Long> groupIds,@Param("offset") int offset,@Param("search") String search);
+	
+	@Query(value = "SELECT tc_groups.* FROM tc_groups "
+			+ " WHERE tc_groups.id IN(:groupIds) and tc_groups.is_deleted is null"
+			+ " and ((tc_groups.name Like %:search%) )", nativeQuery = true)
+	public List<Group> getAllGroupsByIdsExport(@Param("groupIds")List<Long> groupIds,@Param("search") String search);
 	
 	@Query(value = "SELECT count(*) FROM tc_groups INNER JOIN tc_user_group ON tc_user_group.groupid = tc_groups.id"
 			+ " WHERE tc_user_group.userid IN(:userIds)and tc_groups.is_deleted is null"

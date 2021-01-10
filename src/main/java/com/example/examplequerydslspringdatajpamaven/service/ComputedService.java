@@ -9,7 +9,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.Attribute;
 @Service
 public interface ComputedService {
 	public ResponseEntity<?> createComputed(String TOKEN,Attribute attribute,Long userId);
-	public ResponseEntity<?> getAllComputed(String TOKEN,Long id,int offset,String search);
+	public ResponseEntity<?> getAllComputed(String TOKEN,Long id,int offset,String search,String exportData);
 	public ResponseEntity<?> getComputedById(String TOKEN,Long attributeId,Long userId);
 	public ResponseEntity<?> editComputed(String TOKEN,Attribute  attribute,Long id);
 	public ResponseEntity<?> deleteComputed(String TOKEN,Long attributeId,Long userId);

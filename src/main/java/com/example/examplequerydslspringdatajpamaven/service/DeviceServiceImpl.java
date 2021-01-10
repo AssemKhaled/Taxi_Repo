@@ -36,7 +36,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -50,7 +49,6 @@ import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 import com.example.examplequerydslspringdatajpamaven.entity.Group;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoPositions;
-import com.example.examplequerydslspringdatajpamaven.entity.MongoPositionsElm;
 import com.example.examplequerydslspringdatajpamaven.entity.Notification;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.entity.userClientDevice;
@@ -66,8 +64,6 @@ import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import aj.org.objectweb.asm.Attribute;
-
 
 /**
  * services functionality related to devices
@@ -82,21 +78,21 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	private static final Log logger = LogFactory.getLog(DeviceServiceImpl.class);
 	
 	@Autowired
-	MongoPositionRepo mongoPositionRepo;
+	private MongoPositionRepo mongoPositionRepo;
 	
 	@Autowired
-	UserClientDriverRepository userClientDriverRepository;
+	private UserClientDriverRepository userClientDriverRepository;
 
 	@Autowired 
-	GroupRepository groupRepository;
+	private GroupRepository groupRepository;
 	
 	@Autowired
-	UserClientDeviceRepository userClientDeviceRepository;
+	private UserClientDeviceRepository userClientDeviceRepository;
 	
 	@Autowired 
-	DeviceRepository deviceRepository;
+	private DeviceRepository deviceRepository;
 	
-	GetObjectResponse getObjectResponse;
+	private GetObjectResponse getObjectResponse;
 	
 	@Autowired
 	private UserServiceImpl userService;
@@ -105,7 +101,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	private DriverServiceImpl driverService;
 	
 	@Autowired
-	 private GeofenceServiceImpl geofenceService;
+	private GeofenceServiceImpl geofenceService;
 	
 	@Autowired
 	private UserRoleService userRoleService;
@@ -120,7 +116,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	 * get list device by limit 10
 	 */
 	@Override
-	public ResponseEntity<?> getAllUserDevices(String TOKEN,Long userId , int offset, String search) {
+	public ResponseEntity<?> getAllUserDevices(String TOKEN,Long userId , int offset, String search, String exportData) {
 		// TODO Auto-generated method stub
 		 
 		logger.info("************************ getAllUserDevices STARTED ***************************");
@@ -166,8 +162,16 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			 
 			 if(deviceIds.size()>0) {
 
-				 devices= deviceRepository.getDevicesListByIds(deviceIds,offset,search);
-				 size=  deviceRepository.getDevicesListSizeByIds(deviceIds,search);
+				 
+				 
+				 if(exportData.equals("exportData")) {
+			    	 devices= deviceRepository.getDevicesListByIdsExport(deviceIds,search);
+
+			     }
+			     else {
+			    	 devices= deviceRepository.getDevicesListByIds(deviceIds,offset,search);
+					 size=  deviceRepository.getDevicesListSizeByIds(deviceIds,search);
+			     }
 			 }
 
 			 
@@ -185,10 +189,16 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			 }
 		 
 		 
-		
+		     if(exportData.equals("exportData")) {
+		    	 devices= deviceRepository.getDevicesListExport(usersIds,search);
+
+		     }
+		     else {
+		    	 devices= deviceRepository.getDevicesList(usersIds,offset,search);
+				 size=  deviceRepository.getDevicesListSize(usersIds,search); 
+		     }
 		 
-			 devices= deviceRepository.getDevicesList(usersIds,offset,search);
-			 size=  deviceRepository.getDevicesListSize(usersIds,search);
+			 
 
 		}
 		 getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",devices,size);

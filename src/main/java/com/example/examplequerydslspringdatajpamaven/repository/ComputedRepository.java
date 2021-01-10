@@ -25,12 +25,21 @@ public interface ComputedRepository  extends  JpaRepository<Attribute, Long>, Qu
 			" LIMIT :offset,10 ", nativeQuery = true)
 	public List<Attribute> getAllComputed(@Param("userIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
 
+	@Query(value = "SELECT tc_attributes.* FROM tc_attributes INNER JOIN tc_user_attribute ON tc_user_attribute.attributeid = tc_attributes.id"
+			+ " WHERE tc_user_attribute.userid IN(:userIds) and  tc_attributes.delete_date is null"
+			+ " and ( (tc_attributes.type Like %:search%) ) ", nativeQuery = true)
+	public List<Attribute> getAllComputedExport(@Param("userIds")List<Long> userIds,@Param("search") String search);
+
 	@Query(value = "SELECT tc_attributes.* FROM tc_attributes "
 			+ " WHERE tc_attributes.id IN(:computedIds) and  tc_attributes.delete_date is null "
 			+ " and ( (tc_attributes.type Like %:search%) ) " + 
 			" LIMIT :offset,10 ", nativeQuery = true)
 	public List<Attribute> getAllComputedByIds(@Param("computedIds")List<Long> computedIds,@Param("offset") int offset,@Param("search") String search);
 	
+	@Query(value = "SELECT tc_attributes.* FROM tc_attributes "
+			+ " WHERE tc_attributes.id IN(:computedIds) and  tc_attributes.delete_date is null "
+			+ " and ( (tc_attributes.type Like %:search%) ) ", nativeQuery = true)
+	public List<Attribute> getAllComputedByIdsExport(@Param("computedIds")List<Long> computedIds,@Param("search") String search);
 	
 	@Query(value = "SELECT count(*) FROM tc_attributes INNER JOIN tc_user_attribute ON tc_user_attribute.attributeid = tc_attributes.id " + 
 			"  WHERE tc_user_attribute.userid IN(:userIds) and  tc_attributes.delete_date is null", nativeQuery = true)

@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.service.DeviceServiceImpl;
-import com.example.examplequerydslspringdatajpamaven.service.GeofenceServiceImpl;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 
 /**
@@ -33,18 +32,14 @@ public class DeviceRestController {
 	@Autowired
 	private DeviceServiceImpl deviceService;
 	
-
-	@Autowired 
-	GeofenceServiceImpl geofenceService;
-	
-	
 	@GetMapping("/getUserDevices")
 	public ResponseEntity<?> devicesList(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                             @RequestParam (value = "exportData", defaultValue = "") String exportData,
 			                             @RequestParam (value = "userId",defaultValue = "0") Long userId,
 										 @RequestParam(value = "offset", defaultValue = "0") int offset,
 							             @RequestParam(value = "search", defaultValue = "") String search) {
  
-		return deviceService.getAllUserDevices(TOKEN,userId,offset,search);
+		return deviceService.getAllUserDevices(TOKEN,userId,offset,search,exportData);
 		
 	}
 	

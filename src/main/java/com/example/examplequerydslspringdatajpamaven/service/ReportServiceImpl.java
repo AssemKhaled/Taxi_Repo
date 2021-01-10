@@ -19,7 +19,6 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -50,7 +49,6 @@ import com.example.examplequerydslspringdatajpamaven.repository.DriverRepository
 import com.example.examplequerydslspringdatajpamaven.repository.GroupRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoEventsRepo;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionRepo;
-import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionsRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserClientDeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserClientDriverRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserClientGroupRepository;
@@ -67,73 +65,68 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
 public class ReportServiceImpl extends RestServiceController implements ReportService {
 	
-	 @Value("${stopsUrl}")
-	 private String stopsUrl;
+	
+	@Value("${stopsUrl}")
+	private String stopsUrl;
 	 
-	 @Value("${tripsUrl}")
-	 private String tripsUrl;
+	@Value("${tripsUrl}")
+	private String tripsUrl;
 	 
-	 @Value("${eventsUrl}")
-	 private String eventsUrl;
+	@Value("${eventsUrl}")
+	private String eventsUrl;
 	 
-	 @Value("${summaryUrl}")
-	 private String summaryUrl;
+	@Value("${summaryUrl}")
+	private String summaryUrl;
 	
 	@Autowired
-	UserClientDeviceRepository userClientDeviceRepository;
-	
+	private UserClientDeviceRepository userClientDeviceRepository;
 	
 	@Autowired
-	DeviceRepository deviceRepository;
+	private DeviceRepository deviceRepository;
 
 	@Autowired
 	private UserRoleService userRoleService;
 	
 	@Autowired
-	DriverRepository driverRepository;
+	private DriverRepository driverRepository;
 	
 	@Autowired
-	DeviceServiceImpl deviceServiceImpl;
+	private DeviceServiceImpl deviceServiceImpl;
 	
 	@Autowired
-	GroupsServiceImpl groupsServiceImpl;
+	private GroupsServiceImpl groupsServiceImpl;
 	
 	@Autowired
-	GroupRepository groupRepository;
-	@Autowired
-	DriverServiceImpl driverServiceImpl;
+	private GroupRepository groupRepository;
 	
 	@Autowired
-	MongoPositionsRepository mongoPositionsRepository;
+	private DriverServiceImpl driverServiceImpl;
 	
 	@Autowired
-	UserServiceImpl userServiceImpl;
+	private UserServiceImpl userServiceImpl;
 	
 	@Autowired
-	MongoEventsRepo mongoEventsRepo;
+	private MongoEventsRepo mongoEventsRepo;
 	
 	@Autowired
-	UserClientGroupRepository userClientGroupRepository;
+	private UserClientGroupRepository userClientGroupRepository;
 	
 	@Autowired
-	UserClientDriverRepository userClientDriverRepository;
+	private UserClientDriverRepository userClientDriverRepository;
 	
 	private static final Log logger = LogFactory.getLog(ReportServiceImpl.class);
 	
-	GetObjectResponse getObjectResponse;
-
-	@Autowired
-	MongoTemplate mongoTemplate;
+	private GetObjectResponse getObjectResponse;
 	
 	@Autowired
-	MongoPositionRepo mongoPositionRepo;
+	private MongoPositionRepo mongoPositionRepo;
 	
 	
 	/**
 	 * get data of events of one or more device and group from mongo collection tc_events
 	 */
 	@Override
-	public ResponseEntity<?> getEventsReport(String TOKEN,Long [] deviceIds,Long [] groupIds,int offset,String start,String end,String type,String search,Long userId) {
+	public ResponseEntity<?> getEventsReport(String TOKEN,Long [] deviceIds,Long [] groupIds,int offset,String start,String end,String type,String search,Long userId,String exportData) {
 	{
 		
 		
@@ -420,7 +413,18 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	        	return  ResponseEntity.badRequest().body(getObjectResponse);
 	        }
 			
+	        
+	        
 			if(type.equals("")) {
+				
+				if(exportData.equals("exportData")) {
+					eventReport = mongoEventsRepo.getEventsScheduled(allDevices, dateFrom, dateTo);
+
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",eventReport,size);
+					logger.info("************************ getEventsReport ENDED ***************************");
+					return  ResponseEntity.ok().body(getObjectResponse);
+		        }
+				
 				if(!TOKEN.equals("Schedule")) {
 					eventReport = mongoEventsRepo.getEventsWithoutType(allDevices, offset, dateFrom, dateTo);
 					if(eventReport.size()>0) {
@@ -437,6 +441,14 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				
 			}
 			else {
+				if(exportData.equals("exportData")) {
+					eventReport = mongoEventsRepo.getEventsScheduledWithType(allDevices, dateFrom, dateTo,type);
+
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",eventReport,size);
+					logger.info("************************ getEventsReport ENDED ***************************");
+					return  ResponseEntity.ok().body(getObjectResponse);
+		        }
+				
 				if(!TOKEN.equals("Schedule")) {
 					eventReport = mongoEventsRepo.getEventsWithType(allDevices, offset, dateFrom, dateTo, type);
 					if(eventReport.size()>0) {
@@ -466,7 +478,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	 */
 	@Override
 	public ResponseEntity<?> getDeviceWorkingHours(String TOKEN, Long[] deviceIds, Long[] groupIds, int offset,
-			String start, String end, String search, Long userId) {
+			String start, String end, String search, Long userId,String exportData) {
 
 		
 		logger.info("************************ getDeviceWorkingHours STARTED ***************************");
@@ -749,6 +761,15 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	        	return  ResponseEntity.badRequest().body(getObjectResponse);
 	        }
 
+	        if(exportData.equals("exportData")) {
+	        	
+				deviceHours = mongoPositionRepo.getDeviceWorkingHoursScheduled(allDevices,dateFrom,dateTo);			
+
+				getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",deviceHours,size);
+				logger.info("************************ getDeviceWorkingHours ENDED ***************************");
+				return  ResponseEntity.ok().body(getObjectResponse);
+	        }
+	        
 			if(!TOKEN.equals("Schedule")) {
 				
 				deviceHours = mongoPositionRepo.getDeviceWorkingHours(allDevices,offset,dateFrom,dateTo);			
@@ -783,7 +804,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	 */
 	@Override
 	public ResponseEntity<?> getCustomReport(String TOKEN, Long[] deviceIds, Long[] groupIds, int offset, String start,
-			String end, String search, Long userId, String custom, String value) {
+			String end, String search, Long userId, String custom, String value,String exportData) {
 		
 		
 		logger.info("************************ getCustomReport STARTED ***************************");
@@ -1077,6 +1098,15 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	        	return  ResponseEntity.badRequest().body(getObjectResponse);
 	        }
 			
+	        if(exportData.equals("exportData")) {
+				
+	        	deviceHours = mongoPositionRepo.getDeviceCustomScheduled(allDevices,dateFrom,dateTo,custom,value);
+				
+				getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",deviceHours,size);
+				logger.info("************************ getCustomReport ENDED ***************************");
+				return  ResponseEntity.ok().body(getObjectResponse);
+	        }
+
 			if(!TOKEN.equals("Schedule")) {
 
 				deviceHours = mongoPositionRepo.getDeviceCustom(allDevices, offset, dateFrom, dateTo, custom, value);
@@ -1088,15 +1118,12 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			}
 			else {
 
-				deviceHours = mongoPositionRepo.getDeviceCustomScheduled(allDevices,dateFrom,dateFrom,custom,value);
+				deviceHours = mongoPositionRepo.getDeviceCustomScheduled(allDevices,dateFrom,dateTo,custom,value);
 				
-
 			}
-				
-			
 			
 			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",deviceHours,size);
-			 logger.info("************************ getCustomReport ENDED ***************************");
+			logger.info("************************ getCustomReport ENDED ***************************");
 			return  ResponseEntity.ok().body(getObjectResponse);
 		}		  
 			
@@ -1107,7 +1134,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	 */
 	@Override
 	public ResponseEntity<?> getDriverWorkingHours(String TOKEN, Long[] driverIds, Long[] groupIds, int offset,
-			String start, String end, String search, Long userId) {
+			String start, String end, String search, Long userId,String exportData) {
 		 logger.info("************************ getDriverWorkingHours STARTED ***************************");
 
 		
@@ -1390,9 +1417,16 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	        }
 	        
 	       
-	       
+	       if(exportData.equals("exportData")) {
+
+	    	   driverHours = mongoPositionRepo.getDriverWorkingHoursScheduled(allDevices,dateFrom,dateTo);			
+
+				getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",driverHours,size);
+				logger.info("************************ getDriverWorkingHours ENDED ***************************");
+				return  ResponseEntity.ok().body(getObjectResponse);
+	       }
 			
-			if(!TOKEN.equals("Schedule")) {
+		   if(!TOKEN.equals("Schedule")) {
 				
 				driverHours = mongoPositionRepo.getDriverWorkingHours(allDevices,offset,dateFrom,dateTo);			
 
@@ -1404,15 +1438,13 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				
 			}
 			else {
-				driverHours = mongoPositionRepo.getDriverWorkingHoursScheduled(allDevices,dateFrom,dateFrom);			
+				driverHours = mongoPositionRepo.getDriverWorkingHoursScheduled(allDevices,dateFrom,dateTo);			
 
 
 			}
 				
-			
-			
 			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",driverHours,size);
-			 logger.info("************************ getDriverWorkingHours ENDED ***************************");
+			logger.info("************************ getDriverWorkingHours ENDED ***************************");
 			return  ResponseEntity.ok().body(getObjectResponse);
 		}	
 	}
@@ -3537,7 +3569,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	 */
 	@Override
 	public ResponseEntity<?> getSensorsReport(String TOKEN, Long[] deviceIds, Long[] groupIds, int offset, String start,
-			String end, String search, Long userId) {
+			String end, String search, Long userId,String exportData) {
 		 logger.info("************************ getSensorsReport STARTED ***************************");
 
 		List<CustomPositions> positionsList = new ArrayList<CustomPositions>();
@@ -3821,6 +3853,15 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		}
 		Integer size = 0;
 
+		if(exportData.equals("exportData")) {
+			
+			positionsList = mongoPositionRepo.getPositionsListScheduled(allDevices,dateFrom, dateTo);
+
+			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",positionsList,size);
+			logger.info("************************ getSensorsReport ENDED ***************************");
+			return  ResponseEntity.ok().body(getObjectResponse);
+			
+		}
 		if(!TOKEN.equals("Schedule")) {
 			search = "%"+search+"%";
 			positionsList = mongoPositionRepo.getSensorsList(allDevices, offset, dateFrom, dateTo);
@@ -3836,8 +3877,9 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			positionsList = mongoPositionRepo.getPositionsListScheduled(allDevices,dateFrom, dateTo);
 
 		}
+		
 		getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",positionsList,size);
-		 logger.info("************************ getSensorsReport ENDED ***************************");
+		logger.info("************************ getSensorsReport ENDED ***************************");
 		return  ResponseEntity.ok().body(getObjectResponse);
 	}
 	@Override
@@ -5811,7 +5853,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	 */
 	@Override
 	public ResponseEntity<?> getNumberDriverWorkingHours(String TOKEN, Long[] driverIds, Long[] groupIds, int offset,
-			String start, String end, String search, Long userId) {
+			String start, String end, String search, Long userId,String exportData) {
 		logger.info("************************ getNumberDriverWorkingHours STARTED ***************************");
 
 		List<DriverWorkingHours> driverHours = new ArrayList<DriverWorkingHours>();
@@ -6096,7 +6138,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			
 			
 	        driverHours = mongoPositionRepo.getDriverWorkingHoursScheduled(allDevices, dateFrom, dateTo);
-			  if(driverHours.size()>0) {
+			if(driverHours.size()>0) {
 
 				  for(Long dev:allDevices) {
 

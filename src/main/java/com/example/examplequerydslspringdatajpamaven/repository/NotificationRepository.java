@@ -26,6 +26,12 @@ public interface NotificationRepository extends  JpaRepository<Notification, Lon
 			" LIMIT :offset,10 ", nativeQuery = true)
 	public List<Notification> getAllNotifications(@Param("userIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
 	
+	@Query(value = "SELECT tc_notifications.* FROM tc_notifications INNER JOIN tc_user_notification ON tc_user_notification.notificationid = tc_notifications.id"
+			+ " WHERE tc_user_notification.userid IN(:userIds) and  tc_notifications.delete_date is null"
+			+ " and ((tc_notifications.type Like %:search%) )" , nativeQuery = true)
+	public List<Notification> getAllNotificationsExport(@Param("userIds")List<Long> userIds,@Param("search") String search);
+	
+	
 	@Query(value = "SELECT count(*) FROM tc_notifications INNER JOIN tc_user_notification ON tc_user_notification.notificationid = tc_notifications.id "
 	+  " WHERE tc_user_notification.userid IN(:userIds) and  tc_notifications.delete_date is null", nativeQuery = true)
 	public Integer getAllNotificationsSize(@Param("userIds")List<Long> userIds);

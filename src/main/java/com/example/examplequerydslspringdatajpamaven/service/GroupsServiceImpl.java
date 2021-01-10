@@ -240,7 +240,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 	 * get group list with limit 10
 	 */
 	@Override
-	public ResponseEntity<?> getAllGroups(String TOKEN, Long id, int offset, String search) {
+	public ResponseEntity<?> getAllGroups(String TOKEN, Long id, int offset, String search,String exportData) {
 		logger.info("************************ getAllUserGroups STARTED ***************************");
 		
 		List<Group> groups = new ArrayList<Group>();
@@ -282,44 +282,53 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 						List<Map> data = new ArrayList<>();
 
 						 if(groupIds.size()>0) {
-							    groups = groupRepository.getAllGroupsByIds(groupIds,offset,search);
+							 if(exportData.equals("exportData")) {
+								groups = groupRepository.getAllGroupsByIdsExport(groupIds,search);
+								 
+							 }
+							 else {
+								groups = groupRepository.getAllGroupsByIds(groupIds,offset,search);
 								
 								if(groups.size()>0) {
 									size=groupRepository.getAllGroupsSizeByIds(groupIds,search);
-									for(Group group:groups) {
-									     Map PointsList= new HashMap();
-									     
-										 PointsList.put("id", group.getId());
-										 PointsList.put("name", group.getName());
-										 PointsList.put("attributes", group.getAttributes());
-										 PointsList.put("groupid", group.getGroupid());
-										 PointsList.put("is_deleted", group.getIs_deleted());
-										 PointsList.put("type", group.getType());
-										 PointsList.put("companyName",null);
-										 PointsList.put("companyId",null);
-
 										 
-										 
-									    	Set<User>groupParents = group.getUserGroup();
-											if(groupParents.isEmpty()) {
-												
+								} 
+							 }
 
-											}else {
-												for(User parentObject : groupParents) {
-													 PointsList.put("companyId",parentObject.getId());
-													 User us = userRepository.findOne(parentObject.getId());
-													 if(us != null) {
-														 PointsList.put("companyName", us.getName());
+							    
+							for(Group group:groups) {
+							     Map PointsList= new HashMap();
+							     
+								 PointsList.put("id", group.getId());
+								 PointsList.put("name", group.getName());
+								 PointsList.put("attributes", group.getAttributes());
+								 PointsList.put("groupid", group.getGroupid());
+								 PointsList.put("is_deleted", group.getIs_deleted());
+								 PointsList.put("type", group.getType());
+								 PointsList.put("companyName",null);
+								 PointsList.put("companyId",null);
 
-													 }
-													 break;
-													
-												}
-											}
-											data.add(PointsList);
+								 
+								 
+						    	Set<User>groupParents = group.getUserGroup();
+								if(groupParents.isEmpty()) {
+									
 
-									}	 
+								}else {
+									for(User parentObject : groupParents) {
+										 PointsList.put("companyId",parentObject.getId());
+										 User us = userRepository.findOne(parentObject.getId());
+										 if(us != null) {
+											 PointsList.put("companyName", us.getName());
+
+										 }
+										 break;
+										
+									}
 								}
+								data.add(PointsList);
+
+							}
 
 
 						 }
@@ -340,51 +349,54 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 						 }
 					 }
 
-					
-					
-				    groups = groupRepository.getAllGroups(usersIds,offset,search);
-					Integer size=0;
-					List<Map> data = new ArrayList<>();
-
-					
-					if(groups.size()>0) {
-						size=groupRepository.getAllGroupsSize(usersIds,search);
-
-						for(Group group:groups) {
-						     Map PointsList= new HashMap();
-						     
-							 PointsList.put("id", group.getId());
-							 PointsList.put("name", group.getName());
-							 PointsList.put("attributes", group.getAttributes());
-							 PointsList.put("groupid", group.getGroupid());
-							 PointsList.put("is_deleted", group.getIs_deleted());
-							 PointsList.put("type", group.getType());
-							 PointsList.put("companyName",null);
-							 PointsList.put("companyId",null);
-
-							 
-							 
-					     		Set<User>groupParents = group.getUserGroup();
-								if(groupParents.isEmpty()) {
-									
-
-								}else {
-									for(User parentObject : groupParents) {
-										 PointsList.put("companyId",parentObject.getId());
-										 User us = userRepository.findOne(parentObject.getId());
-										 if(us != null) {
-											 PointsList.put("companyName", us.getName());
-
-										 }
-										break;
-										
-									}
-								}
-								data.add(PointsList);
-
-						}	 
+					 Integer size=0;
+					 List<Map> data = new ArrayList<>();
+					 if(exportData.equals("exportData")) {
+						groups = groupRepository.getAllGroupsExport(usersIds,search);
+						
+					 }
+					 else {
+						groups = groupRepository.getAllGroups(usersIds,offset,search);
 							
+						if(groups.size()>0) {
+							size=groupRepository.getAllGroupsSize(usersIds,search);	
+						}
+					 }
+					 for(Group group:groups) {
+					     Map PointsList= new HashMap();
+					     
+						 PointsList.put("id", group.getId());
+						 PointsList.put("name", group.getName());
+						 PointsList.put("attributes", group.getAttributes());
+						 PointsList.put("groupid", group.getGroupid());
+						 PointsList.put("is_deleted", group.getIs_deleted());
+						 PointsList.put("type", group.getType());
+						 PointsList.put("companyName",null);
+						 PointsList.put("companyId",null);
+
+						 
+						 
+				     		Set<User>groupParents = group.getUserGroup();
+							if(groupParents.isEmpty()) {
+								
+
+							}else {
+								for(User parentObject : groupParents) {
+									 PointsList.put("companyId",parentObject.getId());
+									 User us = userRepository.findOne(parentObject.getId());
+									 if(us != null) {
+										 PointsList.put("companyName", us.getName());
+
+									 }
+									break;
+									
+								}
+							}
+							data.add(PointsList);
+
 					}
+
+				    
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",data,size);
 					logger.info("************************ getAllUserGeofences ENDED ***************************");
 					return  ResponseEntity.ok().body(getObjectResponse);

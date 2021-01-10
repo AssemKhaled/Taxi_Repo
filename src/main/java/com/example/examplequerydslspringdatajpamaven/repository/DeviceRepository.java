@@ -29,9 +29,15 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	@Query(nativeQuery = true, name = "getDevicesList")
 	List<CustomDeviceList> getDevicesList(@Param("userIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
 
+	@Query(nativeQuery = true, name = "getDevicesListExport")
+	List<CustomDeviceList> getDevicesListExport(@Param("userIds")List<Long> userIds,@Param("search") String search);
+
 
 	@Query(nativeQuery = true, name = "getDevicesListByIds")
 	List<CustomDeviceList> getDevicesListByIds(@Param("deviceIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
+
+	@Query(nativeQuery = true, name = "getDevicesListByIdsExport")
+	List<CustomDeviceList> getDevicesListByIdsExport(@Param("deviceIds")List<Long> userIds,@Param("search") String search);
 
 	@Query(value = "select * from tc_devices " + 
 			" inner join tc_user_client_device on tc_devices.id = tc_user_client_device.deviceid " + 

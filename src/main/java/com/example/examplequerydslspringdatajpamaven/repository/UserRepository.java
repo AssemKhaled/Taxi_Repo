@@ -36,11 +36,24 @@ public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredi
 			+ "tc_users.identity_num LIKE %:search%) limit :offset,10", nativeQuery = true)
 	public List<User> getUsersOfUser(@Param("loggedUserId") Long loggedUserId,@Param("userId") Long userId,@Param("offset")int offset,@Param("search")String search); 
 	
+	@Query(value = "SELECT tc_users.* FROM tc_user_user inner join tc_users on tc_user_user.manageduserid=tc_users.id where tc_user_user.userid = :userId and tc_users.id != :loggedUserId and delete_date is null AND  "
+			+ "(tc_users.name LIKE %:search% OR "
+			+ "tc_users.email LIKE %:search% OR tc_users.commercial_num LIKE %:search% OR "
+			+ "tc_users.identity_num LIKE %:search%) ", nativeQuery = true)
+	public List<User> getUsersOfUserExport(@Param("loggedUserId") Long loggedUserId,@Param("userId") Long userId,@Param("search")String search); 
+	
+	
 	@Query(value = "SELECT tc_users.* FROM tc_user_user inner join tc_users on tc_user_user.manageduserid=tc_users.id where tc_user_user.userid = :userId and tc_users.id != :loggedUserId AND  "
 			+ "(tc_users.name LIKE %:search% OR "
 			+ "tc_users.email LIKE %:search% OR tc_users.commercial_num LIKE %:search% OR "
 			+ "tc_users.identity_num LIKE %:search%) limit :offset,10", nativeQuery = true)
 	public List<User> getAllUsersOfUser(@Param("loggedUserId") Long loggedUserId,@Param("userId") Long userId,@Param("offset")int offset,@Param("search")String search); 
+
+	@Query(value = "SELECT tc_users.* FROM tc_user_user inner join tc_users on tc_user_user.manageduserid=tc_users.id where tc_user_user.userid = :userId and tc_users.id != :loggedUserId AND  "
+			+ "(tc_users.name LIKE %:search% OR "
+			+ "tc_users.email LIKE %:search% OR tc_users.commercial_num LIKE %:search% OR "
+			+ "tc_users.identity_num LIKE %:search%) ", nativeQuery = true)
+	public List<User> getAllUsersOfUserExport(@Param("loggedUserId") Long loggedUserId,@Param("userId") Long userId,@Param("search")String search); 
 	
 	
 	@Query(value = "SELECT tc_users.* FROM tc_user_user inner join tc_users on tc_user_user.manageduserid=tc_users.id where tc_user_user.userid = :userId and tc_users.id != :loggedUserId and delete_date is not  null AND  "
@@ -48,6 +61,12 @@ public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredi
 			+ "tc_users.email LIKE %:search% OR tc_users.commercial_num LIKE %:search% OR "
 			+ "tc_users.identity_num LIKE %:search%) limit :offset,10", nativeQuery = true)
 	public List<User> getInactiveUsersOfUser(@Param("loggedUserId") Long loggedUserId,@Param("userId") Long userId,@Param("offset")int offset,@Param("search")String search); 
+	
+	@Query(value = "SELECT tc_users.* FROM tc_user_user inner join tc_users on tc_user_user.manageduserid=tc_users.id where tc_user_user.userid = :userId and tc_users.id != :loggedUserId and delete_date is not  null AND  "
+			+ "(tc_users.name LIKE %:search% OR "
+			+ "tc_users.email LIKE %:search% OR tc_users.commercial_num LIKE %:search% OR "
+			+ "tc_users.identity_num LIKE %:search%) ", nativeQuery = true)
+	public List<User> getInactiveUsersOfUserExport(@Param("loggedUserId") Long loggedUserId,@Param("userId") Long userId,@Param("search")String search); 
 	
 	@Query(value = "SELECT count(*) FROM tc_user_user "
 			+ " inner join tc_users on tc_user_user.manageduserid=tc_users.id "

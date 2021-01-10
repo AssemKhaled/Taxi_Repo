@@ -39,11 +39,12 @@ public class ScheduledCRUDRestController {
 
 	@GetMapping("/getScheduledList")
 	public ResponseEntity<?> getScheduledList(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                             @RequestParam (value = "userId",defaultValue = "0") Long userId,
-										 @RequestParam(value = "offset", defaultValue = "0") int offset,
-							             @RequestParam(value = "search", defaultValue = "") String search) {
- 
-		return scheduledServiceImpl.getScheduledList(TOKEN,userId,offset,search);
+								              @RequestParam (value = "exportData", defaultValue = "") String exportData,                             
+											  @RequestParam (value = "userId",defaultValue = "0") Long userId,
+											  @RequestParam(value = "offset", defaultValue = "0") int offset,
+								              @RequestParam(value = "search", defaultValue = "") String search) {
+	  
+		return scheduledServiceImpl.getScheduledList(TOKEN,userId,offset,search,exportData);
 		
 	}
 	

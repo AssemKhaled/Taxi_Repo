@@ -10,7 +10,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.Group;
 public interface GroupsService {
 	
 	public ResponseEntity<?> createGroup(String TOKEN,Group group,Long userId);
-	public ResponseEntity<?> getAllGroups(String TOKEN,Long id,int offset,String search);
+	public ResponseEntity<?> getAllGroups(String TOKEN,Long id,int offset,String search,String exportData);
 	public ResponseEntity<?> getGroupById(String TOKEN,Long groupId,Long userId);
 	public ResponseEntity<?> editGroup(String TOKEN,Group group,Long id);
 	public ResponseEntity<?> deleteGroup(String TOKEN,Long groupId,Long userId);

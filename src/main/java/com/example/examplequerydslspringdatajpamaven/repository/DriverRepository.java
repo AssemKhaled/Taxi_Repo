@@ -63,9 +63,14 @@ public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslP
 	@Query(nativeQuery = true, name = "getDriverList")
 	public List<CustomDriverList> getAllDriversCustom(@Param("userIds") List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
 	
-
+	@Query(nativeQuery = true, name = "getDriverListExport")
+	public List<CustomDriverList> getAllDriversCustomExport(@Param("userIds") List<Long> userIds,@Param("search") String search);
+	
 	@Query(nativeQuery = true, name = "getDriverListByIds")
 	public List<CustomDriverList> getAllDriversCustomByIds(@Param("driverIds") List<Long> driverIds,@Param("offset") int offset,@Param("search") String search);
+	
+	@Query(nativeQuery = true, name = "getDriverListByIdsExport")
+	public List<CustomDriverList> getAllDriversCustomByIdsExport(@Param("driverIds") List<Long> driverIds,@Param("search") String search);
 	
 	@Query(value = "SELECT  * FROM tc_drivers as A " + 
 			" INNER JOIN tc_user_driver ON tc_user_driver.driverid =A.id " + 

@@ -31,11 +31,12 @@ public class PointsRestController {
 
 	@GetMapping("/getPointsList")
 	public ResponseEntity<?> getPointsList(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-				                           @RequestParam (value = "userId",defaultValue = "0") Long userId,
+								            @RequestParam (value = "exportData", defaultValue = "") String exportData,	                           
+											@RequestParam (value = "userId",defaultValue = "0") Long userId,
 										   @RequestParam(value = "offset", defaultValue = "0") int offset,
 								           @RequestParam(value = "search", defaultValue = "") String search) {
 	 
-		return pointsServiceImpl.getPointsList(TOKEN,userId,offset,search);
+		return pointsServiceImpl.getPointsList(TOKEN,userId,offset,search,exportData);
 		
 	}
 	

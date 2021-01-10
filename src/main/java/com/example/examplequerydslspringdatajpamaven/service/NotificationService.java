@@ -9,7 +9,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.Notification;
 @Service
 public interface NotificationService {
 	public ResponseEntity<?> createNotification(String TOKEN,Notification notification,Long userId);
-	public ResponseEntity<?> getAllNotifications(String TOKEN,Long id,int offset,String search);
+	public ResponseEntity<?> getAllNotifications(String TOKEN,Long id,int offset,String search,String exportData);
 	public ResponseEntity<?> getNotificationById(String TOKEN,Long notificationId,Long userId);
 	public ResponseEntity<?> editNotification(String TOKEN,Notification notification,Long id);
 	public ResponseEntity<?> deleteNotification(String TOKEN,Long notificationId,Long userId);

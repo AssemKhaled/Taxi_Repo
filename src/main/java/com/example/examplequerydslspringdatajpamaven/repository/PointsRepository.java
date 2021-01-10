@@ -24,6 +24,11 @@ public interface PointsRepository  extends JpaRepository<Points, Long>, QueryDsl
 			+ " and ( (tc_points.name Like %:search%) ) " + 
 			" LIMIT :offset,10 ", nativeQuery = true)
 	public List<Points> getAllPoints(@Param("userIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
+
+	@Query(value = "SELECT tc_points.* FROM tc_points"
+			+ " WHERE tc_points.userId IN(:userIds) and tc_points.delete_date is null"
+			+ " and ( (tc_points.name Like %:search%) ) " , nativeQuery = true)
+	public List<Points> getAllPointsExport(@Param("userIds")List<Long> userIds,@Param("search") String search);
 	
 
 	@Query(value = "SELECT tc_points.* FROM tc_points"
@@ -31,6 +36,12 @@ public interface PointsRepository  extends JpaRepository<Points, Long>, QueryDsl
 			+ " and ( (tc_points.name Like %:search%) ) " + 
 			" LIMIT :offset,10 ", nativeQuery = true)
 	public List<Points> getAllPointsByIds(@Param("pointIds")List<Long> pointIds,@Param("offset") int offset,@Param("search") String search);
+	
+	@Query(value = "SELECT tc_points.* FROM tc_points"
+			+ " WHERE tc_points.id IN(:pointIds) and tc_points.delete_date is null"
+			+ " and ( (tc_points.name Like %:search%) ) " , nativeQuery = true)
+	public List<Points> getAllPointsByIdsExport(@Param("pointIds")List<Long> pointIds,@Param("search") String search);
+	
 	
 	@Query(value = "SELECT tc_points.* FROM tc_points"
 			+ " WHERE tc_points.userId IN(:userIds) and tc_points.delete_date is null ", nativeQuery = true)

@@ -40,11 +40,12 @@ public class ComputedRestController {
 	
 	@RequestMapping(value = "/getAllComputed", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getAllComputed(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                            @RequestParam (value = "userId", defaultValue = "0") Long id,
+											            @RequestParam (value = "exportData", defaultValue = "") String exportData,          
+														@RequestParam (value = "userId", defaultValue = "0") Long id,
 														@RequestParam (value = "offset", defaultValue = "0") int offset,
 														@RequestParam (value = "search", defaultValue = "") String search) {
 		
-    	return  computedServiceImpl.getAllComputed(TOKEN,id,offset,search);
+    	return  computedServiceImpl.getAllComputed(TOKEN,id,offset,search,exportData);
 
 	}
 	

@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import com.example.examplequerydslspringdatajpamaven.service.DeviceServiceImpl;
 import com.example.examplequerydslspringdatajpamaven.service.ReportServiceImpl;
 
 /**
@@ -24,11 +23,7 @@ import com.example.examplequerydslspringdatajpamaven.service.ReportServiceImpl;
 public class ReportRestController {
 	
 	@Autowired
-	ReportServiceImpl reportServiceImpl;
-	
-	@Autowired
-	DeviceServiceImpl deviceServiceImpl;
-	
+	private ReportServiceImpl reportServiceImpl;
 
 	@RequestMapping(value = "/getEventsReport", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getEvents(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
@@ -36,11 +31,12 @@ public class ReportRestController {
 													 @RequestParam (value = "groupId", defaultValue = "0") Long [] groupId,
 													 @RequestParam (value = "offset", defaultValue = "0") int offset,
 													 @RequestParam (value = "start", defaultValue = "0") String start,
+													 @RequestParam (value = "exportData", defaultValue = "") String exportData,
 													 @RequestParam (value = "end", defaultValue = "0") String end,
 													 @RequestParam (value = "type", defaultValue = "") String type,
 													 @RequestParam (value = "search", defaultValue = "") String search,
 													 @RequestParam (value = "userId",defaultValue = "0")Long userId) {	
-    	return  reportServiceImpl.getEventsReport(TOKEN, deviceId,groupId, offset, start, end, type, search, userId);
+    	return  reportServiceImpl.getEventsReport(TOKEN, deviceId,groupId, offset, start, end, type, search, userId ,exportData);
 
 	}
 	
@@ -51,13 +47,14 @@ public class ReportRestController {
 													 @RequestParam (value = "groupId", defaultValue = "0") Long [] groupId,
 													 @RequestParam (value = "offset", defaultValue = "0") int offset,
 													 @RequestParam (value = "start", defaultValue = "0") String start,
+													 @RequestParam (value = "exportData", defaultValue = "") String exportData,
 													 @RequestParam (value = "end", defaultValue = "0") String end,
 													 @RequestParam (value = "search", defaultValue = "") String search,
 													 @RequestParam (value = "userId",defaultValue = "0")Long userId) {
 		
 		
 		
-    	return  reportServiceImpl.getDeviceWorkingHours(TOKEN,deviceId,groupId, offset, start, end,search,userId);
+    	return  reportServiceImpl.getDeviceWorkingHours(TOKEN,deviceId,groupId, offset, start, end,search,userId,exportData);
 
 	}
 	
@@ -67,6 +64,7 @@ public class ReportRestController {
 													 @RequestParam (value = "deviceId", defaultValue = "0") Long [] deviceId,
 													 @RequestParam (value = "groupId", defaultValue = "0") Long [] groupId,
 													 @RequestParam (value = "offset", defaultValue = "0") int offset,
+													 @RequestParam (value = "exportData", defaultValue = "") String exportData,
 													 @RequestParam (value = "start", defaultValue = "0") String start,
 													 @RequestParam (value = "end", defaultValue = "0") String end,
 													 @RequestParam (value = "search", defaultValue = "") String search,
@@ -76,7 +74,7 @@ public class ReportRestController {
 		
 		
 		
-    	return  reportServiceImpl.getCustomReport(TOKEN,deviceId,groupId, offset, start, end,search,userId,custom,value);
+    	return  reportServiceImpl.getCustomReport(TOKEN,deviceId,groupId, offset, start, end,search,userId,custom,value,exportData);
 
 	}
 	
@@ -85,6 +83,7 @@ public class ReportRestController {
 	public @ResponseBody ResponseEntity<?> getDriverWorkingHours(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 													 @RequestParam (value = "driverId", defaultValue = "0") Long [] driverId,
 													 @RequestParam (value = "groupId", defaultValue = "0") Long [] groupId,
+													 @RequestParam (value = "exportData", defaultValue = "") String exportData,
 													 @RequestParam (value = "offset", defaultValue = "0") int offset,
 													 @RequestParam (value = "start", defaultValue = "0") String start,
 													 @RequestParam (value = "end", defaultValue = "0") String end,
@@ -93,7 +92,7 @@ public class ReportRestController {
 		
 		
 		
-    	return  reportServiceImpl.getDriverWorkingHours(TOKEN,driverId,groupId, offset,start, end,search,userId);
+    	return  reportServiceImpl.getDriverWorkingHours(TOKEN,driverId,groupId, offset,start, end,search,userId,exportData);
 
 	}
 
@@ -197,6 +196,7 @@ public class ReportRestController {
 	public @ResponseBody ResponseEntity<?> getSensors(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 													 @RequestParam (value = "deviceId", defaultValue = "0") Long [] deviceId,
 													 @RequestParam (value = "groupId", defaultValue = "0") Long [] groupId,
+													 @RequestParam (value = "exportData", defaultValue = "") String exportData,
 													 @RequestParam (value = "offset", defaultValue = "0") int offset,
 													 @RequestParam (value = "start", defaultValue = "0") String start,
 													 @RequestParam (value = "end", defaultValue = "0") String end,
@@ -205,7 +205,7 @@ public class ReportRestController {
 		
 		
 		
-    	return  reportServiceImpl.getSensorsReport(TOKEN,deviceId,groupId, offset, start, end,search,userId);
+    	return  reportServiceImpl.getSensorsReport(TOKEN,deviceId,groupId, offset, start, end,search,userId,exportData);
 
 	}
 	
@@ -296,6 +296,7 @@ public class ReportRestController {
 	public @ResponseBody ResponseEntity<?> getNumberDriverWorkingHours(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 													 @RequestParam (value = "driverId", defaultValue = "0") Long [] driverId,
 													 @RequestParam (value = "groupId", defaultValue = "0") Long [] groupId,
+													 @RequestParam (value = "exportData", defaultValue = "") String exportData,
 													 @RequestParam (value = "offset", defaultValue = "0") int offset,
 													 @RequestParam (value = "start", defaultValue = "0") String start,
 													 @RequestParam (value = "end", defaultValue = "0") String end,
@@ -304,7 +305,7 @@ public class ReportRestController {
 		
 		
 		
-    	return  reportServiceImpl.getNumberDriverWorkingHours(TOKEN,driverId,groupId, offset,start, end,search,userId);
+    	return  reportServiceImpl.getNumberDriverWorkingHours(TOKEN,driverId,groupId, offset,start, end,search,userId,exportData);
 
 	}
 	

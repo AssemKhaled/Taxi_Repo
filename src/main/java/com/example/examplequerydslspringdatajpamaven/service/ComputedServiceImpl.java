@@ -226,7 +226,7 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 	 * get attributes list with limit 10
 	 */
 	@Override
-	public ResponseEntity<?> getAllComputed(String TOKEN, Long id,int offset,String search) {
+	public ResponseEntity<?> getAllComputed(String TOKEN, Long id,int offset,String search,String exportData) {
 		    logger.info("************************ getAllComputed STARTED ***************************");
 			List<Attribute> attrbuites = new ArrayList<Attribute>();
 			
@@ -264,8 +264,15 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 					    	List<Long> computedIds = userClientComputedRepository.getComputedsIds(id);
 					    	Integer size=0;
 					    	if(computedIds.size() > 0) {
-					    		attrbuites = computedRepository.getAllComputedByIds(computedIds,offset,search);
-								size=computedRepository.getAllComputedSizeByIds(computedIds);
+								 if(exportData.equals("exportData")) {
+								    attrbuites = computedRepository.getAllComputedByIdsExport(computedIds,search);
+									 
+								 }
+								 else {
+							    	attrbuites = computedRepository.getAllComputedByIds(computedIds,offset,search);
+									size=computedRepository.getAllComputedSizeByIds(computedIds);
+								 }
+
 								
 					    	}
 					    	
@@ -286,11 +293,17 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 								 usersIds.add(object.getId());
 							 }
 						 }
+						 Integer size = 0;
+						 if(exportData.equals("exportData")) {
+							 attrbuites = computedRepository.getAllComputedExport(usersIds,search);
 
+						 }
+						 else {
+
+							 attrbuites = computedRepository.getAllComputed(usersIds,offset,search);
+							 size=computedRepository.getAllComputedSize(usersIds);
+						 }
 						
-						
-						 attrbuites = computedRepository.getAllComputed(usersIds,offset,search);
-						 Integer size=computedRepository.getAllComputedSize(usersIds);
 
 						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",attrbuites,size);
 						logger.info("************************ getAllComputed ENDED ***************************");

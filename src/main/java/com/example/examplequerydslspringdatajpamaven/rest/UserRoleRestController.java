@@ -65,12 +65,13 @@ public class UserRoleRestController {
 	
 	@GetMapping("/getAllRolesCreatedByUser")
 	public ResponseEntity<?> getAllRolesCreatedByUser(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+            @RequestParam (value = "exportData", defaultValue = "") String exportData,
 			@RequestParam(value = "offset", defaultValue = "0") int offset,
 	        @RequestParam(value = "search", defaultValue = "") String search,
 			@RequestParam (value = "userId",defaultValue = "0") Long userId){
 		
 		
-		return userRoleService.getAllRolesCreatedByUser(TOKEN,userId,offset,search);
+		return userRoleService.getAllRolesCreatedByUser(TOKEN,userId,offset,search,exportData);
 	}
 	
 	@GetMapping("/getRolePageContent")

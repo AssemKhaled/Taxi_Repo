@@ -9,7 +9,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.Schedule;
 public interface ScheduledService {
 	
 	public ResponseEntity<?> createScheduled(String TOKEN,Schedule schedule,Long userId);
-	public ResponseEntity<?> getScheduledList(String TOKEN,Long id,int offset,String search);
+	public ResponseEntity<?> getScheduledList(String TOKEN,Long id,int offset,String search,String exportData);
 	public ResponseEntity<?> getScheduledById(String TOKEN,Long scheduledId,Long userId);
 	public ResponseEntity<?> deleteScheduled(String TOKEN,Long scheduledId,Long userId);
 	public ResponseEntity<?> editScheduled(String TOKEN,Schedule schedule,Long userId);

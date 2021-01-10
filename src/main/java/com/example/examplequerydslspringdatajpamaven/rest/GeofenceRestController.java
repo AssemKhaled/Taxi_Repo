@@ -34,11 +34,12 @@ public class GeofenceRestController {
 
 	@RequestMapping(value = "/getAllGeofences", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getGeofences(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+                                                        @RequestParam (value = "exportData", defaultValue = "") String exportData,
 			                                            @RequestParam (value = "userId", defaultValue = "0") Long id,
 														@RequestParam (value = "offset", defaultValue = "0") int offset,
 														@RequestParam (value = "search", defaultValue = "") String search) {
 		
-    	return  geofenceServiceImpl.getAllGeofences(TOKEN,id,offset,search);
+    	return  geofenceServiceImpl.getAllGeofences(TOKEN,id,offset,search,exportData);
 
 	}
 	

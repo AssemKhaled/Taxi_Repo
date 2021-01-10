@@ -20,7 +20,7 @@ public interface UserRoleService {
 	
 	public ResponseEntity<?>assignRoleToUser(String TOKEN,Long roleId,Long userId,Long loggedId);
 	
-	public ResponseEntity<?>getAllRolesCreatedByUser(String TOKEN,Long userId,int offset,String search);
+	public ResponseEntity<?>getAllRolesCreatedByUser(String TOKEN,Long userId,int offset,String search, String exportData);
 	
 	public ResponseEntity<?> getRolePageContent(String TOKEN,Long userId);
 	

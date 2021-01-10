@@ -9,13 +9,13 @@ import org.springframework.stereotype.Service;
 public interface ReportService {
 	
 	
-	public ResponseEntity<?> getEventsReport(String TOKEN,Long [] deviceId,Long [] groupId,int offset,String start,String end,String type,String search,Long userId);
+	public ResponseEntity<?> getEventsReport(String TOKEN,Long [] deviceId,Long [] groupId,int offset,String start,String end,String type,String search,Long userId,String exportData);
 
-	public ResponseEntity<?> getDeviceWorkingHours(String TOKEN,Long [] deviceId,Long [] groupId,int offset,String start,String end,String search,Long userId);
+	public ResponseEntity<?> getDeviceWorkingHours(String TOKEN,Long [] deviceId,Long [] groupId,int offset,String start,String end,String search,Long userId,String exportData);
 	
-	public ResponseEntity<?> getCustomReport(String TOKEN,Long [] deviceId,Long [] groupId,int offset,String start,String end,String search,Long userId,String custom,String  value);
+	public ResponseEntity<?> getCustomReport(String TOKEN,Long [] deviceId,Long [] groupId,int offset,String start,String end,String search,Long userId,String custom,String  value,String exportData);
 
-    public ResponseEntity<?> getDriverWorkingHours(String TOKEN,Long [] driverId,Long [] groupId,int offset,String start,String end,String search,Long userId);
+    public ResponseEntity<?> getDriverWorkingHours(String TOKEN,Long [] driverId,Long [] groupId,int offset,String start,String end,String search,Long userId,String exportData);
 
 	public ResponseEntity<?> getStopsReport(String TOKEN,Long [] deviceId,Long [] groupId,String type,String from,String to,int page,int start,int limit,Long userId);
 
@@ -29,7 +29,7 @@ public interface ReportService {
 	
 	public ResponseEntity<?> getSummaryReport(String TOKEN,Long [] deviceId,Long [] groupId,String type,String from,String to,int page,int start,int limit,Long userId);
 
-	public ResponseEntity<?> getSensorsReport(String TOKEN,Long [] deviceId,Long [] groupId,int offset,String start,String end,String search,Long userId);
+	public ResponseEntity<?> getSensorsReport(String TOKEN,Long [] deviceId,Long [] groupId,int offset,String start,String end,String search,Long userId,String exportData);
 	
 	public ResponseEntity<?> getNotifications(String TOKEN,Long userId,int offset,String search);
 
@@ -41,7 +41,7 @@ public interface ReportService {
 
 	public ResponseEntity<?> getTotalStopsReport(String TOKEN,Long [] deviceId,Long [] driverId,Long [] groupId,String type,String from,String to,int page,int start,int limit,Long userId);
     
-	public ResponseEntity<?> getNumberDriverWorkingHours(String TOKEN,Long [] driverId,Long [] groupId,int offset,String start,String end,String search,Long userId);
+	public ResponseEntity<?> getNumberDriverWorkingHours(String TOKEN,Long [] driverId,Long [] groupId,int offset,String start,String end,String search,Long userId,String exportData);
 
 	
 	public ResponseEntity<?> getviewTrip(String TOKEN,Long deviceId,String startTime,String endTime);

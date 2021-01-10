@@ -55,12 +55,22 @@ public interface GeofenceRepository extends JpaRepository<Geofence, Long>, Query
 			+ " LIMIT :offset,10", nativeQuery = true)
 	public List<Geofence> getAllGeofences(@Param("userIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
 	
-
+	@Query(value = "SELECT tc_geofences.* FROM tc_geofences INNER JOIN tc_user_geofence ON tc_user_geofence.geofenceid = tc_geofences.id"
+			+ " WHERE tc_user_geofence.userid IN(:userIds)and tc_geofences.delete_date is null"
+			+ " and ((tc_geofences.name Like %:search%) OR (tc_geofences.type Like %:search%)) ", nativeQuery = true)
+	public List<Geofence> getAllGeofencesExport(@Param("userIds")List<Long> userIds,@Param("search") String search);
+	
+	
 	@Query(value = "SELECT tc_geofences.* FROM tc_geofences "
 			+ " WHERE tc_geofences.id IN(:geofenceIds)and tc_geofences.delete_date is null"
 			+ " and ((tc_geofences.name Like %:search%) OR (tc_geofences.type Like %:search%))"
 			+ " LIMIT :offset,10", nativeQuery = true)
 	public List<Geofence> getAllGeofencesByIds(@Param("geofenceIds")List<Long> geofenceIds,@Param("offset") int offset,@Param("search") String search);
+	
+	@Query(value = "SELECT tc_geofences.* FROM tc_geofences "
+			+ " WHERE tc_geofences.id IN(:geofenceIds)and tc_geofences.delete_date is null"
+			+ " and ((tc_geofences.name Like %:search%) OR (tc_geofences.type Like %:search%))", nativeQuery = true)
+	public List<Geofence> getAllGeofencesByIdsExport(@Param("geofenceIds")List<Long> geofenceIds,@Param("search") String search);
 	
 	
 	@Query(value = "SELECT count(*) FROM tc_geofences INNER JOIN tc_user_geofence ON tc_user_geofence.geofenceid = tc_geofences.id"

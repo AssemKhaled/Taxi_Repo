@@ -9,12 +9,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
+
 @Service
 public interface DeviceService {
 	
 	public Device findById(Long deviceId);
 
-	public ResponseEntity<?>  getAllUserDevices(String TOKEN,Long userId , int offset, String search);
+	public ResponseEntity<?>  getAllUserDevices(String TOKEN,Long userId , int offset, String search, String exportData);
 	
 	public ResponseEntity<?> createDevice(String TOKEN,Device device,Long userId);
 	

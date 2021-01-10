@@ -12,7 +12,7 @@ public interface IUserService {
 	public User getName();
 	public User findById(Long userId);
 	public ResponseEntity<?> findUserById(String TOKEN,Long userId,Long loggedUserId);
-	public ResponseEntity<?> usersOfUser(String TOKEN,Long userId,Long loggedUserId,int offset,String search,int active);
+	public ResponseEntity<?> usersOfUser(String TOKEN,Long userId,Long loggedUserId,int offset,String search,int active,String exportData);
 	public ResponseEntity<?> createUser(String TOKEN,User user,Long userId);
 	public ResponseEntity<?> editUser(String TOKEN,User user,Long userId);
 	public List<Integer> checkUserDuplication(User user);
