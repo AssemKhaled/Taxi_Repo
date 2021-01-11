@@ -40,6 +40,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.ElmReturn;
 import com.example.examplequerydslspringdatajpamaven.entity.ExpiredVehicles;
 import com.example.examplequerydslspringdatajpamaven.entity.LastElmData;
 import com.example.examplequerydslspringdatajpamaven.entity.LastPositionData;
+import com.example.examplequerydslspringdatajpamaven.entity.MongoElmLastLocations;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoElmLiveLocation;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoElmLogs;
 import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
@@ -3631,10 +3632,10 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		
 		logger.info("************************ lastLocations STARTED ***************************");
 
-		 List<Map> dataArray = new ArrayList<>();
-		 List<String> ids = new ArrayList<>();
+		List<Map> dataArray = new ArrayList<>();
+		List<String> ids = new ArrayList<>();
 
-
+		List<MongoElmLastLocations> elm_connection_logs = new ArrayList<MongoElmLastLocations>();
 		List<MongoElmLiveLocation> positions = mongoElmLiveLocationRepository.findByIdsIn(new PageRequest(0, 1000));
 		
 		for(MongoElmLiveLocation position:positions) {
@@ -3654,6 +3655,15 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			ids.add(position.get_id().toString());
 			
 			dataArray.add(record);
+			
+			
+//			MongoElmLastLocations connection_log = new MongoElmLastLocations();  
+//			
+//			connection_log.setPositionid(position.get_id().toString());
+//			connection_log.setElm_data(record);
+//			connection_log.setSendtime(time);
+//			
+//			elm_connection_logs.add(connection_log);
 		}
 		
     	 Map body = new HashMap();
@@ -3735,13 +3745,13 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  MongoElmLogs elmLogs = new MongoElmLogs(null,null,null,null,null,null,null,time,type,requet,response);
 		  elmLogsRepository.save(elmLogs);
 		  
-
-      	mongoElmLiveLocationRepository.deleteByIdIn(ids);
-
-
-	    getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",data,dataArray.size());
-		logger.info("************************ lastLocations ENDED ***************************");
-		return  ResponseEntity.ok().body(getObjectResponse);
+		  //elmLastLocationsRepository.save(elm_connection_logs);  
+	      mongoElmLiveLocationRepository.deleteByIdIn(ids);
+	
+	
+		  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",data,dataArray.size());
+		  logger.info("************************ lastLocations ENDED ***************************");
+		  return  ResponseEntity.ok().body(getObjectResponse);
 	}
 
 	/**

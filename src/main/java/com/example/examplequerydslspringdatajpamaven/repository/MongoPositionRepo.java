@@ -1220,9 +1220,7 @@ public class MongoPositionRepo {
 
 		LastPositionData position = new LastPositionData();
 
-				
-		BasicDBObject basicDBObject = new BasicDBObject();
-		
+						
 	    Aggregation aggregation = newAggregation(
 	            match(Criteria.where("deviceid").in(deviceId)),
 	            project("speed","longitude","latitude","attributes","weight").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime")
@@ -1231,22 +1229,20 @@ public class MongoPositionRepo {
 	            skip(0),
 	            limit(1)
 	            
-	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+	        );
 
 	    
-	        AggregationResults<MongoPositions> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
 
 	        
-	       if(groupResults.getRawResults().containsField("cursor")) {
-	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
-	            
-			    JSONArray list = (JSONArray) obj.get("firstBatch");
-	            Iterator<Object> iterator = list.iterator();
+            if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
 	            while (iterator.hasNext()) {
-	            	JSONObject object = (JSONObject) iterator.next();
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
 	            	
-	            	if(object.has("servertime") && object.get("servertime").toString() != "null") {
+	            	if(object.containsField("servertime") && object.get("servertime") != null) {
 	            		
 						Date dateTime = null;
 						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -1270,7 +1266,7 @@ public class MongoPositionRepo {
 	            		
 	            		
 	            	}  
-                    if(object.has("devicetime") && object.get("devicetime").toString() != "null") {
+                    if(object.containsField("devicetime") && object.get("devicetime") != null) {
                     	
 						Date dateTime = null;
 						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -1295,7 +1291,7 @@ public class MongoPositionRepo {
 	            		
 	            		
 	            	}
-                    if(object.has("fixtime") && object.get("fixtime").toString() != "null") {
+                    if(object.containsField("fixtime") && object.get("fixtime") != null) {
 	            		
                     	
 						Date dateTime = null;
@@ -1320,25 +1316,24 @@ public class MongoPositionRepo {
 	            		
 
 	            	}
-	            	if(object.has("attributes") && object.get("attributes").toString() != "null") {
+	            	if(object.containsField("attributes") && object.get("attributes") != null) {
 	            		position.setAttributes(object.get("attributes").toString());
 	
 	            	}
-                    if(object.has("latitude")) {
+                    if(object.containsField("latitude") && object.get("latitude") != null) {
 	            		
 	            		position.setLatitude(object.getDouble("latitude"));
 
 	            	}
-                    if(object.has("longitude")) {
+                    if(object.containsField("longitude") && object.get("longitude") != null) {
 	            		
 	            		position.setLongitude(object.getDouble("longitude"));
 
 	            	}
-                    
-	            	if(object.has("speed")) {
+	            	if(object.containsField("speed") && object.get("speed") != null) {
 	            		position.setSpeed(object.getDouble("speed") * (1.852) );    		
 	                }
-	            	if(object.has("weight")) {
+	            	if(object.containsField("weight") && object.get("weight") != null) {
 	            		position.setWeight(object.getDouble("weight"));    		
 	                }
 					
@@ -1353,9 +1348,6 @@ public class MongoPositionRepo {
 	public List<LastPositionData> getLastPositionSpeedZero(Long deviceId){
 
 		List<LastPositionData> positions = new ArrayList<LastPositionData>();
-
-				
-		BasicDBObject basicDBObject = new BasicDBObject();
 		
 	    Aggregation aggregation = newAggregation(
 	            match(Criteria.where("deviceid").in(deviceId).and("speed").in(0)),
@@ -1365,22 +1357,21 @@ public class MongoPositionRepo {
 	            skip(0),
 	            limit(10)
 	            
-	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+	        );
 
 	    
-	        AggregationResults<MongoPositions> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
 
 	        
-	       if(groupResults.getRawResults().containsField("cursor")) {
-	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
-	            
-			    JSONArray list = (JSONArray) obj.get("firstBatch");
-	            Iterator<Object> iterator = list.iterator();
+            if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
 	            while (iterator.hasNext()) {
-	            	JSONObject object = (JSONObject) iterator.next();
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
 	            	LastPositionData position = new LastPositionData();
-	            	if(object.has("servertime") && object.get("servertime").toString() != "null") {
+	            	
+	            	if(object.containsField("servertime") && object.get("servertime") != null) {
 	            		
 						Date dateTime = null;
 						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -1404,7 +1395,7 @@ public class MongoPositionRepo {
 	            		
 	            		
 	            	}  
-                    if(object.has("devicetime") && object.get("devicetime").toString() != "null") {
+                    if(object.containsField("devicetime") && object.get("devicetime") != null) {
                     	
 						Date dateTime = null;
 						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -1429,7 +1420,7 @@ public class MongoPositionRepo {
 	            		
 	            		
 	            	}
-                    if(object.has("fixtime") && object.get("fixtime").toString() != "null") {
+                    if(object.containsField("fixtime") && object.get("fixtime") != null) {
 	            		
                     	
 						Date dateTime = null;
@@ -1454,26 +1445,25 @@ public class MongoPositionRepo {
 	            		
 
 	            	}
-	            	if(object.has("attributes") && object.get("attributes").toString() != "null") {
+	            	if(object.containsField("attributes") && object.get("attributes") != null) {
 	            		position.setAttributes(object.get("attributes").toString());
 	
 	            	}
-                    if(object.has("latitude")) {
+                    if(object.containsField("latitude") && object.get("latitude") != null) {
 	            		
 	            		position.setLatitude(object.getDouble("latitude"));
 
 	            	}
-                    if(object.has("longitude")) {
+                    if(object.containsField("longitude") && object.get("longitude") != null) {
 	            		
 	            		position.setLongitude(object.getDouble("longitude"));
 
 	            	}
-                    
-	            	if(object.has("speed")) {
+	            	if(object.containsField("speed") && object.get("speed") != null) {
 	            		position.setSpeed(object.getDouble("speed") * (1.852) );    		
 	                }
 	            	
-	            	if(object.has("weight")) {
+	            	if(object.containsField("weight") && object.get("weight") != null) {
 	            		position.setWeight(object.getDouble("weight"));    		
 	                }
 					
@@ -1489,9 +1479,7 @@ public class MongoPositionRepo {
 
 		List<LastPositionData> positions = new ArrayList<LastPositionData>();
 
-				
-		BasicDBObject basicDBObject = new BasicDBObject();
-		
+						
 	    Aggregation aggregation = newAggregation(
 	            match(Criteria.where("deviceid").in(deviceId).and("speed").gt(0)),
 	            project("speed","longitude","latitude","attributes","weight").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime")
@@ -1500,22 +1488,22 @@ public class MongoPositionRepo {
 	            skip(0),
 	            limit(10)
 	            
-	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+	        );
 
 	    
-	        AggregationResults<MongoPositions> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
 
 	        
-	       if(groupResults.getRawResults().containsField("cursor")) {
-	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
-	            
-			    JSONArray list = (JSONArray) obj.get("firstBatch");
-	            Iterator<Object> iterator = list.iterator();
+ 
+	        if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
 	            while (iterator.hasNext()) {
-	            	JSONObject object = (JSONObject) iterator.next();
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
 	            	LastPositionData position = new LastPositionData();
-                    if(object.has("servertime") && object.get("servertime").toString() != "null") {
+	            	
+                    if(object.containsField("servertime") && object.get("servertime") != null) {
 	            		
 						Date dateTime = null;
 						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -1539,7 +1527,7 @@ public class MongoPositionRepo {
 	            		
 	            		
 	            	}  
-                    if(object.has("devicetime") && object.get("devicetime").toString() != "null") {
+                    if(object.containsField("devicetime") && object.get("devicetime") != null) {
                     	
 						Date dateTime = null;
 						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -1564,7 +1552,7 @@ public class MongoPositionRepo {
 	            		
 	            		
 	            	}
-                    if(object.has("fixtime") && object.get("fixtime").toString() != "null") {
+                    if(object.containsField("fixtime") && object.get("fixtime") != null) {
 	            		
                     	
 						Date dateTime = null;
@@ -1589,26 +1577,26 @@ public class MongoPositionRepo {
 	            		
 
 	            	}
-	            	if(object.has("attributes") && object.get("attributes").toString() != "null") {
+	            	if(object.containsField("attributes") && object.get("attributes") != null) {
 	            		position.setAttributes(object.get("attributes").toString());
 	
 	            	}
-                    if(object.has("latitude")) {
+                    if(object.containsField("latitude") && object.get("latitude") != null) {
 	            		
 	            		position.setLatitude(object.getDouble("latitude"));
 
 	            	}
-                    if(object.has("longitude")) {
+                    if(object.containsField("longitude") && object.get("longitude") != null) {
 	            		
 	            		position.setLongitude(object.getDouble("longitude"));
 
 	            	}
                     
-	            	if(object.has("speed")) {
+	            	if(object.containsField("speed") && object.get("speed") != null) {
 	            		position.setSpeed(object.getDouble("speed") * (1.852) );    		
 	                }
 	            	
-	            	if(object.has("weight")) {
+	            	if(object.containsField("weight") && object.get("weight") != null) {
 	            		position.setWeight(object.getDouble("weight"));    		
 	                }
 	            	
@@ -1624,9 +1612,7 @@ public class MongoPositionRepo {
 
 		List<LastElmData> positions = new ArrayList<LastElmData>();
 
-				
-		BasicDBObject basicDBObject = new BasicDBObject();
-		
+						
 	    Aggregation aggregation = newAggregation(
 	            match(Criteria.where("vehicleid").in(deviceId).and("elm_data.velocity").in(0)),
 	            project("sendtime","elm_data","vehiclename","drivername"),
@@ -1634,36 +1620,35 @@ public class MongoPositionRepo {
 	            skip(0),
 	            limit(10)
 	            
-	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+	        );
 
 	    
-	        AggregationResults<MongoElmLastLocations> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_elm_last_locations_tbl", MongoElmLastLocations.class);
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_elm_last_locations_tbl", BasicDBObject.class);
 
 	        
-	       if(groupResults.getRawResults().containsField("cursor")) {
-	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
-	            
-			    JSONArray list = (JSONArray) obj.get("firstBatch");
-	            Iterator<Object> iterator = list.iterator();
+            if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
 	            while (iterator.hasNext()) {
-	            	JSONObject object = (JSONObject) iterator.next();
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
 	            	LastElmData position = new LastElmData();
-	            	if(object.has("sendtime") && object.get("sendtime").toString() != "null") {
+	            	
+	            	if(object.containsField("sendtime") && object.get("sendtime") != null) {
 	            		position.setSendtime( object.getString("sendtime"));
 	            		
 	            	}  
-                    if(object.has("elm_data") && object.get("elm_data").toString() != "null") {
+                    if(object.containsField("elm_data") && object.get("elm_data") != null) {
 	            		position.setElm_data(object.get("elm_data").toString());
 
 	            		
 	            	}
-                    if(object.has("vehiclename") && object.get("vehiclename").toString() != "null") {
+                    if(object.containsField("vehiclename") && object.get("vehiclename") != null) {
 	            		
 	            		position.setVehiclename(object.getString("vehiclename"));
 
 	            	}
-	            	if(object.has("drivername") && object.get("drivername").toString() != "null") {
+	            	if(object.containsField("drivername") && object.get("drivername") != null) {
 	            		position.setDrivername(object.getString("drivername"));
 	
 	            	}
@@ -1681,9 +1666,7 @@ public class MongoPositionRepo {
 
 		List<LastElmData> positions = new ArrayList<LastElmData>();
 
-				
-		BasicDBObject basicDBObject = new BasicDBObject();
-		
+						
 	    Aggregation aggregation = newAggregation(
 	            match(Criteria.where("vehicleid").in(deviceId).and("elm_data.velocity").gt(0)),
 	            project("sendtime","elm_data","vehiclename","drivername"),
@@ -1691,36 +1674,36 @@ public class MongoPositionRepo {
 	            skip(0),
 	            limit(10)
 	            
-	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+	        );
 
 	    
-	        AggregationResults<MongoElmLastLocations> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_elm_last_locations_tbl", MongoElmLastLocations.class);
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_elm_last_locations_tbl", BasicDBObject.class);
 
 	        
-	       if(groupResults.getRawResults().containsField("cursor")) {
-	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
-	            
-			    JSONArray list = (JSONArray) obj.get("firstBatch");
-	            Iterator<Object> iterator = list.iterator();
+ 
+	        if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
 	            while (iterator.hasNext()) {
-	            	JSONObject object = (JSONObject) iterator.next();
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
 	            	LastElmData position = new LastElmData();
-	            	if(object.has("sendtime") && object.get("sendtime").toString() != "null") {
+	            	
+	            	if(object.containsField("sendtime") && object.get("sendtime") != null) {
 	            		position.setSendtime( object.getString("sendtime"));
 	            		
 	            	}  
-                    if(object.has("elm_data") && object.get("elm_data").toString() != "null") {
+                    if(object.containsField("elm_data") && object.get("elm_data").toString() != null) {
 	            		position.setElm_data(object.get("elm_data").toString());
 
 	            		
 	            	}
-                    if(object.has("vehiclename") && object.get("vehiclename").toString() != "null") {
+                    if(object.containsField("vehiclename") && object.get("vehiclename") != null) {
 	            		
 	            		position.setVehiclename(object.getString("vehiclename"));
 
 	            	}
-	            	if(object.has("drivername") && object.get("drivername").toString() != "null") {
+	            	if(object.containsField("drivername") && object.get("drivername") != null) {
 	            		position.setDrivername(object.getString("drivername"));
 	
 	            	}
@@ -1738,9 +1721,6 @@ public class MongoPositionRepo {
 	public Integer getCountFromAttrbuites(List<String> positionIds,String attr,Boolean value){
 
 		Integer size = 0;
-
-		
-		BasicDBObject basicDBObject = new BasicDBObject();
 		
 		List<ObjectId> ids = new ArrayList<ObjectId>();
 
@@ -1755,23 +1735,20 @@ public class MongoPositionRepo {
 	            count().as("size")
 
 	            
-	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+	        );
 
 
-	        AggregationResults<MongoPositions> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
 
-	        if(groupResults.getRawResults().containsField("cursor")) {
-	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
-			    JSONArray list = (JSONArray) obj.get("firstBatch");
 
-			    if(!list.isNull(0)) {
-			    	JSONObject object = (JSONObject) list.get(0);
+	        if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
+	            while (iterator.hasNext()) {
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
 	            	size = object.getInt("size");
-			    }
-			    
-            	
-	            
+	            }
 
 	        }
 		return size;
@@ -1803,9 +1780,7 @@ public class MongoPositionRepo {
 		}
 		
 		
-		
-		BasicDBObject basicDBObject = new BasicDBObject();
-		
+				
 		List<ObjectId> ids = new ArrayList<ObjectId>();
 
 		for(String id:positionIds) {
@@ -1817,25 +1792,20 @@ public class MongoPositionRepo {
 	    Aggregation aggregation = newAggregation(
 	            match(Criteria.where("_id").in(ids).and("devicetime").gte(dateFrom).lte(dateTo).and("attributes."+attr).in(value)),
 	            count().as("size")
+   
+	        );
 
-	            
-	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
 
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
 
-	        AggregationResults<MongoPositions> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
-
-	        if(groupResults.getRawResults().containsField("cursor")) {
-	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
-			    JSONArray list = (JSONArray) obj.get("firstBatch");
-
-			    if(!list.isNull(0)) {
-			    	JSONObject object = (JSONObject) list.get(0);
+	        if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
+	            while (iterator.hasNext()) {
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
 	            	size = object.getInt("size");
-			    }
-			    
-            	
-	            
+	            }
 
 	        }
 		return size;
@@ -1846,9 +1816,6 @@ public class MongoPositionRepo {
 	public Integer getCountFromSpeedGreaterThanZero(List<String> positionIds){
 
 		Integer size = 0;
-
-		
-		BasicDBObject basicDBObject = new BasicDBObject();
 		
 		List<ObjectId> ids = new ArrayList<ObjectId>();
 
@@ -1863,23 +1830,20 @@ public class MongoPositionRepo {
 	            count().as("size")
 
 	            
-	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+	        );
 
 
-	        AggregationResults<MongoPositions> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
 
-	        if(groupResults.getRawResults().containsField("cursor")) {
-	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
-			    JSONArray list = (JSONArray) obj.get("firstBatch");
 
-			    if(!list.isNull(0)) {
-			    	JSONObject object = (JSONObject) list.get(0);
+	        if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
+	            while (iterator.hasNext()) {
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
 	            	size = object.getInt("size");
-			    }
-			    
-            	
-	            
+	            }
 
 	        }
 		return size;
@@ -1889,8 +1853,6 @@ public class MongoPositionRepo {
 
 		Integer size = 0;
 
-		
-		BasicDBObject basicDBObject = new BasicDBObject();
 		
 		List<ObjectId> ids = new ArrayList<ObjectId>();
 
@@ -1903,25 +1865,21 @@ public class MongoPositionRepo {
 	    Aggregation aggregation = newAggregation(
 	            match(Criteria.where("_id").in(ids).and("speed").in(0)),
 	            count().as("size")
+     
+	       );
 
-	            
-	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
 
 
-	        AggregationResults<MongoPositions> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
-
-	        if(groupResults.getRawResults().containsField("cursor")) {
-	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
-			    JSONArray list = (JSONArray) obj.get("firstBatch");
-
-			    if(!list.isNull(0)) {
-			    	JSONObject object = (JSONObject) list.get(0);
+	        if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
+	            while (iterator.hasNext()) {
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
 	            	size = object.getInt("size");
-			    }
-			    
-            	
-	            
+	            }
 
 	        }
 		return size;
@@ -1934,8 +1892,6 @@ public class MongoPositionRepo {
 		
 		List<CustomMapData> positions = new ArrayList<CustomMapData>();
 
-
-		BasicDBObject basicDBObject = new BasicDBObject();
 		List<ObjectId> ids = new ArrayList<ObjectId>();
 
 		for(String id:positionIds) {
@@ -1953,39 +1909,37 @@ public class MongoPositionRepo {
 	            sort(Sort.Direction.DESC, "servertime")
 
 	            
-	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+	        );
 
 	    
 
 
-	        AggregationResults<MongoPositions> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
 
-	        if(groupResults.getRawResults().containsField("cursor")) {
-	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
-	            
-			    JSONArray list = (JSONArray) obj.get("firstBatch");
-	            Iterator<Object> iterator = list.iterator();
+
+	        if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
 	            while (iterator.hasNext()) {
-
-	            	JSONObject object = (JSONObject) iterator.next();
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
 	            	CustomMapData position = new CustomMapData();
 
-	            	if(object.has("deviceid")) {
+	            	if(object.containsField("deviceid") && object.get("deviceid") != null) {
 	            		position.setId(object.getLong("deviceid"));
 	
 	            	}
 	            	
-	            	if(object.has("address") && object.get("address").toString() != "null") {
+	            	if(object.containsField("address") && object.get("address") != null) {
  	            		position.setAddress(object.getString("address"));
  	
  	            	}
 	            	
-	            	if(object.has("deviceName") && object.get("deviceName").toString() != "null") {
+	            	if(object.containsField("deviceName") && object.get("deviceName") != null) {
 	            		position.setDeviceName(object.getString("deviceName"));
 	
 	            	}
-	            	if(object.has("servertime") && object.get("servertime").toString() != "null") {
+	            	if(object.containsField("servertime") && object.get("servertime") != null) {
 	            		
 	            		position.setLastUpdateApp(object.getString("servertime"));
 	            		
@@ -2010,16 +1964,14 @@ public class MongoPositionRepo {
 	            		position.setLastUpdate(outputFormat.format(dateTime));
 	
 	            	} 
-					if(object.has("_id")) {
-		            	JSONObject objId = (JSONObject) object.get("_id");
-		            	if(objId.has("$oid")) {
-		            		position.setPositionId(objId.getString("$oid"));
-						}
+	            	if(object.containsField("_id") && object.get("_id") != null) {
+	            		position.setPositionId(object.getObjectId("_id").toString());
 	
 					}
+					
 					position.setStatus(4);
 					position.setVehicleStatus(3);
-					if(object.has("valid")) {
+					if(object.containsField("valid") && object.get("valid") != null) {
 	            		
 	            		if(object.getBoolean("valid") == true) {
 	            			position.setValid(1);
@@ -2031,7 +1983,7 @@ public class MongoPositionRepo {
 						}
 	
 	            	}
-					if(object.has("ignition")) {
+					if(object.containsField("ignition")  && object.get("ignition") != null) {
 						if(object.getBoolean("ignition") == true) {
 	            			position.setIgnition(1);
 	
@@ -2043,29 +1995,29 @@ public class MongoPositionRepo {
 	
 	            	}
 					
-					if(object.has("power")) {
+					if(object.containsField("power") && object.get("power") != null) {
 	            		position.setPower(object.getDouble("power"));
 	
 	            	} 
 
-					if(object.has("operator")) {
+					if(object.containsField("operator") && object.get("operator") != null) {
 	            		position.setOperator(object.getDouble("operator"));
 	
 	            	} 
 
 					
-					if(object.has("latitude")) {
+					if(object.containsField("latitude") && object.get("latitude") != null) {
 	            		position.setLatitude(object.getDouble("latitude"));
 	
 	            	} 
 
 					
-					if(object.has("longitude")) {
+					if(object.containsField("longitude") && object.get("longitude") != null) {
 	            		position.setLongitude(object.getDouble("longitude"));
 	
 	            	} 
 
-					if(object.has("speed")) {
+					if(object.containsField("speed") && object.get("speed") != null) {
 	            		position.setSpeed(object.getDouble("speed") * (1.852) );
 	
 	            	} 
@@ -2080,14 +2032,9 @@ public class MongoPositionRepo {
 	}
 	
     public List<CustomMapData> getOutOfNetworkList(List<String> positionIds){
-
-		
-
 		
 		List<CustomMapData> positions = new ArrayList<CustomMapData>();
 
-
-		BasicDBObject basicDBObject = new BasicDBObject();
 		List<ObjectId> ids = new ArrayList<ObjectId>();
 
 		for(String id:positionIds) {
@@ -2105,38 +2052,36 @@ public class MongoPositionRepo {
 	            sort(Sort.Direction.DESC, "servertime")
 
 	            
-	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+	        );
 
 	    
 
 
-	        AggregationResults<MongoPositions> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
 
-	        if(groupResults.getRawResults().containsField("cursor")) {
-	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
-	            
-			    JSONArray list = (JSONArray) obj.get("firstBatch");
-	            Iterator<Object> iterator = list.iterator();
+
+	        if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
 	            while (iterator.hasNext()) {
-
-	            	JSONObject object = (JSONObject) iterator.next();
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
 	            	CustomMapData position = new CustomMapData();
 
-	            	if(object.has("deviceid")) {
+	            	if(object.containsField("deviceid") && object.get("deviceid") != null) {
 	            		position.setId(object.getLong("deviceid"));
 	
 	            	}
-	            	if(object.has("address") && object.get("address").toString() != "null") {
+	            	if(object.containsField("address") && object.get("address") != null) {
  	            		position.setAddress(object.getString("address"));
  	
  	            	}
  	            	
-	            	if(object.has("deviceName") && object.get("deviceName").toString() != "null") {
+	            	if(object.containsField("deviceName") && object.get("deviceName") != null) {
 	            		position.setDeviceName(object.getString("deviceName"));
 	
 	            	}
-	            	if(object.has("servertime") && object.get("servertime").toString() != "null") {
+	            	if(object.containsField("servertime") && object.get("servertime") != null) {
 	            		position.setLastUpdateApp(object.getString("servertime"));
 
 						Date dateTime = null;
@@ -2161,16 +2106,13 @@ public class MongoPositionRepo {
 	            		
 	
 	            	} 
-					if(object.has("_id")) {
-		            	JSONObject objId = (JSONObject) object.get("_id");
-		            	if(objId.has("$oid")) {
-		            		position.setPositionId(objId.getString("$oid"));
-						}
-	
+	            	if(object.containsField("_id") && object.get("_id") != null) {
+	            		position.setPositionId(object.getObjectId("_id").toString());
+
 					}
 					position.setStatus(6);
 					position.setVehicleStatus(2);
-					if(object.has("valid")) {
+					if(object.containsField("valid") && object.get("valid") != null) {
 	            		
 	            		if(object.getBoolean("valid") == true) {
 	            			position.setValid(1);
@@ -2182,7 +2124,7 @@ public class MongoPositionRepo {
 						}
 	
 	            	}
-					if(object.has("ignition")) {
+					if(object.containsField("ignition") && object.get("ignition") != null) {
 						if(object.getBoolean("ignition") == true) {
 	            			position.setIgnition(1);
 	
@@ -2194,29 +2136,29 @@ public class MongoPositionRepo {
 	
 	            	}
 					
-					if(object.has("power")) {
+					if(object.containsField("power") && object.get("power") != null) {
 	            		position.setPower(object.getDouble("power"));
 	
 	            	} 
 
-					if(object.has("operator")) {
+					if(object.containsField("operator") && object.get("operator") != null) {
 	            		position.setOperator(object.getDouble("operator"));
 	
 	            	} 
 
 					
-					if(object.has("latitude")) {
+					if(object.containsField("latitude") && object.get("latitude") != null) {
 	            		position.setLatitude(object.getDouble("latitude"));
 	
 	            	} 
 
 					
-					if(object.has("longitude")) {
+					if(object.containsField("longitude") && object.get("longitude") != null) {
 	            		position.setLongitude(object.getDouble("longitude"));
 	
 	            	} 
 
-					if(object.has("speed")) {
+					if(object.containsField("speed") && object.get("speed") != null) {
 	            		position.setSpeed(object.getDouble("speed") * (1.852) );
 	
 	            	} 
@@ -2231,14 +2173,9 @@ public class MongoPositionRepo {
 	}
     
     public List<CustomMapData> getOnlineList(List<String> positionIds){
-
-		
-
 		
  		List<CustomMapData> positions = new ArrayList<CustomMapData>();
 
-
- 		BasicDBObject basicDBObject = new BasicDBObject();
  		List<ObjectId> ids = new ArrayList<ObjectId>();
 
  		for(String id:positionIds) {
@@ -2256,37 +2193,34 @@ public class MongoPositionRepo {
  	            sort(Sort.Direction.DESC, "servertime")
 
  	            
- 	        ).withOptions(new AggregationOptions(false, false, basicDBObject));
+ 	        );
 
 
 
- 	        AggregationResults<MongoPositions> groupResults
- 	            = mongoTemplate.aggregate(aggregation,"tc_positions", MongoPositions.class);
+ 	        AggregationResults<BasicDBObject> groupResults
+ 	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
 
- 	        if(groupResults.getRawResults().containsField("cursor")) {
- 	            JSONObject obj = new JSONObject(groupResults.getRawResults().get("cursor").toString());
- 	            
- 			    JSONArray list = (JSONArray) obj.get("firstBatch");
- 	            Iterator<Object> iterator = list.iterator();
- 	            while (iterator.hasNext()) {
-
- 	            	JSONObject object = (JSONObject) iterator.next();
+ 	       if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
+	            while (iterator.hasNext()) {
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
  	            	CustomMapData position = new CustomMapData();
 
- 	            	if(object.has("deviceid")) {
+ 	            	if(object.containsField("deviceid") && object.get("deviceid") != null) {
  	            		position.setId(object.getLong("deviceid"));
  	
  	            	}
- 	            	if(object.has("deviceName") && object.get("deviceName").toString() != "null") {
+ 	            	if(object.containsField("deviceName") && object.get("deviceName") != null) {
  	            		position.setDeviceName(object.getString("deviceName"));
  	
  	            	}
- 	            	if(object.has("address") && object.get("address").toString() != "null") {
+ 	            	if(object.containsField("address") && object.get("address") != null) {
  	            		position.setAddress(object.getString("address"));
  	
  	            	}
  	            	
- 	            	if(object.has("servertime") && object.get("servertime").toString() != "null") {
+ 	            	if(object.containsField("servertime") && object.get("servertime") != null) {
 	            		position.setLastUpdateApp(object.getString("servertime"));
 
 						Date dateTime = null;
@@ -2311,15 +2245,12 @@ public class MongoPositionRepo {
 	            		
  	
  	            	} 
- 					if(object.has("_id")) {
- 		            	JSONObject objId = (JSONObject) object.get("_id");
- 		            	if(objId.has("$oid")) {
- 		            		position.setPositionId(objId.getString("$oid"));
- 						}
- 	
- 					}
+ 	            	if(object.containsField("_id") && object.get("_id") != null) {
+ 	            		position.setPositionId(object.getObjectId("_id").toString());
+
+					}
  					position.setVehicleStatus(1);
- 					if(object.has("valid")) {
+ 					if(object.containsField("valid") && object.get("valid") != null) {
  	            		
  	            		if(object.getBoolean("valid") == true) {
  	            			position.setValid(1);
@@ -2331,7 +2262,7 @@ public class MongoPositionRepo {
  						}
  	
  	            	}
- 					if(object.has("speed")) {
+ 					if(object.containsField("speed") && object.get("speed") != null) {
  	            		position.setSpeed(object.getDouble("speed") * (1.852) );
  	            		if(object.getDouble("speed") >0 ) {
          					position.setStatus(2);
@@ -2341,7 +2272,7 @@ public class MongoPositionRepo {
          				}
  	            	} 
  					
- 					if(object.has("ignition")) {
+ 					if(object.containsField("ignition") && object.get("ignition") != null) {
  						if(object.getBoolean("ignition") == true) {
  	            			position.setIgnition(1);
  	            			
@@ -2362,24 +2293,24 @@ public class MongoPositionRepo {
  	
  	            	}
  					
- 					if(object.has("power")) {
+ 					if(object.containsField("power") && object.get("power") != null) {
  	            		position.setPower(object.getDouble("power"));
  	
  	            	} 
 
- 					if(object.has("operator")) {
+ 					if(object.containsField("operator") && object.get("operator") != null) {
  	            		position.setOperator(object.getDouble("operator"));
  	
  	            	} 
 
  					
- 					if(object.has("latitude")) {
+ 					if(object.containsField("latitude") && object.get("latitude") != null) {
  	            		position.setLatitude(object.getDouble("latitude"));
  	
  	            	} 
 
  					
- 					if(object.has("longitude")) {
+ 					if(object.containsField("longitude") && object.get("longitude") != null) {
  	            		position.setLongitude(object.getDouble("longitude"));
  	
  	            	} 
