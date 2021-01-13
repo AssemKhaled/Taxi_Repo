@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @Entity
 @Table(name = "tc_notifications")
-public class Notification {
+public class Notification extends Attributes{
 	
 	@Id
 	@GeneratedValue
@@ -32,9 +32,6 @@ public class Notification {
 
 	@Column(name = "type")
 	private String type;
-	
-	@Column(name = "attributes",length=1024)
-	private String attributes;
 	
 	@Column(name = "always")
 	private boolean always;
@@ -62,14 +59,6 @@ public class Notification {
 
 	public void setType(String type) {
 		this.type = type;
-	}
-
-	public String getAttributes() {
-		return attributes;
-	}
-
-	public void setAttributes(String attributes) {
-		this.attributes = attributes;
 	}
 
 	public boolean isAlways() {

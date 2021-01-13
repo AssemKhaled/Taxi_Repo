@@ -15,7 +15,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "tc_points")
-public class Points {
+public class Points extends Attributes{
 
 	
 	@Id

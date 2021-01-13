@@ -593,7 +593,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "tc_devices")
-public class Device {
+public class Device extends Attributes{
 
 	@Id
 	@GeneratedValue
@@ -614,9 +614,6 @@ public class Device {
 	
 	@Column(name = "position_id")
 	private String position_id;
-	
-	@Column(name = "attributes")
-	private String attributes;
 	
 	@Column(name = "phone") 
 	private String phone;
@@ -927,37 +924,17 @@ public class Device {
 		this.positionid = positionid;
 	}
 
-
-
-	public String getAttributes() {
-		return attributes;
-	}
-
-
-
-	public void setAttributes(String attributes) {
-		this.attributes = attributes;
-	}
-
-
-
 	public String getPhone() {
 		return phone;
 	}
-
-
 
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
 
-
-
 	public String getModel() {
 		return model;
 	}
-
-
 
 	public void setModel(String model) {
 		this.model = model;

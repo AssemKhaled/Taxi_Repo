@@ -133,7 +133,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Entity
 @Table(name = "tc_drivers")
 @JsonIgnoreProperties(value = { "device" })
-public class Driver {
+public class Driver extends Attributes{
 	
 	
 	@Id
@@ -146,9 +146,6 @@ public class Driver {
 	
 	@Column(name = "uniqueid")
 	private String uniqueid;
-
-	@Column(name = "attributes")
-	private String attributes;
 	
 	@Column(name = "mobile_num")
 	private String mobile_num;
@@ -214,14 +211,6 @@ public class Driver {
 
 	public void setUniqueid(String uniqueid) {
 		this.uniqueid = uniqueid;
-	}
-
-	public String getAttributes() {
-		return attributes;
-	}
-
-	public void setAttributes(String attributes) {
-		this.attributes = attributes;
 	}
 
 	public String getMobile_num() {

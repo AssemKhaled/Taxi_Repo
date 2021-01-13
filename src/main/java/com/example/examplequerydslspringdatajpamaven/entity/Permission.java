@@ -13,7 +13,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "tc_permissions")
-public class Permission {
+public class Permission extends Attributes{
 	@Id
 	@GeneratedValue
 	@Column(name = "id")
@@ -27,8 +27,6 @@ public class Permission {
 	
 	@Column(name = "delete_date")
 	private String delete_date;
-	
-	
 	
 	public Long getId() {
 		return id;

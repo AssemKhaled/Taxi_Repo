@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 @Entity
 @Table(name ="tc_users")
-public class User {
+public class User extends Attributes{
 
 	@Id
 	@GeneratedValue
@@ -357,13 +357,13 @@ public class User {
 	@JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE},
             mappedBy = "userAttribute")
-    private Set<Attribute> attributes = new HashSet<>();
+    private Set<Attribute> attribute = new HashSet<>();
 
-	public Set<Attribute> getAttributes() {
-		return attributes;
+	public Set<Attribute> getAttribute() {
+		return attribute;
 	}
-	public void setAttributes(Set<Attribute> attributes) {
-		this.attributes = attributes;
+	public void setAttribute(Set<Attribute> attribute) {
+		this.attribute = attribute;
 	}
 	public String getCreate_date() {
 		return create_date;

@@ -24,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Entity
 @Table(name = "tc_geofences")
 @JsonIgnoreProperties(value = { "device" })
-public class Geofence {
+public class Geofence extends Attributes{
 	
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Id
@@ -41,9 +41,6 @@ public class Geofence {
 	
 	@Column(name = "type")
 	private String type;
-	
-	@Column(name = "attributes")
-	private String attributes;
 	
 	@Column(name = "calendarid")
 	private Integer calendarid=null;
@@ -103,14 +100,6 @@ public class Geofence {
 
 	public void setType(String type) {
 		this.type = type;
-	}
-
-	public String getAttributes() {
-		return attributes;
-	}
-
-	public void setAttributes(String attributes) {
-		this.attributes = attributes;
 	}
 
 	public Integer getCalendarid() {

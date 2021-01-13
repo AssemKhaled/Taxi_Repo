@@ -14,7 +14,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "tc_user_roles")
-public class UserRole {
+public class UserRole extends Attributes{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

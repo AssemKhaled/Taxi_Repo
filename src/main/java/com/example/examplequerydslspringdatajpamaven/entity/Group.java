@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @Entity
 @Table(name = "tc_groups")
-public class Group {
+public class Group extends Attributes{
 	@Id
 	@GeneratedValue
 	@Column(name = "id")
@@ -34,9 +34,6 @@ public class Group {
 	
 	@Column(name = "groupid")
 	private Long groupid;
-	
-	@Column(name = "attributes",length=1024)
-	private String attributes;
 	
 	@Column(name = "is_deleted")
 	private String is_deleted=null;
@@ -66,14 +63,6 @@ public class Group {
 
 	public void setGroupid(Long groupid) {
 		this.groupid = groupid;
-	}
-
-	public String getAttributes() {
-		return attributes;
-	}
-
-	public void setAttributes(String attributes) {
-		this.attributes = attributes;
 	}
 
 	public String getIs_deleted() {

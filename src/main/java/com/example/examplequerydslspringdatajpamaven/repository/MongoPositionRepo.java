@@ -11,14 +11,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.bson.types.ObjectId;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOptions;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.ComparisonOperators.Eq;
+import org.springframework.data.mongodb.core.aggregation.ComparisonOperators.Gt;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Repository;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomMapData;
@@ -27,10 +27,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.DeviceWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.LastElmData;
 import com.example.examplequerydslspringdatajpamaven.entity.LastPositionData;
-import com.example.examplequerydslspringdatajpamaven.entity.MongoElmLastLocations;
-import com.example.examplequerydslspringdatajpamaven.entity.MongoPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.TripPositions;
-import com.fasterxml.jackson.databind.introspect.TypeResolutionContext.Basic;
 import com.mongodb.BasicDBObject;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
@@ -38,6 +35,15 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.newA
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.sort;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.skip;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.unwind;
+import static org.springframework.data.mongodb.core.aggregation.BooleanOperators.And.and;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
+import static org.springframework.data.mongodb.core.aggregation.ArrayOperators.Filter.filter;
+import static org.springframework.data.mongodb.core.aggregation.ComparisonOperators.Eq.valueOf;
+import static org.springframework.data.mongodb.core.aggregation.ComparisonOperators.Gt.valueOf;
+import static org.springframework.data.mongodb.core.aggregation.ComparisonOperators.Lt.valueOf;
+import static org.springframework.data.mongodb.core.aggregation.ComparisonOperators.Gte.valueOf;
+import static org.springframework.data.mongodb.core.aggregation.ComparisonOperators.Lte.valueOf;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.limit;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.count;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.replaceRoot;
@@ -1608,15 +1614,25 @@ public class MongoPositionRepo {
 		return positions;
 	}
 	
-	public List<LastElmData> getLastPositionVelocityZero(Long deviceId){
+	public List<LastElmData> getLastPositionVelocityZero(String referenceKey){
 
 		List<LastElmData> positions = new ArrayList<LastElmData>();
 
 						
 	    Aggregation aggregation = newAggregation(
-	            match(Criteria.where("vehicleid").in(deviceId).and("elm_data.velocity").in(0)),
-	            project("sendtime","elm_data","vehiclename","drivername"),
-	            sort(Sort.Direction.DESC, "sendtime"),
+	            match(Criteria.where("type").in("Location").and("response.body.success").in(true)),
+	            project("time").and(
+	            		filter("requet.dataObject.vehicleLocations")
+	                    .as("loc")
+	                    .by(
+	                    	and( Eq.valueOf("loc.referenceKey").equalToValue(referenceKey),
+	                    		 Eq.valueOf("loc.velocity").equalToValue(0) ) 
+	                    	)
+                		     
+	                    ).as("locations"),
+	            match(Criteria.where("locations.0").exists(true)),
+	            unwind("locations", "arrayIndex"),
+	            sort(Sort.Direction.DESC, "locations.locationTime"),
 	            skip(0),
 	            limit(10)
 	            
@@ -1624,33 +1640,21 @@ public class MongoPositionRepo {
 
 	    
 	        AggregationResults<BasicDBObject> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_elm_last_locations_tbl", BasicDBObject.class);
+	            = mongoTemplate.aggregate(aggregation,"tc_elmLogs", BasicDBObject.class);
 
-	        
             if(groupResults.getMappedResults().size() > 0) {
 	        	
 	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
 	            while (iterator.hasNext()) {
 	            	BasicDBObject object = (BasicDBObject) iterator.next();
+	    	        
 	            	LastElmData position = new LastElmData();
 	            	
-	            	if(object.containsField("sendtime") && object.get("sendtime") != null) {
-	            		position.setSendtime( object.getString("sendtime"));
-	            		
+	            	if(object.containsField("time") && object.get("time") != null) {
+	            		position.setSendtime( object.getString("time"));
 	            	}  
-                    if(object.containsField("elm_data") && object.get("elm_data") != null) {
-	            		position.setElm_data(object.get("elm_data").toString());
-
-	            		
-	            	}
-                    if(object.containsField("vehiclename") && object.get("vehiclename") != null) {
-	            		
-	            		position.setVehiclename(object.getString("vehiclename"));
-
-	            	}
-	            	if(object.containsField("drivername") && object.get("drivername") != null) {
-	            		position.setDrivername(object.getString("drivername"));
-	
+                    if(object.containsField("locations") && object.get("locations") != null) {
+	            		position.setElm_data(object.get("locations").toString());
 	            	}
 
 
@@ -1662,56 +1666,55 @@ public class MongoPositionRepo {
 		return positions;
 	}
 	
-	public List<LastElmData> getLastPositionGreaterVelocityZero(Long deviceId){
+	public List<LastElmData> getLastPositionGreaterVelocityZero(String referenceKey){
 
 		List<LastElmData> positions = new ArrayList<LastElmData>();
 
 						
-	    Aggregation aggregation = newAggregation(
-	            match(Criteria.where("vehicleid").in(deviceId).and("elm_data.velocity").gt(0)),
-	            project("sendtime","elm_data","vehiclename","drivername"),
-	            sort(Sort.Direction.DESC, "sendtime"),
+		Aggregation aggregation = newAggregation(
+	            match(Criteria.where("type").in("Location").and("response.body.success").in(true)),
+	            project("time").and(
+	            		filter("requet.dataObject.vehicleLocations")
+	                    .as("loc")
+	                    .by(
+	                    	and( Eq.valueOf("loc.referenceKey").equalToValue(referenceKey),
+		                    	 Gt.valueOf("loc.velocity").greaterThanValue(0)) 
+	                    	)
+                		     
+	                    ).as("locations"),
+	            match(Criteria.where("locations.0").exists(true)),
+	            unwind("locations", "arrayIndex"),
+	            sort(Sort.Direction.DESC, "locations.locationTime"),
 	            skip(0),
 	            limit(10)
 	            
 	        );
 
-	    
 	        AggregationResults<BasicDBObject> groupResults
-	            = mongoTemplate.aggregate(aggregation,"tc_elm_last_locations_tbl", BasicDBObject.class);
+	            = mongoTemplate.aggregate(aggregation,"tc_elmLogs", BasicDBObject.class);
 
-	        
- 
+
 	        if(groupResults.getMappedResults().size() > 0) {
 	        	
 	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
 	            while (iterator.hasNext()) {
 	            	BasicDBObject object = (BasicDBObject) iterator.next();
+	    	        
 	            	LastElmData position = new LastElmData();
 	            	
-	            	if(object.containsField("sendtime") && object.get("sendtime") != null) {
-	            		position.setSendtime( object.getString("sendtime"));
-	            		
+	            	if(object.containsField("time") && object.get("time") != null) {
+	            		position.setSendtime( object.getString("time"));
 	            	}  
-                    if(object.containsField("elm_data") && object.get("elm_data").toString() != null) {
-	            		position.setElm_data(object.get("elm_data").toString());
+                    if(object.containsField("locations") && object.get("locations") != null) {
+	            		position.setElm_data(object.get("locations").toString());
+	            	}
 
-	            		
-	            	}
-                    if(object.containsField("vehiclename") && object.get("vehiclename") != null) {
-	            		
-	            		position.setVehiclename(object.getString("vehiclename"));
 
-	            	}
-	            	if(object.containsField("drivername") && object.get("drivername") != null) {
-	            		position.setDrivername(object.getString("drivername"));
-	
-	            	}
-                    
 	            	positions.add(position);
 	            	
 	            }
 	        }
+        
         
 		return positions;
 	}

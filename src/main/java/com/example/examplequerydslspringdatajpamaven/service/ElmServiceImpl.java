@@ -33,11 +33,22 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import com.example.examplequerydslspringdatajpamaven.entity.CompanyElmData;
+import com.example.examplequerydslspringdatajpamaven.entity.CompanyElmDataUpdate;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
+import com.example.examplequerydslspringdatajpamaven.entity.DeviceElmData;
+import com.example.examplequerydslspringdatajpamaven.entity.DeviceElmDataUpdate;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
+import com.example.examplequerydslspringdatajpamaven.entity.VehiclePlate;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
+import com.example.examplequerydslspringdatajpamaven.entity.DriverElmDataGregorian;
+import com.example.examplequerydslspringdatajpamaven.entity.DriverElmDataHijri;
+import com.example.examplequerydslspringdatajpamaven.entity.DriverElmDataUpdate;
 import com.example.examplequerydslspringdatajpamaven.entity.ElmReturn;
 import com.example.examplequerydslspringdatajpamaven.entity.ExpiredVehicles;
+import com.example.examplequerydslspringdatajpamaven.entity.IndividualGregorianElmData;
+import com.example.examplequerydslspringdatajpamaven.entity.IndividualHijriElmData;
 import com.example.examplequerydslspringdatajpamaven.entity.LastElmData;
 import com.example.examplequerydslspringdatajpamaven.entity.LastPositionData;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoElmLastLocations;
@@ -566,54 +577,62 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		
 		
 
-		  Map body = new HashMap();
 		  Map bodyToMiddleWare = new HashMap();
 
+		  bodyToMiddleWare.put("url",elmCompanies);
+		  bodyToMiddleWare.put("methodType","POST");
+		  
 		  if(user.getIsCompany().equals(1)) {
+			  CompanyElmData companyElmData = new CompanyElmData();
 
+			  companyElmData.setCommercialRecordIssueDateHijri(user.getCommercial_reg());
+			  companyElmData.setCommercialRecordNumber(user.getCommercial_num());
+			  companyElmData.setManagerMobileNumber(user.getManager_mobile());
+			  companyElmData.setManagerName(user.getManager_name());
+			  companyElmData.setManagerPhoneNumber( user.getManager_phone());
+		
+			  companyElmData.setEmailAddress(user.getEmail());
+			  companyElmData.setExtensionNumber(user.getPhone());
+			  companyElmData.setIdentityNumber(user.getIdentity_num());
+			  companyElmData.setPhoneNumber(user.getCompany_phone());
 			  
-			  body.put("identityNumber", user.getIdentity_num());
-			  body.put("commercialRecordNumber", user.getCommercial_num());
-			  body.put("commercialRecordIssueDateHijri", user.getCommercial_reg());
-			  
-			  
-			  
-			  
-			  body.put("phoneNumber", user.getCompany_phone());
-			  body.put("extensionNumber", user.getPhone());
-			  body.put("emailAddress", user.getEmail());
-			  body.put("managerName", user.getManager_name());
-			  body.put("managerPhoneNumber", user.getManager_phone());
-			  body.put("managerMobileNumber", user.getManager_mobile());
-			  
-			  
+
+			  bodyToMiddleWare.put("dataObject", companyElmData);
+
 		  }
 		  else {
 
 			  if(user.getDateType().equals(1)) {
 				  
-				  body.put("identityNumber", user.getIdentity_num());
-				  body.put("dateOfBirthHijri", user.getDateOfBirth());
-				  body.put("phoneNumber", user.getCompany_phone());
-				  body.put("extensionNumber", user.getPhone());
-				  body.put("emailAddress", user.getEmail());
+				  IndividualHijriElmData  individualHijriElmData = new IndividualHijriElmData();
+				  individualHijriElmData.setEmailAddress(user.getEmail());
+				  individualHijriElmData.setExtensionNumber(user.getPhone());
+				  individualHijriElmData.setIdentityNumber(user.getIdentity_num());
+				  individualHijriElmData.setPhoneNumber(user.getCompany_phone());
+				  individualHijriElmData.setDateOfBirthHijri(user.getDateOfBirth());
 				  
+				  
+				  bodyToMiddleWare.put("dataObject", individualHijriElmData);
+
 
 			  }
 			  else {
-				  body.put("identityNumber", user.getIdentity_num());
-				  body.put("dateOfBirthGregorian", user.getDateOfBirth());
-				  body.put("phoneNumber", user.getCompany_phone());
-				  body.put("extensionNumber", user.getPhone());
-				  body.put("emailAddress", user.getEmail());
+				  IndividualGregorianElmData  individualGregorianElmData = new IndividualGregorianElmData();
+				  
+				  individualGregorianElmData.setEmailAddress(user.getEmail());
+				  individualGregorianElmData.setExtensionNumber(user.getPhone());
+				  individualGregorianElmData.setIdentityNumber(user.getIdentity_num());
+				  individualGregorianElmData.setPhoneNumber(user.getCompany_phone());
+				  individualGregorianElmData.setDateOfBirthGregorian(user.getDateOfBirth());
+				 
+				  
+				  bodyToMiddleWare.put("dataObject", individualGregorianElmData);
+
 
 			  }
 
 		  }
 		  
-		  bodyToMiddleWare.put("dataObject", body);
-		  bodyToMiddleWare.put("url",elmCompanies);
-		  bodyToMiddleWare.put("methodType","POST");
 
 		  
 		  requet = bodyToMiddleWare;
@@ -889,7 +908,6 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		
 		
 		
-		  Map body = new HashMap();
 		  Map bodyToMiddleWare = new HashMap();
 	
 		  if(user.getIsCompany().equals(1)) {
@@ -915,17 +933,18 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "managerMobileNumber shouldn't be null",null);
 				return  ResponseEntity.badRequest().body(getObjectResponse);
 			 }
-				 
-			  body.put("identityNumber", dataObject.get("identityNumber"));
-			  body.put("commercialRecordNumber", dataObject.get("commercialRecordNumber"));
-			  body.put("managerName", dataObject.get("managerName"));
-			  body.put("managerPhoneNumber", dataObject.get("managerPhoneNumber"));
-			  body.put("managerMobileNumber", dataObject.get("managerMobileNumber"));
-			  
-			  
+
+			 CompanyElmDataUpdate companyElmDataUpdate = new CompanyElmDataUpdate();
+			 
+			 companyElmDataUpdate.setCommercialRecordNumber(dataObject.get("commercialRecordNumber"));
+			 companyElmDataUpdate.setIdentityNumber(dataObject.get("identityNumber"));
+			 companyElmDataUpdate.setManagerMobileNumber(dataObject.get("managerMobileNumber"));
+			 companyElmDataUpdate.setManagerName(dataObject.get("managerName"));
+			 companyElmDataUpdate.setManagerPhoneNumber(dataObject.get("managerPhoneNumber"));
+			 
 			  String url = elmCompanies+"/contact-info";
 					  
-			  bodyToMiddleWare.put("dataObject", body);
+			  bodyToMiddleWare.put("dataObject", companyElmDataUpdate);
 			  bodyToMiddleWare.put("url",url);
 			  bodyToMiddleWare.put("methodType","PATCH");
 			  
@@ -1218,15 +1237,16 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				return  ResponseEntity.badRequest().body(getObjectResponse);
 			 }
 
-			  Map body = new HashMap();
 			  Map bodyToMiddleWare = new HashMap();
 			  
-			  body.put("sequenceNumber", dataObject.get("sequenceNumber"));
-			  body.put("imeiNumber", dataObject.get("imeiNumber"));
+			  DeviceElmDataUpdate deviceElmDataUpdate = new DeviceElmDataUpdate();
+			  
+			  deviceElmDataUpdate.setSequenceNumber(dataObject.get("sequenceNumber"));
+			  deviceElmDataUpdate.setImeiNumber(dataObject.get("imeiNumber"));
 			  
 			  String url = elmVehicles+"/imei";
 			  
-			  bodyToMiddleWare.put("dataObject", body);
+			  bodyToMiddleWare.put("dataObject", deviceElmDataUpdate);
 			  bodyToMiddleWare.put("url",url);
 			  bodyToMiddleWare.put("methodType","PUT");
 			  
@@ -1806,31 +1826,32 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	 
 		 
 		 
-		  Map device_data = new HashMap();
-		  Map vehiclePlate = new HashMap();
+
 		  Map bodyToMiddleWare = new HashMap();
 
-	
-		  device_data.put("sequenceNumber", device.getSequence_number());
-		  device_data.put("plateType", device.getPlate_type());
-		  device_data.put("imeiNumber", device.getUniqueid());
+		  DeviceElmData deviceElmData = new DeviceElmData();
+		  VehiclePlate vehiclePlate = new VehiclePlate();
 
-		  vehiclePlate.put("number", device.getPlate_num());
-		  vehiclePlate.put("rightLetter", device.getRight_letter());
-		  vehiclePlate.put("middleLetter", device.getMiddle_letter());
-		  vehiclePlate.put("leftLetter", device.getLeft_letter());
+		  vehiclePlate.setNumber(device.getPlate_num());
+		  vehiclePlate.setRightLetter(device.getRight_letter());
+		  vehiclePlate.setMiddleLetter(device.getMiddle_letter());
+		  vehiclePlate.setLeftLetter(device.getLeft_letter());
 		  
-		  device_data.put("vehiclePlate",vehiclePlate);
-
+		  deviceElmData.setImeiNumber(device.getUniqueid());
+		  deviceElmData.setPlateType(device.getPlate_type());
+		  deviceElmData.setSequenceNumber(device.getSequence_number());
+		  deviceElmData.setVehiclePlate(vehiclePlate);
+		  
 
 		  
 		  String url = elmCompanies+"/"+parent.getReference_key()+"/vehicles";
 
 
-		  bodyToMiddleWare.put("dataObject", device_data);
+		  bodyToMiddleWare.put("dataObject", deviceElmData);
 		  bodyToMiddleWare.put("url",url);
 		  bodyToMiddleWare.put("methodType","POST");
 
+		  
 		  
 		  requet = bodyToMiddleWare;
 		  TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
@@ -2106,28 +2127,38 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 		 }
 		 
-		  Map driver_data = new HashMap();
 
-		  
-		  driver_data.put("identityNumber", driver.getUniqueid());
-		  driver_data.put("mobileNumber", driver.getMobile_num());
-		  
-		  if(driver.getDate_type().equals(1)) {
-			  driver_data.put("dateOfBirthHijri", driver.getBirth_date());
-
-		  }
-		  else {
-			  driver_data.put("dateOfBirthGregorian", driver.getBirth_date());
-
-		  }
 		  Map bodyToMiddleWare = new HashMap();
 
 		  String url = elmCompanies+"/"+parent.getReference_key()+"/drivers";
 
-
-		  bodyToMiddleWare.put("dataObject", driver_data);
 		  bodyToMiddleWare.put("url",url);
 		  bodyToMiddleWare.put("methodType","POST");
+
+		  
+		  if(driver.getDate_type().equals(1)) {
+			  
+			  DriverElmDataHijri driverElmDataHijri = new DriverElmDataHijri();
+			  
+			  driverElmDataHijri.setDateOfBirthHijri(driver.getBirth_date());
+			  driverElmDataHijri.setIdentityNumber(driver.getUniqueid());
+			  driverElmDataHijri.setMobileNumber(driver.getMobile_num());
+			  
+			  bodyToMiddleWare.put("dataObject", driverElmDataHijri);
+			  
+
+		  }
+		  else {
+			  DriverElmDataGregorian driverElmDataGregorian = new DriverElmDataGregorian();
+			  
+
+			  driverElmDataGregorian.setDateOfBirthGregorian(driver.getBirth_date());
+			  driverElmDataGregorian.setIdentityNumber(driver.getUniqueid());
+			  driverElmDataGregorian.setMobileNumber(driver.getMobile_num());
+			  
+			  bodyToMiddleWare.put("dataObject", driverElmDataGregorian);
+
+		  }
 		  
 		  requet = bodyToMiddleWare;
 		  TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
@@ -3467,7 +3498,6 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 		 }
 		 
-		 Map body = new HashMap();
 
 		 String url = elmCompanies +"/"+parent.getReference_key()+"/drivers";
 		 
@@ -3488,14 +3518,15 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 		 }
 
-
+		 DriverElmDataUpdate driverElmDataUpdate = new DriverElmDataUpdate();
 		  
-		  body.put("identityNumber", dataObject.get("identityNumber"));
-		  body.put("mobileNumber", dataObject.get("mobileNumber"));
-		  body.put("email", dataObject.get("email"));
+		 driverElmDataUpdate.setEmail(dataObject.get("email"));
+		 driverElmDataUpdate.setIdentityNumber(dataObject.get("identityNumber"));
+		 driverElmDataUpdate.setMobileNumber(dataObject.get("mobileNumber"));
+		 
+		 
 
-
-		  bodyToMiddleWare.put("dataObject", body);
+		  bodyToMiddleWare.put("dataObject", driverElmDataUpdate);
 		  bodyToMiddleWare.put("url",url);
 		  bodyToMiddleWare.put("methodType","PUT");
 
@@ -4312,8 +4343,8 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	     List<LastPositionData> positionsZeroSpeed = mongoPositionRepo.getLastPositionSpeedZero(device.getId());
 	     List<LastPositionData> positionsGreaterZeroSpeed = mongoPositionRepo.getLastPositionGreaterSpeedZero(device.getId());
 
-	     List<LastElmData> positionsZeroVelocity = mongoPositionRepo.getLastPositionVelocityZero(device.getId());
-	     List<LastElmData> positionsGreaterZeroVelocity = mongoPositionRepo.getLastPositionGreaterVelocityZero(device.getId());
+	     List<LastElmData> positionsZeroVelocity = mongoPositionRepo.getLastPositionVelocityZero(device.getReference_key());
+	     List<LastElmData> positionsGreaterZeroVelocity = mongoPositionRepo.getLastPositionGreaterVelocityZero(device.getReference_key());
 
 	     
 	     dataFinal.put("positionData", position);

@@ -14,7 +14,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "tc_schedule")
-public class Schedule {
+public class Schedule extends Attributes{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

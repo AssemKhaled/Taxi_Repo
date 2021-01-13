@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @Entity
 @Table(name = "tc_attributes" )
-public class Attribute {
+public class Attribute extends Attributes{
 	
 	@Id
 	@GeneratedValue
