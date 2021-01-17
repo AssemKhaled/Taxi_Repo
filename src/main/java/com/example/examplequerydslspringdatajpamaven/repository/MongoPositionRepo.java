@@ -1342,6 +1342,11 @@ public class MongoPositionRepo {
 	            	if(object.containsField("weight") && object.get("weight") != null) {
 	            		position.setWeight(object.getDouble("weight"));    		
 	                }
+	            	
+	            	if(object.containsField("_id") && object.get("_id") != null) {
+	            		position.setPositionId(object.getObjectId("_id").toString());
+	
+					}
 					
 	            	
 	            	
@@ -1620,19 +1625,15 @@ public class MongoPositionRepo {
 
 						
 	    Aggregation aggregation = newAggregation(
-	            match(Criteria.where("type").in("Location").and("response.body.success").in(true)),
-	            project("time").and(
-	            		filter("requet.dataObject.vehicleLocations")
-	                    .as("loc")
-	                    .by(
-	                    	and( Eq.valueOf("loc.referenceKey").equalToValue(referenceKey),
-	                    		 Eq.valueOf("loc.velocity").equalToValue(0) ) 
-	                    	)
-                		     
-	                    ).as("locations"),
-	            match(Criteria.where("locations.0").exists(true)),
-	            unwind("locations", "arrayIndex"),
-	            sort(Sort.Direction.DESC, "locations.locationTime"),
+
+				match(Criteria.where("type").in("Location")
+						.and("requet.dataObject.vehicleLocations").elemMatch(Criteria.where("referenceKey").in(referenceKey))
+						),
+	            sort(Sort.Direction.DESC, "_id"),
+	            unwind("requet.dataObject.vehicleLocations", "arrayIndex"),
+	            match(Criteria.where("requet.dataObject.vehicleLocations.referenceKey").in(referenceKey)
+	            		.and("requet.dataObject.vehicleLocations.velocity").in(0)),
+	            project("time").and("requet.dataObject.vehicleLocations").as("locations"),
 	            skip(0),
 	            limit(10)
 	            
@@ -1672,22 +1673,18 @@ public class MongoPositionRepo {
 
 						
 		Aggregation aggregation = newAggregation(
-	            match(Criteria.where("type").in("Location").and("response.body.success").in(true)),
-	            project("time").and(
-	            		filter("requet.dataObject.vehicleLocations")
-	                    .as("loc")
-	                    .by(
-	                    	and( Eq.valueOf("loc.referenceKey").equalToValue(referenceKey),
-		                    	 Gt.valueOf("loc.velocity").greaterThanValue(0)) 
-	                    	)
-                		     
-	                    ).as("locations"),
-	            match(Criteria.where("locations.0").exists(true)),
-	            unwind("locations", "arrayIndex"),
-	            sort(Sort.Direction.DESC, "locations.locationTime"),
+
+				match(Criteria.where("type").in("Location")
+						.and("requet.dataObject.vehicleLocations").elemMatch(Criteria.where("referenceKey").in(referenceKey))
+						),
+	            sort(Sort.Direction.DESC, "_id"),
+	            unwind("requet.dataObject.vehicleLocations", "arrayIndex"),
+	            match(Criteria.where("requet.dataObject.vehicleLocations.referenceKey").in(referenceKey)
+	            		.and("requet.dataObject.vehicleLocations.velocity").gt(0)),
+	            project("time").and("requet.dataObject.vehicleLocations").as("locations"),
 	            skip(0),
 	            limit(10)
-	            
+
 	        );
 
 	        AggregationResults<BasicDBObject> groupResults

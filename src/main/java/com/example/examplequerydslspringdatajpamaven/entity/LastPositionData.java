@@ -7,6 +7,7 @@ package com.example.examplequerydslspringdatajpamaven.entity;
  */
 public class LastPositionData {
 
+	private String positionId;
 
 	private String servertime;
 	
@@ -115,6 +116,31 @@ public class LastPositionData {
 	public LastPositionData(String servertime, String devicetime, String fixtime, Double latitude, Double longitude,
 			Double speed,Double weight, Object attributes) {
 		super();
+		this.servertime = servertime;
+		this.devicetime = devicetime;
+		this.fixtime = fixtime;
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.speed = speed;
+		this.weight = weight;
+		this.attributes = attributes;
+	}
+
+
+	public String getPositionId() {
+		return positionId;
+	}
+
+
+	public void setPositionId(String positionId) {
+		this.positionId = positionId;
+	}
+
+
+	public LastPositionData(String positionId, String servertime, String devicetime, String fixtime, Double latitude,
+			Double longitude, Double speed, Double weight, Object attributes) {
+		super();
+		this.positionId = positionId;
 		this.servertime = servertime;
 		this.devicetime = devicetime;
 		this.fixtime = fixtime;

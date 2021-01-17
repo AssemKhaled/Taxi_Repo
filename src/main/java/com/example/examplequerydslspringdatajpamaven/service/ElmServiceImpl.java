@@ -4337,15 +4337,26 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	     dataFinal.put("deviceData", deviceData);
 
 	     
+	     LastPositionData position = new LastPositionData();
+
+	     List<LastPositionData> positionsZeroSpeed = new ArrayList<LastPositionData>();
+	     List<LastPositionData> positionsGreaterZeroSpeed = new ArrayList<LastPositionData>();
+	     List<LastElmData> positionsZeroVelocity = new ArrayList<LastElmData>();
+	     List<LastElmData> positionsGreaterZeroVelocity = new ArrayList<LastElmData>();
+
+		 position = mongoPositionRepo.getLastPosition(device.getId());
+		 	     
+	     positionsZeroSpeed = mongoPositionRepo.getLastPositionSpeedZero(device.getId());
+	     positionsGreaterZeroSpeed = mongoPositionRepo.getLastPositionGreaterSpeedZero(device.getId());
+
+	     if(device.getReference_key() != null && position.getPositionId() != null) {
+	    	 
+	    	 positionsZeroVelocity = mongoPositionRepo.getLastPositionVelocityZero(device.getReference_key());
+		     positionsGreaterZeroVelocity = mongoPositionRepo.getLastPositionGreaterVelocityZero(device.getReference_key());
+ 
+	     }
 	     
-	     LastPositionData position = mongoPositionRepo.getLastPosition(device.getId());
-
-	     List<LastPositionData> positionsZeroSpeed = mongoPositionRepo.getLastPositionSpeedZero(device.getId());
-	     List<LastPositionData> positionsGreaterZeroSpeed = mongoPositionRepo.getLastPositionGreaterSpeedZero(device.getId());
-
-	     List<LastElmData> positionsZeroVelocity = mongoPositionRepo.getLastPositionVelocityZero(device.getReference_key());
-	     List<LastElmData> positionsGreaterZeroVelocity = mongoPositionRepo.getLastPositionGreaterVelocityZero(device.getReference_key());
-
+	    
 	     
 	     dataFinal.put("positionData", position);
 	     
