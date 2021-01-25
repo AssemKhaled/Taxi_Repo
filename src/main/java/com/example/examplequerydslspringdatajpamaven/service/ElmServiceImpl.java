@@ -3687,99 +3687,86 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			
 			dataArray.add(record);
 			
-			
-//			MongoElmLastLocations connection_log = new MongoElmLastLocations();  
-//			
-//			connection_log.setPositionid(position.get_id().toString());
-//			connection_log.setElm_data(record);
-//			connection_log.setSendtime(time);
-//			
-//			elm_connection_logs.add(connection_log);
 		}
-		
-    	 Map body = new HashMap();
-
-		 
-
-		  body.put("vehicleLocations", dataArray);
-		
-		  TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
-
-			SSLContext sslContext = null;
-			try {
-				sslContext = org.apache.http.ssl.SSLContexts.custom()
-				        .loadTrustMaterial(null, acceptingTrustStrategy)
+		List<ElmReturn> data = new ArrayList<ElmReturn>();
+		if(dataArray.size() > 0) {
+	    	 Map body = new HashMap();
+	
+			 body.put("vehicleLocations", dataArray);
+			
+			  TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+	
+				SSLContext sslContext = null;
+				try {
+					sslContext = org.apache.http.ssl.SSLContexts.custom()
+					        .loadTrustMaterial(null, acceptingTrustStrategy)
+					        .build();
+				} catch (KeyManagementException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (NoSuchAlgorithmException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (KeyStoreException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	
+				SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
+	
+				CloseableHttpClient httpClient = HttpClients.custom()
+				        .setSSLSocketFactory(csf)
 				        .build();
-			} catch (KeyManagementException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (NoSuchAlgorithmException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (KeyStoreException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
-
-			CloseableHttpClient httpClient = HttpClients.custom()
-			        .setSSLSocketFactory(csf)
-			        .build();
-
-			HttpComponentsClientHttpRequestFactory requestFactory =
-			        new HttpComponentsClientHttpRequestFactory();
-
-			requestFactory.setHttpClient(httpClient);
-
-			RestTemplate restTemplate = new RestTemplate(requestFactory);
-			
-			
-			  restTemplate.getMessageConverters()
-		        .add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
-			  
-			  Map bodyToMiddleWare = new HashMap();
-
-
-			  
-
-			  bodyToMiddleWare.put("dataObject", body);
-			  bodyToMiddleWare.put("url",elmLocations);
-			  bodyToMiddleWare.put("methodType","POST");
-			  
-		  HttpEntity<Object> entity = new HttpEntity<Object>(bodyToMiddleWare);
-
-		  ResponseEntity<ElmReturn> rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
-
-		  List<ElmReturn> data = new ArrayList<ElmReturn>();
-		  
-		  ElmReturn elmReturn = rateResponse.getBody();
-
-		  data.add(elmReturn);
-
-		 if(rateResponse.getStatusCode().OK == null) {
-			  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),elmReturn.getMessage(),data);
-			  logger.info("************************ companyRegistrtaion ENDED ***************************");
-			  return  ResponseEntity.ok().body(getObjectResponse);
-		  }
-		  
-		  Map resp = new HashMap();
-		  resp = elmReturn.getBody();  
-		  
-		  requet = bodyToMiddleWare;
-		  ElmReturn elmReturnd = rateResponse.getBody();
-
-		  response.put("body", elmReturnd.getBody());
-		  response.put("statusCode", elmReturnd.getStatusCode());
-		  response.put("message", elmReturnd.getMessage());
-		  
-		  MongoElmLogs elmLogs = new MongoElmLogs(null,null,null,null,null,null,null,time,type,requet,response);
-		  elmLogsRepository.save(elmLogs);
-		  
-		  //elmLastLocationsRepository.save(elm_connection_logs);  
-	      mongoElmLiveLocationRepository.deleteByIdIn(ids);
+	
+				HttpComponentsClientHttpRequestFactory requestFactory =
+				        new HttpComponentsClientHttpRequestFactory();
+	
+				requestFactory.setHttpClient(httpClient);
+	
+				RestTemplate restTemplate = new RestTemplate(requestFactory);
+				
+				
+				  restTemplate.getMessageConverters()
+			        .add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
+				  
+				  Map bodyToMiddleWare = new HashMap();
 	
 	
+				  
+	
+				  bodyToMiddleWare.put("dataObject", body);
+				  bodyToMiddleWare.put("url",elmLocations);
+				  bodyToMiddleWare.put("methodType","POST");
+				  
+			  HttpEntity<Object> entity = new HttpEntity<Object>(bodyToMiddleWare);
+	
+			  ResponseEntity<ElmReturn> rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
+				  
+			  ElmReturn elmReturn = rateResponse.getBody();
+	
+			  data.add(elmReturn);
+	
+			 if(rateResponse.getStatusCode().OK == null) {
+				  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),elmReturn.getMessage(),data);
+				  logger.info("************************ companyRegistrtaion ENDED ***************************");
+				  return  ResponseEntity.ok().body(getObjectResponse);
+			  }
+			  
+			  Map resp = new HashMap();
+			  resp = elmReturn.getBody();  
+			  
+			  requet = bodyToMiddleWare;
+			  ElmReturn elmReturnd = rateResponse.getBody();
+	
+			  response.put("body", elmReturnd.getBody());
+			  response.put("statusCode", elmReturnd.getStatusCode());
+			  response.put("message", elmReturnd.getMessage());
+			  
+			  MongoElmLogs elmLogs = new MongoElmLogs(null,null,null,null,null,null,null,time,type,requet,response);
+			  elmLogsRepository.save(elmLogs);
+			  mongoElmLiveLocationRepository.deleteByIdIn(ids);
+	
+		}
 		  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",data,dataArray.size());
 		  logger.info("************************ lastLocations ENDED ***************************");
 		  return  ResponseEntity.ok().body(getObjectResponse);
@@ -4302,6 +4289,22 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	     deviceData.put("Name", device.getName());
 	     deviceData.put("Unique Id", device.getUniqueid());
 	     deviceData.put("Sequence Number", device.getSequence_number());
+	     
+	     if(device.getExpired() == 1) {
+		     deviceData.put("Expired", "Expired");
+
+	     }
+	     else {
+		     deviceData.put("Expired", "Not Expired");
+	     }
+	     
+	     if(device.getReference_key() != null) {
+		     deviceData.put("Reference Key", device.getReference_key());
+
+	     }
+	     else {
+		     deviceData.put("Reference Key", "No Reference Key");
+	     }
 	     
 	     List<Map> calibrationData=new ArrayList<Map>();
 	     deviceData.put("Calibration Data", calibrationData);
