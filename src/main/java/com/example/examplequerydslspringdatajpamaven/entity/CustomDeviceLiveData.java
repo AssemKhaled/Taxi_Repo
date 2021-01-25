@@ -59,8 +59,81 @@ public class CustomDeviceLiveData {
 	private String owner_name;
 	private Boolean expired;
 
+	private Double temperature;
+	private Double humidity;
+
+	
+	public Double getTemperature() {
+		return temperature;
+	}
+
+	public void setTemperature(Double temperature) {
+		this.temperature = temperature;
+	}
+
+	public Double getHumidity() {
+		return humidity;
+	}
+
+	public void setHumidity(Double humidity) {
+		this.humidity = humidity;
+	}
+
 	
 	
+	public CustomDeviceLiveData(int id, String deviceName, String uniqueId, String lastUpdate, Double weight,
+			Double latitude, Double operator, Double longitude, String address,
+			ArrayList<Map<Object, Object>> lastPoints, Object attributes, String crash, String batteryUnpluged,
+			String powerUnpluged, String todayHoursString, String deviceWorkingHoursPerDay,
+			String driverWorkingHoursPerDay, Double power, String photo, Double speed, String status,
+			String vehicleStatus, String positionId, JSONObject jsonAttributes, String hours, Boolean motion,
+			Boolean valid, String totalDistance, Boolean ignition, String alarm, Double battery, String driverName,
+			String leftLetter, String middleLetter, String rightLetter, String plate_num, String sequence_number,
+			String owner_name, Boolean expired, Double temperature, Double humidity) {
+		super();
+		this.id = id;
+		this.deviceName = deviceName;
+		this.uniqueId = uniqueId;
+		this.lastUpdate = lastUpdate;
+		this.weight = weight;
+		this.latitude = latitude;
+		this.operator = operator;
+		this.longitude = longitude;
+		this.address = address;
+		this.lastPoints = lastPoints;
+		this.attributes = attributes;
+		this.crash = crash;
+		this.batteryUnpluged = batteryUnpluged;
+		this.PowerUnpluged = powerUnpluged;
+		this.todayHoursString = todayHoursString;
+		this.deviceWorkingHoursPerDay = deviceWorkingHoursPerDay;
+		this.driverWorkingHoursPerDay = driverWorkingHoursPerDay;
+		this.power = power;
+		this.photo = photo;
+		this.speed = speed;
+		this.status = status;
+		this.vehicleStatus = vehicleStatus;
+		this.positionId = positionId;
+		this.jsonAttributes = jsonAttributes;
+		this.hours = hours;
+		this.motion = motion;
+		this.valid = valid;
+		this.totalDistance = totalDistance;
+		this.ignition = ignition;
+		this.alarm = alarm;
+		this.battery = battery;
+		this.driverName = driverName;
+		this.leftLetter = leftLetter;
+		this.middleLetter = middleLetter;
+		this.rightLetter = rightLetter;
+		this.plate_num = plate_num;
+		this.sequence_number = sequence_number;
+		this.owner_name = owner_name;
+		this.expired = expired;
+		this.temperature = temperature;
+		this.humidity = humidity;
+	}
+
 	public Boolean getExpired() {
 		return expired;
 	}

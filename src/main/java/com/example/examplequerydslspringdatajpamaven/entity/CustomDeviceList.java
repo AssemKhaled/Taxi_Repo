@@ -171,12 +171,13 @@ public class CustomDeviceList{
 		this.carWeight = carWeight;
 	}
 
-	public CustomDeviceList(int id, String deviceName,String uniqueId, String sequenceNumber, String driverName, Long driverId,
+	public CustomDeviceList(int id, String lastUpdate, String deviceName,String uniqueId, String sequenceNumber, String driverName, Long driverId,
 			String driverPhoto,String driverUniqueId ,String plateType, String vehiclePlate, String ownerName, String ownerId, String userName, String brand, String model,
 			String madeYear, String color, String licenceExptDate,
 			String positionId, String geofenceName) {
 		super();
 		this.geofenceName=geofenceName;
+		this.lastUpdate=lastUpdate;
 		this.deviceName = deviceName;
 		this.id=id;
 		this.uniqueId = uniqueId;

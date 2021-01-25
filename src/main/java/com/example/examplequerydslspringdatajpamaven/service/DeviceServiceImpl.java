@@ -1758,6 +1758,65 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		
 		                    	JSONObject obj = new JSONObject(json);						
 								
+		                    	Integer countTemp = 0;
+		                    	Integer countHum = 0;
+		                    	
+		                    	Double Temp = (double) 0;
+		                    	Double Hum = (double) 0;
+		                    	
+		                    	if(obj.has("temp1")) {
+		                    		Temp = Temp + obj.getDouble("temp1");
+		                    		countTemp = countTemp + 1;
+								}
+		                    	if(obj.has("temp2")) {
+		                    		Temp = Temp + obj.getDouble("temp2");
+		                    		countTemp = countTemp + 1;
+		
+								}
+		                    	if(obj.has("temp3")) {
+		                    		Temp = Temp + obj.getDouble("temp3");
+		                    		countTemp = countTemp + 1;
+		
+								}
+		                    	if(obj.has("temp4")) {
+		                    		Temp = Temp + obj.getDouble("temp4");
+		                    		countTemp = countTemp + 1;
+		
+								}
+		                    	
+		                    	if(obj.has("hum1")) {
+		                    		Hum = Hum + obj.getDouble("hum1");
+		                    		countHum = countHum + 1;
+								}
+		                    	if(obj.has("hum2")) {
+		                    		Hum = Hum + obj.getDouble("hum2");
+		                    		countHum = countHum + 1;
+		
+								}
+		                    	if(obj.has("hum3")) {
+		                    		Hum = Hum + obj.getDouble("hum3");
+		                    		countHum = countHum + 1;
+		
+								}
+		                    	if(obj.has("hum4")) {
+		                    		Hum = Hum + obj.getDouble("hum4");
+		                    		countHum = countHum + 1;
+		
+								}
+		                    	Double avgTemp = (double) 0;
+		                    	Double avgHum = (double) 0;
+		                    	if(countTemp != 0) {
+			                    	avgTemp = Temp / countTemp;
+
+		                    	}
+		                    	if(countHum != 0) {
+		                    		avgHum = Hum / countHum;
+
+		                    	}
+		                    	
+		                    	allDevicesLiveData.get(i).setTemperature(avgTemp);
+		                    	allDevicesLiveData.get(i).setHumidity(avgHum);
+		                    	
 								allDevicesLiveData.get(i).setAttributes(mongoPosition.getAttributes());
 								allDevicesLiveData.get(i).setSpeed(mongoPosition.getSpeed() * (1.852));
 								allDevicesLiveData.get(i).setLatitude(mongoPosition.getLatitude());
@@ -1898,6 +1957,65 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	
 	                    	JSONObject obj = new JSONObject(json);						
 							
+	                    	Integer countTemp = 0;
+	                    	Integer countHum = 0;
+	                    	
+	                    	Double Temp = (double) 0;
+	                    	Double Hum = (double) 0;
+	                    	
+	                    	if(obj.has("temp1")) {
+	                    		Temp = Temp + obj.getDouble("temp1");
+	                    		countTemp = countTemp + 1;
+							}
+	                    	if(obj.has("temp2")) {
+	                    		Temp = Temp + obj.getDouble("temp2");
+	                    		countTemp = countTemp + 1;
+	
+							}
+	                    	if(obj.has("temp3")) {
+	                    		Temp = Temp + obj.getDouble("temp3");
+	                    		countTemp = countTemp + 1;
+	
+							}
+	                    	if(obj.has("temp4")) {
+	                    		Temp = Temp + obj.getDouble("temp4");
+	                    		countTemp = countTemp + 1;
+	
+							}
+	                    	
+	                    	if(obj.has("hum1")) {
+	                    		Hum = Hum + obj.getDouble("hum1");
+	                    		countHum = countHum + 1;
+							}
+	                    	if(obj.has("hum2")) {
+	                    		Hum = Hum + obj.getDouble("hum2");
+	                    		countHum = countHum + 1;
+	
+							}
+	                    	if(obj.has("hum3")) {
+	                    		Hum = Hum + obj.getDouble("hum3");
+	                    		countHum = countHum + 1;
+	
+							}
+	                    	if(obj.has("hum4")) {
+	                    		Hum = Hum + obj.getDouble("hum4");
+	                    		countHum = countHum + 1;
+	
+							}
+	                    	Double avgTemp = (double) 0;
+	                    	Double avgHum = (double) 0;
+	                    	if(countTemp != 0) {
+		                    	avgTemp = Temp / countTemp;
+
+	                    	}
+	                    	if(countHum != 0) {
+	                    		avgHum = Hum / countHum;
+
+	                    	}
+	                    	
+	                    	allDevicesLiveData.get(i).setTemperature(avgTemp);
+	                    	allDevicesLiveData.get(i).setHumidity(avgHum);
+	                    	
 							allDevicesLiveData.get(i).setAttributes(mongoPosition.getAttributes());
 							allDevicesLiveData.get(i).setSpeed(mongoPosition.getSpeed() * (1.852));
 							allDevicesLiveData.get(i).setLatitude(mongoPosition.getLatitude());

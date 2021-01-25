@@ -3,7 +3,7 @@ package com.example.examplequerydslspringdatajpamaven.entity;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import javax.jdo.annotations.Column;
+import javax.persistence.Column;
 import javax.persistence.CascadeType;
 import javax.persistence.ColumnResult;
 import javax.persistence.ConstructorResult;
@@ -244,6 +244,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
                 targetClass=CustomDeviceList.class,
                   columns={
                 		 @ColumnResult(name="id",type=int.class),
+ 	                     @ColumnResult(name="lastUpdate",type=String.class),
  	                     @ColumnResult(name="deviceName",type=String.class),
  	                     @ColumnResult(name="uniqueId",type=String.class),
  	                     @ColumnResult(name="sequenceNumber",type=String.class),
@@ -563,9 +564,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 	
 	
 	@NamedNativeQuery(name="getVehicleInfoData", 
-	resultSetMapping="vehicleInfo", 
+	resultSetMapping="vehicleInfo",
 	query=" SELECT tc_drivers.id as driverId,tc_drivers.uniqueid as driverUniqueId,tc_drivers.name as driverName,tc_drivers.photo as driverPhoto," + 
-			" tc_devices.id as id,tc_devices.name as deviceName,tc_devices.uniqueid as uniqueId,tc_devices.sequence_number as sequenceNumber," + 
+			" tc_devices.id as id,tc_devices.lastupdate as lastUpdate,tc_devices.name as deviceName,tc_devices.uniqueid as uniqueId,tc_devices.sequence_number as sequenceNumber," + 
 			" tc_devices.owner_name as ownerName,tc_devices.owner_id as ownerId, " + 
 			" tc_devices.username as userName,tc_devices.model as model , " + 
 			" tc_devices.brand as brand,tc_devices.made_year as madeYear, " + 
