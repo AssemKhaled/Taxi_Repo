@@ -29,7 +29,8 @@ public interface IUserService {
 	public ResponseEntity<?> getVendorSelect(String TOKEN,Long userId);
 	public ResponseEntity<?> getClientSelect(String TOKEN,Long vendorId);
 
-	
+	public ResponseEntity<?> updateExpData();
+
 	public List<User>getAllChildernOfUser(Long userId);
 	public List<User>getActiveAndInactiveChildern(Long userId);
 	public void resetChildernArray();

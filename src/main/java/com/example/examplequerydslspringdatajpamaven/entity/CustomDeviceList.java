@@ -50,10 +50,20 @@ public class CustomDeviceList{
 	private String driver_num;
 	private Long companyId;
 	private Boolean expired;
+	private String simcardNumber;
 
 	
 	
-    public Boolean getExpired() {
+
+	public String getSimcardNumber() {
+		return simcardNumber;
+	}
+
+	public void setSimcardNumber(String simcardNumber) {
+		this.simcardNumber = simcardNumber;
+	}
+
+	public Boolean getExpired() {
 		return expired;
 	}
 
@@ -115,7 +125,9 @@ public class CustomDeviceList{
 		
 	}
 	
-	public CustomDeviceList(int id ,String deviceName,String uniqueId , String sequenceNumber,String lastUpdate, String referenceKey , Boolean expired , String driverName ,String companyName, Long companyId,String geofenceName   ) {
+	public CustomDeviceList(int id ,String deviceName,String simcardNumber,String uniqueId , String sequenceNumber,
+			String lastUpdate, String referenceKey , Boolean expired , String driverName ,
+			String companyName, Long companyId,String geofenceName  ) {
 		this.id = id;
 		this.deviceName = deviceName;
 		this.uniqueId = uniqueId;
@@ -127,12 +139,13 @@ public class CustomDeviceList{
 	    this.lastUpdate = lastUpdate;
 	    this.companyName = companyName;
 	    this.companyId = companyId;
+	    this.simcardNumber = simcardNumber;
 
 		
 	}
 	
 	public CustomDeviceList(int id ,String deviceName,String uniqueId , String sequenceNumber,String lastUpdate, String referenceKey , String driverName,String driver_num ,
-			String companyName, String geofenceName ,String positionId  ) {
+			String companyName, String geofenceName ,String positionId ) {
 		this.id = id;
 		this.deviceName = deviceName;
 		this.uniqueId = uniqueId;

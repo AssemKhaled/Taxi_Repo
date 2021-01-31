@@ -137,6 +137,13 @@ public class UserRestController {
 		
 	}
 	
+	@GetMapping("/updateExpData")
+	public ResponseEntity<?> updateExpData() {
+		
+		return userService.updateExpData();
+	
+	}
+	
 
 	
 }

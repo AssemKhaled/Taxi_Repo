@@ -1,6 +1,7 @@
 package com.example.examplequerydslspringdatajpamaven.service;
 
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -9,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,6 +111,42 @@ public class LoginServiceImpl extends RestServiceController implements LoginServ
 							UserRole userRole = userRoleService.findById(user.getRoleId());
 							userInfo.put("userRole", userRole);
 						}
+					}
+					if(user.getAccountType() != 1 && user.getAccountType() != 2 ) {
+						
+						
+
+						if(user.getExp_date() == null || user.getCreate_date() == null) {
+							getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "your account is expired , contact the admin ,please",null);
+							logger.info("************************ Login ENDED ***************************");
+							return  ResponseEntity.status(404).body(getObjectResponse);
+						}
+						else {
+							Date date2 = null;
+							Date date1 = new Date();
+							SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+							try {
+								date2 = format.parse(user.getExp_date());
+
+							} catch (ParseException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							
+							long diff = date2.getTime() - date1.getTime();
+							long days = 0;
+							days = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) + 1;
+							userInfo.put("leftDays" , days);
+
+							if(days <= 0) {
+								getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "your account is expired , contact the admin ,please",null);
+								logger.info("************************ Login ENDED ***************************");
+								return  ResponseEntity.status(404).body(getObjectResponse);
+							}
+
+						}
+
 					}
 					
 					

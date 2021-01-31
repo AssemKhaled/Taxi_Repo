@@ -26,12 +26,14 @@ import com.example.examplequerydslspringdatajpamaven.entity.LastLocationsList;
 @Component
 public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDslPredicateExecutor<Device> {
 	
+	@Query(value = "SELECT * from tc_devices where tc_devices.simcardNumber=:simcardNumber and tc_devices.delete_date is null",nativeQuery = true)
+	public List<Device> checkSIMCard(@Param("simcardNumber")String simcardNumber);
+	
 	@Query(nativeQuery = true, name = "getDevicesList")
 	List<CustomDeviceList> getDevicesList(@Param("userIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
 
 	@Query(nativeQuery = true, name = "getDevicesListExport")
 	List<CustomDeviceList> getDevicesListExport(@Param("userIds")List<Long> userIds,@Param("search") String search);
-
 
 	@Query(nativeQuery = true, name = "getDevicesListByIds")
 	List<CustomDeviceList> getDevicesListByIds(@Param("deviceIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);

@@ -264,6 +264,20 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		
+		if(device.getSimcardNumber() != null) {
+			List<Device> SIM = deviceRepository.checkSIMCard(device.getSimcardNumber());
+			
+			if(SIM.size() > 0) {
+			    List<Integer> duplictionList = new ArrayList<Integer>();
+			    duplictionList.add(5);
+			    
+			    getObjectResponse = new GetObjectResponse( 201, "Duplication in data",duplictionList);
+		    	logger.info("************************ createDevice ENDED ***************************");
+		    	return ResponseEntity.status(201).body(getObjectResponse);
+			}
+			
+		}
+		
 		if(device.getName() == null ||device.getName().equals("")
 				|| device.getUniqueid() == null|| device.getUniqueid() == null
 				|| device.getSequence_number() == null || device.getSequence_number().equals("")
@@ -403,6 +417,20 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			}
 		}
 	
+		if(device.getSimcardNumber() != null) {
+			List<Device> SIM = deviceRepository.checkSIMCard(device.getSimcardNumber());
+			
+			if(SIM.size() > 0) {
+			    List<Integer> duplictionList = new ArrayList<Integer>();
+			    duplictionList.add(5);
+			    
+			    getObjectResponse = new GetObjectResponse( 201, "Duplication in data",duplictionList);
+		    	logger.info("************************ createDevice ENDED ***************************");
+		    	return ResponseEntity.status(201).body(getObjectResponse);
+			}
+			
+		}
+		
 		if(device.getId() == null || device.getName() == null ||device.getName().equals("") 
 			|| device.getUniqueid() == null || device.getUniqueid().equals("")
 			|| device.getSequence_number() == null || device.getSequence_number().equals("")

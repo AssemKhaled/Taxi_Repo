@@ -245,6 +245,25 @@ DEALLOCATE PREPARE stmt;
 ----------------------------------------------------------------
 set @col_exists = 0;
 SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME='tc_devices'
+AND column_name='simcardNumber'
+and table_schema = database()
+into @col_exists;
+
+set @stmt = case @col_exists
+when 0 then CONCAT(
+'alter table tc_devices'
+, ' ADD COLUMN `simcardNumber` text NULL DEFAULT NULL'
+,';')
+else 'select ''column already exists, no op'''
+end;
+
+PREPARE stmt FROM @stmt;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+----------------------------------------------------------------
+set @col_exists = 0;
+SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
 WHERE TABLE_NAME='tc_users'
 AND column_name='create_date'
 and table_schema = database()
@@ -254,6 +273,25 @@ set @stmt = case @col_exists
 when 0 then CONCAT(
 'alter table tc_users'
 , ' ADD COLUMN `create_date` timestamp NULL DEFAULT NULL'
+,';')
+else 'select ''column already exists, no op'''
+end;
+
+PREPARE stmt FROM @stmt;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+----------------------------------------------------------------
+set @col_exists = 0;
+SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME='tc_users'
+AND column_name='exp_date'
+and table_schema = database()
+into @col_exists;
+
+set @stmt = case @col_exists
+when 0 then CONCAT(
+'alter table tc_users'
+, ' ADD COLUMN `exp_date` timestamp NULL DEFAULT NULL'
 ,';')
 else 'select ''column already exists, no op'''
 end;

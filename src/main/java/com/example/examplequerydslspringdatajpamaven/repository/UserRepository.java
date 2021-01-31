@@ -20,7 +20,11 @@ import com.example.examplequerydslspringdatajpamaven.entity.UserSelect;
  */
 @Component
 public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredicateExecutor<User> {
-
+	@Modifying
+    @Transactional
+	@Query(value = "UPDATE tc_users SET exp_date = DATE_ADD(create_date, INTERVAL 1 YEAR) where accountType not in(1,2,0) and create_date is not null", nativeQuery = true )
+	public void updateUsersToSetExp();
+	
 	@Query(value = " select  * from tc_users u where u.email = :email and hashedpassword = :hashedPassword  and  delete_date is null", nativeQuery = true)
 	public User getUserByEmailAndPassword(@Param("email")String email,@Param("hashedPassword")String hashedPassword );
 	

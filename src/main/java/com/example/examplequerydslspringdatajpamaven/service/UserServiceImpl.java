@@ -3,12 +3,14 @@ package com.example.examplequerydslspringdatajpamaven.service;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.entity.UserRole;
 import com.example.examplequerydslspringdatajpamaven.entity.UserSelect;
@@ -389,6 +392,15 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	    	logger.info("************************createUser ENDED ***************************");
 	    	return ResponseEntity.ok().body(getObjectResponse);
 		}
+		
+		if(user.getExp_date() != null) {
+			if(creater.getAccountType() != 2) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Vendor only can set Expiration Date",null);
+		    	logger.info("************************createUser ENDED ***************************");
+		    	return ResponseEntity.ok().body(getObjectResponse);
+			}
+		}
+		
 		if(user.getIsCompany() == 1) {
 			if(user.getEmail() == null || user.getEmail() == "" || user.getPassword() == null
 					|| user.getPassword() == "" || user.getName() == null || user.getName() == "" 
@@ -606,6 +618,14 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 				}
 		}
 		 
+		if(user.getExp_date() != null) {
+			if(loggedUser.getAccountType() != 2) {
+				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Vendor only can set Expiration Date",null);
+		    	logger.info("************************createUser ENDED ***************************");
+		    	return ResponseEntity.ok().body(getObjectResponse);
+			}
+		}
+			
 			if(user.getIsCompany() == 1) {
 				if(user.getId() == null || user.getId() == 0 || user.getEmail() == null || user.getEmail() == "" 
 						|| user.getName() == null || user.getName() == "" 
@@ -1776,6 +1796,16 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	
 		
 
+	}
+
+
+	@Override
+	public ResponseEntity<?> updateExpData() {
+		// TODO Auto-generated method stub
+		
+		userRepository.updateUsersToSetExp();
+		
+		return null;
 	}
 
 	

@@ -100,6 +100,9 @@ public class User extends Attributes{
 		
 	@Column(name = "create_date")
 	private String create_date;
+	
+	@Column(name = "exp_date")
+	private String exp_date;
 
 	 @JsonIgnore
 	 @ManyToMany(
@@ -365,11 +368,20 @@ public class User extends Attributes{
 	public void setAttribute(Set<Attribute> attribute) {
 		this.attribute = attribute;
 	}
+	
 	public String getCreate_date() {
 		return create_date;
 	}
 	public void setCreate_date(String create_date) {
 		this.create_date = create_date;
+	}
+	
+	public String getExp_date() {
+		return exp_date;
+	}
+	
+	public void setExp_date(String exp_date) {
+		this.exp_date = exp_date;
 	}
 	
 	
