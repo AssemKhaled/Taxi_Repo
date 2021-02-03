@@ -4144,6 +4144,9 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 				Device device = deviceRepository.findOne(ExpiredDevice.getDeviceId());
 				
+				device.setExpired(1);
+				deviceRepository.save(device);
+
 				if(ExpiredDevice.getUser_referenceKey() != null && ExpiredDevice.getUser_referenceKey() != "" 
 						&& ExpiredDevice.getVehicle_referenceKey() != null && ExpiredDevice.getVehicle_referenceKey() != ""){
 					
@@ -4227,8 +4230,6 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 						  device.setDelete_from_elm_date(dateCheck);
 						  device.setUpdate_date_in_elm(dateCheck);
 						  device.setDelete_from_elm(resp.get("resultCode").toString());
-						  device.setExpired(1);
-						  
 						  
 						  deviceRepository.save(device);
 						  

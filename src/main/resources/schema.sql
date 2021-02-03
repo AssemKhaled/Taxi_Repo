@@ -1,3 +1,9 @@
+CREATE TABLE IF NOT EXISTS `tc_users_tokens` ( 
+  `id` int(11) NOT NULL auto_increment,  
+  `userid` int(11) NOT NULL,
+  `tokenid` LONGTEXT NOT NULL,
+  PRIMARY KEY  (`id`)
+);
 CREATE TABLE IF NOT EXISTS `tc_user_client_device` (
   `id` int(11) NOT NULL auto_increment, 
   `userid` int(11) NOT NULL,

@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -156,6 +158,43 @@ public class NotificationServiceImpl extends RestServiceController implements No
 				
 				user.add(parent);	
 		        notification.setUserNotification(user);
+		        
+		        if(!notification.getNotificators().equals("")) {
+		        	String[] numberStrs = notification.getNotificators().split(",");
+		        	String noti = "";
+
+		        	for(String num :numberStrs) {
+
+		        		if(num.equals("1")) {
+		        			if(noti.length() > 0) {
+			        			noti = noti + ","+ "web" ;
+		        			}
+		        			else {
+		        				noti = "web" ;
+		        			}
+		        		}
+		        		if(num.equals("2")) {
+		        			if(noti.length() > 0) {
+			        			noti = noti + ","+ "mail" ;
+		        			}
+		        			else {
+		        				noti = "mail" ;
+		        			}
+		        		}
+		        		if(num.equals("3")) {
+		        			if(noti.length() > 0) {
+			        			noti = noti + ","+ "firebase" ;
+		        			}
+		        			else {
+		        				noti = "firebase";
+		        			}
+		        		}
+		        	}
+		        	
+		        	notification.setNotificators(noti);
+		        	
+		        }
+		        
 		        notificationRepository.save(notification);
 		        
 		        
@@ -238,7 +277,6 @@ public class NotificationServiceImpl extends RestServiceController implements No
 						notifications = notificationRepository.getAllNotifications(usersIds,offset,search);
 						size = notificationRepository.getAllNotificationsSize(usersIds); 
 					}
-
 					
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",notifications,size);
 					logger.info("************************ getAllNotifications ENDED ***************************");
@@ -299,6 +337,43 @@ public class NotificationServiceImpl extends RestServiceController implements No
 						logger.info("************************ getNotificationById ENDED ***************************");
 						return ResponseEntity.badRequest().body(getObjectResponse);
 					}
+					
+					if(!notification.getNotificators().equals("")) {
+			        	String[] numberStrs = notification.getNotificators().split(",");
+			        	String noti = "";
+
+			        	for(String num :numberStrs) {
+
+			        		if(num.equals("web")) {
+			        			if(noti.length() > 0) {
+				        			noti = noti + ","+ "1" ;
+			        			}
+			        			else {
+			        				noti = "1" ;
+			        			}
+			        		}
+			        		if(num.equals("mail")) {
+			        			if(noti.length() > 0) {
+				        			noti = noti + ","+ "2" ;
+			        			}
+			        			else {
+			        				noti = "2" ;
+			        			}
+			        		}
+			        		if(num.equals("firebase")) {
+			        			if(noti.length() > 0) {
+				        			noti = noti + ","+ "3" ;
+			        			}
+			        			else {
+			        				noti = "3";
+			        			}
+			        		}
+			        	}
+			        	
+			        	notification.setNotificators(noti);
+			        	
+			        }
+					
 					notifications.add(notification);
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Success",notifications);
 					logger.info("************************ getNotificationById ENDED ***************************");
@@ -423,6 +498,43 @@ public class NotificationServiceImpl extends RestServiceController implements No
 									notification.setUserNotification(userCreater);
 									notification.setDevices(devices);
 									notification.setGroups(groups);
+									
+									
+									if(!notification.getNotificators().equals("")) {
+							        	String[] numberStrs = notification.getNotificators().split(",");
+							        	String noti = "";
+
+							        	for(String num :numberStrs) {
+
+							        		if(num.equals("1")) {
+							        			if(noti.length() > 0) {
+								        			noti = noti + ","+ "web" ;
+							        			}
+							        			else {
+							        				noti = "web" ;
+							        			}
+							        		}
+							        		if(num.equals("2")) {
+							        			if(noti.length() > 0) {
+								        			noti = noti + ","+ "mail" ;
+							        			}
+							        			else {
+							        				noti = "mail" ;
+							        			}
+							        		}
+							        		if(num.equals("3")) {
+							        			if(noti.length() > 0) {
+								        			noti = noti + ","+ "firebase" ;
+							        			}
+							        			else {
+							        				noti = "firebase";
+							        			}
+							        		}
+							        	}
+							        	
+							        	notification.setNotificators(noti);
+							        	
+							        }
 									
 									notificationRepository.save(notification);
 									notifications.add(notification);

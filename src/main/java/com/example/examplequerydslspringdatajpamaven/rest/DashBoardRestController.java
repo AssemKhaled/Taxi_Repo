@@ -26,13 +26,10 @@ import com.example.examplequerydslspringdatajpamaven.service.UserServiceImpl;
 public class DashBoardRestController {
 	
 	@Autowired
-	DeviceServiceImpl deviceService;
-	
+	private DeviceServiceImpl deviceService;
+		
 	@Autowired
-	UserServiceImpl userServiceImpl;
-	
-	@Autowired
-	ReportServiceImpl reportServiceImpl;
+	private ReportServiceImpl reportServiceImpl;
 	
  
 	@GetMapping(path ="/getDevicesStatuesAndAllDrivers")

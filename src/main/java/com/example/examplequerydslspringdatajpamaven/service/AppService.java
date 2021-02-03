@@ -78,6 +78,8 @@ public interface AppService {
 	public ResponseEntity<?> getDistanceFuelEngineApp(String TOKEN,Long userId);
 	public ResponseEntity<?> getNotificationsChartApp(String TOKEN,Long userId);
 	
-	
+	public ResponseEntity<?> registerToken(String TOKEN,Map<Object, Object> data);
+	public ResponseEntity<?> logoutTokenApp(String TOKEN,Map<Object, Object> data);
+
 }	
 

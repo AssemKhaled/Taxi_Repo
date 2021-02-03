@@ -34,10 +34,13 @@ import com.example.examplequerydslspringdatajpamaven.tokens.TokenSecurity;
 public class UserRoleServiceImpl extends RestServiceController implements UserRoleService {
 
 	@Autowired
-	UserRoleRepository userRoleRepository;
+	private TokenSecurity tokenSecurity;
 	
 	@Autowired
-	UserServiceImpl userService;
+	private UserRoleRepository userRoleRepository;
+	
+	@Autowired
+	private UserServiceImpl userService;
 	
 	
 	@Autowired
@@ -45,13 +48,13 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 	
 	
 	@Autowired
-	UserRepository userRepository;
+	private UserRepository userRepository;
 	
 	
 	@Autowired
-	PermissionService permissionService;
+	private PermissionService permissionService;
 	
-	GetObjectResponse getObjectResponse;
+	private GetObjectResponse getObjectResponse;
 	
 	
 	/**
@@ -318,7 +321,9 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 						childRole=child.getPermissions();
 						String check= editCompareRoles(ParentRole, childRole);
 						if(check != null) {
-							Boolean removedUSER = TokenSecurity.getInstance().removeActiveUserById(usersAssignedByRoleId.get(i).getId());
+							//Boolean removedUSER = TokenSecurity.getInstance().removeActiveUserById(usersAssignedByRoleId.get(i).getId());
+							Boolean removedUSER = tokenSecurity.removeActiveUserById(usersAssignedByRoleId.get(i).getId());
+
 							child.setPermissions(check);
 							userRoleRepository.save(child);
 						}
@@ -343,7 +348,8 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 								childRole=childComp.getPermissions();
 								String check= editCompareRoles(ParentRole, childRole);
 								if(check != null) {
-									Boolean removedCHILD = TokenSecurity.getInstance().removeActiveUserById(childUser.getId());
+									//Boolean removedCHILD = TokenSecurity.getInstance().removeActiveUserById(childUser.getId());
+									Boolean removedCHILD = tokenSecurity.removeActiveUserById(childUser.getId());
 									childComp.setPermissions(check);
 									userRoleRepository.save(childComp);
 								}
@@ -533,14 +539,17 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 								for(User objectChild : usersChildsAssignedByRoleId) 
 								{
 									childUserASSigned=objectChild;
-									Boolean removedCHILDYY = TokenSecurity.getInstance().removeActiveUserById(childUserASSigned.getId());
+									//Boolean removedCHILDYY = TokenSecurity.getInstance().removeActiveUserById(childUserASSigned.getId());
+									Boolean removedCHILDYY = tokenSecurity.removeActiveUserById(childUserASSigned.getId());
+
 									childUserASSigned.setRoleId(null);
 						    		userRepository.save(childUserASSigned);
 								}
 				    		    
 				    		    
 				    		    childComp.setDelete_date(date);
-								Boolean removedCHILD = TokenSecurity.getInstance().removeActiveUserById(childUser.getId());
+								//Boolean removedCHILD = TokenSecurity.getInstance().removeActiveUserById(childUser.getId());
+								Boolean removedCHILD = tokenSecurity.removeActiveUserById(childUser.getId());
 				    		    userRoleRepository.save(childComp);
 				    			
 				    		    
@@ -571,13 +580,15 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 						for(User objectChild : usersChildsAssignedByRoleId) 
 						{
 							childUserASSigned=objectChild;
-							Boolean removedCHILDYYT = TokenSecurity.getInstance().removeActiveUserById(childUserASSigned.getId());
+							//Boolean removedCHILDYYT = TokenSecurity.getInstance().removeActiveUserById(childUserASSigned.getId());
+							Boolean removedCHILDYYT = tokenSecurity.removeActiveUserById(childUserASSigned.getId());
 							childUserASSigned.setRoleId(null);
 				    		userRepository.save(childUserASSigned);
 						}
 						
 		    		    child.setDelete_date(date);
-						Boolean removedUSER = TokenSecurity.getInstance().removeActiveUserById(usersAssignedByRoleId.get(i).getId());
+						Boolean removedUSER = tokenSecurity.removeActiveUserById(usersAssignedByRoleId.get(i).getId());
+						//Boolean removedUSER = TokenSecurity.getInstance().removeActiveUserById(usersAssignedByRoleId.get(i).getId());
 		    		    userRoleRepository.save(child);
 					}
 		    		
@@ -586,7 +597,8 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 	    		
 
 				usersAssignedByRoleId.get(i).setRoleId(null);
-	   		    Boolean removeCretedBy = TokenSecurity.getInstance().removeActiveUserById(usersAssignedByRoleId.get(i).getId());
+	   		    Boolean removeCretedBy = tokenSecurity.removeActiveUserById(usersAssignedByRoleId.get(i).getId());
+	   		    //Boolean removeCretedBy = TokenSecurity.getInstance().removeActiveUserById(usersAssignedByRoleId.get(i).getId());
 	    		userRepository.save(usersAssignedByRoleId.get(i));
 
 	    		
@@ -1073,7 +1085,8 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 								 for(User objectRAssiCh1: childUsersAssiCh) {
 									 userChildsAssiCh1=objectRAssiCh1;
 									 userChildsAssiCh1.setRoleId(null);
-									 Boolean removedCHILD = TokenSecurity.getInstance().removeActiveUserById(userChildsAssiCh1.getId());
+									 Boolean removedCHILD = tokenSecurity.removeActiveUserById(userChildsAssiCh1.getId());
+									 //Boolean removedCHILD = TokenSecurity.getInstance().removeActiveUserById(userChildsAssiCh1.getId());
 									 userRepository.save(userChildsAssiCh1);
 								 }	 
 								 
@@ -1088,7 +1101,8 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 							 }	 
 							 
 							 userChildsAssi.setRoleId(null);
-							 Boolean removedCHILD = TokenSecurity.getInstance().removeActiveUserById(userChildsAssi.getId());
+							 //Boolean removedCHILD = TokenSecurity.getInstance().removeActiveUserById(userChildsAssi.getId());
+							 Boolean removedCHILD = tokenSecurity.removeActiveUserById(userChildsAssi.getId());
 							 userRepository.save(userChildsAssi);
 
 
@@ -1104,7 +1118,8 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 					
 					 }	 
 					 userChilds.setRoleId(null);
-					 Boolean removedCHILD = TokenSecurity.getInstance().removeActiveUserById(userChilds.getId());
+					 //Boolean removedCHILD = TokenSecurity.getInstance().removeActiveUserById(userChilds.getId());
+					 Boolean removedCHILD = tokenSecurity.removeActiveUserById(userChilds.getId());
 					 userRepository.save(userChilds);
 				 }
 				 

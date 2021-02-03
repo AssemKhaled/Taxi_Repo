@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 import com.example.examplequerydslspringdatajpamaven.Validator.JWKValidator;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.entity.UserRole;
-import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
@@ -39,25 +38,22 @@ public class LoginServiceImpl extends RestServiceController implements LoginServ
 	
 	private static final Log logger = LogFactory.getLog(LoginServiceImpl.class);
 
+	@Autowired
+	private TokenSecurity tokenSecurity;
 	
-	
-	 @Autowired
-	 UserRepository userRepository;
-	
-	 @Autowired
-	 DeviceRepository deviceRepository;
-	 
+	@Autowired
+	private UserRepository userRepository;
 	 
 	@Autowired
-	UserServiceImpl userServiceImpl;
+	private UserServiceImpl userServiceImpl;
 	
 	@Autowired
-	JWKValidator jwkValidator;
+	private JWKValidator jwkValidator;
 	
 	@Autowired
-	UserRoleService userRoleService;
+	private UserRoleService userRoleService;
 	
-	GetObjectResponse getObjectResponse;
+	private GetObjectResponse getObjectResponse;
 	
 	
 	/**
@@ -136,7 +132,7 @@ public class LoginServiceImpl extends RestServiceController implements LoginServ
 							
 							long diff = date2.getTime() - date1.getTime();
 							long days = 0;
-							days = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) + 1;
+							days = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) ;
 							userInfo.put("leftDays" , days);
 
 							if(days <= 0) {
@@ -156,9 +152,14 @@ public class LoginServiceImpl extends RestServiceController implements LoginServ
 			    	TimeZone etTimeZone = TimeZone.getTimeZone("Asia/Riyadh");
 			         
 			        Date currentDate = new Date();
+			        
+			        
 			        String requestLastUpdate = FORMATTER.format(currentDate);
-				    TokenSecurity.getInstance().addActiveUser(user.getId(),token,requestLastUpdate); 
-					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",loggedUser);
+				    //TokenSecurity.getInstance().addActiveUser(user.getId(),token,requestLastUpdate); 
+			        
+			        
+			        tokenSecurity.addActiveUser(user.getId(),token); 
+				    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",loggedUser);
 					logger.info("************************ Login ENDED ***************************");
 					
 					return  ResponseEntity.ok().body(getObjectResponse);
@@ -197,7 +198,7 @@ public class LoginServiceImpl extends RestServiceController implements LoginServ
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		else {
-			  Boolean removed = TokenSecurity.getInstance().removeActiveUser(token);
+			  Boolean removed = tokenSecurity.removeActiveUser(token);
 			  if(removed) {
 				  List<User> loggedUser = null ;
 				  getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "loggedOut successfully",loggedUser);

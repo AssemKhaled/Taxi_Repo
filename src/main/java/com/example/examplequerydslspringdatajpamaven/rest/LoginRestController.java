@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-import com.example.examplequerydslspringdatajpamaven.Validator.JWKValidator;
 import com.example.examplequerydslspringdatajpamaven.service.LoginService;
 
 /**
@@ -20,9 +19,7 @@ import com.example.examplequerydslspringdatajpamaven.service.LoginService;
 public class LoginRestController {
 	
 	@Autowired
-	LoginService loginService;
-
-	JWKValidator jwkValidator;
+	private LoginService loginService;
 
 	@GetMapping(path = "/login")
 	public 	ResponseEntity<?> login(@RequestHeader(value = "Authorization", defaultValue = "")String authtorization ){

@@ -29,6 +29,9 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	@Query(value = "SELECT * from tc_devices where tc_devices.simcardNumber=:simcardNumber and tc_devices.delete_date is null",nativeQuery = true)
 	public List<Device> checkSIMCard(@Param("simcardNumber")String simcardNumber);
 	
+	@Query(value = "SELECT * from tc_devices where tc_devices.simcardNumber=:simcardNumber and tc_devices.delete_date is null and tc_devices.id !=:id",nativeQuery = true)
+	public List<Device> checkSIMCardEdit(@Param("simcardNumber")String simcardNumber,@Param("id")Long id);
+	
 	@Query(nativeQuery = true, name = "getDevicesList")
 	List<CustomDeviceList> getDevicesList(@Param("userIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
 

@@ -7,34 +7,106 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+
 import com.example.examplequerydslspringdatajpamaven.entity.Token;
+import com.example.examplequerydslspringdatajpamaven.entity.UserTokens;
+import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.UserTokensRepository;
 
 /**
  * Create token and expire time
  * @author fuinco
  *
  */
+@Component
+@Service
 public class TokenSecurity {
 
+	 @Autowired
+	 private UserTokensRepository userTokensRepository;
 	  
-	  private List<Token> ActiveUsers;
-	 /** private constructor to prevent others from instantiating this class */
-    private TokenSecurity() {
+	//private List<Token> ActiveUsers;
+	
+	/** private constructor to prevent others from instantiating this class */
+    /*private TokenSecurity() {
     	this.ActiveUsers = new ArrayList<>();
-    }
+    }*/
    
-    
+//	private TokenSecurity() {
+//
+//    }
+	
     /** Create an instance of the class at the time of class loading */
-    private static final TokenSecurity instance = new TokenSecurity();
+//    private static final TokenSecurity instance = new TokenSecurity();
+    
+    
+    public void addActiveUser(Long userId, String token) {
+    	UserTokens userToken = new UserTokens();
+    	
+    	userToken.setUserid(userId);
+    	userToken.setTokenid(token);
+    	 
+    	userTokensRepository.save(userToken);
+	    
+    }
+    public Boolean removeActiveUser(String token) {
+    	
+    	List<UserTokens> userTokens = userTokensRepository.getUserToken(token);
+
+    	if(userTokens.size() > 0) {
+    		for(UserTokens userToken:userTokens) {
+        		userTokensRepository.deleteTokenOfUser(userToken.getTokenid());
+    		}
+			return true;
+    	}
+    	else {
+    		
+        	return false;
+
+    	}
+    	
+    	
+    }
+    public Boolean removeActiveUserById(Long userId) {
+    	
+    	List<UserTokens> userTokens = userTokensRepository.getUserTokenById(userId);
+    	
+    	if(userTokens.size() > 0) {
+    		for(UserTokens userToken:userTokens) {
+        		userTokensRepository.deleteTokenOfUserById(userToken.getUserid());
+    		}
+			return true;
+    	}
+    	else {
+        	return false;
+
+    	}
+    	
+    	
+    }
+    
+    public Boolean checkToken(String token) {
+    	List<UserTokens> userTokens = userTokensRepository.getUserToken(token);
+
+    	if(userTokens.size() > 0) {
+        	return true;
+    	}
+    	else {
+			return false;
+    	}
+    }
     
     /** Provide a global point of access to the instance */
-    public static TokenSecurity getInstance() {
-        return instance;
-    }
+//    public static TokenSecurity getInstance() {
+//        return instance;
+//    }
 
 	
 
-	public List<Token> getActiveUsers() {
+	/*public List<Token> getActiveUsers() {
 		return ActiveUsers;
 	}
 
@@ -100,7 +172,7 @@ public class TokenSecurity {
     		i++;
     	}
     	return false;
-    }
+    }*/
     
     
 }

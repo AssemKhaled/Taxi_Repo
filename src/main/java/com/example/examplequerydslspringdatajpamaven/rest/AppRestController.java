@@ -53,6 +53,20 @@ public class AppRestController {
 		return appService.logoutApp(TOKEN);
 	}
 	
+	@PostMapping(path ="/logoutTokenApp")
+	public ResponseEntity<?> logoutTokenApp(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                               @RequestBody Map<Object, Object> data) {
+		
+		 return  appService.logoutTokenApp(TOKEN,data);		
+	}
+	
+	@PostMapping(path ="/registerTokenApp")
+	public ResponseEntity<?> registerToken(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+			                               @RequestBody Map<Object, Object> data) {
+		
+		 return  appService.registerToken(TOKEN,data);		
+	}
+	
 	@GetMapping(path = "/getAllDevicesMapApp")
 	public ResponseEntity<?> getAllDevicesLastInfoMapApp(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 			                                       @RequestParam (value = "userId", defaultValue = "0") Long userId

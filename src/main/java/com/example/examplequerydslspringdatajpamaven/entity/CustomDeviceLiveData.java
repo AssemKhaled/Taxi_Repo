@@ -58,11 +58,28 @@ public class CustomDeviceLiveData {
 	private String sequence_number;
 	private String owner_name;
 	private Boolean expired;
-
+	private Long leftDays;
 	private Double temperature;
 	private Double humidity;
+	private String create_date;
 
 	
+	public String getCreate_date() {
+		return create_date;
+	}
+
+	public void setCreate_date(String create_date) {
+		this.create_date = create_date;
+	}
+
+	public Long getLeftDays() {
+		return leftDays;
+	}
+
+	public void setLeftDays(Long leftDays) {
+		this.leftDays = leftDays;
+	}
+
 	public Double getTemperature() {
 		return temperature;
 	}
@@ -502,7 +519,8 @@ public class CustomDeviceLiveData {
 		this.owner_name = owner_name;
 		
 	}
-	public CustomDeviceLiveData(int id ,String deviceName , String uniqueId,String lastUpdate,Boolean expired ,String positionId,String photo) {
+	public CustomDeviceLiveData(int id ,String deviceName , String uniqueId,String lastUpdate,
+			Boolean expired ,String positionId,String photo,String create_date, Long leftDays) {
 		this.id = id ;
 		this.uniqueId = uniqueId ;
 		this.deviceName = deviceName ;
@@ -510,6 +528,8 @@ public class CustomDeviceLiveData {
 		this.expired = expired;
 		this.positionId = positionId;
 		this.photo=photo;
+		this.create_date = create_date;
+		this.leftDays = leftDays;
 
 	   		
 	}

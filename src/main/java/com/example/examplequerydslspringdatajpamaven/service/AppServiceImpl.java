@@ -93,6 +93,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	private static final Log logger = LogFactory.getLog(AppServiceImpl.class);
 	private GetObjectResponse getObjectResponse;
 	
+	@Autowired
+	private TokenSecurity tokenSecurity;
+	
 	 @Value("${stopsUrl}")
 	 private String stopsUrl;
 	 
@@ -106,29 +109,29 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	 private String summaryUrl;
 
 	@Autowired
-	UserClientDriverRepository userClientDriverRepository;
+	private UserClientDriverRepository userClientDriverRepository;
 
 	@Autowired
-	UserClientGeofenceRepository userClientGeofenceRepository;
+	private UserClientGeofenceRepository userClientGeofenceRepository;
 	
 	@Autowired
-	UserClientDeviceRepository userClientDeviceRepository;
+	private UserClientDeviceRepository userClientDeviceRepository;
 	
 	@Autowired
-	UserClientGroupRepository userClientGroupRepository;
+	private UserClientGroupRepository userClientGroupRepository;
 	
 		
 	@Autowired
-	MongoEventsRepo mongoEventsRepo;
+	private MongoEventsRepo mongoEventsRepo;
 		
 	@Autowired
-	ProfileRepository profileRepository;
+	private ProfileRepository profileRepository;
 	
 	@Autowired
-	MongoPositionRepo mongoPositionRepo;
+	private MongoPositionRepo mongoPositionRepo;
 	
 	@Autowired
-	ProfileServiceImpl profileServiceImpl;
+	private ProfileServiceImpl profileServiceImpl;
 
 	
 	@Autowired
@@ -232,7 +235,11 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		         
 		        Date currentDate = new Date();
 		        String requestLastUpdate = FORMATTER.format(currentDate);
-			    TokenSecurity.getInstance().addActiveUser(user.getId(),token,requestLastUpdate); 
+//			    TokenSecurity.getInstance().addActiveUser(user.getId(),token,requestLastUpdate); 
+		        
+		        //TokenSecurity.getInstance().addActiveUser(user.getId(),token); 
+		        tokenSecurity.addActiveUser(user.getId(),token); 
+
 				getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",loggedUser);
 				logger.info("************************ Login ENDED ***************************");
 				
@@ -268,7 +275,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		else {
-			  Boolean removed = TokenSecurity.getInstance().removeActiveUser(TOKEN);
+			  //Boolean removed = TokenSecurity.getInstance().removeActiveUser(TOKEN);
+			  Boolean removed = tokenSecurity.removeActiveUser(TOKEN);
+
 			  if(removed) {
 				  List<User> loggedUser = null ;
 				  getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "loggedOut successfully",loggedUser);
@@ -10236,9 +10245,182 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 		}
 	
+	}
+	
+	
+	@Override
+	public ResponseEntity<?> registerToken(String TOKEN, Map<Object, Object> data) {
+		// TODO Auto-generated method stub
+	    logger.info("************************registerToken STARTED ***************************");
+
+		if(TOKEN.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
+			 logger.info("************************registerToken ENDED ***************************");
+
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
 		
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		
+		if(!data.containsKey("userId")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "userId is required",null);
+			 logger.info("************************registerToken ENDED ***************************");
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(!data.containsKey("registerToken")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "registerToken is required",null);
+			 logger.info("************************registerToken ENDED ***************************");
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		Long userId = Long.parseLong(data.get("userId").toString());
+		String registerToken = (String) data.get("registerToken");
 
+		if(registerToken == null) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "registerToken is required",null);
+			 logger.info("************************registerToken ENDED ***************************");
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		
+		if(registerToken.equals("")) {
+			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "registerToken is required",null);
+			 logger.info("************************registerToken ENDED ***************************");
+			 return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
 
+        if(userId == 0) {
+			
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "userId is required",null);
+		    logger.info("************************registerToken ENDED ***************************");
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+
+		User user = userServiceImpl.findById(userId);
+		if(user == null) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "User is not found",null);
+		    logger.info("************************registerToken ENDED ***************************");
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+		
+		String attr = user.getAttributes();
+		
+		if(attr != null && attr != "" && attr.startsWith("{")) {
+			JSONObject obj = new JSONObject(attr);	
+			if(obj.has("notificationTokens")) {
+				String notificationTokens = obj.getString("notificationTokens");
+				if(notificationTokens.length() > 0) {
+					notificationTokens = notificationTokens + "," + registerToken;
+				}
+				else {
+					notificationTokens = registerToken;
+				}
+				obj.put("notificationTokens", notificationTokens);
+
+			}
+			else {
+				obj.put("notificationTokens", registerToken);
+			}
+			
+			user.setAttributes(obj.toString());
+		}
+		else {
+			JSONObject obj = new JSONObject();	
+			obj.put("notificationTokens", registerToken);
+			user.setAttributes(obj.toString());
+
+		}
+		
+		userRepository.save(user);
+		
+		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",null);
+		logger.info("************************ registerToken ENDED ***************************");
+		return ResponseEntity.ok().body(getObjectResponse);
+	}
+	
+	@Override
+	public ResponseEntity<?> logoutTokenApp(String TOKEN, Map<Object, Object> data) {
+		
+		
+		logger.info("************************ Logout STARTED ***************************");
+
+		// TODO Auto-generated method stub
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		
+		if(TOKEN == "") {
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id required",null);
+			logger.info("************************ Logout ENDED ***************************");
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		else {
+			
+			//Boolean removed = TokenSecurity.getInstance().removeActiveUser(TOKEN);
+			Boolean removed = tokenSecurity.removeActiveUser(TOKEN);
+
+			if(removed) {
+
+				if(data.containsKey("userId") && data.containsKey("registerToken")) {
+
+					Long userId = Long.parseLong(data.get("userId").toString());
+				    String registerToken = (String) data.get("registerToken");
+	 
+					User user = userServiceImpl.findById(userId);
+					if(user != null) {
+						
+						if(registerToken != null) {
+							if(!registerToken.equals("")) {
+								
+								String attr = user.getAttributes();
+								
+								if(attr != null && attr != "" && attr.startsWith("{")) {
+									JSONObject obj = new JSONObject(attr);	
+						        	String noti = "";
+									if(obj.has("notificationTokens")) {
+										String notificationTokens = obj.getString("notificationTokens");
+										
+										if(notificationTokens.length() > 0) {
+											String[] numberStrs = notificationTokens.split(",");
+
+								        	for(String str :numberStrs) {
+								        		if(!str.equals(registerToken)) {
+								        			if(noti .length() > 0) {
+									        			noti = noti + ","+ str ;
+									        		}
+								        			else {
+									        			noti = str ;
+								        			}
+								        		}
+								        	}
+										}
+										
+										obj.put("notificationTokens", noti);
+
+									}
+									
+									user.setAttributes(obj.toString());
+									userRepository.save(user);
+								}
+							}
+						}
+					}
+	            }
+				getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "loggedOut successfully",null);
+				logger.info("************************ Logout ENDED ***************************");
+				return  ResponseEntity.ok().body(getObjectResponse);
+			}
+			else {
+				List<User> loggedUser = null ;
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged token is not Found",null);
+				logger.info("************************ Logout ENDED ***************************");
+				return  ResponseEntity.status(404).body(getObjectResponse);
+			}
+		}
 	}
 
 }

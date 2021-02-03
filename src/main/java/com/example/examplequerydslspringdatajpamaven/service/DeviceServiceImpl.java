@@ -161,8 +161,6 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			 List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(userId);
 			 
 			 if(deviceIds.size()>0) {
-
-				 
 				 
 				 if(exportData.equals("exportData")) {
 			    	 devices= deviceRepository.getDevicesListByIdsExport(deviceIds,search);
@@ -417,19 +415,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			}
 		}
 	
-		if(device.getSimcardNumber() != null) {
-			List<Device> SIM = deviceRepository.checkSIMCard(device.getSimcardNumber());
-			
-			if(SIM.size() > 0) {
-			    List<Integer> duplictionList = new ArrayList<Integer>();
-			    duplictionList.add(5);
-			    
-			    getObjectResponse = new GetObjectResponse( 201, "Duplication in data",duplictionList);
-		    	logger.info("************************ createDevice ENDED ***************************");
-		    	return ResponseEntity.status(201).body(getObjectResponse);
-			}
-			
-		}
+		
 		
 		if(device.getId() == null || device.getName() == null ||device.getName().equals("") 
 			|| device.getUniqueid() == null || device.getUniqueid().equals("")
@@ -447,6 +433,21 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					
 		}
 		else {
+			
+			if(device.getSimcardNumber() != null) {
+				List<Device> SIM = deviceRepository.checkSIMCardEdit(device.getSimcardNumber(),device.getId());
+				
+				if(SIM.size() > 0) {
+				    List<Integer> duplictionList = new ArrayList<Integer>();
+				    duplictionList.add(5);
+				    
+				    getObjectResponse = new GetObjectResponse( 201, "Duplication in data",duplictionList);
+			    	logger.info("************************ createDevice ENDED ***************************");
+			    	return ResponseEntity.status(201).body(getObjectResponse);
+				}
+				
+			}
+			
 			  boolean	isParent = false;
 			  Device oldDevice = findById(device.getId());
 			if(oldDevice == null) {
@@ -1735,6 +1736,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			    size=deviceRepository.getAllDevicesLiveDataSizeByIds(deviceIds,search);
 			    if(size > 0) {
 					for(int i=0;i<allDevicesLiveData.size();i++) {
+							
 						long minutes = 0;
 		            	allDevicesLiveData.get(i).setVehicleStatus("offline");
 		
@@ -1934,6 +1936,9 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		    Integer size=deviceRepository.getAllDevicesLiveDataSize(usersIds,search);
 		    if(size > 0) {
 				for(int i=0;i<allDevicesLiveData.size();i++) {
+					
+					
+					
 					long minutes = 0;
 	            	allDevicesLiveData.get(i).setVehicleStatus("offline");
 	

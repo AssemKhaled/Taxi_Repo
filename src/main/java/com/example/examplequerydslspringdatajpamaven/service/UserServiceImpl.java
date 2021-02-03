@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,10 +50,12 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	@Autowired
 	private UserRoleService userRoleService;
 	
+	@Autowired
+	private TokenSecurity tokenSecurity;
 	
 	private static final Log logger = LogFactory.getLog(UserServiceImpl.class);
 	
-	GetObjectResponse getObjectResponse;
+	private GetObjectResponse getObjectResponse;
 
 	@Override
 	public User getName() {
@@ -1268,19 +1271,22 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	   				
 
 	   				 if(deletedUser.getAccountType() == 4) {
-	   				   TokenSecurity.getInstance().removeActiveUserById(deleteUserId);
+	   					tokenSecurity.removeActiveUserById(deleteUserId);
+	   				    //TokenSecurity.getInstance().removeActiveUserById(deleteUserId);
 	   				 }else {
-	   				  TokenSecurity.getInstance().removeActiveUserById(deleteUserId);
+	   					tokenSecurity.removeActiveUserById(deleteUserId);
+	   				    //TokenSecurity.getInstance().removeActiveUserById(deleteUserId);
 
-	   				 resetChildernArray();
-	   				  List<User>children = getAllChildernOfUser(deleteUserId);
-	   				  if(!children.isEmpty()) {
-	   					  for(User object : children ) {
-	   						TokenSecurity.getInstance().removeActiveUserById(object.getId());
-	   		   				object.setDelete_date(date);
-	   		   				userRepository.save(object);
-	   					  }
-	   				  }
+		   				  resetChildernArray();
+		   				  List<User>children = getAllChildernOfUser(deleteUserId);
+		   				  if(!children.isEmpty()) {
+		   					  for(User object : children ) {
+		   						tokenSecurity.removeActiveUserById(object.getId());
+		   						//TokenSecurity.getInstance().removeActiveUserById(object.getId());
+		   		   				object.setDelete_date(date);
+		   		   				userRepository.save(object);
+		   					  }
+		   				  }
 	   				   
 	   				 }
 	   				
@@ -1807,6 +1813,7 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 		
 		return null;
 	}
+
 
 	
 	
