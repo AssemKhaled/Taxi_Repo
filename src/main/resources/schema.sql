@@ -176,6 +176,25 @@ DEALLOCATE PREPARE stmt;
 set @col_exists = 0;
 SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
 WHERE TABLE_NAME='tc_devices'
+AND column_name='user_id'
+and table_schema = database()
+into @col_exists;
+
+set @stmt = case @col_exists
+when 0 then CONCAT(
+'alter table tc_devices'
+, ' ADD COLUMN `user_id` int(11) NULL DEFAULT NULL'
+,';')
+else 'select ''column already exists, no op'''
+end;
+
+PREPARE stmt FROM @stmt;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+----------------------------------------------------------------
+set @col_exists = 0;
+SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME='tc_devices'
 AND column_name='representative'
 and table_schema = database()
 into @col_exists;

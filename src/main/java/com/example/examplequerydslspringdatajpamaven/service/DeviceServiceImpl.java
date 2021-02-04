@@ -211,7 +211,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	public ResponseEntity<?> createDevice(String TOKEN,Device device,Long userId) {
 		// TODO Auto-generated method stub
 		logger.info("************************ createDevice STARTED ***************************");
-		
+		device.setUser_id(userId);
 		Date now = new Date();
 		SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String nowTime = isoFormat.format(now);
@@ -380,8 +380,8 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	@Override
 	public ResponseEntity<?> editDevice(String TOKEN,Device device, Long userId) {
 		logger.info("************************ editDevice STARTED ***************************");
+		device.setUser_id(userId);
     	String newPhoto= device.getPhoto();
-		
     	device.setPhoto("not_available.png");
     	
     	
@@ -762,6 +762,8 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	         Set<Notification> notificationDevice=new HashSet<>();
 	         device.setNotificationDevice(notificationDevice);
 	         
+	         String uniqueId = device.getUniqueid();
+	         device.setUniqueid(uniqueId+"/D");
 			 deviceRepository.save(device);
 		     
 		     List<Device> devices = null;
@@ -1843,7 +1845,9 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		                    		avgHum = Hum / countHum;
 
 		                    	}
-		                    	
+		                    	avgHum = Math.round(avgHum * 100.0) / 100.0;
+		                    	avgTemp = Math.round(avgTemp * 100.0) / 100.0;
+
 		                    	allDevicesLiveData.get(i).setTemperature(avgTemp);
 		                    	allDevicesLiveData.get(i).setHumidity(avgHum);
 		                    	
@@ -2045,6 +2049,9 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	                    		avgHum = Hum / countHum;
 
 	                    	}
+	                    	
+	                    	avgHum = Math.round(avgHum * 100.0) / 100.0;
+	                    	avgTemp = Math.round(avgTemp * 100.0) / 100.0;
 	                    	
 	                    	allDevicesLiveData.get(i).setTemperature(avgTemp);
 	                    	allDevicesLiveData.get(i).setHumidity(avgHum);
@@ -2520,6 +2527,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 						    			 device.setUser(deviceOldUser);
 						    		     deviceOldUser.add(toUser);
 						    		     device.setUser(deviceOldUser);
+						    		     device.setUser_id(toUserId);
 						    		     deviceRepository.save(device);
 						    		     getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "device assigned successfully",null);
 											
@@ -2554,6 +2562,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					    			 device.setUser(deviceOldUser);
 					    		     deviceOldUser.add(toUser);
 					    		     device.setUser(deviceOldUser);
+					    		     device.setUser_id(toUserId);
 					    		     deviceRepository.save(device);
 					    		     getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "device assigned successfully",null);
 										

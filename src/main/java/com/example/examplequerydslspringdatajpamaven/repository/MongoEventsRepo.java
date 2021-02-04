@@ -681,15 +681,13 @@ public class MongoEventsRepo {
 		return notifications;
 	}
 	
-	public List<EventReport> getNotificationsToday(List<Long> allDevices,int offset){
+	public List<EventReport> getNotificationsTodayByDeviceId(List<Long> allDevices,int offset){
 	
 	
 		Date date = new Date();
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); 
 
-	    
-		
 		String currentDate=formatter.format(date);
 		
 		String from = currentDate +" 00:00:01";
@@ -813,7 +811,139 @@ public class MongoEventsRepo {
 	        
 		return notifications;
 	}
-	public List<EventReport> getNotificationsTodaySearch(List<Long> allDevices,String search,int offset){
+	
+	public List<EventReport> getNotificationsTodayByUserId(List<Long> userIds,int offset){
+		
+		
+		Date date = new Date();
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); 
+
+		String currentDate=formatter.format(date);
+		
+		String from = currentDate +" 00:00:01";
+		String to = currentDate +" 23:59:59";
+		
+		Date dateFrom = null;
+		Date dateTo = null;
+		try {
+			dateFrom = output.parse(from);
+			dateTo = output.parse(to);
+
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		Calendar calendarFrom = Calendar.getInstance();
+		calendarFrom.setTime(dateFrom);
+		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
+		dateFrom = calendarFrom.getTime();
+	    
+		Calendar calendarTo = Calendar.getInstance();
+		calendarTo.setTime(dateTo);
+		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
+		dateTo = calendarTo.getTime();
+		
+		
+		List<EventReport> notifications = new ArrayList<EventReport>();
+
+
+		
+	    Aggregation aggregation = newAggregation(
+	            match(Criteria.where("userId").in(userIds).and("servertime").gte(dateFrom).lte(dateTo)),
+	            project("deviceid","attributes","type","positionid","deviceName","driverName","driverid","attributes.alarm").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime"),
+	            sort(Sort.Direction.DESC, "servertime"),
+	            skip(offset),
+	            limit(10)
+	            
+	        );
+
+
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_events", BasicDBObject.class);
+
+	        if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
+	            while (iterator.hasNext()) {
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
+	            	EventReport notification = new EventReport();
+	            	
+                    if(object.containsField("attributes") && object.get("attributes") != null) {
+                    	
+                    	notification.setAttributes(object.get("attributes").toString());
+
+	            	}
+	            	if(object.containsField("deviceid") && object.get("deviceid") != null) {
+	            		notification.setDeviceId(object.getLong("deviceid"));
+	
+	            	}
+	            	if(object.containsField("driverid") && object.get("driverid") != null) {
+	            		notification.setDriverId(object.getLong("driverid"));
+	
+	            	}
+	            	if(object.containsField("driverName") && object.get("driverName") != null) {
+	            		notification.setDriverName(object.get("driverName").toString());
+	            	}
+	            	if(object.containsField("deviceName") && object.get("deviceName") != null) {
+	            		notification.setDeviceName(object.get("deviceName").toString());
+	
+	            	}
+					if(object.containsField("servertime") && object.get("servertime") != null) {
+						Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(object.getString("servertime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+
+						
+						notification.setServerTime(outputFormat.format(dateTime));    		
+	                }
+					if(object.containsField("type") && object.get("type") != null) {
+						notification.setEventType(object.getString("type"));    		
+	                }
+					if(object.containsField("alarm") && object.get("alarm") != null) {
+						notification.setEventType(object.getString("alarm"));    		
+	                }
+					if(object.containsField("positionid") && object.get("positionid") != null) {
+						Object pos = object.get("positionid");
+						if(pos.toString() != "null") {
+							notification.setPositionId(pos.toString());
+							MongoPositions position = mongoPositionsRepository.findById(notification.getPositionId());
+							if(position != null) {
+								notification.setLatitude(position.getLatitude());
+								notification.setLongitude(position.getLongitude());
+								
+							}
+						}
+						
+	                }
+					if(object.containsField("_id") && object.get("_id") != null) {
+						notification.setEventId(object.getObjectId("_id").toString());
+
+					}
+					notifications.add(notification);
+
+	            }
+	        }
+	        
+		return notifications;
+	}
+	
+	public List<EventReport> getNotificationsTodaySearchByDeviceId(List<Long> allDevices,String search,int offset){
 		
 		
 		Date date = new Date();
@@ -856,6 +986,145 @@ public class MongoEventsRepo {
 
 	    Aggregation aggregation = newAggregation(
 	            match(Criteria.where("deviceid").in(allDevices).and("servertime").gte(dateFrom).lte(dateTo)),
+	    		match(orCriteria.orOperator(
+	    				Criteria.where("type").regex(search, "i"),Criteria.where("deviceName").regex(search, "i"),
+	    				Criteria.where("driverName").regex(search, "i"),Criteria.where("attributes.alarm").regex(search, "i"))
+	    				),
+	            project("deviceid","attributes","type","positionid","deviceName","driverName","driverid","attributes.alarm").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime"),
+	            sort(Sort.Direction.DESC, "servertime"),
+	            skip(offset),
+	            limit(10)
+	            
+	        );
+
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_events", BasicDBObject.class);
+	        
+	        if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
+	            while (iterator.hasNext()) {
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
+	            	EventReport notification = new EventReport();
+	            	
+                    if(object.containsField("attributes") && object.get("attributes") != null) {
+                    	
+                    	notification.setAttributes(object.get("attributes").toString());
+
+	            	}
+	            	if(object.containsField("deviceid") && object.get("deviceid") != null) {
+	            		notification.setDeviceId(object.getLong("deviceid"));
+	
+	            	}
+	            	if(object.containsField("driverid") && object.get("driverid") != null) {
+	            		notification.setDriverId(object.getLong("driverid"));
+	
+	            	}
+	            	if(object.containsField("driverName") && object.get("driverName") != null) {
+	            		notification.setDriverName(object.get("driverName").toString());
+	            	}
+	            	if(object.containsField("deviceName") && object.get("deviceName") != null) {
+	            		notification.setDeviceName(object.get("deviceName").toString());
+	
+	            	}
+					if(object.containsField("servertime") && object.get("servertime") != null) {
+						Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(object.getString("servertime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+
+						
+						notification.setServerTime(outputFormat.format(dateTime));    		
+	                }
+					if(object.containsField("type") && object.get("type") != null) {
+						notification.setEventType(object.getString("type"));    		
+	                }
+					if(object.containsField("alarm") && object.get("alarm") != null) {
+						notification.setEventType(object.getString("alarm"));    		
+	                }
+					if(object.containsField("positionid") && object.get("positionid") != null) {
+						Object pos = object.get("positionid");
+						if(pos.toString() != "null") {
+							notification.setPositionId(pos.toString());    		
+							MongoPositions position = mongoPositionsRepository.findById(notification.getPositionId());
+							if(position != null) {
+								notification.setLatitude(position.getLatitude());
+								notification.setLongitude(position.getLongitude());
+								
+							}
+						}
+						
+						
+	                }
+					if(object.containsField("_id") && object.get("_id") != null) {
+						notification.setEventId(object.getObjectId("_id").toString());
+
+					}
+					notifications.add(notification);
+
+	            }
+	        }
+	        
+		return notifications;
+	}
+	
+
+	public List<EventReport> getNotificationsTodaySearchByUserId(List<Long> usersIds,String search,int offset){
+		
+		
+		Date date = new Date();
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); 
+
+	    
+		
+		String currentDate=formatter.format(date);
+		
+		String from = currentDate +" 00:00:01";
+		String to = currentDate +" 23:59:59";
+		
+		Date dateFrom = null;
+		Date dateTo = null;
+		try {
+			dateFrom = output.parse(from);
+			dateTo = output.parse(to);
+
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		Calendar calendarFrom = Calendar.getInstance();
+		calendarFrom.setTime(dateFrom);
+		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
+		dateFrom = calendarFrom.getTime();
+	    
+		Calendar calendarTo = Calendar.getInstance();
+		calendarTo.setTime(dateTo);
+		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
+		dateTo = calendarTo.getTime();
+		
+		
+		List<EventReport> notifications = new ArrayList<EventReport>();
+
+		
+		 Criteria orCriteria = new Criteria();
+
+	    Aggregation aggregation = newAggregation(
+	            match(Criteria.where("userId").in(usersIds).and("servertime").gte(dateFrom).lte(dateTo)),
 	    		match(orCriteria.orOperator(
 	    				Criteria.where("type").regex(search, "i"),Criteria.where("deviceName").regex(search, "i"),
 	    				Criteria.where("driverName").regex(search, "i"),Criteria.where("attributes.alarm").regex(search, "i"))

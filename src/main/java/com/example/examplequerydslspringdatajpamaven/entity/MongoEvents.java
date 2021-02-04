@@ -38,8 +38,27 @@ public class MongoEvents {
 	
 	private String driverName;
 	
+	private Long userId;
+	
 	public MongoEvents() {
 		
+	}
+
+	public MongoEvents(ObjectId _id, String type, Date servertime, Long deviceid, String positionid, Long geofenceid,
+			Object attributes, Long maintinanceid, String deviceName, Long driverid, String driverName, Long userId) {
+		super();
+		this._id = _id;
+		this.type = type;
+		this.servertime = servertime;
+		this.deviceid = deviceid;
+		this.positionid = positionid;
+		this.geofenceid = geofenceid;
+		this.attributes = attributes;
+		this.maintinanceid = maintinanceid;
+		this.deviceName = deviceName;
+		this.driverid = driverid;
+		this.driverName = driverName;
+		this.userId = userId;
 	}
 
 	public MongoEvents(ObjectId _id, String type, Date servertime, Long deviceid, String positionid, Long geofenceid,
@@ -144,6 +163,14 @@ public class MongoEvents {
 
 	public void setDriverName(String driverName) {
 		this.driverName = driverName;
+	}
+
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
 	}
 	
 	

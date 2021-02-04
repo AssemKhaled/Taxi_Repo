@@ -4035,6 +4035,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	         Set<Notification> notificationDevice=new HashSet<>();
 	         device.setNotificationDevice(notificationDevice);
 	         
+	         String uniqueId = device.getUniqueid();
+	         device.setUniqueid(uniqueId+"/D");
+	         
 			 deviceRepository.save(device);
 		     
 		     List<Device> devices = null;

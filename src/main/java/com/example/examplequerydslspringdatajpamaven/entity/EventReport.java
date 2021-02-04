@@ -20,7 +20,7 @@ public class EventReport {
 	private String positionId;
 	private Double latitude;
 	private Double longitude;
-	
+	private Long userId;
 	
 	public EventReport() {
 		
@@ -89,6 +89,26 @@ public class EventReport {
 
 	}
 	
+	public EventReport(String eventId, String eventType, String serverTime, Object attributes, Long deviceId,
+			String deviceName, Long driverId, String driverName, Long geofenceId, String geofenceName,
+			String positionId, Double latitude, Double longitude, Long userId) {
+		super();
+		this.eventId = eventId;
+		this.eventType = eventType;
+		this.serverTime = serverTime;
+		this.attributes = attributes;
+		this.deviceId = deviceId;
+		this.deviceName = deviceName;
+		this.driverId = driverId;
+		this.driverName = driverName;
+		this.geofenceId = geofenceId;
+		this.geofenceName = geofenceName;
+		this.positionId = positionId;
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.userId = userId;
+	}
+
 	public String getEventId() {
 		return eventId;
 	}
@@ -166,6 +186,14 @@ public class EventReport {
 	}
 	public void setLongitude(Double longitude) {
 		this.longitude = longitude;
+	}
+
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
 	}
 	
 

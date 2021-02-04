@@ -1172,8 +1172,8 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			}
 		}
 		
-		List<Long>allDevices= new ArrayList<>();
-		List<Long>allDrivers= new ArrayList<>();
+		List<Long>allDevices= new ArrayList<Long>();
+		List<Long>allDrivers= new ArrayList<Long>();
 		List<DriverSelect>allDevicesList= new ArrayList<DriverSelect>();
 
 		if(groupIds.length != 0) {
@@ -1246,11 +1246,15 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			}
 		}
 		if(driverIds.length !=0 ) {
+
 			for(Long driverId : driverIds) {
+
+
 				if(driverId !=0) {
-					
+
 					Driver driver =driverServiceImpl.getDriverById(driverId);
 					if(driver != null) {
+
 						boolean isParent = false;
 						if(loggedUser.getAccountType() == 4) {
 							Set<User>parentClients = loggedUser.getUsersOfUser();
@@ -1285,11 +1289,15 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 									isParent = true;
 							}
 						}
+
+
 						if(!driverServiceImpl.checkIfParent(driver , loggedUser) && ! isParent) {
 							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this driver",driverHours);
 							 logger.info("************************ getDriverWorkingHours ENDED ***************************");
 							return ResponseEntity.badRequest().body(getObjectResponse);
 						}
+
+
 						allDrivers.add(driverId);
 						
 						
@@ -1301,8 +1309,10 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		}
 		if(allDrivers.size()>0) {
 			allDevicesList.addAll(driverRepository.devicesOfDrivers(allDrivers));
+
 		}
 		for(DriverSelect object : allDevicesList) {
+
 			allDevices.add(object.getId());
 		}
 		
@@ -1489,18 +1499,18 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 					
 
 						if(search.equals("")) {
-							notifications = mongoEventsRepo.getNotificationsToday(deviceIds, offset);
-							if(notifications.size()>0) {
-								size= mongoEventsRepo.getNotificationsTodaySize(deviceIds);
-									
-							}
+							notifications = mongoEventsRepo.getNotificationsTodayByDeviceId(deviceIds, offset);
+//							if(notifications.size()>0) {
+//								size= mongoEventsRepo.getNotificationsTodaySize(deviceIds);
+//									
+//							}
 						}
 						else {
-							notifications = mongoEventsRepo.getNotificationsTodaySearch(deviceIds,search, offset);
-							if(notifications.size()>0) {
-								size= mongoEventsRepo.getNotificationsTodaySizeSearch(deviceIds,search);
-									
-							}
+							notifications = mongoEventsRepo.getNotificationsTodaySearchByDeviceId(deviceIds,search, offset);
+//							if(notifications.size()>0) {
+//								size= mongoEventsRepo.getNotificationsTodaySizeSearch(deviceIds,search);
+//									
+//							}
 						}
 						
 
@@ -1527,21 +1537,22 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 					List<Long> allDevices = deviceRepository.getDevicesUsers(usersIds);
 
 					if(search.equals("")) {
+						notifications = mongoEventsRepo.getNotificationsTodayByDeviceId(allDevices, offset);
 
-						notifications = mongoEventsRepo.getNotificationsToday(allDevices, offset);
-						if(notifications.size()>0) {
-							size= mongoEventsRepo.getNotificationsTodaySize(allDevices);
-								
-						}
+						//notifications = mongoEventsRepo.getNotificationsTodayByUserId(usersIds, offset);
+//						if(notifications.size()>0) {
+//							size= mongoEventsRepo.getNotificationsTodaySize(allDevices);
+//								
+//						}
 
 					}
 					else {
-					
-						notifications = mongoEventsRepo.getNotificationsTodaySearch(allDevices,search, offset);
-						if(notifications.size()>0) {
-							size= mongoEventsRepo.getNotificationsTodaySizeSearch(allDevices,search);
-								
-						}
+						notifications = mongoEventsRepo.getNotificationsTodaySearchByDeviceId(allDevices,search, offset);
+						//notifications = mongoEventsRepo.getNotificationsTodaySearchByUserId(usersIds,search, offset);
+//						if(notifications.size()>0) {
+//							size= mongoEventsRepo.getNotificationsTodaySizeSearch(allDevices,search);
+//								
+//						}
 					}
 					
 				    
