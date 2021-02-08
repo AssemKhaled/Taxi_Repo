@@ -6849,12 +6849,14 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			}
 		}
 		if(allDrivers.size()>0) {
-			allDevicesList.addAll(driverRepository.devicesOfDrivers(allDrivers));
+
+			List<Long> dri = new ArrayList<Long>();
+			for(Object obj : allDrivers.toArray()) {
+				dri.add(Long.valueOf(obj.toString()));
+			}
+			allDevices.addAll(driverRepository.devicesOfDrivers(dri));
+
 		}
-		for(DriverSelect object : allDevicesList) {
-			allDevices.add(object.getId());
-		}
-		
 		Date dateFrom;
 		Date dateTo;
 		if(start.equals("0") || end.equals("0")) {
@@ -7178,11 +7180,13 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			}
 		}
 		if(allDrivers.size()>0) {
-			allDevicesList.addAll(driverRepository.devicesOfDrivers(allDrivers));
-		}
-		
-		for(DriverSelect object : allDevicesList) {
-			allDevices.add(object.getId());
+
+			List<Long> dri = new ArrayList<Long>();
+			for(Object obj : allDrivers.toArray()) {
+				dri.add(Long.valueOf(obj.toString()));
+			}
+			allDevices.addAll(driverRepository.devicesOfDrivers(dri));
+
 		}
 		
 		if(deviceIds.length != 0 ) {
@@ -8266,11 +8270,13 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			}
 		}
 		if(allDrivers.size()>0) {
-			allDevicesList.addAll(driverRepository.devicesOfDrivers(allDrivers));
-		}
-		
-		for(DriverSelect object : allDevicesList) {
-			allDevices.add(object.getId());
+
+			List<Long> dri = new ArrayList<Long>();
+			for(Object obj : allDrivers.toArray()) {
+				dri.add(Long.valueOf(obj.toString()));
+			}
+			allDevices.addAll(driverRepository.devicesOfDrivers(dri));
+
 		}
 		
 		if(deviceIds.length != 0 ) {
@@ -8667,11 +8673,13 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			}
 		}
 		if(allDrivers.size()>0) {
-			allDevicesList.addAll(driverRepository.devicesOfDrivers(allDrivers));
-		}
-		
-		for(DriverSelect object : allDevicesList) {
-			allDevices.add(object.getId());
+
+			List<Long> dri = new ArrayList<Long>();
+			for(Object obj : allDrivers.toArray()) {
+				dri.add(Long.valueOf(obj.toString()));
+			}
+			allDevices.addAll(driverRepository.devicesOfDrivers(dri));
+
 		}
 		
 		if(deviceIds.length != 0 ) {
@@ -9067,13 +9075,14 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				}
 			}
 			if(allDrivers.size()>0) {
-				allDevicesList.addAll(driverRepository.devicesOfDrivers(allDrivers));
+
+				List<Long> dri = new ArrayList<Long>();
+				for(Object obj : allDrivers.toArray()) {
+					dri.add(Long.valueOf(obj.toString()));
+				}
+				allDevices.addAll(driverRepository.devicesOfDrivers(dri));
+
 			}
-			
-			for(DriverSelect object : allDevicesList) {
-				allDevices.add(object.getId());
-			}
-			
 			if(deviceIds.length != 0 ) {
 				for(Long deviceId:deviceIds) {
 					if(deviceId !=0) {
@@ -9525,13 +9534,14 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			}
 		}
 		if(allDrivers.size()>0) {
-			allDevicesList.addAll(driverRepository.devicesOfDrivers(allDrivers));
+
+			List<Long> dri = new ArrayList<Long>();
+			for(Object obj : allDrivers.toArray()) {
+				dri.add(Long.valueOf(obj.toString()));
+			}
+			allDevices.addAll(driverRepository.devicesOfDrivers(dri));
+
 		}
-		
-		for(DriverSelect object : allDevicesList) {
-			allDevices.add(object.getId());
-		}
-		
 		if(deviceIds.length != 0 ) {
 			for(Long deviceId:deviceIds) {
 				if(deviceId !=0) {
@@ -9994,12 +10004,14 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			}
 		}
 		if(allDrivers.size()>0) {
-			allDevicesList.addAll(driverRepository.devicesOfDrivers(allDrivers));
-		}
-		for(DriverSelect object : allDevicesList) {
-			allDevices.add(object.getId());
-		}
 
+			List<Long> dri = new ArrayList<Long>();
+			for(Object obj : allDrivers.toArray()) {
+				dri.add(Long.valueOf(obj.toString()));
+			}
+			allDevices.addAll(driverRepository.devicesOfDrivers(dri));
+
+		}
 
 		Date dateFrom;
 		Date dateTo;

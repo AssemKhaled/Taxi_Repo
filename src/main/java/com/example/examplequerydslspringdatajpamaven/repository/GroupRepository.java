@@ -154,8 +154,17 @@ public interface GroupRepository extends  JpaRepository<Group, Long>, QueryDslPr
 	public List<DriverSelect> getGroupSelect(@Param("userIds") List<Long> userIds);
 	
 	@Query(value = "SELECT tc_groups.id,tc_groups.name FROM tc_groups"
+			+ " INNER JOIN tc_user_group ON tc_user_group.groupid = tc_groups.id"
+			+ " WHERE tc_user_group.userid IN(:userIds) and tc_groups.is_deleted is null and  tc_groups.type IN(:type)",nativeQuery = true)
+	public List<DriverSelect> getGroupSelectByType(@Param("userIds") List<Long> userIds,@Param("type") List<String> type);
+	
+	@Query(value = "SELECT tc_groups.id,tc_groups.name FROM tc_groups"
 			+ " WHERE tc_groups.id IN(:groupIds) and tc_groups.is_deleted is null",nativeQuery = true)
 	public List<DriverSelect> getGroupSelectByIds(@Param("groupIds") List<Long> groupIds);
+	
+	@Query(value = "SELECT tc_groups.id,tc_groups.name FROM tc_groups"
+			+ " WHERE tc_groups.id IN(:groupIds) and tc_groups.is_deleted is null and tc_groups.type IN(:type)",nativeQuery = true)
+	public List<DriverSelect> getGroupSelectByIdsByType(@Param("groupIds") List<Long> groupIds,@Param("type") List<String> type);
 	
 	@Query(value = "SELECT tc_groups.id,tc_groups.name FROM tc_groups"
 			+ " INNER JOIN tc_user_group ON tc_user_group.groupid = tc_groups.id"

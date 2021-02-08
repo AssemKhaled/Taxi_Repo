@@ -34,7 +34,6 @@ import com.example.examplequerydslspringdatajpamaven.entity.CustomPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
-import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.EventReport;
 import com.example.examplequerydslspringdatajpamaven.entity.EventReportByCurl;
@@ -1174,7 +1173,6 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		
 		List<Long>allDevices= new ArrayList<Long>();
 		List<Long>allDrivers= new ArrayList<Long>();
-		List<DriverSelect>allDevicesList= new ArrayList<DriverSelect>();
 
 		if(groupIds.length != 0) {
 			for(Long groupId:groupIds) {
@@ -1308,13 +1306,15 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			}
 		}
 		if(allDrivers.size()>0) {
-			allDevicesList.addAll(driverRepository.devicesOfDrivers(allDrivers));
+
+			List<Long> dri = new ArrayList<Long>();
+			for(Object obj : allDrivers.toArray()) {
+				dri.add(Long.valueOf(obj.toString()));
+			}
+			allDevices.addAll(driverRepository.devicesOfDrivers(dri));
 
 		}
-		for(DriverSelect object : allDevicesList) {
 
-			allDevices.add(object.getId());
-		}
 		
 		Date dateFrom;
 		Date dateTo;
@@ -1537,9 +1537,8 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 					List<Long> allDevices = deviceRepository.getDevicesUsers(usersIds);
 
 					if(search.equals("")) {
-						notifications = mongoEventsRepo.getNotificationsTodayByDeviceId(allDevices, offset);
-
-						//notifications = mongoEventsRepo.getNotificationsTodayByUserId(usersIds, offset);
+						//notifications = mongoEventsRepo.getNotificationsTodayByDeviceId(allDevices, offset);
+						notifications = mongoEventsRepo.getNotificationsTodayByUserId(usersIds, offset);
 //						if(notifications.size()>0) {
 //							size= mongoEventsRepo.getNotificationsTodaySize(allDevices);
 //								
@@ -1547,8 +1546,8 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 					}
 					else {
-						notifications = mongoEventsRepo.getNotificationsTodaySearchByDeviceId(allDevices,search, offset);
-						//notifications = mongoEventsRepo.getNotificationsTodaySearchByUserId(usersIds,search, offset);
+						//notifications = mongoEventsRepo.getNotificationsTodaySearchByDeviceId(allDevices,search, offset);
+						notifications = mongoEventsRepo.getNotificationsTodaySearchByUserId(usersIds,search, offset);
 //						if(notifications.size()>0) {
 //							size= mongoEventsRepo.getNotificationsTodaySizeSearch(allDevices,search);
 //								
@@ -2388,7 +2387,6 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 
 		List<Long>allDrivers= new ArrayList<>();
-		List<DriverSelect>allDevicesList= new ArrayList<DriverSelect>();
 		if(TOKEN.equals("")) {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",tripReport);
 				logger.info("************************ getDriveMoreThanReport ENDED ***************************");
@@ -2559,11 +2557,13 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			}
 		}
 		if(allDrivers.size()>0) {
-			allDevicesList.addAll(driverRepository.devicesOfDrivers(allDrivers));
-		}
-		
-		for(DriverSelect object : allDevicesList) {
-			allDevices.add(object.getId());
+
+			List<Long> dri = new ArrayList<Long>();
+			for(Object obj : allDrivers.toArray()) {
+				dri.add(Long.valueOf(obj.toString()));
+			}
+			allDevices.addAll(driverRepository.devicesOfDrivers(dri));
+
 		}
 		
 		if(deviceIds.length != 0 ) {
@@ -4021,7 +4021,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		List<StopReport> stopReport = new ArrayList<>();
 
 		List<Long>allDrivers= new ArrayList<>();
-		List<DriverSelect>allDevicesList= new ArrayList<DriverSelect>();
+
 		if(TOKEN.equals("")) {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",stopReport);
 			 logger.info("************************ getNumStopsReport ENDED ***************************");
@@ -4191,12 +4191,15 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				}
 			}
 		}
-		if(allDrivers.size()>0) {
-			allDevicesList.addAll(driverRepository.devicesOfDrivers(allDrivers));
-		}
 		
-		for(DriverSelect object : allDevicesList) {
-			allDevices.add(object.getId());
+		if(allDrivers.size()>0) {
+
+			List<Long> dri = new ArrayList<Long>();
+			for(Object obj : allDrivers.toArray()) {
+				dri.add(Long.valueOf(obj.toString()));
+			}
+			allDevices.addAll(driverRepository.devicesOfDrivers(dri));
+
 		}
 		
 		if(deviceIds.length != 0 ) {
@@ -4424,7 +4427,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		List<StopReport> stopReport = new ArrayList<>();
 
 		List<Long>allDrivers= new ArrayList<>();
-		List<DriverSelect>allDevicesList= new ArrayList<DriverSelect>();
+
 		if(TOKEN.equals("")) {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",stopReport);
 			 logger.info("************************ getTotalStopsReport ENDED ***************************");
@@ -4593,12 +4596,15 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				}
 			}
 		}
-		if(allDrivers.size()>0) {
-			allDevicesList.addAll(driverRepository.devicesOfDrivers(allDrivers));
-		}
 		
-		for(DriverSelect object : allDevicesList) {
-			allDevices.add(object.getId());
+		if(allDrivers.size()>0) {
+
+			List<Long> dri = new ArrayList<Long>();
+			for(Object obj : allDrivers.toArray()) {
+				dri.add(Long.valueOf(obj.toString()));
+			}
+			allDevices.addAll(driverRepository.devicesOfDrivers(dri));
+
 		}
 		
 		if(deviceIds.length != 0 ) {
@@ -4905,7 +4911,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		List<TripReport> tripReport = new ArrayList<>();
 
 		List<Long>allDrivers= new ArrayList<>();
-		List<DriverSelect>allDevicesList= new ArrayList<DriverSelect>();
+
 		if(TOKEN.equals("")) {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",tripReport);
 			 logger.info("************************ geTotalTripsReport ENDED ***************************");
@@ -5074,12 +5080,15 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				}
 			}
 		}
-		if(allDrivers.size()>0) {
-			allDevicesList.addAll(driverRepository.devicesOfDrivers(allDrivers));
-		}
 		
-		for(DriverSelect object : allDevicesList) {
-			allDevices.add(object.getId());
+		if(allDrivers.size()>0) {
+
+			List<Long> dri = new ArrayList<Long>();
+			for(Object obj : allDrivers.toArray()) {
+				dri.add(Long.valueOf(obj.toString()));
+			}
+			allDevices.addAll(driverRepository.devicesOfDrivers(dri));
+
 		}
 		
 		if(deviceIds.length != 0 ) {
@@ -5362,7 +5371,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		List<TripReport> tripReport = new ArrayList<>();
 
 		List<Long>allDrivers= new ArrayList<>();
-		List<DriverSelect>allDevicesList= new ArrayList<DriverSelect>();
+
 		if(TOKEN.equals("")) {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",tripReport);
 			 logger.info("************************ getNumTripsReport ENDED ***************************");
@@ -5529,12 +5538,15 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				}
 			}
 		}
-		if(allDrivers.size()>0) {
-			allDevicesList.addAll(driverRepository.devicesOfDrivers(allDrivers));
-		}
 		
-		for(DriverSelect object : allDevicesList) {
-			allDevices.add(object.getId());
+		if(allDrivers.size()>0) {
+
+			List<Long> dri = new ArrayList<Long>();
+			for(Object obj : allDrivers.toArray()) {
+				dri.add(Long.valueOf(obj.toString()));
+			}
+			allDevices.addAll(driverRepository.devicesOfDrivers(dri));
+
 		}
 		
 		if(deviceIds.length != 0 ) {
@@ -5903,7 +5915,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		
 		List<Long>allDevices= new ArrayList<>();
 		List<Long>allDrivers= new ArrayList<>();
-		List<DriverSelect>allDevicesList= new ArrayList<DriverSelect>();
+
 
 		if(groupIds.length != 0) {
 			for(Long groupId:groupIds) {
@@ -6029,12 +6041,14 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			}
 		}
 		if(allDrivers.size()>0) {
-			allDevicesList.addAll(driverRepository.devicesOfDrivers(allDrivers));
-		}
-		for(DriverSelect object : allDevicesList) {
-			allDevices.add(object.getId());
-		}
 
+			List<Long> dri = new ArrayList<Long>();
+			for(Object obj : allDrivers.toArray()) {
+				dri.add(Long.valueOf(obj.toString()));
+			}
+			allDevices.addAll(driverRepository.devicesOfDrivers(dri));
+
+		}
 
 		Date dateFrom;
 		Date dateTo;

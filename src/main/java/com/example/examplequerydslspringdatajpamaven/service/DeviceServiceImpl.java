@@ -2507,6 +2507,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					
 					return ResponseEntity.status(404).body(getObjectResponse);
 				}else {
+	    		    device.setUser_id(toUserId);
 					if(checkIfParent( device ,  loggedUser)) {
 					     User toUser = userService.findById(toUserId);
 					     if(toUser == null) {

@@ -20,7 +20,7 @@ public interface GroupsService {
 
 	public ResponseEntity<?> getGroupDevices(String TOKEN,Long groupId,String type);
 
-	public ResponseEntity<?> getGroupSelect(String TOKEN,Long loggedUserId,Long userId);
+	public ResponseEntity<?> getGroupSelect(String TOKEN,Long loggedUserId,Long userId,List<String> type);
 	public ResponseEntity<?> getGroupUnSelectOfCient(String TOKEN,Long loggedUserId,Long userId);
 
 

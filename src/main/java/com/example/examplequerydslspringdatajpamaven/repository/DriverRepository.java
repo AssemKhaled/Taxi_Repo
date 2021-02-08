@@ -128,10 +128,10 @@ public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslP
 			+ " and tc_drivers.id Not IN(Select tc_user_client_driver.driverid from tc_user_client_driver where tc_user_client_driver.userid !=:userId) ",nativeQuery = true)
 	public List<DriverSelect> getDriverUnSelectOfClient(@Param("loggedUserId") Long loggedUserId,@Param("userId")Long userId);
 	
-	@Query(value = "Select tc_device_driver.deviceid,tc_drivers.name from tc_device_driver " + 
+	@Query(value = "Select tc_device_driver.deviceid from tc_device_driver " + 
 			" INNER JOIN tc_drivers ON tc_device_driver.driverid=tc_drivers.id " + 
 			" where tc_drivers.id IN(:driverIds) and tc_drivers.delete_date is null ",nativeQuery = true)
-	public List<DriverSelect> devicesOfDrivers(@Param("driverIds") List<Long> driverIds);
+	public List<Long> devicesOfDrivers(@Param("driverIds") List<Long> driverIds);
 	
 	
 	@Query(value = "select * from tc_drivers " + 

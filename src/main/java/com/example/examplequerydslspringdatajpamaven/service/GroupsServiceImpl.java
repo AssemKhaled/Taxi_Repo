@@ -1450,7 +1450,7 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 	 * get group list selection
 	 */
 	@Override
-	public ResponseEntity<?> getGroupSelect(String TOKEN,Long loggedUserId, Long userId) {
+	public ResponseEntity<?> getGroupSelect(String TOKEN,Long loggedUserId, Long userId,List<String> type) {
 		logger.info("************************ getDriverSelect STARTED ***************************");
 		List<DriverSelect> drivers = new ArrayList<DriverSelect>();
 		if(TOKEN.equals("")) {
@@ -1472,7 +1472,15 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 	    				List<Long> groupIds = userClientGroupRepository.getGroupsIds(loggedUserId);
 
 						 if(groupIds.size()>0) {
-				    			drivers = groupRepository.getGroupSelectByIds(groupIds);
+							 if(type.size() > 0) {
+						    	drivers = groupRepository.getGroupSelectByIdsByType(groupIds,type);
+
+ 
+							 }
+							 else {
+						    	drivers = groupRepository.getGroupSelectByIds(groupIds);
+
+							 }
 
 						 }
 						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
@@ -1500,10 +1508,17 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 
 				    	List<Long> groupIds = userClientGroupRepository.getGroupsIds(userId);
 
-						 if(groupIds.size()>0) {
-				    			drivers = groupRepository.getGroupSelectByIds(groupIds);
+				    	if(groupIds.size()>0) {
+				    		if(type.size() > 0) {
+						    	drivers = groupRepository.getGroupSelectByIdsByType(groupIds,type);
 
-						 }
+							}
+							else {
+					    		drivers = groupRepository.getGroupSelectByIds(groupIds);
+
+							}
+
+						}
 						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
 						logger.info("************************ getDriverSelect ENDED ***************************");
 						return ResponseEntity.ok().body(getObjectResponse);
@@ -1519,8 +1534,15 @@ public class GroupsServiceImpl extends RestServiceController implements GroupsSe
 		   					 usersIds.add(object.getId());
 		   				 }
 		   			 }
+		   			 
+		   			 if(type.size() > 0) {
+			    			drivers = groupRepository.getGroupSelectByType(usersIds,type);		   				 
+
+		   			 }
+		   			 else {
+			    			drivers = groupRepository.getGroupSelect(usersIds);		   				 
+		   			 }
 	    			
-	    			drivers = groupRepository.getGroupSelect(usersIds);
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",drivers);
 					logger.info("************************ getDriverSelect ENDED ***************************");
 					return ResponseEntity.ok().body(getObjectResponse);
