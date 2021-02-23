@@ -52,9 +52,18 @@ public class CustomDeviceList{
 	private Boolean expired;
 	private String simcardNumber;
 	private String create_date;
+	private String update_date_elm;
 	private Long leftDays;
 	
 	
+
+	public String getUpdate_date_elm() {
+		return update_date_elm;
+	}
+
+	public void setUpdate_date_elm(String update_date_elm) {
+		this.update_date_elm = update_date_elm;
+	}
 
 	public Long getLeftDays() {
 		return leftDays;
@@ -144,7 +153,7 @@ public class CustomDeviceList{
 	
 	public CustomDeviceList(int id ,String deviceName,String simcardNumber,String uniqueId , String sequenceNumber,
 			String lastUpdate, String referenceKey , Boolean expired , String driverName ,
-			String companyName, Long companyId,String geofenceName ,String create_date ,Long leftDays ) {
+			String companyName, Long companyId,String geofenceName ,String create_date,String update_date_elm ,Long leftDays ) {
 		this.id = id;
 		this.deviceName = deviceName;
 		this.uniqueId = uniqueId;
@@ -158,6 +167,7 @@ public class CustomDeviceList{
 	    this.companyId = companyId;
 	    this.simcardNumber = simcardNumber;
 	    this.create_date = create_date;
+	    this.update_date_elm = update_date_elm;
 	    this.leftDays = leftDays;
 		
 	}

@@ -7,7 +7,8 @@ public class IndividualHijriElmData {
 	String extensionNumber;
 	String emailAddress;
 	String dateOfBirthHijri;
-	
+	String activity;
+
 	
 	public IndividualHijriElmData() {
 		super();
@@ -22,6 +23,19 @@ public class IndividualHijriElmData {
 		this.emailAddress = emailAddress;
 		this.dateOfBirthHijri = dateOfBirthHijri;
 	}
+	
+	
+	public IndividualHijriElmData(String identityNumber, String phoneNumber, String extensionNumber,
+			String emailAddress, String dateOfBirthHijri, String activity) {
+		super();
+		this.identityNumber = identityNumber;
+		this.phoneNumber = phoneNumber;
+		this.extensionNumber = extensionNumber;
+		this.emailAddress = emailAddress;
+		this.dateOfBirthHijri = dateOfBirthHijri;
+		this.activity = activity;
+	}
+
 	public String getIdentityNumber() {
 		return identityNumber;
 	}
@@ -51,6 +65,14 @@ public class IndividualHijriElmData {
 	}
 	public void setDateOfBirthHijri(String dateOfBirthHijri) {
 		this.dateOfBirthHijri = dateOfBirthHijri;
+	}
+
+	public String getActivity() {
+		return activity;
+	}
+
+	public void setActivity(String activity) {
+		this.activity = activity;
 	}
 	
 	

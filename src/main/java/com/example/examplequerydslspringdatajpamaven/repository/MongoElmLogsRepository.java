@@ -1,9 +1,12 @@
 package com.example.examplequerydslspringdatajpamaven.repository;
 
+import java.util.Date;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 
+import com.example.examplequerydslspringdatajpamaven.entity.MongoElmLiveLocation;
 import com.example.examplequerydslspringdatajpamaven.entity.MongoElmLogs;
 
 /**
@@ -12,6 +15,9 @@ import com.example.examplequerydslspringdatajpamaven.entity.MongoElmLogs;
  *
  */
 public interface MongoElmLogsRepository extends MongoRepository<MongoElmLogs, String>{
+	
+	@Query(value="{ '_id' : { $in: ?0 } }", delete = true)
+	public List<MongoElmLogs> deleteByIdIn(List<String> positionIds);
 	
 	public List<MongoElmLogs> findAllByUserIdIn(List<Long> userIds,Pageable pageable);
 	

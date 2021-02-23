@@ -16,9 +16,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationExpression;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperationContext;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.ComparisonOperators.Eq;
 import org.springframework.data.mongodb.core.aggregation.ComparisonOperators.Gt;
+import org.springframework.data.mongodb.core.aggregation.ComparisonOperators.Lte;
+import org.springframework.data.mongodb.core.aggregation.DateOperators;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Repository;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomMapData;
@@ -27,8 +31,11 @@ import com.example.examplequerydslspringdatajpamaven.entity.DeviceWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.LastElmData;
 import com.example.examplequerydslspringdatajpamaven.entity.LastPositionData;
+import com.example.examplequerydslspringdatajpamaven.entity.MongoElmLogs;
 import com.example.examplequerydslspringdatajpamaven.entity.TripPositions;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
@@ -47,6 +54,7 @@ import static org.springframework.data.mongodb.core.aggregation.ComparisonOperat
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.limit;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.count;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.replaceRoot;
+
 
 /**
  * Mongo manual queries on position collection
@@ -71,7 +79,7 @@ public class MongoPositionRepo {
 	            sort(Sort.Direction.DESC, "devicetime"),
 	            limit(5)
 	            
-	        );
+	    	).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 	    
 	        AggregationResults<BasicDBObject> groupResults
@@ -116,7 +124,7 @@ public class MongoPositionRepo {
 	            match(Criteria.where("deviceid").in(deviceId).and("devicetime").gte(start).lte(end)),
 	            project("deviceid","latitude","longitude").and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("devicetime")
 	            
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 	    
 	        AggregationResults<BasicDBObject> groupResults
@@ -151,6 +159,85 @@ public class MongoPositionRepo {
         
 		return positions;
 	}	
+	
+    public List<String> getElmLogsExpiredDays(Date time){
+	
+		List<String> data = new ArrayList<String>();
+		
+		BasicDBObject fromString = new BasicDBObject();
+		BasicDBObject dateFromString = new BasicDBObject();
+		
+		fromString.put("dateString", "$time");
+		fromString.put("format", "%Y-%m-%d %H:%M:%S");
+		dateFromString.put("$dateFromString", fromString);
+		
+		
+	    Aggregation aggregation = newAggregation(
+	    		project().and(new AggregationExpression() {
+					
+					@Override
+					public DBObject toDbObject(AggregationOperationContext context) {
+						// TODO Auto-generated method stub
+						return dateFromString;
+					}
+				}).as("date"),
+	    		match(Criteria.where("date").lt(time)),
+	    		limit(100)
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
+
+	    
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_elmLogs", BasicDBObject.class);
+	        
+            if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
+	            while (iterator.hasNext()) {
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
+	            	
+	            	if(object.containsField("_id") && object.get("_id") != null) {						
+						data.add(object.getObjectId("_id").toString());
+
+					}
+	            	
+	            	
+	            }
+	        }
+        
+		return data;
+	}	
+    
+    public List<String> getElmPositionsExpiredDays(Date time){
+    	
+		List<String> data = new ArrayList<String>();
+		
+	    Aggregation aggregation = newAggregation(
+	    		match(Criteria.where("servertime").lt(time)),
+	    		limit(100)
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
+
+	    
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
+	        
+            if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
+	            while (iterator.hasNext()) {
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
+	            	
+	            	if(object.containsField("_id") && object.get("_id") != null) {						
+						data.add(object.getObjectId("_id").toString());
+
+					}
+	            	
+	            	
+	            }
+	        }
+        
+		return data;
+	}	
+
 	public List<DeviceWorkingHours> getDeviceCustom(List<Long> allDevices,int offset,Date start,Date end,String custom,String value){
 
 		Calendar calendarFrom = Calendar.getInstance();
@@ -179,7 +266,7 @@ public class MongoPositionRepo {
 		            skip(offset),
 		            limit(10)
 		            
-		        );
+					).withOptions(newAggregationOptions().allowDiskUse(true).build());
 		}
 		else {
 			
@@ -209,7 +296,7 @@ public class MongoPositionRepo {
 		            skip(offset),
 		            limit(10)
 		            
-		        );
+					).withOptions(newAggregationOptions().allowDiskUse(true).build());
 		}
 		
 
@@ -307,7 +394,7 @@ public class MongoPositionRepo {
 		            project("deviceid","attributes","deviceName").and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("devicetime"),
 		    		sort(Sort.Direction.DESC, "devicetime")
 		            
-		        );
+					).withOptions(newAggregationOptions().allowDiskUse(true).build());
 		}
 		else {
 			if(custom.equals("priority") || custom.equals("sat") || custom.equals("event") || custom.equals("rssi")
@@ -332,7 +419,7 @@ public class MongoPositionRepo {
 			            project("deviceid","attributes","deviceName").and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("devicetime"),
 			    		sort(Sort.Direction.DESC, "devicetime")
 			            
-			        );
+						).withOptions(newAggregationOptions().allowDiskUse(true).build());
 		}
 		
 	    
@@ -431,7 +518,7 @@ public class MongoPositionRepo {
 		            project("deviceid","attributes","deviceName").and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("devicetime"),
 		    		sort(Sort.Direction.DESC, "devicetime"),
 		            count().as("size")
-		        );
+		    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 		}
 		else {
 			
@@ -458,7 +545,7 @@ public class MongoPositionRepo {
 		            project("deviceid","attributes","deviceName").and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("devicetime"),
 		    		sort(Sort.Direction.DESC, "devicetime"),
 		            count().as("size")
-		        );
+		    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 		}
 		
 
@@ -499,7 +586,7 @@ public class MongoPositionRepo {
 	            project("deviceid","attributes","speed","deviceName","weight").and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("devicetime"),
 	            sort(Sort.Direction.DESC, "devicetime"),
 	            count().as("size")
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 
 	        AggregationResults<BasicDBObject> groupResults
@@ -541,7 +628,7 @@ public class MongoPositionRepo {
 	            skip(offset),
 	            limit(10)
 	            
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 	    
 	        AggregationResults<BasicDBObject> groupResults
@@ -641,7 +728,7 @@ public class MongoPositionRepo {
 	            project("deviceid","attributes","speed","deviceName","weight").and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("devicetime"),
 	            sort(Sort.Direction.DESC, "devicetime")
 	            
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 	    
 	        AggregationResults<BasicDBObject> groupResults
@@ -769,7 +856,7 @@ public class MongoPositionRepo {
 	            limit(10)
 	            
 
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 	        AggregationResults<BasicDBObject> groupResults
 	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
@@ -839,7 +926,7 @@ public class MongoPositionRepo {
 	            skip(offset),
 	            limit(10)
 	            
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 
 	        AggregationResults<BasicDBObject> groupResults
@@ -922,7 +1009,7 @@ public class MongoPositionRepo {
 	            skip(offset),
 	            limit(10)
 	            
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 	    
 	        AggregationResults<BasicDBObject> groupResults
@@ -999,7 +1086,7 @@ public class MongoPositionRepo {
 	            group("deviceid","devicetime").last("$$ROOT").as("test"),
 	            replaceRoot("test"),
 	            sort(Sort.Direction.DESC, "devicetime")
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 	    
 	        AggregationResults<BasicDBObject> groupResults
@@ -1083,7 +1170,7 @@ public class MongoPositionRepo {
 	            replaceRoot("test"),
 	            sort(Sort.Direction.DESC, "devicetime")
 	            
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 	    
 	        AggregationResults<BasicDBObject> groupResults
@@ -1163,7 +1250,7 @@ public class MongoPositionRepo {
 	            sort(Sort.Direction.DESC, "devicetime"),
 	            count().as("size")
 	            
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 
 	        AggregationResults<BasicDBObject> groupResults
@@ -1203,7 +1290,7 @@ public class MongoPositionRepo {
 	            sort(Sort.Direction.DESC, "devicetime"),
 	            count().as("size")
 	            
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 
 	        AggregationResults<BasicDBObject> groupResults
@@ -1235,7 +1322,7 @@ public class MongoPositionRepo {
 	            skip(0),
 	            limit(1)
 	            
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 	    
 	        AggregationResults<BasicDBObject> groupResults
@@ -1368,7 +1455,7 @@ public class MongoPositionRepo {
 	            skip(0),
 	            limit(10)
 	            
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 	    
 	        AggregationResults<BasicDBObject> groupResults
@@ -1499,7 +1586,7 @@ public class MongoPositionRepo {
 	            skip(0),
 	            limit(10)
 	            
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 	    
 	        AggregationResults<BasicDBObject> groupResults
@@ -1637,7 +1724,7 @@ public class MongoPositionRepo {
 	            skip(0),
 	            limit(10)
 	            
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 	    
 	        AggregationResults<BasicDBObject> groupResults
@@ -1685,7 +1772,7 @@ public class MongoPositionRepo {
 	            skip(0),
 	            limit(10)
 
-	        );
+				).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 	        AggregationResults<BasicDBObject> groupResults
 	            = mongoTemplate.aggregate(aggregation,"tc_elmLogs", BasicDBObject.class);
@@ -1735,7 +1822,7 @@ public class MongoPositionRepo {
 	            count().as("size")
 
 	            
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 
 	        AggregationResults<BasicDBObject> groupResults
@@ -1793,7 +1880,7 @@ public class MongoPositionRepo {
 	            match(Criteria.where("_id").in(ids).and("devicetime").gte(dateFrom).lte(dateTo).and("attributes."+attr).in(value)),
 	            count().as("size")
    
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 
 	        AggregationResults<BasicDBObject> groupResults
@@ -1830,7 +1917,7 @@ public class MongoPositionRepo {
 	            count().as("size")
 
 	            
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 
 	        AggregationResults<BasicDBObject> groupResults
@@ -1866,7 +1953,7 @@ public class MongoPositionRepo {
 	            match(Criteria.where("_id").in(ids).and("speed").in(0)),
 	            count().as("size")
      
-	       );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 
 	        AggregationResults<BasicDBObject> groupResults
@@ -1909,7 +1996,7 @@ public class MongoPositionRepo {
 	            sort(Sort.Direction.DESC, "servertime")
 
 	            
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 	    
 
@@ -2052,7 +2139,7 @@ public class MongoPositionRepo {
 	            sort(Sort.Direction.DESC, "servertime")
 
 	            
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 	    
 
@@ -2193,7 +2280,7 @@ public class MongoPositionRepo {
  	            sort(Sort.Direction.DESC, "servertime")
 
  	            
- 	        );
+ 	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 
 

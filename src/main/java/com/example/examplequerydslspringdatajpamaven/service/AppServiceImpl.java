@@ -2,6 +2,10 @@ package com.example.examplequerydslspringdatajpamaven.service;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,8 +21,15 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import javax.net.ssl.SSLContext;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,10 +38,14 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -92,6 +107,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 	private static final Log logger = LogFactory.getLog(AppServiceImpl.class);
 	private GetObjectResponse getObjectResponse;
+	
+	@Value("${urlSession}")
+	private String urlSession;
 	
 	@Autowired
 	private TokenSecurity tokenSecurity;
@@ -180,13 +198,13 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	 * login of app
 	 */
 	@Override
-	public ResponseEntity<?> loginApp(String authtorization) {
+	public ResponseEntity<?> loginApp(String authorization) {
 		
 		logger.info("************************ Login STARTED ***************************");
-		if(authtorization != "" && authtorization.toLowerCase().startsWith("basic")) {
+		if(authorization != "" && authorization.toLowerCase().startsWith("basic")) {
 			
 			 
-			String base64Credentials = authtorization.substring("Basic".length()).trim();
+			String base64Credentials = authorization.substring("Basic".length()).trim();
 			byte[] credDecoded = Base64.getDecoder().decode(base64Credentials);
 			String credentials = new String(credDecoded, StandardCharsets.UTF_8);
 			final String[] values = credentials.split(":", 2);
@@ -230,16 +248,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				
 				List<Map> loggedUser = new ArrayList<>();
 				loggedUser.add(userInfo);
-				SimpleDateFormat FORMATTER = new SimpleDateFormat("yyyy-MM-dd  HH:MM:ss");
-		    	TimeZone etTimeZone = TimeZone.getTimeZone("Asia/Riyadh"); 
-		         
-		        Date currentDate = new Date();
-		        String requestLastUpdate = FORMATTER.format(currentDate);
-//			    TokenSecurity.getInstance().addActiveUser(user.getId(),token,requestLastUpdate); 
-		        
-		        //TokenSecurity.getInstance().addActiveUser(user.getId(),token); 
+				
 		        tokenSecurity.addActiveUser(user.getId(),token); 
-
+		        loginTraccarApp(authorization);
 				getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",loggedUser);
 				logger.info("************************ Login ENDED ***************************");
 				
@@ -275,11 +286,12 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
 		else {
-			  //Boolean removed = TokenSecurity.getInstance().removeActiveUser(TOKEN);
+
 			  Boolean removed = tokenSecurity.removeActiveUser(TOKEN);
 
 			  if(removed) {
 				  List<User> loggedUser = null ;
+
 				  getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "loggedOut successfully",loggedUser);
 				  logger.info("************************ Login ENDED ***************************");
 					 return  ResponseEntity.ok().body(getObjectResponse);
@@ -10375,7 +10387,6 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		}
 		else {
 			
-			//Boolean removed = TokenSecurity.getInstance().removeActiveUser(TOKEN);
 			Boolean removed = tokenSecurity.removeActiveUser(TOKEN);
 
 			if(removed) {
@@ -10425,6 +10436,10 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 						}
 					}
 	            }
+				if(data.containsKey("email") && data.containsKey("password")) {
+					logoutTraccarApp(data.get("email").toString(),data.get("password").toString());
+
+				}
 				getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "loggedOut successfully",null);
 				logger.info("************************ Logout ENDED ***************************");
 				return  ResponseEntity.ok().body(getObjectResponse);
@@ -10437,5 +10452,169 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			}
 		}
 	}
+
+	@Override
+	public Boolean loginTraccarApp(String authorization) {
+		// TODO Auto-generated method stub
+		
+		TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+
+		SSLContext sslContext = null;
+		try {
+			sslContext = org.apache.http.ssl.SSLContexts.custom()
+			        .loadTrustMaterial(null, acceptingTrustStrategy)
+			        .build();
+		} catch (KeyManagementException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (KeyStoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
+
+		CloseableHttpClient httpClient = HttpClients.custom()
+		        .setSSLSocketFactory(csf)
+		        .build();
+
+		HttpComponentsClientHttpRequestFactory requestFactory =
+		        new HttpComponentsClientHttpRequestFactory();
+
+		requestFactory.setHttpClient(httpClient);
+		
+		String base64Credentials = authorization.substring("Basic".length()).trim();
+		byte[] credDecoded = Base64.getDecoder().decode(base64Credentials);
+		String credentials = new String(credDecoded, StandardCharsets.UTF_8);
+
+		final String[] values = credentials.split(":", 2);
+		String email = values[0].toString();
+		String password = values[1].toString();
+
+
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+		MultiValueMap<String, String> map= new LinkedMultiValueMap<String, String>();
+		map.add("email", email);
+		map.add("password", password);
+		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
+
+		
+	    String URL = urlSession;
+	    RestTemplate restTemplate = new RestTemplate(requestFactory);
+	    restTemplate.getMessageConverters()
+        .add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
+    
+	    
+
+		ResponseEntity<String> rateResponse = null;
+		
+		try {
+
+			rateResponse = restTemplate.exchange(URL, HttpMethod.POST, request, String.class);
+			
+			if (rateResponse.getStatusCode() == HttpStatus.OK) {
+
+				return true;
+				
+			}
+			else {
+
+				return false;
+
+			}
+			
+		} catch (Exception e) {
+			
+			return false;
+
+        }
+		
+	}
+
+	@Override
+	public Boolean logoutTraccarApp(String email,String password) {
+		// TODO Auto-generated method stub
+		
+
+		TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+
+		SSLContext sslContext = null;
+		try {
+			sslContext = org.apache.http.ssl.SSLContexts.custom()
+			        .loadTrustMaterial(null, acceptingTrustStrategy)
+			        .build();
+		} catch (KeyManagementException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (KeyStoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
+
+		CloseableHttpClient httpClient = HttpClients.custom()
+		        .setSSLSocketFactory(csf)
+		        .build();
+
+		HttpComponentsClientHttpRequestFactory requestFactory =
+		        new HttpComponentsClientHttpRequestFactory();
+
+		requestFactory.setHttpClient(httpClient);
+		
+	
+		String plainCreds = email+":"+password;
+		
+		byte[] plainCredsBytes = plainCreds.getBytes();
+		
+		byte[] base64CredsBytes = Base64.getEncoder().encode(plainCredsBytes);
+		String base64Creds = new String(base64CredsBytes);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", "Basic " + base64Creds);
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+	    HttpEntity<String> request = new HttpEntity<String>(headers);
+
+		
+	    String URL = urlSession;
+	    RestTemplate restTemplate = new RestTemplate(requestFactory);
+	    restTemplate.getMessageConverters()
+        .add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
+    
+	    
+
+		ResponseEntity<String> rateResponse = null;
+		
+		try {
+
+			rateResponse = restTemplate.exchange(URL, HttpMethod.DELETE, request, String.class);
+			
+			if (rateResponse.getStatusCode() == HttpStatus.NO_CONTENT) {
+
+				return true;
+				
+			}
+			else {
+				return false;
+
+			}
+			
+		} catch (Exception e) {
+			return false;
+
+        }
+		
+	}
+
+	
 
 }

@@ -34,9 +34,10 @@ public class NotificationsRestController {
 	
 	@PostMapping(path ="/createNotification")
 	public ResponseEntity<?> createNotification(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			@RequestParam (value = "userId",defaultValue = "0") Long userId,
-            @RequestBody(required = false) Notification notification) {
-			 return notificationServiceImpl.createNotification(TOKEN, notification,userId);				
+												@RequestParam (value = "userId",defaultValue = "0") Long userId,
+									            @RequestBody(required = false) Notification notification,
+									            @RequestHeader(value = "Authorization", defaultValue = "")String authorization) {
+		return notificationServiceImpl.createNotification(TOKEN,authorization,notification,userId);				
 	}
 	
 	@RequestMapping(value = "/getAllNotifications", method = RequestMethod.GET)
@@ -62,10 +63,11 @@ public class NotificationsRestController {
 	@RequestMapping(value = "/editNotification", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<?> editNotification(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 			                                            @RequestBody(required = false) Notification notification,
-			                                            @RequestParam (value = "userId", defaultValue = "0") Long id) {
+			                                            @RequestParam (value = "userId", defaultValue = "0") Long id,
+			                                            @RequestHeader(value = "Authorization", defaultValue = "")String authorization) {
 		
 		
-		return notificationServiceImpl.editNotification(TOKEN,notification,id);
+		return notificationServiceImpl.editNotification(TOKEN,authorization,notification,id);
 
 	}
 	

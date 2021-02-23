@@ -17,8 +17,9 @@ import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
  */
 @Service
 public interface AppService {
-	
-	public ResponseEntity<?> loginApp(String authtorization);
+	public Boolean logoutTraccarApp(String email , String password);
+	public Boolean loginTraccarApp(String authorization);
+	public ResponseEntity<?> loginApp(String authorization);
 	public ResponseEntity<?> logoutApp(String TOKEN);
 
 	public ResponseEntity<?> getAllDeviceLiveDataMapApp(String TOKEN,Long userId);
@@ -27,7 +28,7 @@ public interface AppService {
 	public ResponseEntity<?>  getDevicesListApp(String TOKEN,Long userId , int offset, String search);
 	public ResponseEntity<?> createDeviceApp(String TOKEN,Device device,Long userId);
 	public ResponseEntity<?> editDeviceApp(String TOKEN,Device device,Long userId);
-	public  ResponseEntity<?> deleteDeviceApp(String TOKEN,Long userId, Long deviceId);
+	public ResponseEntity<?> deleteDeviceApp(String TOKEN,Long userId, Long deviceId);
 	public ResponseEntity<?>  findDeviceByIdApp(String TOKEN,Long deviceId,Long userId);
 	public ResponseEntity<?> assignDeviceToDriverApp(String TOKEN,Long deviceId , Long driverId , Long userId);
 	public ResponseEntity<?> assignGeofencesToDeviceApp(String TOKEN,Long deviceId,Long [] geoIds,Long userId );

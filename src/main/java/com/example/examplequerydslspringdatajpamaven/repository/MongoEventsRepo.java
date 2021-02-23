@@ -4,6 +4,7 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.coun
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.limit;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregationOptions;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.skip;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.sort;
@@ -60,7 +61,7 @@ public class MongoEventsRepo {
 	            project("deviceid","attributes","type","positionid","deviceName","driverName","attributes.alarm").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime"),
 	            sort(Sort.Direction.DESC, "servertime"),
 	            count().as("size")
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 	    
 
@@ -102,7 +103,7 @@ public class MongoEventsRepo {
 	            project("deviceid","attributes","type","positionid","deviceName","driverName","attributes.alarm").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime"),
 	            sort(Sort.Direction.DESC, "servertime"),
 	            count().as("size")
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 	    
 
@@ -144,7 +145,7 @@ public class MongoEventsRepo {
 	            project("deviceid","attributes","type","positionid","deviceName","driverName","attributes.alarm").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime"),
 	            sort(Sort.Direction.DESC, "servertime")
 	            
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 	    
 
@@ -254,7 +255,7 @@ public class MongoEventsRepo {
 	            project("deviceid","attributes","type","positionid","deviceName","driverName","attributes.alarm").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime"),
 	            sort(Sort.Direction.DESC, "servertime")
 	            
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 
 
@@ -369,7 +370,7 @@ public class MongoEventsRepo {
 	            sort(Sort.Direction.DESC, "servertime"),
 	            skip(offset),
 	            limit(10)
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 	    
 
@@ -483,7 +484,7 @@ public class MongoEventsRepo {
 	            sort(Sort.Direction.DESC, "servertime"),
 	            skip(offset),
 	            limit(10)
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 	    
 
@@ -614,7 +615,7 @@ public class MongoEventsRepo {
 	            match(Criteria.where("deviceid").in(allDevices).and("servertime").gte(dateFrom).lte(dateTo)),
 	            project("deviceid","attributes","type","positionid").and("servertime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("servertime"),
 	            sort(Sort.Direction.DESC, "servertime")            
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 
 	        AggregationResults<BasicDBObject> groupResults
@@ -726,7 +727,7 @@ public class MongoEventsRepo {
 	            skip(offset),
 	            limit(10)
 	            
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 
 	        AggregationResults<BasicDBObject> groupResults
@@ -857,7 +858,7 @@ public class MongoEventsRepo {
 	            skip(offset),
 	            limit(10)
 	            
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 
 	        AggregationResults<BasicDBObject> groupResults
@@ -995,7 +996,7 @@ public class MongoEventsRepo {
 	            skip(offset),
 	            limit(10)
 	            
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 	        AggregationResults<BasicDBObject> groupResults
 	            = mongoTemplate.aggregate(aggregation,"tc_events", BasicDBObject.class);
@@ -1134,7 +1135,7 @@ public class MongoEventsRepo {
 	            skip(offset),
 	            limit(10)
 	            
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 	        AggregationResults<BasicDBObject> groupResults
 	            = mongoTemplate.aggregate(aggregation,"tc_events", BasicDBObject.class);
@@ -1264,7 +1265,7 @@ public class MongoEventsRepo {
 	            sort(Sort.Direction.DESC, "servertime"),
 	            count().as("size")
 	            
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 	        AggregationResults<BasicDBObject> groupResults
 	            = mongoTemplate.aggregate(aggregation,"tc_events", BasicDBObject.class);
@@ -1331,7 +1332,7 @@ public class MongoEventsRepo {
 	            sort(Sort.Direction.DESC, "servertime"),
 	            count().as("size")
 	            
-	        );
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 	        AggregationResults<BasicDBObject> groupResults
 	            = mongoTemplate.aggregate(aggregation,"tc_events", BasicDBObject.class);
@@ -1349,5 +1350,37 @@ public class MongoEventsRepo {
 	        
 		return size;
 	}
+	
+
+	public List<String> getElmEventsExpiredDays(Date time){
+    	
+		List<String> data = new ArrayList<String>();
+		
+	    Aggregation aggregation = newAggregation(
+	    		match(Criteria.where("servertime").lt(time)),
+	    		limit(100)
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
+
+	    
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(aggregation,"tc_events", BasicDBObject.class);
+
+            if(groupResults.getMappedResults().size() > 0) {
+	        	
+	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
+	            while (iterator.hasNext()) {
+	            	BasicDBObject object = (BasicDBObject) iterator.next();
+	            	
+	            	if(object.containsField("_id") && object.get("_id") != null) {						
+						data.add(object.getObjectId("_id").toString());
+
+					}
+	            	
+	            	
+	            }
+	        }
+        
+		return data;
+	}	
 	
 }

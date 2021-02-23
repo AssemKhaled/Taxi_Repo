@@ -4374,28 +4374,29 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 				  int count=0;
 				  Map devicesStatus = new HashMap();
+
+				  devicesStatus.put("deviceName", null);
+				  devicesStatus.put("deviceId" ,null);
+				  devicesStatus.put("driverName", null);
+				  devicesStatus.put("driverUniqueId",null);
+				  
+				  devicesStatus.put("stops" ,count);
+				  
+				  Device device= deviceServiceImpl.findById(dev);
+				  
+			      devicesStatus.put("deviceName", device.getName());
+				  devicesStatus.put("deviceId" ,device.getId());
+				  Set<Driver>  drivers = device.getDriver();
+
+				  for(Driver driver : drivers ) {
+
+					  devicesStatus.put("driverName", driver.getName());
+					  devicesStatus.put("driverUniqueId", driver.getUniqueid());
+					  
+				  }
+				  
 				  for(StopReport stop: stopReport) {
 
-
-					  devicesStatus.put("deviceName", null);
-					  devicesStatus.put("deviceId" ,null);
-					  devicesStatus.put("driverName", null);
-					  devicesStatus.put("driverUniqueId",null);
-					  devicesStatus.put("stops" ,count);
-					  
-					  Device device= deviceServiceImpl.findById(dev);
-					  
-				      devicesStatus.put("deviceName", device.getName());
-					  devicesStatus.put("deviceId" ,device.getId());
-					  Set<Driver>  drivers = device.getDriver();
-
-					  for(Driver driver : drivers ) {
-
-						  devicesStatus.put("driverName", driver.getName());
-						  devicesStatus.put("driverUniqueId", driver.getUniqueid());
-						  
-					  }
-					  
 
 					  if((long) stop.getDeviceId() == (long) dev) {
 
@@ -4789,37 +4790,36 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 					  duplicateAddressList.clear();
 
 					  Map devicesStatus = new HashMap();
+					  
+					  devicesStatus.put("deviceName", null);
+					  devicesStatus.put("deviceId" ,null);
+					  devicesStatus.put("driverName", null);
+					  devicesStatus.put("driverUniqueId",null);
+					  
+					  devicesStatus.put("totalDuration", totalDuration);
+				      devicesStatus.put("totalEngineHours", totalEngineHours);
+				      devicesStatus.put("totalSpentFuel", roundOffFuel);
+					  devicesStatus.put("totalVisitedPlace" ,0);
+					  
+					  Device device= deviceServiceImpl.findById(dev);
+					  
+				      devicesStatus.put("deviceName", device.getName());
+					  devicesStatus.put("deviceId" ,device.getId());
+					  Set<Driver>  drivers = device.getDriver();
+
+					  for(Driver driver : drivers ) {
+
+						  devicesStatus.put("driverName", driver.getName());
+						  devicesStatus.put("driverUniqueId", driver.getUniqueid());
+						  
+					  }
+					  
 					  for(StopReport stopReportOne: stopReport) {
 						 
 						  
 						  if((long) stopReportOne.getDeviceId() == (long) dev) {
-							  
-							  
-							  devicesStatus.put("deviceName", null);
-							  devicesStatus.put("deviceId" ,null);
-							  devicesStatus.put("driverName", null);
-							  devicesStatus.put("driverUniqueId",null);
-							  
-							  devicesStatus.put("totalDuration", totalDuration);
-						      devicesStatus.put("totalEngineHours", totalEngineHours);
-						      devicesStatus.put("totalSpentFuel", roundOffFuel);
-							  devicesStatus.put("totalVisitedPlace" ,0);
 
-							  
-							  Device device= deviceServiceImpl.findById(dev);
-							  
-						      devicesStatus.put("deviceName", device.getName());
-							  devicesStatus.put("deviceId" ,device.getId());
-							  Set<Driver>  drivers = device.getDriver();
 
-							  for(Driver driver : drivers ) {
-
-								  devicesStatus.put("driverName", driver.getName());
-								  devicesStatus.put("driverUniqueId", driver.getUniqueid());
-								  
-							  }
-							  
-							  
 							  if(stopReportOne.getAddress() != null && stopReportOne.getAddress() != "") {
 								  duplicateAddressList.add(stopReportOne.getAddress());
 							  
@@ -4887,7 +4887,11 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 					  }
 					  Map<String, Long> couterMap = duplicateAddressList.stream().collect(Collectors.groupingBy(e -> e.toString(),Collectors.counting()));
 					  devicesStatus.put("totalVisitedPlace" ,couterMap.size());
-					  data.add(devicesStatus);
+					  
+					  
+					  if(devicesStatus.size() > 0) {
+						  data.add(devicesStatus);
+					  }
 
 				  }
 				  
@@ -5269,27 +5273,30 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				  String totalDuration = "00:00:00";
 
 				  Map devicesStatus = new HashMap();
+				  
+				  devicesStatus.put("deviceName", null);
+				  devicesStatus.put("deviceId" ,null);
+				  devicesStatus.put("driverName", null);
+				  devicesStatus.put("driverUniqueId",null);
+				  
+				  devicesStatus.put("totalDrivingHours",totalDuration);
+			      devicesStatus.put("totalDistance", roundOffDistance);
+			      devicesStatus.put("totalSpentFuel", roundOffFuel);
+			      
+			      Device device= deviceServiceImpl.findById(dev);
+				  
+			      devicesStatus.put("deviceName", device.getName());
+				  devicesStatus.put("deviceId" ,device.getId());
+				  Set<Driver>  drivers = device.getDriver();
+
+				  for(Driver driver : drivers ) {
+
+					  devicesStatus.put("driverName", driver.getName());
+					  devicesStatus.put("driverUniqueId", driver.getUniqueid());
+					  
+				  }
+				  
 				  for(TripReport tripReportOne: tripReport) {
-					  devicesStatus.put("deviceName", null);
-					  devicesStatus.put("deviceId" ,null);
-					  devicesStatus.put("driverName", null);
-					  devicesStatus.put("driverUniqueId",null);
-					  devicesStatus.put("totalDrivingHours",totalDuration);
-				      devicesStatus.put("totalDistance", roundOffDistance);
-				      devicesStatus.put("totalSpentFuel", roundOffFuel);
-					  
-					  Device device= deviceServiceImpl.findById(dev);
-					  
-				      devicesStatus.put("deviceName", device.getName());
-					  devicesStatus.put("deviceId" ,device.getId());
-					  Set<Driver>  drivers = device.getDriver();
-
-					  for(Driver driver : drivers ) {
-
-						  devicesStatus.put("driverName", driver.getName());
-						  devicesStatus.put("driverUniqueId", driver.getUniqueid());
-						  
-					  }
 					  
 					  if((long) tripReportOne.getDeviceId() == (long) dev) {
 						  if(tripReportOne.getDistance() != null && tripReportOne.getDistance() != "") {
@@ -5346,7 +5353,9 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				      
 					  
 				  }
-				  data.add(devicesStatus);
+				  if(devicesStatus.size() > 0) {
+					  data.add(devicesStatus);
+				  }
 
 			  }
 			  
@@ -5721,36 +5730,37 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 				  int count=0;
 				  Map devicesStatus = new HashMap();
-				  for(TripReport trip: tripReport) {
+				  
+				  devicesStatus.put("deviceName", null);
+				  devicesStatus.put("deviceId" ,null);
+				  devicesStatus.put("driverName", null);
+				  devicesStatus.put("driverUniqueId",null);
+				  
+				  devicesStatus.put("trips" ,count);
+				  
+				  Device device= deviceServiceImpl.findById(dev);
+				  
+			      devicesStatus.put("deviceName", device.getName());
+				  devicesStatus.put("deviceId" ,device.getId());
+				  Set<Driver>  drivers = device.getDriver();
 
+				  for(Driver driver : drivers ) {
 
-					  devicesStatus.put("deviceName", null);
-					  devicesStatus.put("deviceId" ,null);
-					  devicesStatus.put("driverName", null);
-					  devicesStatus.put("driverUniqueId",null);
-					  devicesStatus.put("trips" ,count);
+					  devicesStatus.put("driverName", driver.getName());
+					  devicesStatus.put("driverUniqueId", driver.getUniqueid());
 					  
-					  Device device= deviceServiceImpl.findById(dev);
-					  
-				      devicesStatus.put("deviceName", device.getName());
-					  devicesStatus.put("deviceId" ,device.getId());
-					  Set<Driver>  drivers = device.getDriver();
-
-					  for(Driver driver : drivers ) {
-
-						  devicesStatus.put("driverName", driver.getName());
-						  devicesStatus.put("driverUniqueId", driver.getUniqueid());
-						  
-					  }
-					  
-					  
+				  }
+				  
+				  for(TripReport trip: tripReport) {  
 					  if((long) trip.getDeviceId() == (long) dev) {
 						  
 						  count= count+1;
 						  devicesStatus.put("trips" ,count);
 					  }
 				  }
-				  data.add(devicesStatus);
+				  if(devicesStatus.size() > 0) {
+					  data.add(devicesStatus);
+				  }
 
 			  }
 			  
@@ -6202,7 +6212,9 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 						      devicesStatus.put("totalHours", totalHours);
 						  }
 					  }
-					  dataAll.add(devicesStatus);
+					  if(devicesStatus.size() > 0) {
+						  dataAll.add(devicesStatus);
+					  }
 
 				  }
 				 
@@ -6213,7 +6225,6 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",dataAll,dataAll.size());
 			logger.info("************************ getNumberDriverWorkingHours ENDED ***************************");
 			return  ResponseEntity.ok().body(getObjectResponse);
-			
 			
 			
 	}

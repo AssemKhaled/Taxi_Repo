@@ -7,7 +7,8 @@ public class IndividualGregorianElmData {
 	String extensionNumber;
 	String emailAddress;
 	String dateOfBirthGregorian;
-	
+	String activity;
+
 	public IndividualGregorianElmData() {
 		super();
 	}
@@ -22,6 +23,17 @@ public class IndividualGregorianElmData {
 		this.dateOfBirthGregorian = dateOfBirthGregorian;
 	}
 	
+	public IndividualGregorianElmData(String identityNumber, String phoneNumber, String extensionNumber,
+			String emailAddress, String dateOfBirthGregorian, String activity) {
+		super();
+		this.identityNumber = identityNumber;
+		this.phoneNumber = phoneNumber;
+		this.extensionNumber = extensionNumber;
+		this.emailAddress = emailAddress;
+		this.dateOfBirthGregorian = dateOfBirthGregorian;
+		this.activity = activity;
+	}
+
 	public String getIdentityNumber() {
 		return identityNumber;
 	}
@@ -51,6 +63,14 @@ public class IndividualGregorianElmData {
 	}
 	public void setDateOfBirthGregorian(String dateOfBirthGregorian) {
 		this.dateOfBirthGregorian = dateOfBirthGregorian;
+	}
+
+	public String getActivity() {
+		return activity;
+	}
+
+	public void setActivity(String activity) {
+		this.activity = activity;
 	}
 	
 	

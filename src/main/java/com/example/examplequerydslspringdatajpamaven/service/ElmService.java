@@ -27,6 +27,9 @@ public interface ElmService {
 
 	public ResponseEntity<?> lastLocations();
 	public ResponseEntity<?> getExpiredVehicles();
+	public ResponseEntity<?> getRemoveOldLogs();
+	public ResponseEntity<?> getRemoveOldPositions();
+	public ResponseEntity<?> getRemoveOldEvents();
 	public ResponseEntity<?> checkBySequenceNumber(String sequenceNumber);
 
 	public ResponseEntity<?> getLogs(String TOKEN,Long id,Long userId,Long driverId,Long deviceId,int offset,String search);

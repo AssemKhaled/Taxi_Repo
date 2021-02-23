@@ -8,6 +8,7 @@ import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -59,8 +60,11 @@ import com.example.examplequerydslspringdatajpamaven.repository.DriverRepository
 import com.example.examplequerydslspringdatajpamaven.repository.MongoElmLastLocationsRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoElmLiveLocationRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoElmLogsRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.MongoEventsRepo;
+import com.example.examplequerydslspringdatajpamaven.repository.MongoEventsRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionRepo;
 import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionsElmRepository;
+import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionsRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserClientDeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserClientDriverRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
@@ -100,28 +104,37 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	private String elm;
 	
 	@Autowired
-	MongoPositionsElmRepository mongoPositionsElmRepository;
+	private MongoPositionsElmRepository mongoPositionsElmRepository;
 	
 	@Autowired
-	MongoElmLiveLocationRepository mongoElmLiveLocationRepository;
+	private MongoElmLiveLocationRepository mongoElmLiveLocationRepository;
 	
 	@Autowired
-	MongoPositionRepo mongoPositionRepo;
+	MongoEventsRepository mongoEventsRepository;
+	
+	@Autowired
+	private MongoPositionRepo mongoPositionRepo;
+	
+	@Autowired
+	private MongoEventsRepo mongoEventsRepo;
 	
 	@Autowired
 	private MongoElmLogsRepository elmLogsRepository;
 	
 	@Autowired
-	UserClientDeviceRepository userClientDeviceRepository;
+	private UserClientDeviceRepository userClientDeviceRepository;
 	
 	@Autowired
-	UserClientDriverRepository userClientDriverRepository;
+	private UserClientDriverRepository userClientDriverRepository;
 	
 	@Autowired
 	private UserServiceImpl userService;
 	
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	MongoPositionsRepository mongoPositionsRepository;
 	
 	@Autowired
 	private MongoElmLastLocationsRepository elmLastLocationsRepository;
@@ -596,6 +609,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			  companyElmData.setIdentityNumber(user.getIdentity_num());
 			  companyElmData.setPhoneNumber(user.getCompany_phone());
 			  
+			  companyElmData.setActivity("DEFAULT");
 
 			  bodyToMiddleWare.put("dataObject", companyElmData);
 
@@ -610,10 +624,9 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				  individualHijriElmData.setIdentityNumber(user.getIdentity_num());
 				  individualHijriElmData.setPhoneNumber(user.getCompany_phone());
 				  individualHijriElmData.setDateOfBirthHijri(user.getDateOfBirth());
-				  
+				  individualHijriElmData.setActivity("DEFAULT");
 				  
 				  bodyToMiddleWare.put("dataObject", individualHijriElmData);
-
 
 			  }
 			  else {
@@ -624,10 +637,9 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				  individualGregorianElmData.setIdentityNumber(user.getIdentity_num());
 				  individualGregorianElmData.setPhoneNumber(user.getCompany_phone());
 				  individualGregorianElmData.setDateOfBirthGregorian(user.getDateOfBirth());
-				 
-				  
-				  bodyToMiddleWare.put("dataObject", individualGregorianElmData);
+				  individualGregorianElmData.setActivity("DEFAULT");
 
+				  bodyToMiddleWare.put("dataObject", individualGregorianElmData);
 
 			  }
 
@@ -4676,10 +4688,99 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 
 
+	@Override
+	public ResponseEntity<?> getRemoveOldLogs() {
+		// TODO Auto-generated method stub
+		logger.info("************************ removed logs STARTED ***************************");
+
+		Date date= new Date();
+	
+		Calendar calendarFrom = Calendar.getInstance();
+		calendarFrom.setTime(date);
+		calendarFrom.add(Calendar.DATE, -5);
+		
+		date = calendarFrom.getTime();
+		
+		
+		List<String> data = new ArrayList<String>(); 
+		
+		data = mongoPositionRepo.getElmLogsExpiredDays(date);
+
+		if(data.size() > 0) {
+			elmLogsRepository.deleteByIdIn(data);
+			getRemoveOldLogs();
+		}
+		
+		getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",null,data.size());
+		logger.info("************************ removed logs ENDED ***************************");
+		return  ResponseEntity.ok().body(getObjectResponse);
+
+	}
 
 	
+	@Override
+	public ResponseEntity<?> getRemoveOldPositions() {
+		// TODO Auto-generated method stub
+        
+		logger.info("************************ getRemoveOldPositions STARTED ***************************");
+
+		Date date= new Date();
 	
+		Calendar calendarFrom = Calendar.getInstance();
+		calendarFrom.setTime(date);
+		calendarFrom.add(Calendar.MONTH, -6);
+		
+		date = calendarFrom.getTime();
+		
+
+		List<String> data = new ArrayList<String>(); 
+		
+		data = mongoPositionRepo.getElmPositionsExpiredDays(date);
+
+	
+		if(data.size() > 0) {
+
+			mongoPositionsRepository.deleteByIdIn(data);
+			getRemoveOldPositions();
+		}
+		
+		getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",null,data.size());
+		logger.info("************************ getRemoveOldPositions ENDED ***************************");
+		return  ResponseEntity.ok().body(getObjectResponse);
+
+	}
+	
+	@Override
+	public ResponseEntity<?> getRemoveOldEvents() {
+		// TODO Auto-generated method stub
+        
+		logger.info("************************ getRemoveOldEvents STARTED ***************************");
+
+		Date date= new Date();
+	
+		Calendar calendarFrom = Calendar.getInstance();
+		calendarFrom.setTime(date);
+		calendarFrom.add(Calendar.MONTH, -6);
+		
+		date = calendarFrom.getTime();
+		
+
+		List<String> data = new ArrayList<String>(); 
+		
+		data = mongoEventsRepo.getElmEventsExpiredDays(date);
 
 
+		if(data.size() > 0) {
+
+			mongoEventsRepository.deleteByIdIn(data);
+			getRemoveOldEvents();
+		}
+		
+
+		getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",null,data.size());
+		logger.info("************************ getRemoveOldEvents ENDED ***************************");
+		return  ResponseEntity.ok().body(getObjectResponse);
+
+	}
 
 }

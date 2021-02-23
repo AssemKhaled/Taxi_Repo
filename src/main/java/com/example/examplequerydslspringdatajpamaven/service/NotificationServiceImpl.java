@@ -1,22 +1,45 @@
 package com.example.examplequerydslspringdatajpamaven.service;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.net.ssl.SSLContext;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
@@ -39,7 +62,10 @@ import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 public class NotificationServiceImpl extends RestServiceController implements NotificationService{
 	private static final Log logger = LogFactory.getLog(NotificationServiceImpl.class);
 
-	GetObjectResponse getObjectResponse;
+	@Value("${urlNotification}")
+	private String urlNotification;
+	
+	private GetObjectResponse getObjectResponse;
 	
 	@Autowired
 	private UserServiceImpl userService;
@@ -67,7 +93,7 @@ public class NotificationServiceImpl extends RestServiceController implements No
 	 * create notification using data in body
 	 */
 	@Override
-	public ResponseEntity<?> createNotification(String TOKEN, Notification notification, Long userId) {
+	public ResponseEntity<?> createNotification(String TOKEN,String authorization,Notification notification, Long userId) {
 		logger.info("************************ createNotification STARTED ***************************");
 	
 
@@ -195,14 +221,93 @@ public class NotificationServiceImpl extends RestServiceController implements No
 		        	
 		        }
 		        
-		        notificationRepository.save(notification);
-		        
-		        
-		        
-		        
-		    	getObjectResponse = new GetObjectResponse(HttpStatus.OK.value() , "success",notifications);
-				logger.info("************************ createNotification ENDED ***************************");
-				return ResponseEntity.ok().body(getObjectResponse);
+		        TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+
+				SSLContext sslContext = null;
+				try {
+					sslContext = org.apache.http.ssl.SSLContexts.custom()
+					        .loadTrustMaterial(null, acceptingTrustStrategy)
+					        .build();
+				} catch (KeyManagementException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (NoSuchAlgorithmException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (KeyStoreException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
+
+				CloseableHttpClient httpClient = HttpClients.custom()
+				        .setSSLSocketFactory(csf)
+				        .build();
+
+				HttpComponentsClientHttpRequestFactory requestFactory =
+				        new HttpComponentsClientHttpRequestFactory();
+
+				requestFactory.setHttpClient(httpClient);
+				
+				String base64Credentials = authorization.substring("Basic".length()).trim();
+				byte[] credDecoded = Base64.getDecoder().decode(base64Credentials);
+				String credentials = new String(credDecoded, StandardCharsets.UTF_8);
+
+				final String[] values = credentials.split(":", 2);
+				String email = values[0].toString();
+				String password = values[1].toString();
+				
+		        String plainCreds = email+":"+password;
+				byte[] plainCredsBytes = plainCreds.getBytes();
+				
+				byte[] base64CredsBytes = Base64.getEncoder().encode(plainCredsBytes);
+				String base64Creds = new String(base64CredsBytes);
+
+
+				HttpHeaders headers = new HttpHeaders();
+			    headers.setContentType(MediaType.APPLICATION_JSON);
+				headers.add("Authorization", "Basic " + base64Creds);
+				
+			    String URL = urlNotification;
+			    RestTemplate restTemplate = new RestTemplate(requestFactory);
+			    restTemplate.getMessageConverters()
+		        .add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
+	        
+			    notification.setId(null);
+			    JSONObject request = new JSONObject();
+			    
+			    request.put("always", notification.isAlways());
+			    request.put("calendarId", notification.getCalendarid());
+			    request.put("id", notification.getId());
+			    request.put("notificators", notification.getNotificators());
+			    request.put("type", notification.getType());
+
+				HttpEntity<?> entity = new HttpEntity<Object>(request.toString(),headers);
+				ResponseEntity<String> rateResponse = null;
+				
+				try {
+
+					rateResponse = restTemplate.exchange(URL, HttpMethod.POST, entity, String.class);
+					
+					if (rateResponse.getStatusCode() == HttpStatus.OK) {
+						getObjectResponse = new GetObjectResponse(HttpStatus.OK.value() , "success",notifications);
+						logger.info("************************ createNotification ENDED ***************************");
+						return ResponseEntity.ok().body(getObjectResponse);
+					}
+					else {
+						getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Error in request to server",notifications);
+						logger.info("************************ createNotification ENDED ***************************");
+						return ResponseEntity.badRequest().body(getObjectResponse);
+					}
+					
+				} catch (Exception e) {
+					
+					getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "Error in server",notifications);
+					logger.info("************************ createNotification ENDED ***************************");
+					return ResponseEntity.badRequest().body(getObjectResponse);
+	            }
+		      
 			}
 			
 			
@@ -253,16 +358,7 @@ public class NotificationServiceImpl extends RestServiceController implements No
 						 
 					}
 				    else {
-				    	List<User>childernUsers = userService.getActiveAndInactiveChildern(id);
-						 if(childernUsers.isEmpty()) {
-							 usersIds.add(id);
-						 }
-						 else {
-							 usersIds.add(id);
-							 for(User object : childernUsers) {
-								 usersIds.add(object.getId());
-							 }
-						 }
+						usersIds.add(id);
 				    }
 				     
 
@@ -435,7 +531,7 @@ public class NotificationServiceImpl extends RestServiceController implements No
 	 * edit notification by id in body mandatory
 	 */
 	@Override
-	public ResponseEntity<?> editNotification(String TOKEN, Notification notification, Long id) {
+	public ResponseEntity<?> editNotification(String TOKEN,String authorization ,Notification notification, Long id) {
 		logger.info("************************ editGeofence STARTED ***************************");
 
 		GetObjectResponse getObjectResponse;
@@ -536,21 +632,95 @@ public class NotificationServiceImpl extends RestServiceController implements No
 							        	
 							        }
 									
-									notificationRepository.save(notification);
-									notifications.add(notification);
-									getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"Updated Successfully",notifications);
-									logger.info("************************ editGeofence ENDED ***************************");
-									return ResponseEntity.ok().body(getObjectResponse);
+									 TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
 
-									
+										SSLContext sslContext = null;
+										try {
+											sslContext = org.apache.http.ssl.SSLContexts.custom()
+											        .loadTrustMaterial(null, acceptingTrustStrategy)
+											        .build();
+										} catch (KeyManagementException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (NoSuchAlgorithmException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (KeyStoreException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										}
+
+										SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
+
+										CloseableHttpClient httpClient = HttpClients.custom()
+										        .setSSLSocketFactory(csf)
+										        .build();
+
+										HttpComponentsClientHttpRequestFactory requestFactory =
+										        new HttpComponentsClientHttpRequestFactory();
+
+										requestFactory.setHttpClient(httpClient);
+										
+										String base64Credentials = authorization.substring("Basic".length()).trim();
+										byte[] credDecoded = Base64.getDecoder().decode(base64Credentials);
+										String credentials = new String(credDecoded, StandardCharsets.UTF_8);
+
+										final String[] values = credentials.split(":", 2);
+										String email = values[0].toString();
+										String password = values[1].toString();
+										
+								        String plainCreds = email+":"+password;
+										byte[] plainCredsBytes = plainCreds.getBytes();
+										
+										byte[] base64CredsBytes = Base64.getEncoder().encode(plainCredsBytes);
+										String base64Creds = new String(base64CredsBytes);
+
+
+										HttpHeaders headers = new HttpHeaders();
+									    headers.setContentType(MediaType.APPLICATION_JSON);
+										headers.add("Authorization", "Basic " + base64Creds);
+										
+									    String URL = urlNotification+"/"+notification.getId();
+									    RestTemplate restTemplate = new RestTemplate(requestFactory);
+									    restTemplate.getMessageConverters()
+								        .add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
+							        
+									    JSONObject request = new JSONObject();
+									    
+									    request.put("always", notification.isAlways());
+									    request.put("calendarId", notification.getCalendarid());
+									    request.put("id", notification.getId());
+									    request.put("notificators", notification.getNotificators());
+									    request.put("type", notification.getType());
+
+										HttpEntity<?> entity = new HttpEntity<Object>(request.toString(),headers);
+										ResponseEntity<String> rateResponse = null;
+										
+										try {
+
+											rateResponse = restTemplate.exchange(URL, HttpMethod.PUT, entity, String.class);
+											
+											if (rateResponse.getStatusCode() == HttpStatus.OK) {
+												notifications.add(notification);
+												getObjectResponse = new GetObjectResponse(HttpStatus.OK.value() , "Updated Successfully",notifications);
+												logger.info("************************ editNotification ENDED ***************************");
+												return ResponseEntity.ok().body(getObjectResponse);
+											}
+											else {
+												getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Error in request to server",notifications);
+												logger.info("************************ editNotification ENDED ***************************");
+												return ResponseEntity.badRequest().body(getObjectResponse);
+											}
+											
+										} catch (Exception e) {
+											
+											getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "Error in server",notifications);
+											logger.info("************************ editNotification ENDED ***************************");
+											return ResponseEntity.badRequest().body(getObjectResponse);
+							            }
 			    					
 			    				}	
 								
-								
-
-							
-
-							
 						}
 						else {
 							getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This notification ID is not Found",notifications);

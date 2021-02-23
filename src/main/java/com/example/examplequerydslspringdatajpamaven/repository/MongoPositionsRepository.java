@@ -14,6 +14,9 @@ import com.example.examplequerydslspringdatajpamaven.entity.MongoPositions;
  */
 public interface MongoPositionsRepository extends MongoRepository<MongoPositions,String>{
 
+	@Query(value="{ '_id' : { $in: ?0 } }", delete = true)
+	public List<MongoPositions> deleteByIdIn(List<String> positionIds);
+	
 	public Integer countByDeviceidIn(List<Long> deviceIds);
 	
 	@Query("{ '_id' : { $in: ?0 } }")
