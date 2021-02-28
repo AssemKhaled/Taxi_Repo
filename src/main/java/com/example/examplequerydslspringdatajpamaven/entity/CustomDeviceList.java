@@ -53,9 +53,36 @@ public class CustomDeviceList{
 	private String simcardNumber;
 	private String create_date;
 	private String update_date_elm;
+	private String delete_date_elm;
 	private Long leftDays;
+	private String servertime;
+	private String devicetime;
+
 	
-	
+
+	public String getDelete_date_elm() {
+		return delete_date_elm;
+	}
+
+	public void setDelete_date_elm(String delete_date_elm) {
+		this.delete_date_elm = delete_date_elm;
+	}
+
+	public String getServertime() {
+		return servertime;
+	}
+
+	public void setServertime(String servertime) {
+		this.servertime = servertime;
+	}
+
+	public String getDevicetime() {
+		return devicetime;
+	}
+
+	public void setDevicetime(String devicetime) {
+		this.devicetime = devicetime;
+	}
 
 	public String getUpdate_date_elm() {
 		return update_date_elm;
@@ -153,7 +180,7 @@ public class CustomDeviceList{
 	
 	public CustomDeviceList(int id ,String deviceName,String simcardNumber,String uniqueId , String sequenceNumber,
 			String lastUpdate, String referenceKey , Boolean expired , String driverName ,
-			String companyName, Long companyId,String geofenceName ,String create_date,String update_date_elm ,Long leftDays ) {
+			String companyName, Long companyId,String geofenceName ,String create_date,String delete_date_elm,String update_date_elm ,Long leftDays ) {
 		this.id = id;
 		this.deviceName = deviceName;
 		this.uniqueId = uniqueId;
@@ -167,6 +194,7 @@ public class CustomDeviceList{
 	    this.companyId = companyId;
 	    this.simcardNumber = simcardNumber;
 	    this.create_date = create_date;
+	    this.delete_date_elm = delete_date_elm;
 	    this.update_date_elm = update_date_elm;
 	    this.leftDays = leftDays;
 		

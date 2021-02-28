@@ -1,5 +1,6 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
@@ -45,7 +46,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
                      @ColumnResult(name="date_type",type=String.class),
                      @ColumnResult(name="is_valid",type=String.class),
                      @ColumnResult(name="photo",type=String.class),
-                     @ColumnResult(name="companyName",type=String.class)
+                     @ColumnResult(name="companyName",type=String.class),
+                     @ColumnResult(name="create_date_elm",type=String.class),
+                     @ColumnResult(name="delete_date_elm",type=String.class),
+                     @ColumnResult(name="update_date_elm",type=String.class)
+
                      }
            )
         }
@@ -64,6 +69,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 					" tc_drivers.is_deleted as is_deleted,tc_drivers.delete_date as delete_date,"
 					+ " tc_drivers.reject_reason as reject_reason,tc_drivers.date_type as date_type,tc_drivers.is_valid as is_valid, " + 
 					" tc_drivers.photo as photo,tc_users.name as companyName  "
+					+" ,tc_drivers.regestration_to_elm_date as create_date_elm , tc_drivers.delete_from_elm_date as delete_date_elm , tc_drivers.update_date_in_elm as update_date_elm "
 					+ " FROM tc_drivers "
 					+ " INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id " +
 					" LEFT JOIN tc_users ON tc_user_driver.userid = tc_users.id " + 
@@ -81,6 +87,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 			" tc_drivers.is_deleted as is_deleted,tc_drivers.delete_date as delete_date,"
 			+ " tc_drivers.reject_reason as reject_reason,tc_drivers.date_type as date_type,tc_drivers.is_valid as is_valid, " + 
 			" tc_drivers.photo as photo,tc_users.name as companyName  "
+			+" ,tc_drivers.regestration_to_elm_date as create_date_elm , tc_drivers.delete_from_elm_date as delete_date_elm , tc_drivers.update_date_in_elm as update_date_elm "
 			+ " FROM tc_drivers "
 			+ " INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id " +
 			" LEFT JOIN tc_users ON tc_user_driver.userid = tc_users.id " + 
@@ -97,6 +104,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 			" tc_drivers.is_deleted as is_deleted,tc_drivers.delete_date as delete_date,"
 			+ " tc_drivers.reject_reason as reject_reason,tc_drivers.date_type as date_type,tc_drivers.is_valid as is_valid, " + 
 			" tc_drivers.photo as photo,tc_users.name as companyName  "
+			+" ,tc_drivers.regestration_to_elm_date as create_date_elm , tc_drivers.delete_from_elm_date as delete_date_elm , tc_drivers.update_date_in_elm as update_date_elm "
 			+ " FROM tc_drivers "
 			+ " INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id " +
 			" LEFT JOIN tc_users ON tc_user_driver.userid = tc_users.id " + 
@@ -114,6 +122,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 			" tc_drivers.is_deleted as is_deleted,tc_drivers.delete_date as delete_date,"
 			+ " tc_drivers.reject_reason as reject_reason,tc_drivers.date_type as date_type,tc_drivers.is_valid as is_valid, " + 
 			" tc_drivers.photo as photo,tc_users.name as companyName  "
+			+" ,tc_drivers.regestration_to_elm_date as create_date_elm , tc_drivers.delete_from_elm_date as delete_date_elm , tc_drivers.update_date_in_elm as update_date_elm "
 			+ " FROM tc_drivers "
 			+ " INNER JOIN tc_user_driver ON tc_user_driver.driverid = tc_drivers.id " +
 			" LEFT JOIN tc_users ON tc_user_driver.userid = tc_users.id " + 
@@ -176,6 +185,15 @@ public class Driver extends Attributes{
 	
 	@Column(name = "photo")
 	private String photo;
+	
+	@Column(name = "regestration_to_elm_date")
+	private Date regestration_to_elm_date;
+	
+	@Column(name = "delete_from_elm_date")
+	private Date delete_from_elm_date;
+	
+	@Column(name = "update_date_in_elm")
+	private Date update_date_in_elm;
 	
 	@ManyToMany(
             fetch = FetchType.LAZY,
@@ -327,6 +345,30 @@ public class Driver extends Attributes{
 
 	public void setGroups(Set<Group> groups) {
 		this.groups = groups;
+	}
+
+	public Date getRegestration_to_elm_date() {
+		return regestration_to_elm_date;
+	}
+
+	public void setRegestration_to_elm_date(Date regestration_to_elm_date) {
+		this.regestration_to_elm_date = regestration_to_elm_date;
+	}
+
+	public Date getDelete_from_elm_date() {
+		return delete_from_elm_date;
+	}
+
+	public void setDelete_from_elm_date(Date delete_from_elm_date) {
+		this.delete_from_elm_date = delete_from_elm_date;
+	}
+
+	public Date getUpdate_date_in_elm() {
+		return update_date_in_elm;
+	}
+
+	public void setUpdate_date_in_elm(Date update_date_in_elm) {
+		this.update_date_in_elm = update_date_in_elm;
 	}
 	 
 	 

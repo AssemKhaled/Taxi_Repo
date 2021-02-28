@@ -1,5 +1,6 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
@@ -103,6 +104,15 @@ public class User extends Attributes{
 	
 	@Column(name = "exp_date")
 	private String exp_date;
+	
+	@Column(name = "regestration_to_elm_date")
+	private Date regestration_to_elm_date;
+	
+	@Column(name = "delete_from_elm_date")
+	private Date delete_from_elm_date;
+	
+	@Column(name = "update_date_in_elm")
+	private Date update_date_in_elm;
 
 	 @JsonIgnore
 	 @ManyToMany(
@@ -382,6 +392,24 @@ public class User extends Attributes{
 	
 	public void setExp_date(String exp_date) {
 		this.exp_date = exp_date;
+	}
+	public Date getRegestration_to_elm_date() {
+		return regestration_to_elm_date;
+	}
+	public void setRegestration_to_elm_date(Date regestration_to_elm_date) {
+		this.regestration_to_elm_date = regestration_to_elm_date;
+	}
+	public Date getDelete_from_elm_date() {
+		return delete_from_elm_date;
+	}
+	public void setDelete_from_elm_date(Date delete_from_elm_date) {
+		this.delete_from_elm_date = delete_from_elm_date;
+	}
+	public Date getUpdate_date_in_elm() {
+		return update_date_in_elm;
+	}
+	public void setUpdate_date_in_elm(Date update_date_in_elm) {
+		this.update_date_in_elm = update_date_in_elm;
 	}
 	
 	

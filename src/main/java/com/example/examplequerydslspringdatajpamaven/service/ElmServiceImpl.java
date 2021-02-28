@@ -172,6 +172,18 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		Map requet = new HashMap();
 		Map response = new HashMap();
 		
+		SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); 
+
+		String currentDate=formatter.format(date);
+		
+		Date dateReg = null;
+		try {
+			dateReg = output.parse(currentDate);
+
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		if(TOKEN.equals("")) {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
@@ -409,14 +421,16 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  }
 		  else if(resp.containsKey("resultCode")) {
 			  if(resp.get("success").equals(true)) {
+				  
 				  user.setReject_reason(null);
-				  user.setReference_key(null);
+				  user.setDelete_from_elm_date(dateReg);
+				  
+				  
+				  userRepository.save(user);
 					  
-					  userRepository.save(user);
-					  
-					  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",data);
-					  logger.info("************************ companyDelete ENDED ***************************");
-					  return  ResponseEntity.ok().body(getObjectResponse);
+				  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",data);
+				  logger.info("************************ companyDelete ENDED ***************************");
+				  return  ResponseEntity.ok().body(getObjectResponse);
 					
 			  }
 			  else{
@@ -455,6 +469,19 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		String type = "Register Company";
 		Map requet = new HashMap();
 		Map response = new HashMap();
+		
+		SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); 
+
+		String currentDate=formatter.format(date);
+		
+		Date dateReg = null;
+		try {
+			dateReg = output.parse(currentDate);
+
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		if(TOKEN.equals("")) {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
@@ -732,20 +759,30 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  }
 		  else if(resp.containsKey("resultCode")) {
 			  if(resp.get("resultCode").toString().equals("success")) {
-					Map res = (Map) resp.get("result");	
-					user.setReject_reason(null);
-					  user.setReference_key(res.get("referenceKey").toString());
-					  userRepository.save(user);
-					  
-					  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",data);
-					  logger.info("************************ companyRegistrtaion ENDED ***************************");
-					  return  ResponseEntity.ok().body(getObjectResponse);
+				  
+				  Map res = (Map) resp.get("result");	
+				  user.setReject_reason(null);
+				  user.setReference_key(res.get("referenceKey").toString());
+				  user.setRegestration_to_elm_date(dateReg);
+				  user.setUpdate_date_in_elm(dateReg);
+				  user.setDelete_from_elm_date(null);
+
+				  
+				  userRepository.save(user);
+				  
+				  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",data);
+				  logger.info("************************ companyRegistrtaion ENDED ***************************");
+				  return  ResponseEntity.ok().body(getObjectResponse);
 					
 			  }
 			  else if(resp.get("resultCode").toString().equals("duplicate")) {
 					Map res = (Map) resp.get("result");	
 					user.setReject_reason(null);
 					  user.setReference_key(res.get("referenceKey").toString());
+					  user.setRegestration_to_elm_date(dateReg);
+					  user.setUpdate_date_in_elm(dateReg);
+					  user.setDelete_from_elm_date(null);
+					  
 					  userRepository.save(user);
 
 					  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"duplicate",data);
@@ -786,6 +823,19 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		String type = "Update Company";
 		Map requet = new HashMap();
 		Map response = new HashMap();
+		
+		SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); 
+
+		String currentDate=formatter.format(date);
+		
+		Date dateReg = null;
+		try {
+			dateReg = output.parse(currentDate);
+
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		if(TOKEN.equals("")) {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
@@ -1052,7 +1102,8 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 					  user.setManager_phone(dataObject.get("managerPhoneNumber").toString());
 					  user.setManager_mobile(dataObject.get("managerMobileNumber").toString());
 
-						  
+						  user.setUpdate_date_in_elm(dateReg);
+						  user.setDelete_from_elm_date(null);
 						  
 						  userRepository.save(user);
 						  
@@ -1355,7 +1406,8 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 					  device.setSequence_number(dataObject.get("sequenceNumber"));
 					  device.setUpdate_date_in_elm(dateRegUpdate);
 					  device.setExpired(0);
-					  
+					  device.setDelete_from_elm_date(null);
+
 					  deviceRepository.save(device);
 					  
 					  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",data);
@@ -1649,9 +1701,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			  if(resp.get("success").equals(true)) {
 				  
 				  device.setReject_reason(null);
-				  device.setReference_key(null);
 				  device.setDelete_from_elm_date(dateRegDelete);
-				  device.setUpdate_date_in_elm(dateRegDelete);
 				  device.setExpired(1);
 				  
 				  
@@ -1956,6 +2006,8 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				  device.setReference_key(res.get("referenceKey").toString());
 				  device.setRegestration_to_elm_date(dateReg);
 				  device.setUpdate_date_in_elm(dateReg);
+				  device.setDelete_from_elm_date(null);
+
 				  device.setExpired(0);
 				 
 				  deviceRepository.save(device);
@@ -1973,7 +2025,8 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 					device.setRegestration_to_elm_date(dateReg);
 					device.setUpdate_date_in_elm(dateReg);
 					device.setExpired(0);
-					
+					device.setDelete_from_elm_date(null);
+
 					deviceRepository.save(device);
 
 					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"duplicate",data);
@@ -2011,6 +2064,19 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		String type = "Register Driver";
 		Map requet = new HashMap();
 		Map response = new HashMap();
+		
+		SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); 
+
+		String currentDate=formatter.format(date);
+		
+		Date dateRegUpdate = null;
+		try {
+			dateRegUpdate = output.parse(currentDate);
+
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		if(TOKEN.equals("")) {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
@@ -2263,6 +2329,10 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				  Map res = (Map) resp.get("result");	
 				  driver.setReject_reason(null);
 				  driver.setReference_key(res.get("referenceKey").toString());
+				  driver.setRegestration_to_elm_date(dateRegUpdate);
+				  driver.setUpdate_date_in_elm(dateRegUpdate);
+				  driver.setDelete_from_elm_date(null);
+				  
 				  driverRepository.save(driver);
 				  
 				  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",data);
@@ -2274,6 +2344,10 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 					Map res = (Map) resp.get("result");	
 					driver.setReject_reason(null);
 					driver.setReference_key(res.get("referenceKey").toString());
+					  driver.setRegestration_to_elm_date(dateRegUpdate);
+					  driver.setUpdate_date_in_elm(dateRegUpdate);
+					  driver.setDelete_from_elm_date(null);
+					  
 					driverRepository.save(driver);
 
 					  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"duplicate",data);
@@ -2842,6 +2916,18 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		Map requet = new HashMap();
 		Map response = new HashMap();
 		
+		SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); 
+
+		String currentDate=formatter.format(date);
+		
+		Date dateRegUpdate = null;
+		try {
+			dateRegUpdate = output.parse(currentDate);
+
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		if(TOKEN.equals("")) {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
@@ -3080,7 +3166,8 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  else if(resp.containsKey("resultCode")) {
 			  if(resp.get("success").equals(true)) {
 				  driver.setReject_reason(null);
-				  driver.setReference_key(null);
+				  driver.setDelete_from_elm_date(dateRegUpdate);
+				  
 				  driverRepository.save(driver);
 				  
 				  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",data);
@@ -3385,6 +3472,19 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		Map requet = new HashMap();
 		Map response = new HashMap();
 		
+		SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); 
+
+		String currentDate=formatter.format(date);
+		
+		Date dateRegUpdate = null;
+		try {
+			dateRegUpdate = output.parse(currentDate);
+
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		if(TOKEN.equals("")) {
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
@@ -3630,6 +3730,9 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				  driver.setUniqueid(dataObject.get("identityNumber"));
 				  driver.setMobile_num(dataObject.get("mobileNumber"));
 				  driver.setEmail(dataObject.get("email"));
+				  
+				  driver.setUpdate_date_in_elm(dateRegUpdate);
+				  driver.setDelete_from_elm_date(null);
 				  
 				  driver.setReject_reason(null);
 				  
@@ -4238,9 +4341,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 					  if(resp.get("success").equals(true)) {
 						  
 						  device.setReject_reason(null);
-						  device.setReference_key(null);
 						  device.setDelete_from_elm_date(dateCheck);
-						  device.setUpdate_date_in_elm(dateCheck);
 						  device.setDelete_from_elm(resp.get("resultCode").toString());
 						  
 						  deviceRepository.save(device);
@@ -4655,7 +4756,6 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			  if(resp.get("success").equals(true)) {
 				  
 				  device.setReject_reason(null);
-				  device.setReference_key(null);
 				  device.setDelete_from_elm_date(dateRegDelete);
 				  device.setUpdate_date_in_elm(dateRegDelete);
 				  device.setExpired(1);

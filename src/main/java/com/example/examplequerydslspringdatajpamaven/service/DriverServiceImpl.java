@@ -250,10 +250,12 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 						if(!res1.isEmpty()) {
 							for(int i=0;i<res1.size();i++) {
 								
-								if(res1.get(i).getName().equals(driver.getName())) {
-									duplictionList.add(4);				
+								if(res2.get(i).getName() != null) {
+									if(res1.get(i).getName().equals(driver.getName())) {
+										duplictionList.add(4);				
+									}
 								}
-					
+
 							}
 					    	
 
@@ -261,18 +263,29 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 						
 						if(!res2.isEmpty()) {
 							for(int i=0;i<res2.size();i++) {
+								if(res2.get(i).getEmail() != null) {
+									if(res2.get(i).getEmail().equals(driver.getEmail())) {
+										duplictionList.add(1);				
+									}
+								}
+								if(res2.get(i).getUniqueid() != null) {
+									
+									if(res2.get(i).getUniqueid().equals(driver.getUniqueid())) {
+										duplictionList.add(2);				
+					
+									}
+								}
 								
-								if(res2.get(i).getEmail().equals(driver.getEmail())) {
-									duplictionList.add(1);				
-								}
-								if(res2.get(i).getUniqueid().equals(driver.getUniqueid())) {
-									duplictionList.add(2);				
-				
-								}
-								if(res2.get(i).getMobile_num().equals(driver.getMobile_num())) {
-									duplictionList.add(3);				
+								if(res2.get(i).getMobile_num() != null ) {
+									
+									if(res2.get(i).getMobile_num().equals(driver.getMobile_num())) {
+										duplictionList.add(3);				
 
+									}
 								}
+								
+								
+								
 								
 							}
 					    	
@@ -493,8 +506,10 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 									if(!res1.isEmpty()) {
 										for(int i=0;i<res1.size();i++) {
 											
-											if(res1.get(i).getName().equals(driver.getName())) {
-												duplictionList.add(4);				
+											if(res2.get(i).getName() != null) {
+												if(res1.get(i).getName().equals(driver.getName())) {
+													duplictionList.add(4);				
+												}
 											}
 											
 											
@@ -506,16 +521,25 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 									
 									if(!res2.isEmpty()) {
 										for(int i=0;i<res2.size();i++) {
-											if(res2.get(i).getEmail().equals(driver.getEmail())) {
-												duplictionList.add(1);				
+											if(res2.get(i).getEmail() != null) {
+												if(res2.get(i).getEmail().equals(driver.getEmail())) {
+													duplictionList.add(1);				
+												}
 											}
-											if(res2.get(i).getUniqueid().equals(driver.getUniqueid())) {
-												duplictionList.add(2);				
-							
+											if(res2.get(i).getUniqueid() != null) {
+												
+												if(res2.get(i).getUniqueid().equals(driver.getUniqueid())) {
+													duplictionList.add(2);				
+								
+												}
 											}
-											if(res2.get(i).getMobile_num().equals(driver.getMobile_num())) {
-												duplictionList.add(3);				
-			
+											
+											if(res2.get(i).getMobile_num() != null ) {
+												
+												if(res2.get(i).getMobile_num().equals(driver.getMobile_num())) {
+													duplictionList.add(3);				
+
+												}
 											}
 											
 										}

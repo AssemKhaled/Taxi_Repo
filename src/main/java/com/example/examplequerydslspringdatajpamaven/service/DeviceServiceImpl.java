@@ -2495,6 +2495,18 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			                    vehicleInfo.get(0).setAddress(mongoPosition.getAddress());
 			                    vehicleInfo.get(0).setAttributes(mongoPosition.getAttributes());
 			                    
+			                    if(mongoPosition.getServertime() != null) {
+			                    	
+									vehicleInfo.get(0).setServertime(mongoPosition.getServertime().toString());
+
+			                    }
+			                    if(mongoPosition.getDevicetime() != null) {
+			                    	
+
+									vehicleInfo.get(0).setDevicetime(mongoPosition.getDevicetime().toString());
+									
+			                    }
+
 			                    
 							}
 							

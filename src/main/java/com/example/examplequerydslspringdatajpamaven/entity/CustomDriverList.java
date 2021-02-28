@@ -22,11 +22,34 @@ public class CustomDriverList {
 	private String is_valid;
 	private String photo;
 	private String companyName;
+	private String create_date_elm;
+	private String update_date_elm;
+	private String delete_date_elm;
 	
 	
+	
+	public String getCreate_date_elm() {
+		return create_date_elm;
+	}
+	public void setCreate_date_elm(String create_date_elm) {
+		this.create_date_elm = create_date_elm;
+	}
+	public String getUpdate_date_elm() {
+		return update_date_elm;
+	}
+	public void setUpdate_date_elm(String update_date_elm) {
+		this.update_date_elm = update_date_elm;
+	}
+	public String getDelete_date_elm() {
+		return delete_date_elm;
+	}
+	public void setDelete_date_elm(String delete_date_elm) {
+		this.delete_date_elm = delete_date_elm;
+	}
 	public CustomDriverList(Long id, String name, String uniqueid, String attributes, String mobile_num,
 			String birth_date, String email, String reference_key, String is_deleted, String delete_date,
-			String reject_reason, String date_type, String is_valid, String photo, String companyName) {
+			String reject_reason, String date_type, String is_valid, String photo, String companyName,
+			String create_date_elm,String delete_date_elm,String update_date_elm ) {
 		this.id = id;
 		this.name = name;
 		this.uniqueid = uniqueid;
@@ -42,6 +65,10 @@ public class CustomDriverList {
 		this.is_valid = is_valid;
 		this.photo = photo;
 		this.companyName = companyName;
+		this.create_date_elm = create_date_elm;
+		this.delete_date_elm = delete_date_elm;
+		this.update_date_elm = update_date_elm;
+
 	}
 	public Long getId() {
 		return id;
