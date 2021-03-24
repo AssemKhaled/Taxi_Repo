@@ -1093,9 +1093,15 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 		Set<User> userCreater=new HashSet<>() ;
 		userCreater.add(findById(parentId));
 		user.setUsersOfUser(userCreater);
-		String password = user.getPassword();
-		String hashedPassword = getMd5(password);  
-		user.setPassword(hashedPassword);
+		
+		
+		if(user.getId() == null || user.getId() == 0) {
+			
+			String password = user.getPassword();
+			String hashedPassword = getMd5(password);  
+			user.setPassword(hashedPassword);
+		}
+		
 		List<Integer> duplictionList = checkUserDuplication(user);
 		if(duplictionList.size()>0)
 		{

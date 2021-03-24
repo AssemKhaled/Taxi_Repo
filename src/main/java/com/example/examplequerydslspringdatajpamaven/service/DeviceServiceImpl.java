@@ -3987,9 +3987,13 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 
 		  ResponseEntity<String> response = restTemplate.postForEntity(sendCommand, request, String.class);
 
-		if (response.getStatusCode() == HttpStatus.ACCEPTED) {
+		if(response.getStatusCode() == HttpStatus.ACCEPTED) {
 		    return "success";
-		} else {
+		} 
+		else if(response.getStatusCode() == HttpStatus.OK) {
+		    return "success";
+		} 
+		else {
 		    return "faild";
 		}
 

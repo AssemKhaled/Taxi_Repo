@@ -267,6 +267,21 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	@Query(nativeQuery = true, name = "getExpiredVehicles")
 	public List<ExpiredVehicles> getAllExpiredIds(@Param("currentDate")Date currentDate);
 	
+	@Query(value = "SELECT tc_devices.id " + 
+			" FROM tc_devices" + 
+			" INNER JOIN tc_user_device ON tc_user_device.deviceid=tc_devices.id " + 
+			" INNER JOIN tc_users ON tc_user_device.userid=tc_users.id " + 
+			" where tc_devices.delete_date IS NULL" + 
+			" AND tc_devices.create_date Is NOT NULL " + 
+			" AND TIMESTAMPDIFF(day ,tc_devices.create_date,CURDATE()) >= 275 " + 
+			" AND tc_devices.reference_key IS NOT NULL" + 
+			" AND tc_devices.expired IS true" + 
+			" AND ( ( TIMESTAMPDIFF(day ,tc_devices.update_date_in_elm,CURDATE()) >= 275) " + 
+			" or (tc_devices.update_date_in_elm IS NULL) )"
+			+ "order by tc_devices.id LIMIT 100,100", nativeQuery = true)
+	public List<Long> getAllDevicesExpired();
+	
+	
 	@Query(value = " SELECT tc_devices.id FROM tc_devices " + 
 			" INNER JOIN  tc_user_device ON tc_devices.id=tc_user_device.deviceid " + 
 			" where tc_user_device.userid IN (:userId) and tc_devices.delete_date is null "

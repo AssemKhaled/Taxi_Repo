@@ -245,6 +245,43 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 					}
 				}
 				
+				if(user.getAccountType() != 1 && user.getAccountType() != 2 ) {
+					
+					
+
+					if(user.getExp_date() == null || user.getCreate_date() == null) {
+						getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "your account is expired , contact the admin ,please",null);
+						logger.info("************************ Login ENDED ***************************");
+						return  ResponseEntity.status(404).body(getObjectResponse);
+					}
+					else {
+						Date date2 = null;
+						Date date1 = new Date();
+						SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+						try {
+							date2 = format.parse(user.getExp_date());
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+						long diff = date2.getTime() - date1.getTime();
+						long days = 0;
+						days = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) ;
+						userInfo.put("leftDays" , days);
+
+						if(days <= 0) {
+							getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "your account is expired , contact the admin ,please",null);
+							logger.info("************************ Login ENDED ***************************");
+							return  ResponseEntity.status(404).body(getObjectResponse);
+						}
+
+					}
+
+				}
+				
 				
 				List<Map> loggedUser = new ArrayList<>();
 				loggedUser.add(userInfo);
@@ -755,7 +792,18 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 					
 					if(mongoPosition != null) {
 						devices.get(i).setAttributes(mongoPosition.getAttributes());
+						
+						double  roundOffDistance = 0.0;
+						
+						
 						devices.get(i).setSpeed(mongoPosition.getSpeed() * (1.852) );
+						
+						
+						if(devices.get(i).getSpeed() != 0) {
+							roundOffDistance = Math.round(devices.get(i).getSpeed() * 100.0) / 100.0;
+							devices.get(i).setSpeed(roundOffDistance);
+						}
+						
 						devices.get(i).setLatitude(mongoPosition.getLatitude());
 						devices.get(i).setLongitude(mongoPosition.getLongitude());
 						devices.get(i).setAddress(mongoPosition.getAddress());

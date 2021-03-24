@@ -21,6 +21,7 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -4757,7 +4758,6 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				  
 				  device.setReject_reason(null);
 				  device.setDelete_from_elm_date(dateRegDelete);
-				  device.setUpdate_date_in_elm(dateRegDelete);
 				  device.setExpired(1);
 				  
 				  
@@ -4881,6 +4881,78 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		logger.info("************************ getRemoveOldEvents ENDED ***************************");
 		return  ResponseEntity.ok().body(getObjectResponse);
 
+	}
+
+
+
+	@Override
+	public ResponseEntity<?> deleteOldExpiredData() {
+		// TODO Auto-generated method stub
+		
+
+		List<Long> devicList = new ArrayList<Long>();
+		
+		devicList = deviceRepository.getAllDevicesExpired();
+		List<String> dataFinished = new ArrayList<String>();
+		
+		
+		int x =0;
+		int y =0;
+		for(Object id :devicList.toArray()) {
+			
+			Device dev = deviceRepository.findOne(Long.valueOf(id.toString()));
+			dataFinished.add(dev.getSequence_number());
+			
+			ResponseEntity<?> s = deviceInquery("eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJ0cmFjY2FydXNlciIsImlhdCI6MTYxNTM3ODQ2NCwic3ViIjoidHJhY2NhcnVzZXIiLCJpc3MiOiJ0cmFjY2FydXNlciIsInVzZXJOYW1lIjoiYWRtaW5AZnVpbmNvLmNvbSJ9.gHzEWJtfoFWPXt-w5BK30pk3b6xcgywyYut76JYmLK8",Long.valueOf(id.toString()),(long) 2337);
+			JSONObject data = new JSONObject(s.getBody());
+
+			if(data.has("entity")) {
+
+				x++;
+				System.out.println("all: "+ x);
+				JSONArray entity = new JSONArray(data.get("entity").toString());
+
+				if(entity.length() > 0) {
+					JSONObject bodyEntity = new JSONObject(entity.get(0).toString());
+
+					if(bodyEntity.has("body")) {
+							JSONObject body = new JSONObject(bodyEntity.get("body").toString());
+		
+							if(body.has("operatingCompanies")) {
+								JSONArray operatingComp = new JSONArray(body.get("operatingCompanies").toString());
+								
+								if(operatingComp.length() >0) {
+									JSONObject companyObj = new JSONObject(operatingComp.get(0).toString());
+									
+									if(companyObj.has("referenceKey") && body.has("referenceKey") ) {
+
+										Map<String, String> mapData =new HashMap<String, String>();
+										mapData.put("companyReferenceKey", companyObj.get("referenceKey").toString());
+										mapData.put("deviceReferenceKey", body.get("referenceKey").toString());
+
+										ResponseEntity<?> finish = deleteVehicleFromElm("eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJ0cmFjY2FydXNlciIsImlhdCI6MTYxNTM3ODQ2NCwic3ViIjoidHJhY2NhcnVzZXIiLCJpc3MiOiJ0cmFjY2FydXNlciIsInVzZXJOYW1lIjoiYWRtaW5AZnVpbmNvLmNvbSJ9.gHzEWJtfoFWPXt-w5BK30pk3b6xcgywyYut76JYmLK8",Long.valueOf(id.toString()),(long) 2337,mapData);
+										y++;
+										
+										System.out.println("comp: "+ y);
+
+									}
+								}
+								
+					
+							}
+						}
+						
+					}
+					
+				}
+				
+			}
+				
+		
+
+		getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",dataFinished,dataFinished.size());
+		logger.info("************************ getRemoveOldEvents ENDED ***************************");
+		return  ResponseEntity.ok().body(getObjectResponse);
 	}
 
 }

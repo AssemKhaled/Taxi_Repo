@@ -1933,6 +1933,11 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 							e.printStackTrace();
 						}
 						
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+						
 						stopReportOne.setStartTime(outputFormat.format(dateTime));
 
 				  }
@@ -1948,6 +1953,10 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
 						
 						stopReportOne.setEndTime(outputFormat.format(dateTime));
 
@@ -2343,6 +2352,11 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 							e.printStackTrace();
 						}
 						
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+						
 						tripReportOne.setStartTime(outputFormat.format(dateTime));
 
 				  }
@@ -2358,6 +2372,11 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
+						
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
 						
 						tripReportOne.setEndTime(outputFormat.format(dateTime));
 
@@ -2833,6 +2852,11 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								e.printStackTrace();
 							}
 							
+							Calendar calendarTime = Calendar.getInstance();
+							calendarTime.setTime(dateTime);
+							calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+							dateTime = calendarTime.getTime();
+							
 							tripReportOne.setStartTime(outputFormat.format(dateTime));
 
 					  }
@@ -2848,6 +2872,11 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
+							
+							Calendar calendarTime = Calendar.getInstance();
+							calendarTime.setTime(dateTime);
+							calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+							dateTime = calendarTime.getTime();
 							
 							tripReportOne.setEndTime(outputFormat.format(dateTime));
 
@@ -3193,6 +3222,11 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
+						
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
 						
 						eventReportOne.setServerTime(outputFormat.format(dateTime));
 				  }
@@ -3899,8 +3933,8 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		 logger.info("************************ returnFromTraccar STARTED ***************************");
 
 		 
-		 SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-         outputFormat.setLenient(false);
+		SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        outputFormat.setLenient(false);
 
 		Date dateFrom;	
 		Date dateTo;	
@@ -3910,7 +3944,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			
 			Calendar calendarFrom = Calendar.getInstance();
 			calendarFrom.setTime(dateFrom);
-			calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
+			calendarFrom.add(Calendar.HOUR_OF_DAY, -3);
 			dateFrom = calendarFrom.getTime();
 			
 			from = outputFormat.format(dateFrom);
@@ -3925,7 +3959,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			
 			Calendar calendarFrom = Calendar.getInstance();
 			calendarFrom.setTime(dateTo);
-			calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
+			calendarFrom.add(Calendar.HOUR_OF_DAY, -3);
 			dateTo = calendarFrom.getTime();
 			
 			to = outputFormat.format(dateTo);
@@ -3934,9 +3968,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		} catch (ParseException e2) {
 			
 		}
-		 
-		 
-		
+
 		String plainCreds = "admin@fuinco.com:admin";
 		byte[] plainCredsBytes = plainCreds.getBytes();
 		

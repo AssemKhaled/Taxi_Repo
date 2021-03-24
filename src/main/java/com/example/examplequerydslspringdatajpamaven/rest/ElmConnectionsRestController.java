@@ -186,10 +186,16 @@ public class ElmConnectionsRestController {
 	
 	@PostMapping(path ="/deleteVehicleFromElm")
 	public ResponseEntity<?> deleteVehicleFromElm(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                     @RequestBody Map<String, String> data,
-			                                     @RequestParam (value = "userId", defaultValue = "0") Long userId,
-			                                     @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId){
+			                                      @RequestBody Map<String, String> data,
+			                                      @RequestParam (value = "userId", defaultValue = "0") Long userId,
+			                                      @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId){
 		
 		return elmServiceImpl.deleteVehicleFromElm(TOKEN,deviceId,userId,data);
+	}
+	
+	@GetMapping(path ="/deleteOldExpiredData")
+	public ResponseEntity<?> deleteOldExpiredData(){
+		
+		return elmServiceImpl.deleteOldExpiredData();
 	}
 }

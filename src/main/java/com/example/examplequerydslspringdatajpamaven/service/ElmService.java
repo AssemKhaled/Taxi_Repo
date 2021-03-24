@@ -34,5 +34,6 @@ public interface ElmService {
 
 	public ResponseEntity<?> getLogs(String TOKEN,Long id,Long userId,Long driverId,Long deviceId,int offset,String search);
 	
+	public ResponseEntity<?> deleteOldExpiredData();
 
 }
