@@ -17,6 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationExpression;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperationContext;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.ComparisonOperators.Eq;
@@ -37,6 +38,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.fields;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
@@ -902,32 +904,89 @@ public class MongoPositionRepo {
 	public List<DeviceWorkingHours> getDeviceWorkingHours(List<Long> allDevices,int offset,Date start,Date end){
 
 		
-		Calendar calendarFrom = Calendar.getInstance();
-		calendarFrom.setTime(start);
-		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
-		start = calendarFrom.getTime();
-	    
-		Calendar calendarTo = Calendar.getInstance();
-		calendarTo.setTime(end);
-		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
-		end = calendarTo.getTime();
-		
-		
 		List<DeviceWorkingHours> deviceHours = new ArrayList<DeviceWorkingHours>();
 
+		BasicDBObject addFields = new BasicDBObject();
 
+		BasicDBObject fields = new BasicDBObject();
+		BasicDBObject subtract = new BasicDBObject();
+		List<String> arr = new ArrayList<String>();
+		
+		arr.add("$lastTime");
+		arr.add("$firstTime");
+		subtract.put("$subtract", arr);
+		
+		fields.put("time", subtract);
+		fields.put("deviceid", "$_id.deviceid");
+		fields.put("devicetime", "$_id.devicetime");
+
+		addFields.put("$addFields", fields);
+		
+		BasicDBObject deviceName = new BasicDBObject();
+		deviceName.put("$last", "$deviceName");
+		BasicDBObject startTime = new BasicDBObject();
+		startTime.put("$first", "$time");
+		BasicDBObject endTime = new BasicDBObject();
+		endTime.put("$last", "$time");
+		BasicDBObject firstTime = new BasicDBObject();
+		firstTime.put("$first", "$attributes.todayHours");
+		BasicDBObject lastTime = new BasicDBObject();
+		lastTime.put("$last", "$attributes.todayHours");
+
+		BasicDBObject attributes = new BasicDBObject();
+		attributes.put("$last", "$attributes");
+
+		BasicDBObject groups = new BasicDBObject();
+
+		BasicDBObject group = new BasicDBObject();
+		BasicDBObject _id = new BasicDBObject();
+
+		_id.put("deviceid", "$deviceid");
+		_id.put("devicetime", "$devicetime");
+		
+		group.put("_id", _id);
+		
+		group.put("deviceName", deviceName);
+		group.put("startTime", startTime);
+		group.put("endTime", endTime);
+		group.put("firstTime", firstTime);
+		group.put("lastTime", lastTime);
+		group.put("attributes", attributes);
+
+		groups.put("$group", group);
 		
 	    Aggregation aggregation = newAggregation(
 	            match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)), 
-	            project("deviceid","attributes","deviceName").and("devicetime").dateAsFormattedString("%Y-%m-%d").as("devicetime"),
-	            group("deviceid","devicetime").last("$$ROOT").as("test"),
-	            replaceRoot("test"),
+	            project("deviceid","attributes","deviceName")
+	            .and("devicetime").dateAsFormattedString("%Y-%m-%d").as("devicetime")
+	            .and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("time"),
+	            new AggregationOperation() {
+
+					@Override
+					public DBObject toDBObject(AggregationOperationContext context) {
+						// TODO Auto-generated method stub
+						return groups;
+					}
+	                
+	            },
+	            
+	            new AggregationOperation() {
+
+					@Override
+					public DBObject toDBObject(AggregationOperationContext context) {
+						// TODO Auto-generated method stub
+						return addFields;
+					}
+	                
+	            },
 	            sort(Sort.Direction.DESC, "devicetime"),
 	            skip(offset),
 	            limit(10)
 	            
-	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
+	            
 
+	            
+	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 	        AggregationResults<BasicDBObject> groupResults
 	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
@@ -937,24 +996,78 @@ public class MongoPositionRepo {
 	        	
 	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
 	            while (iterator.hasNext()) {
+	            	
+	            	
+	            	
 	            	BasicDBObject object = (BasicDBObject) iterator.next();
+	            		            	
 	            	DeviceWorkingHours device = new DeviceWorkingHours();
 	            	
 	            	
-	            	device.setHours("0");
+	            	device.setHours("00:00:00");
 	            	
+
 	            	if(object.containsField("attributes") && object.get("attributes") != null) {
-                    	
 	                	device.setAttributes(object.get("attributes").toString());
-	                	
-	                	JSONObject attr = new JSONObject(device.getAttributes().toString());
-	                	
-						if(attr.has("todayHoursString")) {
-							device.setHours(attr.getString("todayHoursString"));
+	            	}
+	            	
+	            	if(object.containsField("deviceName") && object.get("deviceName") != null) {
+		            	
+						device.setDeviceName(object.getString("deviceName"));
+	
+					}
+	            	
+	            	if(object.containsField("startTime") && object.get("startTime") != null) {
+                    	
+	            		Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(object.getString("startTime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
 						
 
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+
+						
+						device.setStartTime(outputFormat.format(dateTime));
+	            		
 	            	}
+	            	
+
+	            	if(object.containsField("endTime") && object.get("endTime") != null) {
+                    	
+	            		Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(object.getString("endTime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+
+						
+						device.setEndTime(outputFormat.format(dateTime));
+	            		
+	            	}
+
 	            	if(object.containsField("deviceid") && object.get("deviceid") != null) {
 	                	device.setDeviceId(object.getLong("deviceid"));
 	
@@ -966,16 +1079,72 @@ public class MongoPositionRepo {
 						
 						
 	                }
-					if(object.containsField("_id") && object.get("_id") != null) {
-						device.setPositionId(object.getObjectId("_id").toString());
 
-					}
+
+					if(object.containsField("time") && object.get("time") != null) {
+
+
+
+						long hr = TimeUnit.MILLISECONDS.toHours(object.getLong("time"));
+						
+						if(hr < 0) {
+							hr = hr + 24;
+						}
+						
+						long min = TimeUnit.MILLISECONDS.toMinutes(object.getLong("time"))
+								- TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(object.getLong("time")));
+						
+						if(min < 0) {
+							min = min + 60;
+						}
+						
+						long sec = TimeUnit.MILLISECONDS.toSeconds(object.getLong("time"))
+								- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(object.getLong("time")));
+						
+						if(sec < 0) {
+							sec = sec + 60;
+						}
+						
+						
+						String time = "";
+						String timeHr = "";
+						String timeMin = "";
+						String timeSec = "";
+
+						if(hr < 10) {
+							timeHr = "0"+hr+":";
+						}
+						else {
+							timeHr = hr+":";
+
+						}
+						
+						
+						if(min < 10) {
+							timeMin = "0"+min+":";
+						}
+						else {
+							timeMin = min+":";
+
+						}
+						
+						
+						if(sec < 10) {
+							timeSec = "0"+sec;
+						}
+						else {
+							timeSec = ""+sec;
+
+						}
+						
+						time = timeHr + timeMin + timeSec;
+						
+						
+						device.setHours(time);
+						
+	                }
 					
-					if(object.containsField("deviceName") && object.get("deviceName") != null) {
-		            	
-						device.setDeviceName(object.getString("deviceName"));
-	
-					}
+					
 					
 				
 	            	deviceHours.add(device);
@@ -987,78 +1156,256 @@ public class MongoPositionRepo {
 	
 	public List<DriverWorkingHours> getDriverWorkingHours(List<Long> allDevices,int offset,Date start,Date end){
 
-		Calendar calendarFrom = Calendar.getInstance();
-		calendarFrom.setTime(start);
-		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
-		start = calendarFrom.getTime();
-	    
-		Calendar calendarTo = Calendar.getInstance();
-		calendarTo.setTime(end);
-		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
-		end = calendarTo.getTime();
-		
 		List<DriverWorkingHours> driverHours = new ArrayList<DriverWorkingHours>();
 
-						
+		BasicDBObject addFields = new BasicDBObject();
+
+		BasicDBObject fields = new BasicDBObject();
+		BasicDBObject subtract = new BasicDBObject();
+		List<String> arr = new ArrayList<String>();
+		
+		arr.add("$lastTime");
+		arr.add("$firstTime");
+		subtract.put("$subtract", arr);
+		
+		fields.put("time", subtract);
+		fields.put("deviceid", "$_id.deviceid");
+		fields.put("devicetime", "$_id.devicetime");
+
+		addFields.put("$addFields", fields);
+		
+		BasicDBObject deviceName = new BasicDBObject();
+		deviceName.put("$last", "$deviceName");
+		BasicDBObject startTime = new BasicDBObject();
+		startTime.put("$first", "$time");
+		BasicDBObject endTime = new BasicDBObject();
+		endTime.put("$last", "$time");
+		BasicDBObject firstTime = new BasicDBObject();
+		firstTime.put("$first", "$attributes.todayHours");
+		BasicDBObject lastTime = new BasicDBObject();
+		lastTime.put("$last", "$attributes.todayHours");
+
+		BasicDBObject attributes = new BasicDBObject();
+		attributes.put("$last", "$attributes");
+		
+		BasicDBObject driverName = new BasicDBObject();
+		driverName.put("$last", "$driverName");
+
+		BasicDBObject groups = new BasicDBObject();
+
+		BasicDBObject group = new BasicDBObject();
+		BasicDBObject _id = new BasicDBObject();
+
+		_id.put("deviceid", "$deviceid");
+		_id.put("devicetime", "$devicetime");
+		
+		group.put("_id", _id);
+		
+		group.put("deviceName", deviceName);
+		group.put("startTime", startTime);
+		group.put("endTime", endTime);
+		group.put("firstTime", firstTime);
+		group.put("lastTime", lastTime);
+		group.put("attributes", attributes);
+		group.put("driverName", driverName);
+
+		groups.put("$group", group);
+		
 	    Aggregation aggregation = newAggregation(
-	            match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)),
-	            project("deviceid","attributes","deviceName","driverName").and("devicetime").dateAsFormattedString("%Y-%m-%d").as("devicetime"),
-	            group("deviceid","devicetime").last("$$ROOT").as("test"),
-	            replaceRoot("test"),
+	            match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)), 
+	            project("deviceid","attributes","deviceName","driverName")
+	            .and("devicetime").dateAsFormattedString("%Y-%m-%d").as("devicetime")
+	            .and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("time"),
+	            new AggregationOperation() {
+
+					@Override
+					public DBObject toDBObject(AggregationOperationContext context) {
+						// TODO Auto-generated method stub
+						return groups;
+					}
+	                
+	            },
+	            
+	            new AggregationOperation() {
+
+					@Override
+					public DBObject toDBObject(AggregationOperationContext context) {
+						// TODO Auto-generated method stub
+						return addFields;
+					}
+	                
+	            },
 	            sort(Sort.Direction.DESC, "devicetime"),
 	            skip(offset),
 	            limit(10)
 	            
+	            
+
+	            
 	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
-	    
 	        AggregationResults<BasicDBObject> groupResults
 	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
 
 
-	        if(groupResults.getMappedResults().size() > 0) {
+            if(groupResults.getMappedResults().size() > 0) {
 	        	
 	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
 	            while (iterator.hasNext()) {
+	            	
+	            	
+	            	
 	            	BasicDBObject object = (BasicDBObject) iterator.next();
-	            	DriverWorkingHours device = new DriverWorkingHours();
+	            		            	
+	            	DriverWorkingHours driver = new DriverWorkingHours();
 	            	
 	            	
-	            	device.setHours("0");
+	            	driver.setHours("00:00:00");
+	            	
+
 	            	if(object.containsField("attributes") && object.get("attributes") != null) {
-	                	device.setAttributes(object.get("attributes").toString());
-	
-                        JSONObject attr = new JSONObject(device.getAttributes().toString());
-	                	
-						if(attr.has("todayHoursString")) {
-							device.setHours(attr.getString("todayHoursString"));
-						}
+	            		driver.setAttributes(object.get("attributes").toString());
 	            	}
+	            	
+	            	if(object.containsField("deviceName") && object.get("deviceName") != null) {
+		            	
+	            		driver.setDeviceName(object.getString("deviceName"));
+	
+					}
+	            	
+	            	if(object.containsField("driverName") && object.get("driverName") != null) {
+		            	
+	            		driver.setDriverName(object.getString("driverName"));
+	
+					}
+	            	
+	            	if(object.containsField("startTime") && object.get("startTime") != null) {
+                    	
+	            		Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(object.getString("startTime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+
+						
+						driver.setStartTime(outputFormat.format(dateTime));
+	            		
+	            	}
+	            	
+
+	            	if(object.containsField("endTime") && object.get("endTime") != null) {
+                    	
+	            		Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(object.getString("endTime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+
+						
+						driver.setEndTime(outputFormat.format(dateTime));
+	            		
+	            	}
+
 	            	if(object.containsField("deviceid") && object.get("deviceid") != null) {
-	                	device.setDeviceId(object.getLong("deviceid"));
+	            		driver.setDeviceId(object.getLong("deviceid"));
 	
 	            	}
 					if(object.containsField("devicetime") && object.get("devicetime") != null) {
-						
-						device.setDeviceTime(object.getString("devicetime"));
 
+
+						driver.setDeviceTime(object.getString("devicetime"));
+						
 						
 	                }
-					if(object.containsField("_id") && object.get("_id") != null) {
-						device.setPositionId(object.getObjectId("_id").toString());
 
-					}
-					
-					if(object.containsField("deviceName") && object.get("deviceName") != null) {
-		            	device.setDeviceName(object.getString("deviceName"));    		
+
+					if(object.containsField("time") && object.get("time") != null) {
+
+						long hr = TimeUnit.MILLISECONDS.toHours(object.getLong("time"));
+						
+						if(hr < 0) {
+							hr = hr + 24;
+						}
+						
+						long min = TimeUnit.MILLISECONDS.toMinutes(object.getLong("time"))
+								- TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(object.getLong("time")));
+						
+						if(min < 0) {
+							min = min + 60;
+						}
+						
+						long sec = TimeUnit.MILLISECONDS.toSeconds(object.getLong("time"))
+								- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(object.getLong("time")));
+						
+						if(sec < 0) {
+							sec = sec + 60;
+						}
+						
+						
+						String time = "";
+						String timeHr = "";
+						String timeMin = "";
+						String timeSec = "";
+
+						if(hr < 10) {
+							timeHr = "0"+hr+":";
+						}
+						else {
+							timeHr = hr+":";
+
+						}
+						
+						
+						if(min < 10) {
+							timeMin = "0"+min+":";
+						}
+						else {
+							timeMin = min+":";
+
+						}
+						
+						
+						if(sec < 10) {
+							timeSec = "0"+sec;
+						}
+						else {
+							timeSec = ""+sec;
+
+						}
+						
+						time = timeHr + timeMin + timeSec;
+						
+						
+						driver.setHours(time);
+						
+						
 	                }
-					if(object.containsField("driverName") && object.get("driverName") != null) {
-		            	device.setDriverName(object.getString("driverName"));    		
-	                }
 					
-	            	
-	            	
-	            	driverHours.add(device);
+					driverHours.add(driver);
 	            }
 	        }
         
@@ -1067,79 +1414,245 @@ public class MongoPositionRepo {
 	
 	public List<DeviceWorkingHours> getDeviceWorkingHoursScheduled(List<Long> allDevices,Date start,Date end){
 
-		Calendar calendarFrom = Calendar.getInstance();
-		calendarFrom.setTime(start);
-		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
-		start = calendarFrom.getTime();
-	    
-		Calendar calendarTo = Calendar.getInstance();
-		calendarTo.setTime(end);
-		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
-		end = calendarTo.getTime();
 		
 		List<DeviceWorkingHours> deviceHours = new ArrayList<DeviceWorkingHours>();
 
-						
+		BasicDBObject addFields = new BasicDBObject();
+
+		BasicDBObject fields = new BasicDBObject();
+		BasicDBObject subtract = new BasicDBObject();
+		List<String> arr = new ArrayList<String>();
+		
+		arr.add("$lastTime");
+		arr.add("$firstTime");
+		subtract.put("$subtract", arr);
+		
+		fields.put("time", subtract);
+		fields.put("deviceid", "$_id.deviceid");
+		fields.put("devicetime", "$_id.devicetime");
+
+		addFields.put("$addFields", fields);
+		
+		BasicDBObject deviceName = new BasicDBObject();
+		deviceName.put("$first", "$deviceName");
+		BasicDBObject startTime = new BasicDBObject();
+		startTime.put("$first", "$time");
+		BasicDBObject endTime = new BasicDBObject();
+		endTime.put("$last", "$time");
+		BasicDBObject firstTime = new BasicDBObject();
+		firstTime.put("$first", "$attributes.todayHours");
+		BasicDBObject lastTime = new BasicDBObject();
+		lastTime.put("$last", "$attributes.todayHours");
+
+		BasicDBObject attributes = new BasicDBObject();
+		attributes.put("$first", "$attributes");
+
+		BasicDBObject groups = new BasicDBObject();
+
+		BasicDBObject group = new BasicDBObject();
+		BasicDBObject _id = new BasicDBObject();
+
+		_id.put("deviceid", "$deviceid");
+		_id.put("devicetime", "$devicetime");
+		
+		group.put("_id", _id);
+		
+		group.put("deviceName", deviceName);
+		group.put("startTime", startTime);
+		group.put("endTime", endTime);
+		group.put("firstTime", firstTime);
+		group.put("lastTime", lastTime);
+		group.put("attributes", attributes);
+
+		groups.put("$group", group);
+		
 	    Aggregation aggregation = newAggregation(
 	            match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)), 
-	            project("deviceid","attributes","deviceName").and("devicetime").dateAsFormattedString("%Y-%m-%d").as("devicetime"),
-	            group("deviceid","devicetime").last("$$ROOT").as("test"),
-	            replaceRoot("test"),
-	            sort(Sort.Direction.DESC, "devicetime")
+	            project("deviceid","attributes","deviceName")
+	            .and("devicetime").dateAsFormattedString("%Y-%m-%d").as("devicetime")
+	            .and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("time"),
+	            new AggregationOperation() {
+
+					@Override
+					public DBObject toDBObject(AggregationOperationContext context) {
+						// TODO Auto-generated method stub
+						return groups;
+					}
+	                
+	            },
+	            
+	            new AggregationOperation() {
+
+					@Override
+					public DBObject toDBObject(AggregationOperationContext context) {
+						// TODO Auto-generated method stub
+						return addFields;
+					}
+	                
+	            },
+	            sort(Sort.Direction.DESC, "devicetime")	            
+	            
 	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
-	    
 	        AggregationResults<BasicDBObject> groupResults
 	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
 
 
-
-	        if(groupResults.getMappedResults().size() > 0) {
+            if(groupResults.getMappedResults().size() > 0) {
 	        	
 	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
 	            while (iterator.hasNext()) {
+	            	
+	            	
+	            	
 	            	BasicDBObject object = (BasicDBObject) iterator.next();
+	            		            	
 	            	DeviceWorkingHours device = new DeviceWorkingHours();
 	            	
-
-	            	device.setHours("0");
 	            	
+	            	device.setHours("00:00:00");
+	            	
+
 	            	if(object.containsField("attributes") && object.get("attributes") != null) {
-                    	
 	                	device.setAttributes(object.get("attributes").toString());
-	                	
-	                	JSONObject attr = new JSONObject(device.getAttributes().toString());
-	                	
-						if(attr.has("todayHoursString")) {
-							device.setHours(attr.getString("todayHoursString"));
+	            	}
+	            	
+	            	if(object.containsField("deviceName") && object.get("deviceName") != null) {
+		            	
+						device.setDeviceName(object.getString("deviceName"));
+	
+					}
+	            	
+	            	if(object.containsField("startTime") && object.get("startTime") != null) {
+                    	
+	            		Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(object.getString("startTime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
 						
 
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+
+						
+						device.setStartTime(outputFormat.format(dateTime));
+	            		
 	            	}
+	            	
+
+	            	if(object.containsField("endTime") && object.get("endTime") != null) {
+                    	
+	            		Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(object.getString("endTime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+
+						
+						device.setEndTime(outputFormat.format(dateTime));
+	            		
+	            	}
+
 	            	if(object.containsField("deviceid") && object.get("deviceid") != null) {
 	                	device.setDeviceId(object.getLong("deviceid"));
 	
 	            	}
 					if(object.containsField("devicetime") && object.get("devicetime") != null) {
-						
-						device.setDeviceTime(object.getString("devicetime"));
 
+
+						device.setDeviceTime(object.getString("devicetime"));
+						
 						
 	                }
-					if(object.containsField("_id") && object.get("_id") != null) {
-		            	
-		            	device.setPositionId(object.getObjectId("_id").toString());
 
-	
-					}
+
+					if(object.containsField("time") && object.get("time") != null) {
+
+
+
+						long hr = TimeUnit.MILLISECONDS.toHours(object.getLong("time"));
+						
+						if(hr < 0) {
+							hr = hr + 24;
+						}
+						
+						long min = TimeUnit.MILLISECONDS.toMinutes(object.getLong("time"))
+								- TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(object.getLong("time")));
+						
+						if(min < 0) {
+							min = min + 60;
+						}
+						
+						long sec = TimeUnit.MILLISECONDS.toSeconds(object.getLong("time"))
+								- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(object.getLong("time")));
+						
+						if(sec < 0) {
+							sec = sec + 60;
+						}
+						
+						
+						String time = "";
+						String timeHr = "";
+						String timeMin = "";
+						String timeSec = "";
+
+						if(hr < 10) {
+							timeHr = "0"+hr+":";
+						}
+						else {
+							timeHr = hr+":";
+
+						}
+						
+						
+						if(min < 10) {
+							timeMin = "0"+min+":";
+						}
+						else {
+							timeMin = min+":";
+
+						}
+						
+						
+						if(sec < 10) {
+							timeSec = "0"+sec;
+						}
+						else {
+							timeSec = ""+sec;
+
+						}
+						
+						time = timeHr + timeMin + timeSec;
+						
+						
+						device.setHours(time);
+						
+	                }
 					
-					if(object.containsField("deviceName") && object.get("deviceName") != null) {
-		            	
-						device.setDeviceName(object.getString("deviceName"));
-	
-					}
 					
-	            	
+					
+				
 	            	deviceHours.add(device);
 	            }
 	        }
@@ -1149,78 +1662,254 @@ public class MongoPositionRepo {
 	
 	public List<DriverWorkingHours> getDriverWorkingHoursScheduled(List<Long> allDevices,Date start,Date end){
 
-
-		Calendar calendarFrom = Calendar.getInstance();
-		calendarFrom.setTime(start);
-		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
-		start = calendarFrom.getTime();
-	    
-		Calendar calendarTo = Calendar.getInstance();
-		calendarTo.setTime(end);
-		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
-		end = calendarTo.getTime();
 		
 		List<DriverWorkingHours> driverHours = new ArrayList<DriverWorkingHours>();
 
+		BasicDBObject addFields = new BasicDBObject();
+
+		BasicDBObject fields = new BasicDBObject();
+		BasicDBObject subtract = new BasicDBObject();
+		List<String> arr = new ArrayList<String>();
+		
+		arr.add("$lastTime");
+		arr.add("$firstTime");
+		subtract.put("$subtract", arr);
+		
+		fields.put("time", subtract);
+		fields.put("deviceid", "$_id.deviceid");
+		fields.put("devicetime", "$_id.devicetime");
+
+		addFields.put("$addFields", fields);
+		
+		BasicDBObject deviceName = new BasicDBObject();
+		deviceName.put("$last", "$deviceName");
+		BasicDBObject startTime = new BasicDBObject();
+		startTime.put("$first", "$time");
+		BasicDBObject endTime = new BasicDBObject();
+		endTime.put("$last", "$time");
+		BasicDBObject firstTime = new BasicDBObject();
+		firstTime.put("$first", "$attributes.todayHours");
+		BasicDBObject lastTime = new BasicDBObject();
+		lastTime.put("$last", "$attributes.todayHours");
+
+		BasicDBObject attributes = new BasicDBObject();
+		attributes.put("$last", "$attributes");
+		
+		BasicDBObject driverName = new BasicDBObject();
+		driverName.put("$last", "$driverName");
+
+		BasicDBObject groups = new BasicDBObject();
+
+		BasicDBObject group = new BasicDBObject();
+		BasicDBObject _id = new BasicDBObject();
+
+		_id.put("deviceid", "$deviceid");
+		_id.put("devicetime", "$devicetime");
+		
+		group.put("_id", _id);
+		
+		group.put("deviceName", deviceName);
+		group.put("startTime", startTime);
+		group.put("endTime", endTime);
+		group.put("firstTime", firstTime);
+		group.put("lastTime", lastTime);
+		group.put("attributes", attributes);
+		group.put("driverName", driverName);
+
+		groups.put("$group", group);
 		
 	    Aggregation aggregation = newAggregation(
-	            match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)),
-	            project("deviceid","attributes","deviceName","driverName").and("devicetime").dateAsFormattedString("%Y-%m-%d").as("devicetime"),
-	            group("deviceid","devicetime").last("$$ROOT").as("test"),
-	            replaceRoot("test"),
+	            match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)), 
+	            project("deviceid","attributes","deviceName","driverName")
+	            .and("devicetime").dateAsFormattedString("%Y-%m-%d").as("devicetime")
+	            .and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("time"),
+	            new AggregationOperation() {
+
+					@Override
+					public DBObject toDBObject(AggregationOperationContext context) {
+						// TODO Auto-generated method stub
+						return groups;
+					}
+	                
+	            },
+	            
+	            new AggregationOperation() {
+
+					@Override
+					public DBObject toDBObject(AggregationOperationContext context) {
+						// TODO Auto-generated method stub
+						return addFields;
+					}
+	                
+	            },
 	            sort(Sort.Direction.DESC, "devicetime")
 	            
 	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
-	    
 	        AggregationResults<BasicDBObject> groupResults
 	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
 
 
-
-	        if(groupResults.getMappedResults().size() > 0) {
+            if(groupResults.getMappedResults().size() > 0) {
 	        	
 	            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
 	            while (iterator.hasNext()) {
+	            	
+	            	
+	            	
 	            	BasicDBObject object = (BasicDBObject) iterator.next();
-	            	DriverWorkingHours device = new DriverWorkingHours();
+	            		            	
+	            	DriverWorkingHours driver = new DriverWorkingHours();
 	            	
 	            	
-	            	device.setHours("0");
+	            	driver.setHours("00:00:00");
+	            	
+
 	            	if(object.containsField("attributes") && object.get("attributes") != null) {
-	                	device.setAttributes(object.get("attributes").toString());
-	
-                        JSONObject attr = new JSONObject(device.getAttributes().toString());
-	                	
-						if(attr.has("todayHoursString")) {
-							device.setHours(attr.getString("todayHoursString"));
-						}
+	            		driver.setAttributes(object.get("attributes").toString());
 	            	}
-	            	if(object.containsField("deviceid") && object.get("deviceid") !=null) {
-	                	device.setDeviceId(object.getLong("deviceid"));
-	
-	            	}
-					if(object.containsField("devicetime") && object.get("devicetime") !=null) {
-						
-						device.setDeviceTime(object.getString("devicetime"));
-
-						
-	                }
-					if(object.containsField("_id") && object.get("_id") !=null) {
+	            	
+	            	if(object.containsField("deviceName") && object.get("deviceName") != null) {
 		            	
-		            	device.setPositionId(object.getObjectId("_id").toString());
-
+	            		driver.setDeviceName(object.getString("deviceName"));
+	
 					}
-					if(object.containsField("deviceName") && object.get("deviceName") !=null) {
-		            	device.setDeviceName(object.getString("deviceName"));    		
+	            	
+	            	if(object.containsField("driverName") && object.get("driverName") != null) {
+		            	
+	            		driver.setDriverName(object.getString("driverName"));
+	
+					}
+	            	
+	            	if(object.containsField("startTime") && object.get("startTime") != null) {
+                    	
+	            		Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(object.getString("startTime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+
+						
+						driver.setStartTime(outputFormat.format(dateTime));
+	            		
+	            	}
+	            	
+
+	            	if(object.containsField("endTime") && object.get("endTime") != null) {
+                    	
+	            		Date dateTime = null;
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss aa");
+
+						try {
+							dateTime = inputFormat.parse(object.getString("endTime"));
+
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+
+						Calendar calendarTime = Calendar.getInstance();
+						calendarTime.setTime(dateTime);
+						calendarTime.add(Calendar.HOUR_OF_DAY, 3);
+						dateTime = calendarTime.getTime();
+
+						
+						driver.setEndTime(outputFormat.format(dateTime));
+	            		
+	            	}
+
+	            	if(object.containsField("deviceid") && object.get("deviceid") != null) {
+	            		driver.setDeviceId(object.getLong("deviceid"));
+	
+	            	}
+					if(object.containsField("devicetime") && object.get("devicetime") != null) {
+
+
+						driver.setDeviceTime(object.getString("devicetime"));
+						
+						
 	                }
-					if(object.containsField("driverName") && object.get("driverName") !=null) {
-		            	device.setDriverName(object.getString("driverName"));    		
+
+
+					if(object.containsField("time") && object.get("time") != null) {
+
+
+
+						long hr = TimeUnit.MILLISECONDS.toHours(object.getLong("time"));
+						
+						if(hr < 0) {
+							hr = hr + 24;
+						}
+						
+						long min = TimeUnit.MILLISECONDS.toMinutes(object.getLong("time"))
+								- TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(object.getLong("time")));
+						
+						if(min < 0) {
+							min = min + 60;
+						}
+						
+						long sec = TimeUnit.MILLISECONDS.toSeconds(object.getLong("time"))
+								- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(object.getLong("time")));
+						
+						if(sec < 0) {
+							sec = sec + 60;
+						}
+						
+						String time = "";
+						String timeHr = "";
+						String timeMin = "";
+						String timeSec = "";
+
+						if(hr < 10) {
+							timeHr = "0"+hr+":";
+						}
+						else {
+							timeHr = hr+":";
+
+						}
+						
+						
+						if(min < 10) {
+							timeMin = "0"+min+":";
+						}
+						else {
+							timeMin = min+":";
+
+						}
+						
+						
+						if(sec < 10) {
+							timeSec = "0"+sec;
+						}
+						else {
+							timeSec = ""+sec;
+
+						}
+						
+						time = timeHr + timeMin + timeSec;
+						
+						
+						driver.setHours(time);
 	                }
 					
-	            	
-	            	
-	            	driverHours.add(device);
+					
+					
+				
+					driverHours.add(driver);
 	            }
 	        }
         
@@ -1230,28 +1919,92 @@ public class MongoPositionRepo {
 	
 	public Integer getDeviceWorkingHoursSize(List<Long> allDevices,Date start,Date end){
 
-		Calendar calendarFrom = Calendar.getInstance();
-		calendarFrom.setTime(start);
-		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
-		start = calendarFrom.getTime();
-	    
-		Calendar calendarTo = Calendar.getInstance();
-		calendarTo.setTime(end);
-		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
-		end = calendarTo.getTime();
+
 		
 		Integer size = 0;
 		
+		BasicDBObject addFields = new BasicDBObject();
+
+		BasicDBObject fields = new BasicDBObject();
+		BasicDBObject subtract = new BasicDBObject();
+		List<String> arr = new ArrayList<String>();
+		
+		arr.add("$lastTime");
+		arr.add("$firstTime");
+		subtract.put("$subtract", arr);
+		
+		fields.put("time", subtract);
+		fields.put("deviceid", "$_id.deviceid");
+		fields.put("devicetime", "$_id.devicetime");
+
+		addFields.put("$addFields", fields);
+		
+		BasicDBObject deviceName = new BasicDBObject();
+		deviceName.put("$first", "$deviceName");
+		BasicDBObject startTime = new BasicDBObject();
+		startTime.put("$first", "$time");
+		BasicDBObject endTime = new BasicDBObject();
+		endTime.put("$last", "$time");
+		BasicDBObject firstTime = new BasicDBObject();
+		firstTime.put("$first", "$attributes.todayHours");
+		BasicDBObject lastTime = new BasicDBObject();
+		lastTime.put("$last", "$attributes.todayHours");
+
+		BasicDBObject attributes = new BasicDBObject();
+		attributes.put("$first", "$attributes");
+
+		BasicDBObject groups = new BasicDBObject();
+
+		BasicDBObject group = new BasicDBObject();
+		BasicDBObject _id = new BasicDBObject();
+
+		_id.put("deviceid", "$deviceid");
+		_id.put("devicetime", "$devicetime");
+		
+		group.put("_id", _id);
+		
+		group.put("deviceName", deviceName);
+		group.put("startTime", startTime);
+		group.put("endTime", endTime);
+		group.put("firstTime", firstTime);
+		group.put("lastTime", lastTime);
+		group.put("attributes", attributes);
+
+		groups.put("$group", group);
+		
 	    Aggregation aggregation = newAggregation(
 	            match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)), 
-	            project("deviceid","attributes","deviceName").and("devicetime").dateAsFormattedString("%Y-%m-%d").as("devicetime"),
-	            group("deviceid","devicetime").last("$$ROOT").as("test"),
-	            replaceRoot("test"),
+	            project("deviceid","attributes","deviceName")
+	            .and("devicetime").dateAsFormattedString("%Y-%m-%d").as("devicetime")
+	            .and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("time"),
+	            new AggregationOperation() {
+
+					@Override
+					public DBObject toDBObject(AggregationOperationContext context) {
+						// TODO Auto-generated method stub
+						return groups;
+					}
+	                
+	            },
+	            
+	            new AggregationOperation() {
+
+					@Override
+					public DBObject toDBObject(AggregationOperationContext context) {
+						// TODO Auto-generated method stub
+						return addFields;
+					}
+	                
+	            },
 	            sort(Sort.Direction.DESC, "devicetime"),
 	            count().as("size")
+
+	            
+	            
+
 	            
 	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
-
+		
 
 	        AggregationResults<BasicDBObject> groupResults
 	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);
@@ -1270,28 +2023,92 @@ public class MongoPositionRepo {
 	}
 	public Integer getDriverWorkingHoursSize(List<Long> allDevices,Date start,Date end){
 
-		Calendar calendarFrom = Calendar.getInstance();
-		calendarFrom.setTime(start);
-		calendarFrom.add(Calendar.HOUR_OF_DAY, 3);
-		start = calendarFrom.getTime();
-	    
-		Calendar calendarTo = Calendar.getInstance();
-		calendarTo.setTime(end);
-		calendarTo.add(Calendar.HOUR_OF_DAY, 3);
-		end = calendarTo.getTime();
 		
 		Integer size = 0;
 		
+		BasicDBObject addFields = new BasicDBObject();
+
+		BasicDBObject fields = new BasicDBObject();
+		BasicDBObject subtract = new BasicDBObject();
+		List<String> arr = new ArrayList<String>();
+		
+		arr.add("$lastTime");
+		arr.add("$firstTime");
+		subtract.put("$subtract", arr);
+		
+		fields.put("time", subtract);
+		fields.put("deviceid", "$_id.deviceid");
+		fields.put("devicetime", "$_id.devicetime");
+
+		addFields.put("$addFields", fields);
+		
+		BasicDBObject deviceName = new BasicDBObject();
+		deviceName.put("$last", "$deviceName");
+		BasicDBObject startTime = new BasicDBObject();
+		startTime.put("$first", "$time");
+		BasicDBObject endTime = new BasicDBObject();
+		endTime.put("$last", "$time");
+		BasicDBObject firstTime = new BasicDBObject();
+		firstTime.put("$first", "$attributes.todayHours");
+		BasicDBObject lastTime = new BasicDBObject();
+		lastTime.put("$last", "$attributes.todayHours");
+
+		BasicDBObject attributes = new BasicDBObject();
+		attributes.put("$last", "$attributes");
+		
+		BasicDBObject driverName = new BasicDBObject();
+		driverName.put("$last", "$driverName");
+
+		BasicDBObject groups = new BasicDBObject();
+
+		BasicDBObject group = new BasicDBObject();
+		BasicDBObject _id = new BasicDBObject();
+
+		_id.put("deviceid", "$deviceid");
+		_id.put("devicetime", "$devicetime");
+		
+		group.put("_id", _id);
+		
+		group.put("deviceName", deviceName);
+		group.put("startTime", startTime);
+		group.put("endTime", endTime);
+		group.put("firstTime", firstTime);
+		group.put("lastTime", lastTime);
+		group.put("attributes", attributes);
+		group.put("driverName", driverName);
+
+		groups.put("$group", group);
+		
 	    Aggregation aggregation = newAggregation(
-	            match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)),
-	            project("deviceid","attributes","deviceName","driverName").and("devicetime").dateAsFormattedString("%Y-%m-%d").as("devicetime"),
-	            group("deviceid","devicetime").last("$$ROOT").as("test"),
-	            replaceRoot("test"),
+	            match(Criteria.where("deviceid").in(allDevices).and("devicetime").gte(start).lte(end)), 
+	            project("deviceid","attributes","deviceName","driverName")
+	            .and("devicetime").dateAsFormattedString("%Y-%m-%d").as("devicetime")
+	            .and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("time"),
+	            new AggregationOperation() {
+
+					@Override
+					public DBObject toDBObject(AggregationOperationContext context) {
+						// TODO Auto-generated method stub
+						return groups;
+					}
+	                
+	            },
+	            
+	            new AggregationOperation() {
+
+					@Override
+					public DBObject toDBObject(AggregationOperationContext context) {
+						// TODO Auto-generated method stub
+						return addFields;
+					}
+	                
+	            },
 	            sort(Sort.Direction.DESC, "devicetime"),
 	            count().as("size")
 	            
 	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
+		
 
 	        AggregationResults<BasicDBObject> groupResults
 	            = mongoTemplate.aggregate(aggregation,"tc_positions", BasicDBObject.class);

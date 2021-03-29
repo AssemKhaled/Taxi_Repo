@@ -14,6 +14,9 @@ public class DriverWorkingHours {
 	private String driverName;
 	private String hours;
 	private String deviceName;
+	private String startTime;
+	private String endTime;
+
 
 	
 	public DriverWorkingHours() {
@@ -76,5 +79,36 @@ public class DriverWorkingHours {
 		this.hours = hours;
 	}
 
+	public String getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(String startTime) {
+		this.startTime = startTime;
+	}
+
+	public String getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(String endTime) {
+		this.endTime = endTime;
+	}
+
+	public DriverWorkingHours(String deviceTime, String positionId, Object attributes, Long deviceId, String driverName,
+			String hours, String deviceName, String startTime, String endTime) {
+		super();
+		this.deviceTime = deviceTime;
+		this.positionId = positionId;
+		this.attributes = attributes;
+		this.deviceId = deviceId;
+		this.driverName = driverName;
+		this.hours = hours;
+		this.deviceName = deviceName;
+		this.startTime = startTime;
+		this.endTime = endTime;
+	}
+
+	
 	
 }

@@ -19,8 +19,26 @@ public class DeviceWorkingHours {
 	private Long deviceId;
 	private String deviceName;
 	private String hours;
+	private String startTime;
+	private String endTime;
 
 	
+	public String getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(String startTime) {
+		this.startTime = startTime;
+	}
+
+	public String getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(String endTime) {
+		this.endTime = endTime;
+	}
+
 	public DeviceWorkingHours() {
 		
 	}
@@ -68,6 +86,19 @@ public class DeviceWorkingHours {
 	}
 	public void setHours(String hours) {
 		this.hours = hours;
+	}
+
+	public DeviceWorkingHours(String deviceTime, String positionId, Object attributes, Long deviceId, String deviceName,
+			String hours, String startTime, String endTime) {
+		super();
+		this.deviceTime = deviceTime;
+		this.positionId = positionId;
+		this.attributes = attributes;
+		this.deviceId = deviceId;
+		this.deviceName = deviceName;
+		this.hours = hours;
+		this.startTime = startTime;
+		this.endTime = endTime;
 	}
 	
 	
