@@ -37,6 +37,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomPositions;
+import com.example.examplequerydslspringdatajpamaven.entity.DeviceTempHum;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverWorkingHours;
@@ -942,6 +943,22 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 		    for (int i = 0 ; i < reports.length(); i++) {
 		    	
 		    	
+                if(reports.get(i).equals("vehicleTempHum")) {
+		    		
+		    		ResponseEntity<?> response = reportServiceImpl.getVehicleTempHum("Schedule", deviIds, grouIds, 0, from, to, "", userId,"");
+		    		
+		    		getObjectResponse = (GetObjectResponse) response.getBody();
+		    		List<DeviceTempHum> tempHumReports = (List<DeviceTempHum>) getObjectResponse.getEntity();
+
+					Random rand = new Random();
+					int n = rand.nextInt(999999);
+
+		    		String[] columns = {"Vehicle Name", "Time", "Temperature", "Humidity","Speed (Km/h)"};
+				    createExcel("vehicleTempHum",tempHumReports, "vehicleTempHum"+n+".xlsx",columns);
+				    sendMail("vehicleTempHum"+n+".xlsx",email);
+		    		
+		    	}
+                
                 if(reports.get(i).equals("sensorWeight")) {
 		    		
 		    		ResponseEntity<?> response = reportServiceImpl.getSensorsReport("Schedule", deviIds, grouIds, 0, from, to, "", userId,"");
@@ -1300,8 +1317,9 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 		List<Map> numVisitedReport = new ArrayList<Map>();
 		List<Map> engineNotMovingReport = new ArrayList<Map>();
 		List<Map> numDriveHoursReport = new ArrayList<Map>();
+		List<DeviceTempHum> tempHumReport = new ArrayList<DeviceTempHum>();
 
-
+		
 		
 		if(reportType.equals("numDriveHours")) {
 			numDriveHoursReport = (List<Map>) entity;
@@ -1313,6 +1331,10 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 		}
     	if(reportType.equals("engineNotMoving")) {
     		engineNotMovingReport = (List<Map>) entity;
+
+		}
+		if(reportType.equals("vehicleTempHum")) {
+			tempHumReport = (List<DeviceTempHum>) entity;
 
 		}
 		if(reportType.equals("sensorWeight")) {
@@ -1475,6 +1497,61 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
                 }
                 else {
                 	row.createCell(5)
+                    .setCellValue(sensorWeight.getSpeed());
+                }
+                
+              
+
+            }
+        }
+        if(reportType.equals("vehicleTempHum")) {
+        	for(DeviceTempHum sensorWeight: tempHumReport) {
+
+
+                Row row = sheet.createRow(rowNum++);
+                
+               
+                if(sensorWeight.getDeviceName() == null){
+                	row.createCell(0)
+                    .setCellValue("");
+                }
+                else {
+                	row.createCell(0)
+                    .setCellValue(sensorWeight.getDeviceName());
+                }
+                
+                if(sensorWeight.getServertime() == null){
+                	row.createCell(1)
+                    .setCellValue("");
+                }
+                else {
+                	row.createCell(1)
+                    .setCellValue(sensorWeight.getServertime());
+                }
+                
+                if(sensorWeight.getTemperature() == null){
+                	row.createCell(2)
+                    .setCellValue("");
+                }
+                else {
+                	row.createCell(2)
+                    .setCellValue(sensorWeight.getTemperature());
+                }
+                
+                if(sensorWeight.getHumidity() == null){
+                	row.createCell(3)
+                    .setCellValue("");
+                }
+                else {
+                	row.createCell(3)
+                    .setCellValue(sensorWeight.getHumidity());
+                }
+                if(sensorWeight.getSpeed() == null){
+                	row.createCell(4)
+                    .setCellValue("");
+                }
+                else {
+                	row.createCell(4)
                     .setCellValue(sensorWeight.getSpeed());
                 }
                 

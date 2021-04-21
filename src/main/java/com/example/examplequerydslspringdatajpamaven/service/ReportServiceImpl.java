@@ -32,6 +32,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
+import com.example.examplequerydslspringdatajpamaven.entity.DeviceTempHum;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverWorkingHours;
@@ -6263,6 +6264,321 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 	
 
+
+	@Override
+	public ResponseEntity<?> getVehicleTempHum(String TOKEN, Long[] deviceIds, Long[] groupIds, int offset, String start,
+			String end, String search, Long userId, String exportData) {
+		 logger.info("************************ getSensorsReport STARTED ***************************");
+
+			List<DeviceTempHum> positionsList = new ArrayList<DeviceTempHum>();
+			if(TOKEN.equals("")) {
+				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",positionsList);
+				 logger.info("************************ getSensorsReport ENDED ***************************");
+				 return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			
+			
+			if(!TOKEN.equals("Schedule")) {
+				if(super.checkActive(TOKEN)!= null)
+				{
+					return super.checkActive(TOKEN);
+				}
+			}
+			
+			
+			User loggedUser = new User();
+			if(userId != 0) {
+				
+				loggedUser = userServiceImpl.findById(userId);
+				if(loggedUser == null) {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",positionsList);
+					 logger.info("************************ getSensorsReport ENDED ***************************");
+					return  ResponseEntity.status(404).body(getObjectResponse);
+				}
+			}	
+			
+			if(!loggedUser.getAccountType().equals(1)) {
+				if(!userRoleService.checkUserHasPermission(userId, "SENSORWEIGHT", "list")) {
+					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get SENSORWEIGHT list",positionsList);
+					 logger.info("************************ getSensorsReport ENDED ***************************");
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+			}
+			
+			
+			
+			List<Long>allDevices= new ArrayList<>();
+
+			if(groupIds.length != 0) {
+				for(Long groupId:groupIds) {
+					if(groupId != 0) {
+				    	Group group=groupRepository.findOne(groupId);
+				    	if(group != null) {
+							if(group.getIs_deleted() == null) {
+								boolean isParent = false;
+								if(loggedUser.getAccountType().equals(4)) {
+									Set<User> clientParents = loggedUser.getUsersOfUser();
+									if(clientParents.isEmpty()) {
+										getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group",positionsList);
+										 logger.info("************************ getSensorsReport ENDED ***************************"); 
+										return  ResponseEntity.badRequest().body(getObjectResponse);
+									}else {
+										User parent = null;
+										for(User object : clientParents) {
+											parent = object ;
+										}
+
+										Set<User>groupParents = group.getUserGroup();
+										if(groupParents.isEmpty()) {
+											getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group",positionsList);
+											 logger.info("************************ getSensorsReport ENDED ***************************");
+											return  ResponseEntity.badRequest().body(getObjectResponse);
+										}else {
+											for(User parentObject : groupParents) {
+												if(parentObject.getId().equals(parent.getId())) {
+													isParent = true;
+													break;
+												}
+											}
+										}
+									}
+									List<Long> CheckData = userClientGroupRepository.getGroup(userId,groupId);
+									if(CheckData.isEmpty()) {
+											isParent = false;
+									}
+									else {
+											isParent = true;
+									}
+								}
+								if(!groupsServiceImpl.checkIfParent(group , loggedUser) && ! isParent) {
+									getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group ",positionsList);
+									 logger.info("************************ getSensorsReport ENDED ***************************");
+									return ResponseEntity.badRequest().body(getObjectResponse);
+								}
+								if(group.getType() != null) {
+									if(group.getType().equals("driver")) {
+										
+										allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
+									
+
+									}
+									else if(group.getType().equals("device")) {
+										
+										allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
+										
+										
+									}
+									else if(group.getType().equals("geofence")) {
+										
+										allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
+										
+
+									}
+								}
+
+								
+							}
+				    	}
+				    	
+
+					}
+				}
+			}
+			if(deviceIds.length != 0 ) {
+				for(Long deviceId:deviceIds) {
+					if(deviceId !=0) {
+						Device device =deviceServiceImpl.findById(deviceId);
+						boolean isParent = false;
+						if(loggedUser.getAccountType() == 4) {
+							Set<User>parentClients = loggedUser.getUsersOfUser();
+							if(parentClients.isEmpty()) {
+								getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this device ",positionsList);
+								 logger.info("************************ getSensorsReport ENDED ***************************");
+								return  ResponseEntity.badRequest().body(getObjectResponse);
+							}else {
+								User parent = null;
+								for(User object : parentClients) {
+									parent = object ;
+								}
+								Set<User>deviceParent = device.getUser();
+								if(deviceParent.isEmpty()) {
+									getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this device ",positionsList);
+									 logger.info("************************ getSensorsReport ENDED ***************************");
+									return  ResponseEntity.badRequest().body(getObjectResponse);
+								}else {
+									for(User  parentObject : deviceParent) {
+										if(parent.getId() == parentObject.getId()) {
+											isParent = true;
+											break;
+										}
+									}
+								}
+							}
+							List<Long> CheckData = userClientDeviceRepository.getDevice(userId,deviceId);
+							if(CheckData.isEmpty()) {
+									isParent = false;
+							}
+							else {
+									isParent = true;
+							}
+						}
+						if(!deviceServiceImpl.checkIfParent(device , loggedUser) && ! isParent) {
+							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this device",positionsList);
+							 logger.info("************************ getSensorsReport ENDED ***************************");
+							return ResponseEntity.badRequest().body(getObjectResponse);
+						}
+						
+						allDevices.add(deviceId);
+
+						
+		
+					}
+				}
+			}
+
+			Date dateFrom;
+			Date dateTo;
+			if(start.equals("0") || end.equals("0")) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+
+			}
+			else {
+				SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+				SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+				SimpleDateFormat inputFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+				inputFormat1.setLenient(false);
+				inputFormat.setLenient(false);
+				outputFormat.setLenient(false);
+
+				
+				try {
+					dateFrom = inputFormat.parse(start);
+					start = outputFormat.format(dateFrom);
+					
+
+				} catch (ParseException e2) {
+					// TODO Auto-generated catch block
+					try {
+						dateFrom = inputFormat1.parse(start);
+						start = outputFormat.format(dateFrom);
+
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						
+						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+						logger.info("************************ getEventsReport ENDED ***************************");		
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+					}
+					
+				}
+				
+				try {
+					dateTo = inputFormat.parse(end);
+					end = outputFormat.format(dateTo);
+					
+
+				} catch (ParseException e2) {
+					// TODO Auto-generated catch block
+					try {
+						dateTo = inputFormat1.parse(end);
+						end = outputFormat.format(dateTo);
+
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+						logger.info("************************ getEventsReport ENDED ***************************");		
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+					}
+					
+				}
+				
+				
+				
+				
+				Date today=new Date();
+
+				if(dateFrom.getTime() > dateTo.getTime()) {
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
+				search = "%"+search+"%";				
+				
+				String appendString="";
+		
+				if(allDevices.size()>0) {
+					  for(int i=0;i<allDevices.size();i++) {
+						  if(appendString != "") {
+							  appendString +=","+allDevices.get(i);
+						  }
+						  else {
+							  appendString +=allDevices.get(i);
+						  }
+					  }
+				 }
+				allDevices = new ArrayList<Long>();
+				
+				String[] data = {};
+				if(!appendString.equals("")) {
+			        data = appendString.split(",");
+
+				}
+		        
+
+		        for(String d:data) {
+
+		        	if(!allDevices.contains(Long.parseLong(d))) {
+			        	allDevices.add(Long.parseLong(d));
+		        	}
+		        }
+		        
+		        if(allDevices.isEmpty()) {
+
+		        	getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "no data for devices of group or devices that you selected ",positionsList);
+					 logger.info("************************ getSensorsReport ENDED ***************************");
+		        	return  ResponseEntity.badRequest().body(getObjectResponse);
+		        }
+			}
+			Integer size = 0;
+
+			if(exportData.equals("exportData")) {
+				
+				positionsList = mongoPositionRepo.getVehicleTempHumListScheduled(allDevices,dateFrom, dateTo);
+				
+
+				getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",positionsList);
+				logger.info("************************ getSensorsReport ENDED ***************************");
+				return  ResponseEntity.ok().body(getObjectResponse);
+				
+			}
+			if(!TOKEN.equals("Schedule")) {
+				
+				
+				search = "%"+search+"%";
+				positionsList = mongoPositionRepo.getVehicleTempHumList(allDevices, offset, dateFrom, dateTo);
+				if(positionsList.size()>0) {
+					    size=mongoPositionRepo.getVehicleTempHumListSize(allDevices,dateFrom, dateTo);
+				
+				}
+				
+			}
+			else {
+				positionsList = mongoPositionRepo.getVehicleTempHumListScheduled(allDevices,dateFrom, dateTo);
+
+			}
+			
+			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",positionsList,size);
+			logger.info("************************ getSensorsReport ENDED ***************************");
+			return  ResponseEntity.ok().body(getObjectResponse);
+	}
 	
 	
 

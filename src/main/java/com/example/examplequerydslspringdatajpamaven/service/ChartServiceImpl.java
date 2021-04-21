@@ -413,7 +413,9 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 			from = outputFormat.format(dateFrom);
 			to = outputFormat.format(dateTo);
 				
-			
+			  System.out.println(from);
+			  System.out.println(to);
+
 
 		  UriComponents builder = UriComponentsBuilder.fromHttpUrl(GET_URL)
 			        .queryParam("type", "allEvents")
@@ -427,8 +429,12 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 			  if(allDevices.size()>0) {
 				  for(int i=0;i<allDevices.size();i++) {
 					  URL +="&deviceId="+allDevices.get(i);
+
 				  }
+				  
 			  }
+
+			  System.out.println(URL);
 			  ResponseEntity<List<SummaryReport>> rateResponse =
 				        restTemplate.exchange(URL,
 				                    HttpMethod.GET,request, new ParameterizedTypeReference<List<SummaryReport>>() {

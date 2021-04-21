@@ -317,6 +317,21 @@ public class ReportRestController {
     	return  reportServiceImpl.getviewTrip(TOKEN, deviceId,startTime, endTime);
 
 	}
+	
+	@RequestMapping(value = "/getVehicleTempHum", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getVehicleTempHum(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+													  @RequestParam (value = "deviceId", defaultValue = "0") Long [] deviceId,
+													  @RequestParam (value = "groupId", defaultValue = "0") Long [] groupId,
+													  @RequestParam (value = "exportData", defaultValue = "") String exportData,
+													  @RequestParam (value = "offset", defaultValue = "0") int offset,
+													  @RequestParam (value = "start", defaultValue = "0") String start,
+													  @RequestParam (value = "end", defaultValue = "0") String end,
+													  @RequestParam (value = "search", defaultValue = "") String search,
+													  @RequestParam (value = "userId",defaultValue = "0")Long userId) {
+	
+    	return  reportServiceImpl.getVehicleTempHum(TOKEN,deviceId,groupId, offset, start, end,search,userId,exportData);
+
+	}
 
 
 }

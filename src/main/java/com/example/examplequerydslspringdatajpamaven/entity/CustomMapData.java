@@ -23,12 +23,15 @@ public class CustomMapData {
 	private Double longitude;
 	private Double speed ;
 	private String address;
-	
+	private Double temperature;
+	private Double humidity;
+
 
 	public CustomMapData() {
 		
 	}
-    public CustomMapData(Long id, String deviceName, String lastUpdate, String positionId,Integer status,Integer vehicleStatus) {
+    public CustomMapData(Long id, String deviceName, String lastUpdate, String positionId,Integer status,Integer vehicleStatus
+    		,Double temperature, Double humidity) {
     	super();
 		this.id = id;
 		this.deviceName = deviceName;
@@ -36,7 +39,10 @@ public class CustomMapData {
 		this.positionId = positionId;
 		this.status = status;
 		this.vehicleStatus = vehicleStatus;
-	}
+		this.temperature = temperature;
+		this.humidity = humidity;
+
+    }
 	
     public CustomMapData(Long id, String deviceName, String lastUpdate, String positionId) {
     	super();
@@ -220,6 +226,18 @@ public class CustomMapData {
 	}
 	public void setLastUpdateApp(String lastUpdateApp) {
 		this.lastUpdateApp = lastUpdateApp;
+	}
+	public Double getTemperature() {
+		return temperature;
+	}
+	public void setTemperature(Double temperature) {
+		this.temperature = temperature;
+	}
+	public Double getHumidity() {
+		return humidity;
+	}
+	public void setHumidity(Double humidity) {
+		this.humidity = humidity;
 	}
 
 

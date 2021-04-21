@@ -35,6 +35,7 @@ public class CustomDeviceList{
 	private String color;
 	private String licenceExptDate;
 	private Double carWeight;
+	private Double car_weight;
 	private String vehiclePlate;
 	private String companyName;
 	private String positionId;
@@ -122,6 +123,14 @@ public class CustomDeviceList{
 
 	public void setExpired(Boolean expired) {
 		this.expired = expired;
+	}
+
+	public Double getCar_weight() {
+		return car_weight;
+	}
+
+	public void setCar_weight(Double car_weight) {
+		this.car_weight = car_weight;
 	}
 
 	public Long getCompanyId() {
@@ -242,7 +251,7 @@ public class CustomDeviceList{
 
 	public CustomDeviceList(int id, String lastUpdate, String deviceName,String uniqueId, String sequenceNumber, String driverName, Long driverId,
 			String driverPhoto,String driverUniqueId ,String plateType, String vehiclePlate, String ownerName, String ownerId, String userName, String brand, String model,
-			String madeYear, String color, String licenceExptDate,
+			String madeYear, String color,Double car_weight ,String licenceExptDate,
 			String positionId, String geofenceName) {
 		super();
 		this.geofenceName=geofenceName;
@@ -264,6 +273,7 @@ public class CustomDeviceList{
 		this.model = model;
 		this.madeYear = madeYear;
 		this.color = color;
+		this.car_weight = car_weight;
 		this.licenceExptDate = licenceExptDate;
 		this.positionId = positionId;
 	}

@@ -1739,6 +1739,15 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			    if(size > 0) {
 					for(int i=0;i<allDevicesLiveData.size();i++) {
 							
+						Double roundTemp = 0.0;
+						Double roundHum = 0.0;
+
+						roundTemp = Math.round(allDevicesLiveData.get(i).getTemperature() * 100.0) / 100.0;
+						roundHum = Math.round(allDevicesLiveData.get(i).getHumidity() * 100.0) / 100.0;
+
+						allDevicesLiveData.get(i).setTemperature(roundTemp);
+						allDevicesLiveData.get(i).setHumidity(roundHum);
+						
 						long minutes = 0;
 		            	allDevicesLiveData.get(i).setVehicleStatus("offline");
 		
@@ -1790,7 +1799,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		
 		                    	JSONObject obj = new JSONObject(json);						
 								
-		                    	Integer countTemp = 0;
+		                    	/*Integer countTemp = 0;
 		                    	Integer countHum = 0;
 		                    	
 		                    	Double Temp = (double) 0;
@@ -1922,7 +1931,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		                    	avgTemp = Math.round(avgTemp * 100.0) / 100.0;
 
 		                    	allDevicesLiveData.get(i).setTemperature(avgTemp);
-		                    	allDevicesLiveData.get(i).setHumidity(avgHum);
+		                    	allDevicesLiveData.get(i).setHumidity(avgHum);*/
 		                    	
 								allDevicesLiveData.get(i).setAttributes(mongoPosition.getAttributes());
 								allDevicesLiveData.get(i).setSpeed(mongoPosition.getSpeed() * (1.852));
@@ -2014,6 +2023,14 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		    if(size > 0) {
 				for(int i=0;i<allDevicesLiveData.size();i++) {
 					
+					Double roundTemp = 0.0;
+					Double roundHum = 0.0;
+
+					roundTemp = Math.round(allDevicesLiveData.get(i).getTemperature() * 100.0) / 100.0;
+					roundHum = Math.round(allDevicesLiveData.get(i).getHumidity() * 100.0) / 100.0;
+
+					allDevicesLiveData.get(i).setTemperature(roundTemp);
+					allDevicesLiveData.get(i).setHumidity(roundHum);
 					
 					
 					long minutes = 0;
@@ -2067,7 +2084,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	
 	                    	JSONObject obj = new JSONObject(json);						
 							
-	                    	Integer countTemp = 0;
+	                    	/*Integer countTemp = 0;
 	                    	Integer countHum = 0;
 	                    	
 	                    	Double Temp = (double) 0;
@@ -2200,7 +2217,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	                    	
 	                    	allDevicesLiveData.get(i).setTemperature(avgTemp);
 	                    	allDevicesLiveData.get(i).setHumidity(avgHum);
-	                    	
+	                    	*/
 							allDevicesLiveData.get(i).setAttributes(mongoPosition.getAttributes());
 							allDevicesLiveData.get(i).setSpeed(mongoPosition.getSpeed() * (1.852));
 							allDevicesLiveData.get(i).setLatitude(mongoPosition.getLatitude());

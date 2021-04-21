@@ -520,7 +520,7 @@ public class CustomDeviceLiveData {
 		
 	}
 	public CustomDeviceLiveData(int id ,String deviceName , String uniqueId,String lastUpdate,
-			Boolean expired ,String positionId,String photo,String create_date, Long leftDays) {
+			Boolean expired ,String positionId,String photo,String create_date, Long leftDays,Double temperature, Double humidity) {
 		this.id = id ;
 		this.uniqueId = uniqueId ;
 		this.deviceName = deviceName ;
@@ -530,7 +530,8 @@ public class CustomDeviceLiveData {
 		this.photo=photo;
 		this.create_date = create_date;
 		this.leftDays = leftDays;
-
+		this.temperature = temperature;
+		this.humidity = humidity;
 	   		
 	}
 	public CustomDeviceLiveData(int id ,String deviceName , String uniqueId,String lastUpdate ,String positionId,String photo

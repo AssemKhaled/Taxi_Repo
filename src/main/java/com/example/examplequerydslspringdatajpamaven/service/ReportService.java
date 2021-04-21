@@ -43,10 +43,9 @@ public interface ReportService {
     
 	public ResponseEntity<?> getNumberDriverWorkingHours(String TOKEN,Long [] driverId,Long [] groupId,int offset,String start,String end,String search,Long userId,String exportData);
 
-	
 	public ResponseEntity<?> getviewTrip(String TOKEN,Long deviceId,String startTime,String endTime);
 
-	
+	public ResponseEntity<?> getVehicleTempHum(String TOKEN,Long [] deviceId,Long [] groupId,int offset,String start,String end,String search,Long userId,String exportData);	
 
 
 }
