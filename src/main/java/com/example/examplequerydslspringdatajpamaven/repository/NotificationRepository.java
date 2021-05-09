@@ -47,6 +47,11 @@ public interface NotificationRepository extends  JpaRepository<Notification, Lon
 	@Query(value = "Delete from tc_group_notification where tc_group_notification.notificationid=:notificationId", nativeQuery = true)
 	public void deleteNotificationGroupId(@Param("notificationId") Long notificationId);
 	
+	@Transactional
+    @Modifying
+	@Query(value = "Delete from tc_user_notification where tc_user_notification.notificationid=:notificationId", nativeQuery = true)
+	public void deleteNotificationUserId(@Param("notificationId") Long notificationId);
+	
 	@Query(value = "SELECT tc_notifications.id,tc_notifications.type FROM tc_notifications"
 			+ " INNER JOIN tc_user_notification ON tc_user_notification.notificationid = tc_notifications.id"
 			+ " WHERE tc_user_notification.userid IN(:userIds) and tc_notifications.delete_date is null",nativeQuery = true)

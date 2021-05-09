@@ -148,12 +148,14 @@ public class ElmConnectionsRestController {
 	}
 	
 	@GetMapping(path ="/lastLocations")
+//	@Scheduled(fixedRate = 10000)
 	public ResponseEntity<?> lastLocations(){
 		
 		return elmServiceImpl.lastLocations();
 	}
 	
 	@GetMapping(path ="/getExpiredVehicles")
+//	@Scheduled(cron = "0 59 23 ? * *")
 	public ResponseEntity<?> getExpiredVehicles(){
 		
 		return elmServiceImpl.getExpiredVehicles();

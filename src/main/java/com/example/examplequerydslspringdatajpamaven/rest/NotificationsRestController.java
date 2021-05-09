@@ -62,10 +62,10 @@ public class NotificationsRestController {
 	
 	@RequestMapping(value = "/editNotification", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<?> editNotification(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                            @RequestBody(required = false) Notification notification,
-			                                            @RequestParam (value = "userId", defaultValue = "0") Long id,
-			                                            @RequestHeader(value = "Authorization", defaultValue = "")String authorization) {
-		
+			                                                @RequestBody(required = false) Notification notification,
+			                                                @RequestParam (value = "userId", defaultValue = "0") Long id,
+			                                                @RequestHeader(value = "Authorization", defaultValue = "")String authorization) {
+		 
 		
 		return notificationServiceImpl.editNotification(TOKEN,authorization,notification,id);
 
@@ -73,8 +73,8 @@ public class NotificationsRestController {
 	
 	@RequestMapping(value = "/deleteNotification", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> deleteNotification(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
-			                                            @RequestParam (value = "notificationId", defaultValue = "0") Long notificationId,
-			                                            @RequestParam (value = "userId", defaultValue = "0") Long userId) {
+			                                                  @RequestParam (value = "notificationId", defaultValue = "0") Long notificationId,
+			                                                  @RequestParam (value = "userId", defaultValue = "0") Long userId) {
 
     	return  notificationServiceImpl.deleteNotification(TOKEN,notificationId,userId);
 

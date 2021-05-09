@@ -57,18 +57,18 @@ public interface AppService {
 	public ResponseEntity<?> getSummaryReportApp(String TOKEN, Long [] deviceId, Long [] groupId,String type,String from,String to,int page,int start,int limit,Long userId);
 	public ResponseEntity<?> viewTripApp(String TOKEN,Long deviceId,String startTime,String endTime);
 	public ResponseEntity<?> returnFromTraccarApp(String url,String report,List<Long> allDevices,String from,String to,String type,int page,int start,int limit);
-	public ResponseEntity<?> getEventsReportApp(String TOKEN,Long [] deviceId,Long [] groupId,int offset,String start,String end,String type,String search,Long userId);
-	public ResponseEntity<?> getDeviceWorkingHoursApp(String TOKEN,Long [] deviceId,Long [] groupId,int offset,String start,String end,String search,Long userId);
-	public ResponseEntity<?> getCustomReportApp(String TOKEN,Long [] deviceId,Long [] groupId,int offset,String start,String end,String search,Long userId,String custom,String  value);
-    public ResponseEntity<?> getDriverWorkingHoursApp(String TOKEN,Long [] driverId,Long [] groupId,int offset,String start,String end,String search,Long userId);
+	public ResponseEntity<?> getEventsReportApp(String TOKEN,Long [] deviceId,Long [] groupId,int offset,String start,String end,String type,String search,Long userId,String exportData);
+	public ResponseEntity<?> getDeviceWorkingHoursApp(String TOKEN,Long [] deviceId,Long [] groupId,int offset,String start,String end,String search,Long userId,String exportData);
+	public ResponseEntity<?> getCustomReportApp(String TOKEN,Long [] deviceId,Long [] groupId,int offset,String start,String end,String search,Long userId,String custom,String  value,String exportData);
+    public ResponseEntity<?> getDriverWorkingHoursApp(String TOKEN,Long [] driverId,Long [] groupId,int offset,String start,String end,String search,Long userId,String exportData);
 	public ResponseEntity<?> getDriveMoreThanReportApp(String TOKEN,Long [] deviceId,Long [] driverId,Long [] groupId,String type,String from,String to,int page,int start,int limit,Long userId);
 	public ResponseEntity<?> getEventsReportByTypeApp(String TOKEN,Long [] deviceId,Long [] groupId,String type,String from,String to,int page,int start,int limit,Long userId);
-	public ResponseEntity<?> getSensorsReportApp(String TOKEN,Long [] deviceId,Long [] groupId,int offset,String start,String end,String search,Long userId);
+	public ResponseEntity<?> getSensorsReportApp(String TOKEN,Long [] deviceId,Long [] groupId,int offset,String start,String end,String search,Long userId,String exportData);
 	public ResponseEntity<?> getNumTripsReportApp(String TOKEN,Long [] deviceId,Long [] driverId,Long [] groupId,String type,String from,String to,int page,int start,int limit,Long userId);
 	public ResponseEntity<?> getNumStopsReportApp(String TOKEN,Long [] deviceId,Long [] driverId,Long [] groupId,String type,String from,String to,int page,int start,int limit,Long userId);
 	public ResponseEntity<?> geTotalTripsReportApp(String TOKEN,Long [] deviceId,Long [] driverId,Long [] groupId,String type,String from,String to,int page,int start,int limit,Long userId);
 	public ResponseEntity<?> getTotalStopsReportApp(String TOKEN,Long [] deviceId,Long [] driverId,Long [] groupId,String type,String from,String to,int page,int start,int limit,Long userId);
-	public ResponseEntity<?> getNumberDriverWorkingHoursApp(String TOKEN,Long [] driverId,Long [] groupId,int offset,String start,String end,String search,Long userId);
+	public ResponseEntity<?> getNumberDriverWorkingHoursApp(String TOKEN,Long [] driverId,Long [] groupId,int offset,String start,String end,String search,Long userId,String exportData);
 
 	public ResponseEntity<?> updateProfilePhotoApp(String TOKEN,Map<String, String> data,Long userId);
 	public ResponseEntity<?> getUserInfoApp(String TOKEN,Long userId);
@@ -81,6 +81,8 @@ public interface AppService {
 	
 	public ResponseEntity<?> registerToken(String TOKEN,Map<Object, Object> data);
 	public ResponseEntity<?> logoutTokenApp(String TOKEN,Map<Object, Object> data);
+
+	public ResponseEntity<?> getVehicleTempHum(String TOKEN,Long [] deviceId,Long [] groupId,int offset,String start,String end,String search,Long userId,String exportData);	
 
 }	
 

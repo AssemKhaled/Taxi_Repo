@@ -58,6 +58,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.CustomMapData;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
+import com.example.examplequerydslspringdatajpamaven.entity.DeviceTempHum;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceWorkingHours;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
@@ -5689,7 +5690,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	 */
 	@Override
 	public ResponseEntity<?> getEventsReportApp(String TOKEN, Long[] deviceIds, Long[] groupIds, int offset, String start,
-			String end, String type, String search, Long userId) {
+			String end, String type, String search, Long userId,String exportData) {
 		
 		
 		logger.info("************************ getEventsReport STARTED ***************************");		
@@ -5975,129 +5976,63 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	        	return  ResponseEntity.badRequest().body(getObjectResponse);
 	        }
 			
+	        
+	        
 			if(type.equals("")) {
+				
+				if(exportData.equals("exportData")) {
+					eventReport = mongoEventsRepo.getEventsScheduled(allDevices, dateFrom, dateTo);
+
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",eventReport,size);
+					logger.info("************************ getEventsReport ENDED ***************************");
+					return  ResponseEntity.ok().body(getObjectResponse);
+		        }
+				
 				if(!TOKEN.equals("Schedule")) {
 					eventReport = mongoEventsRepo.getEventsWithoutType(allDevices, offset, dateFrom, dateTo);
 					if(eventReport.size()>0) {
 						size = mongoEventsRepo.getEventsWithoutTypeSize(allDevices, dateFrom, dateTo);
-						for(int i=0;i<eventReport.size();i++) {
-							
-							MongoPositions pos = mongoPositionsRepository.findById(eventReport.get(i).getPositionId());
-							
-							if(pos != null) {
-								eventReport.get(i).setLatitude(pos.getLatitude());
-								eventReport.get(i).setLongitude(pos.getLongitude());
-								
-							}
-							
-							Device device = deviceRepository.getOne(eventReport.get(i).getDeviceId());
-							eventReport.get(i).setDeviceName(device.getName());
-							Set<Driver> drivers = device.getDriver();
-							for(Driver driver : drivers) {
-								eventReport.get(i).setDriverId(driver.getId());
-								eventReport.get(i).setDriverName(driver.getName());
-							}
-							
-							if(eventReport.get(i).getEventType().equals("alarm")) {
-								JSONObject obj = new JSONObject(eventReport.get(i).getAttributes().toString());
-								eventReport.get(i).setEventType(obj.getString("alarm"));
-							}
-						}
+						
 						
 					}
 				}
 				else {
 					eventReport = mongoEventsRepo.getEventsScheduled(allDevices, dateFrom, dateTo);
-					if(eventReport.size()>0) {
-						for(int i=0;i<eventReport.size();i++) {
-							
-							MongoPositions pos = mongoPositionsRepository.findById(eventReport.get(i).getPositionId());
-							
-							if(pos != null) {
-								eventReport.get(i).setLatitude(pos.getLatitude());
-								eventReport.get(i).setLongitude(pos.getLongitude());
-								
-							}
-							
-							Device device = deviceRepository.getOne(eventReport.get(i).getDeviceId());
-							eventReport.get(i).setDeviceName(device.getName());
-							Set<Driver> drivers = device.getDriver();
-							for(Driver driver : drivers) {
-								eventReport.get(i).setDriverId(driver.getId());
-								eventReport.get(i).setDriverName(driver.getName());
-							}
-							
-							if(eventReport.get(i).getEventType().equals("alarm")) {
-								JSONObject obj = new JSONObject(eventReport.get(i).getAttributes());
-								eventReport.get(i).setEventType(obj.getString("alarm"));
-							}
-						}
-						
-					}
+					
+
 				}
 				
 			}
 			else {
+				if(exportData.equals("exportData")) {
+					eventReport = mongoEventsRepo.getEventsScheduledWithType(allDevices, dateFrom, dateTo,type);
+
+					getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",eventReport,size);
+					logger.info("************************ getEventsReport ENDED ***************************");
+					return  ResponseEntity.ok().body(getObjectResponse);
+		        }
+				
 				if(!TOKEN.equals("Schedule")) {
 					eventReport = mongoEventsRepo.getEventsWithType(allDevices, offset, dateFrom, dateTo, type);
 					if(eventReport.size()>0) {
 						size = mongoEventsRepo.getEventsWithTypeSize(allDevices, dateFrom, dateTo, type);
-						for(int i=0;i<eventReport.size();i++) {
-							MongoPositions pos = mongoPositionsRepository.findById(eventReport.get(i).getPositionId());
-							
-							if(pos != null) {
-								eventReport.get(i).setLatitude(pos.getLatitude());
-								eventReport.get(i).setLongitude(pos.getLongitude());
-								
-							}
-							Device device = deviceRepository.getOne(eventReport.get(i).getDeviceId());
-							eventReport.get(i).setDeviceName(device.getName());
-							Set<Driver> drivers = device.getDriver();
-							for(Driver driver : drivers) {
-								eventReport.get(i).setDriverId(driver.getId());
-								eventReport.get(i).setDriverName(driver.getName());
-							}
-							if(eventReport.get(i).getEventType().equals("alarm")) {
-								JSONObject obj = new JSONObject(eventReport.get(i).getAttributes());
-								eventReport.get(i).setEventType(obj.getString("alarm"));
-							}
-						}
+						
 						
 					}
 				}
 				else {
 					eventReport = mongoEventsRepo.getEventsScheduled(allDevices, dateFrom, dateTo);
-					if(eventReport.size()>0) {
-						for(int i=0;i<eventReport.size();i++) {
-							
-							MongoPositions pos = mongoPositionsRepository.findById(eventReport.get(i).getPositionId());
-							
-							if(pos != null) {
-								eventReport.get(i).setLatitude(pos.getLatitude());
-								eventReport.get(i).setLongitude(pos.getLongitude());
-								
-							}
-							Device device = deviceRepository.getOne(eventReport.get(i).getDeviceId());
-							eventReport.get(i).setDeviceName(device.getName());
-							Set<Driver> drivers = device.getDriver();
-							for(Driver driver : drivers) {
-								eventReport.get(i).setDriverId(driver.getId());
-								eventReport.get(i).setDriverName(driver.getName());
-							}
-							if(eventReport.get(i).getEventType().equals("alarm")) {
-								JSONObject obj = new JSONObject(eventReport.get(i).getAttributes());
-								eventReport.get(i).setEventType(obj.getString("alarm"));
-							}
-						}
-						
-					}
+					
 				}
 				
 			}
 			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",eventReport,size);
 			logger.info("************************ getEventsReport ENDED ***************************");
 			return  ResponseEntity.ok().body(getObjectResponse);
-		}	
+		}		  
+				  
+			
+	  
 		
 	}
 
@@ -6106,8 +6041,8 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	 */
 	@Override
 	public ResponseEntity<?> getDeviceWorkingHoursApp(String TOKEN, Long[] deviceIds, Long[] groupIds, int offset,
-			String start, String end, String search, Long userId) {
-		
+			String start, String end, String search, Long userId,String exportData) {
+
 		logger.info("************************ getDeviceWorkingHours STARTED ***************************");
 
 		
@@ -6388,6 +6323,15 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	        	return  ResponseEntity.badRequest().body(getObjectResponse);
 	        }
 
+	        if(exportData.equals("exportData")) {
+	        	
+				deviceHours = mongoPositionRepo.getDeviceWorkingHoursScheduled(allDevices,dateFrom,dateTo);			
+
+				getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",deviceHours,size);
+				logger.info("************************ getDeviceWorkingHours ENDED ***************************");
+				return  ResponseEntity.ok().body(getObjectResponse);
+	        }
+	        
 			if(!TOKEN.equals("Schedule")) {
 				
 				deviceHours = mongoPositionRepo.getDeviceWorkingHours(allDevices,offset,dateFrom,dateTo);			
@@ -6402,7 +6346,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			else {
 				deviceHours = mongoPositionRepo.getDeviceWorkingHoursScheduled(allDevices,dateFrom,dateTo);			
 
-				
+
 			}
 				
 			
@@ -6412,6 +6356,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			return  ResponseEntity.ok().body(getObjectResponse);
 		}		  
 				  
+			
+	  
+
 	}
 	
 	/**
@@ -6419,9 +6366,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	 */
 	@Override
 	public ResponseEntity<?> getCustomReportApp(String TOKEN, Long[] deviceIds, Long[] groupIds, int offset, String start,
-			String end, String search, Long userId, String custom, String value) {
+			String end, String search, Long userId, String custom, String value,String exportData) {
 		
-		
+
 		logger.info("************************ getCustomReport STARTED ***************************");
 
 		List<DeviceWorkingHours> deviceHours = new ArrayList<DeviceWorkingHours>();
@@ -6713,28 +6660,34 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	        	return  ResponseEntity.badRequest().body(getObjectResponse);
 	        }
 			
+	        if(exportData.equals("exportData")) {
+				
+	        	deviceHours = mongoPositionRepo.getDeviceCustomScheduled(allDevices,dateFrom,dateTo,custom,value);
+				
+				getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",deviceHours,size);
+				logger.info("************************ getCustomReport ENDED ***************************");
+				return  ResponseEntity.ok().body(getObjectResponse);
+	        }
+
 			if(!TOKEN.equals("Schedule")) {
 
 				deviceHours = mongoPositionRepo.getDeviceCustom(allDevices, offset, dateFrom, dateTo, custom, value);
 				if(deviceHours.size()>0) {
 					size=mongoPositionRepo.getDeviceCustomSize(allDevices,dateFrom, dateTo,custom,value);
 
-					
-				
+
 				}
 			}
 			else {
 
-				deviceHours = mongoPositionRepo.getDeviceCustomScheduled(allDevices,dateFrom,dateFrom,custom,value);
+				deviceHours = mongoPositionRepo.getDeviceCustomScheduled(allDevices,dateFrom,dateTo,custom,value);
 				
 			}
-				
-			
 			
 			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",deviceHours,size);
-			 logger.info("************************ getCustomReport ENDED ***************************");
+			logger.info("************************ getCustomReport ENDED ***************************");
 			return  ResponseEntity.ok().body(getObjectResponse);
-		}		    
+		}		  
 			
 	}
 	
@@ -6743,9 +6696,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	 */
 	@Override
 	public ResponseEntity<?> getDriverWorkingHoursApp(String TOKEN, Long[] driverIds, Long[] groupIds, int offset,
-			String start, String end, String search, Long userId) {
-		 logger.info("************************ getDriverWorkingHours STARTED ***************************");
+			String start, String end, String search, Long userId,String exportData) {
 
+		logger.info("************************ getDriverWorkingHours STARTED ***************************");
 			
 		List<DriverWorkingHours> driverHours = new ArrayList<DriverWorkingHours>();
 		if(TOKEN.equals("")) {
@@ -6781,9 +6734,8 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			}
 		}
 		
-		List<Long>allDevices= new ArrayList<>();
-		List<Long>allDrivers= new ArrayList<>();
-		List<DriverSelect>allDevicesList= new ArrayList<DriverSelect>();
+		List<Long>allDevices= new ArrayList<Long>();
+		List<Long>allDrivers= new ArrayList<Long>();
 
 		if(groupIds.length != 0) {
 			for(Long groupId:groupIds) {
@@ -6855,11 +6807,15 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			}
 		}
 		if(driverIds.length !=0 ) {
+
 			for(Long driverId : driverIds) {
+
+
 				if(driverId !=0) {
-					
+
 					Driver driver =driverServiceImpl.getDriverById(driverId);
 					if(driver != null) {
+
 						boolean isParent = false;
 						if(loggedUser.getAccountType() == 4) {
 							Set<User>parentClients = loggedUser.getUsersOfUser();
@@ -6894,11 +6850,15 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 									isParent = true;
 							}
 						}
+
+
 						if(!driverServiceImpl.checkIfParent(driver , loggedUser) && ! isParent) {
 							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this driver",driverHours);
 							 logger.info("************************ getDriverWorkingHours ENDED ***************************");
 							return ResponseEntity.badRequest().body(getObjectResponse);
 						}
+
+
 						allDrivers.add(driverId);
 						
 						
@@ -6917,6 +6877,8 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			allDevices.addAll(driverRepository.devicesOfDrivers(dri));
 
 		}
+
+		
 		Date dateFrom;
 		Date dateTo;
 		if(start.equals("0") || end.equals("0")) {
@@ -7028,29 +6990,34 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	        }
 	        
 	       
-	       
+	       if(exportData.equals("exportData")) {
+
+	    	   driverHours = mongoPositionRepo.getDriverWorkingHoursScheduled(allDevices,dateFrom,dateTo);			
+
+				getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",driverHours,size);
+				logger.info("************************ getDriverWorkingHours ENDED ***************************");
+				return  ResponseEntity.ok().body(getObjectResponse);
+	       }
 			
-			if(!TOKEN.equals("Schedule")) {
+		   if(!TOKEN.equals("Schedule")) {
 				
 				driverHours = mongoPositionRepo.getDriverWorkingHours(allDevices,offset,dateFrom,dateTo);			
 
 				if(driverHours.size()>0) {
-  				    size=mongoPositionRepo.getDriverWorkingHoursSize(allDevices,dateFrom,dateTo);
+   				    size=mongoPositionRepo.getDriverWorkingHoursSize(allDevices,dateFrom,dateTo);
 
-					
 				
 				}
 				
 			}
 			else {
-				driverHours = mongoPositionRepo.getDriverWorkingHoursScheduled(allDevices,dateFrom,dateFrom);			
+				driverHours = mongoPositionRepo.getDriverWorkingHoursScheduled(allDevices,dateFrom,dateTo);			
+
 
 			}
 				
-			
-			
 			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",driverHours,size);
-			 logger.info("************************ getDriverWorkingHours ENDED ***************************");
+			logger.info("************************ getDriverWorkingHours ENDED ***************************");
 			return  ResponseEntity.ok().body(getObjectResponse);
 		}	
 	}
@@ -7848,8 +7815,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	 */
 	@Override
 	public ResponseEntity<?> getSensorsReportApp(String TOKEN, Long[] deviceIds, Long[] groupIds, int offset, String start,
-			String end, String search, Long userId) {
-		 logger.info("************************ getSensorsReport STARTED ***************************");
+			String end, String search, Long userId,String exportData) {
+		
+		logger.info("************************ getSensorsReport STARTED ***************************");
 
 		List<CustomPositions> positionsList = new ArrayList<CustomPositions>();
 		if(TOKEN.equals("")) {
@@ -8132,12 +8100,23 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		}
 		Integer size = 0;
 
+		if(exportData.equals("exportData")) {
+			
+			positionsList = mongoPositionRepo.getPositionsListScheduled(allDevices,dateFrom, dateTo);
+
+			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",positionsList,size);
+			logger.info("************************ getSensorsReport ENDED ***************************");
+			return  ResponseEntity.ok().body(getObjectResponse);
+			
+		}
 		if(!TOKEN.equals("Schedule")) {
 			search = "%"+search+"%";
 			positionsList = mongoPositionRepo.getSensorsList(allDevices, offset, dateFrom, dateTo);
 			if(positionsList.size()>0) {
 				    size=mongoPositionRepo.getSensorsListSize(allDevices,dateFrom, dateTo);
 
+
+			
 			}
 			
 		}
@@ -8145,8 +8124,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			positionsList = mongoPositionRepo.getPositionsListScheduled(allDevices,dateFrom, dateTo);
 
 		}
+		
 		getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",positionsList,size);
-		 logger.info("************************ getSensorsReport ENDED ***************************");
+		logger.info("************************ getSensorsReport ENDED ***************************");
 		return  ResponseEntity.ok().body(getObjectResponse);
 	
 	}
@@ -9894,12 +9874,331 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				return  ResponseEntity.ok().body(getObjectResponse);
 	}
 
+
+	@Override
+	public ResponseEntity<?> getVehicleTempHum(String TOKEN, Long[] deviceIds, Long[] groupIds, int offset, String start,
+			String end, String search, Long userId, String exportData) {
+		 logger.info("************************ getSensorsReport STARTED ***************************");
+
+			List<DeviceTempHum> positionsList = new ArrayList<DeviceTempHum>();
+			if(TOKEN.equals("")) {
+				 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",positionsList);
+				 logger.info("************************ getSensorsReport ENDED ***************************");
+				 return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			
+			
+			if(!TOKEN.equals("Schedule")) {
+				if(super.checkActive(TOKEN)!= null)
+				{
+					return super.checkActive(TOKEN);
+				}
+			}
+			
+			
+			User loggedUser = new User();
+			if(userId != 0) {
+				
+				loggedUser = userServiceImpl.findById(userId);
+				if(loggedUser == null) {
+					getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "logged user is not found",positionsList);
+					 logger.info("************************ getSensorsReport ENDED ***************************");
+					return  ResponseEntity.status(404).body(getObjectResponse);
+				}
+			}	
+			
+			if(!loggedUser.getAccountType().equals(1)) {
+				if(!userRoleService.checkUserHasPermission(userId, "SENSORWEIGHT", "list")) {
+					 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to get SENSORWEIGHT list",positionsList);
+					 logger.info("************************ getSensorsReport ENDED ***************************");
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+			}
+			
+			
+			
+			List<Long>allDevices= new ArrayList<>();
+
+			if(groupIds.length != 0) {
+				for(Long groupId:groupIds) {
+					if(groupId != 0) {
+				    	Group group=groupRepository.findOne(groupId);
+				    	if(group != null) {
+							if(group.getIs_deleted() == null) {
+								boolean isParent = false;
+								if(loggedUser.getAccountType().equals(4)) {
+									Set<User> clientParents = loggedUser.getUsersOfUser();
+									if(clientParents.isEmpty()) {
+										getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group",positionsList);
+										 logger.info("************************ getSensorsReport ENDED ***************************"); 
+										return  ResponseEntity.badRequest().body(getObjectResponse);
+									}else {
+										User parent = null;
+										for(User object : clientParents) {
+											parent = object ;
+										}
+
+										Set<User>groupParents = group.getUserGroup();
+										if(groupParents.isEmpty()) {
+											getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group",positionsList);
+											 logger.info("************************ getSensorsReport ENDED ***************************");
+											return  ResponseEntity.badRequest().body(getObjectResponse);
+										}else {
+											for(User parentObject : groupParents) {
+												if(parentObject.getId().equals(parent.getId())) {
+													isParent = true;
+													break;
+												}
+											}
+										}
+									}
+									List<Long> CheckData = userClientGroupRepository.getGroup(userId,groupId);
+									if(CheckData.isEmpty()) {
+											isParent = false;
+									}
+									else {
+											isParent = true;
+									}
+								}
+								if(!groupsServiceImpl.checkIfParent(group , loggedUser) && ! isParent) {
+									getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this group ",positionsList);
+									 logger.info("************************ getSensorsReport ENDED ***************************");
+									return ResponseEntity.badRequest().body(getObjectResponse);
+								}
+								if(group.getType() != null) {
+									if(group.getType().equals("driver")) {
+										
+										allDevices.addAll(groupRepository.getDevicesFromDriver(groupId));
+									
+
+									}
+									else if(group.getType().equals("device")) {
+										
+										allDevices.addAll(groupRepository.getDevicesFromGroup(groupId));
+										
+										
+									}
+									else if(group.getType().equals("geofence")) {
+										
+										allDevices.addAll(groupRepository.getDevicesFromGeofence(groupId));
+										
+
+									}
+								}
+
+								
+							}
+				    	}
+				    	
+
+					}
+				}
+			}
+			if(deviceIds.length != 0 ) {
+				for(Long deviceId:deviceIds) {
+					if(deviceId !=0) {
+						Device device =deviceServiceImpl.findById(deviceId);
+						boolean isParent = false;
+						if(loggedUser.getAccountType() == 4) {
+							Set<User>parentClients = loggedUser.getUsersOfUser();
+							if(parentClients.isEmpty()) {
+								getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this device ",positionsList);
+								 logger.info("************************ getSensorsReport ENDED ***************************");
+								return  ResponseEntity.badRequest().body(getObjectResponse);
+							}else {
+								User parent = null;
+								for(User object : parentClients) {
+									parent = object ;
+								}
+								Set<User>deviceParent = device.getUser();
+								if(deviceParent.isEmpty()) {
+									getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user is not allwed to get data of this device ",positionsList);
+									 logger.info("************************ getSensorsReport ENDED ***************************");
+									return  ResponseEntity.badRequest().body(getObjectResponse);
+								}else {
+									for(User  parentObject : deviceParent) {
+										if(parent.getId() == parentObject.getId()) {
+											isParent = true;
+											break;
+										}
+									}
+								}
+							}
+							List<Long> CheckData = userClientDeviceRepository.getDevice(userId,deviceId);
+							if(CheckData.isEmpty()) {
+									isParent = false;
+							}
+							else {
+									isParent = true;
+							}
+						}
+						if(!deviceServiceImpl.checkIfParent(device , loggedUser) && ! isParent) {
+							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to get this device",positionsList);
+							 logger.info("************************ getSensorsReport ENDED ***************************");
+							return ResponseEntity.badRequest().body(getObjectResponse);
+						}
+						
+						allDevices.add(deviceId);
+
+						
+		
+					}
+				}
+			}
+
+			Date dateFrom;
+			Date dateTo;
+			if(start.equals("0") || end.equals("0")) {
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",null);
+				logger.info("************************ getEventsReport ENDED ***************************");		
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+
+			}
+			else {
+				SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+				SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+				SimpleDateFormat inputFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+				inputFormat1.setLenient(false);
+				inputFormat.setLenient(false);
+				outputFormat.setLenient(false);
+
+				
+				try {
+					dateFrom = inputFormat.parse(start);
+					start = outputFormat.format(dateFrom);
+					
+
+				} catch (ParseException e2) {
+					// TODO Auto-generated catch block
+					try {
+						dateFrom = inputFormat1.parse(start);
+						start = outputFormat.format(dateFrom);
+
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						
+						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+						logger.info("************************ getEventsReport ENDED ***************************");		
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+					}
+					
+				}
+				
+				try {
+					dateTo = inputFormat.parse(end);
+					end = outputFormat.format(dateTo);
+					
+
+				} catch (ParseException e2) {
+					// TODO Auto-generated catch block
+					try {
+						dateTo = inputFormat1.parse(end);
+						end = outputFormat.format(dateTo);
+
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start and End Dates should be in the following format YYYY-MM-DD or yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",null);
+						logger.info("************************ getEventsReport ENDED ***************************");		
+						return  ResponseEntity.badRequest().body(getObjectResponse);
+					}
+					
+				}
+				
+				
+				
+				
+				Date today=new Date();
+
+				if(dateFrom.getTime() > dateTo.getTime()) {
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+					getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",null);
+					logger.info("************************ getEventsReport ENDED ***************************");		
+					return  ResponseEntity.badRequest().body(getObjectResponse);
+				}
+				
+				search = "%"+search+"%";				
+				
+				String appendString="";
+		
+				if(allDevices.size()>0) {
+					  for(int i=0;i<allDevices.size();i++) {
+						  if(appendString != "") {
+							  appendString +=","+allDevices.get(i);
+						  }
+						  else {
+							  appendString +=allDevices.get(i);
+						  }
+					  }
+				 }
+				allDevices = new ArrayList<Long>();
+				
+				String[] data = {};
+				if(!appendString.equals("")) {
+			        data = appendString.split(",");
+
+				}
+		        
+
+		        for(String d:data) {
+
+		        	if(!allDevices.contains(Long.parseLong(d))) {
+			        	allDevices.add(Long.parseLong(d));
+		        	}
+		        }
+		        
+		        if(allDevices.isEmpty()) {
+
+		        	getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "no data for devices of group or devices that you selected ",positionsList);
+					 logger.info("************************ getSensorsReport ENDED ***************************");
+		        	return  ResponseEntity.badRequest().body(getObjectResponse);
+		        }
+			}
+			Integer size = 0;
+
+			if(exportData.equals("exportData")) {
+				
+				positionsList = mongoPositionRepo.getVehicleTempHumListScheduled(allDevices,dateFrom, dateTo);
+				
+
+				getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",positionsList);
+				logger.info("************************ getSensorsReport ENDED ***************************");
+				return  ResponseEntity.ok().body(getObjectResponse);
+				
+			}
+			if(!TOKEN.equals("Schedule")) {
+				
+				
+				search = "%"+search+"%";
+				positionsList = mongoPositionRepo.getVehicleTempHumList(allDevices, offset, dateFrom, dateTo);
+				if(positionsList.size()>0) {
+					    size=mongoPositionRepo.getVehicleTempHumListSize(allDevices,dateFrom, dateTo);
+				
+				}
+				
+			}
+			else {
+				positionsList = mongoPositionRepo.getVehicleTempHumListScheduled(allDevices,dateFrom, dateTo);
+
+			}
+			
+			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",positionsList,size);
+			logger.info("************************ getSensorsReport ENDED ***************************");
+			return  ResponseEntity.ok().body(getObjectResponse);
+	}
+	
+	
+	
 	/**
 	 * number of drivering hours during period for driver and group from mongo collection tc_positions
 	 */
 	@Override
 	public ResponseEntity<?> getNumberDriverWorkingHoursApp(String TOKEN, Long[] driverIds, Long[] groupIds, int offset,
-			String start, String end, String search, Long userId) {
+			String start, String end, String search, Long userId,String exportData) {
+		
 		logger.info("************************ getNumberDriverWorkingHours STARTED ***************************");
 
 		List<DriverWorkingHours> driverHours = new ArrayList<DriverWorkingHours>();
@@ -9938,7 +10237,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		
 		List<Long>allDevices= new ArrayList<>();
 		List<Long>allDrivers= new ArrayList<>();
-		List<DriverSelect>allDevicesList= new ArrayList<DriverSelect>();
+
 
 		if(groupIds.length != 0) {
 			for(Long groupId:groupIds) {
@@ -10134,108 +10433,111 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		}	
 			
 			
-			Date today=new Date();
+		Date today=new Date();
 
-			if(dateFrom.getTime() > dateTo.getTime()) {
-				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",null);
-				logger.info("************************ getEventsReport ENDED ***************************");		
-				return  ResponseEntity.badRequest().body(getObjectResponse);
-			}
-			if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
-				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",null);
-				logger.info("************************ getEventsReport ENDED ***************************");		
-				return  ResponseEntity.badRequest().body(getObjectResponse);
-			}
-			search = "%"+search+"%";
-			Integer size = 0;
-			
-			
-			String appendString="";
-	
-			if(allDevices.size()>0) {
-				  for(int i=0;i<allDevices.size();i++) {
-					  if(appendString != "") {
-						  appendString +=","+allDevices.get(i);
-					  }
-					  else {
-						  appendString +=allDevices.get(i);
-					  }
+		if(dateFrom.getTime() > dateTo.getTime()) {
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date should be Earlier than End Date",null);
+			logger.info("************************ getEventsReport ENDED ***************************");		
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		if(today.getTime()<dateFrom.getTime() || today.getTime()<dateTo.getTime() ){
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Start Date and End Date should be Earlier than Today",null);
+			logger.info("************************ getEventsReport ENDED ***************************");		
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		search = "%"+search+"%";
+		Integer size = 0;
+		
+		
+		String appendString="";
+
+		if(allDevices.size()>0) {
+			  for(int i=0;i<allDevices.size();i++) {
+				  if(appendString != "") {
+					  appendString +=","+allDevices.get(i);
 				  }
-			 }
-			allDevices = new ArrayList<Long>();
-			String[] data = {};
-			if(!appendString.equals("")) {
-		        data = appendString.split(",");
-
-			}
-
-	        for(String d:data) {
-	        	if(!allDevices.contains(Long.parseLong(d))) {
-		        	allDevices.add(Long.parseLong(d));
-	        	}
-	        }
-			
-	        if(allDevices.isEmpty()) {
-
-	        	getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "no data for drivers of groups or drivers that you selected",driverHours);
-				logger.info("************************ getNumberDriverWorkingHours ENDED ***************************");
-	        	return  ResponseEntity.badRequest().body(getObjectResponse);
-	        }
-	        
-			List<Map> dataAll = new ArrayList<Map>();
-			
-			
-	        driverHours = mongoPositionRepo.getDriverWorkingHoursScheduled(allDevices, dateFrom, dateTo);
-			  if(driverHours.size()>0) {
-
-				  for(Long dev:allDevices) {
-
-						String totalHours = "00:00:00";
-						Long time= (long) 0;
-
-					  Map devicesStatus = new HashMap();
-					  for(DriverWorkingHours driverH: driverHours) {
-
-						  if( (long) driverH.getDeviceId() == (long) dev ) {
-							  
-							  devicesStatus.put("deviceId" ,driverH.getDeviceId());
-
-							  if(driverH.getDeviceName() != null) {
-								  devicesStatus.put("deviceName", driverH.getDeviceName());
-							  }
-							  if(driverH.getDriverName() != null) {
-								  devicesStatus.put("driverName", driverH.getDriverName());
-							  }
-
-						      devicesStatus.put("totalHours", totalHours);
-							  
-
-						      
-							JSONObject obj = new JSONObject(driverH.getAttributes().toString());
-
-							if(obj.has("todayHours")) {
-								  time += Math.abs(  obj.getLong("todayHours") );
-								  Long hoursEngine =   TimeUnit.MILLISECONDS.toHours(time) ;
-								  Long minutesEngine = TimeUnit.MILLISECONDS.toMinutes(time) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(time));
-								  Long secondsEngine = TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time));
-								  
-								  totalHours = String.valueOf(hoursEngine)+":"+String.valueOf(minutesEngine)+":"+String.valueOf(secondsEngine);
-
-							}
-						      devicesStatus.put("totalHours", totalHours);
-						  }
-					  }
-					  dataAll.add(devicesStatus);
-
+				  else {
+					  appendString +=allDevices.get(i);
 				  }
-				 
 			  }
+		 }
+		allDevices = new ArrayList<Long>();
+		String[] data = {};
+		if(!appendString.equals("")) {
+	        data = appendString.split(",");
 
-			
+		}
 
-			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",dataAll,dataAll.size());
+        for(String d:data) {
+        	if(!allDevices.contains(Long.parseLong(d))) {
+	        	allDevices.add(Long.parseLong(d));
+        	}
+        }
+		
+        if(allDevices.isEmpty()) {
+
+        	getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "no data for drivers of groups or drivers that you selected",driverHours);
 			logger.info("************************ getNumberDriverWorkingHours ENDED ***************************");
-			return  ResponseEntity.ok().body(getObjectResponse);
+        	return  ResponseEntity.badRequest().body(getObjectResponse);
+        }
+        
+		List<Map> dataAll = new ArrayList<Map>();
+		
+		
+        driverHours = mongoPositionRepo.getDriverWorkingHoursScheduled(allDevices, dateFrom, dateTo);
+		if(driverHours.size()>0) {
+
+			  for(Long dev:allDevices) {
+
+					String totalHours = "00:00:00";
+					Long time= (long) 0;
+
+				  Map devicesStatus = new HashMap();
+				  for(DriverWorkingHours driverH: driverHours) {
+
+					  if( (long) driverH.getDeviceId() == (long) dev ) {
+						  
+						  devicesStatus.put("deviceId" ,driverH.getDeviceId());
+
+						  if(driverH.getDeviceName() != null) {
+							  devicesStatus.put("deviceName", driverH.getDeviceName());
+						  }
+						  if(driverH.getDriverName() != null) {
+							  devicesStatus.put("driverName", driverH.getDriverName());
+						  }
+
+					      devicesStatus.put("totalHours", totalHours);
+						  
+
+
+						JSONObject obj = new JSONObject(driverH.getAttributes().toString());
+
+						if(obj.has("todayHours")) {
+							  time += Math.abs(  obj.getLong("todayHours") );
+							  Long hoursEngine =   TimeUnit.MILLISECONDS.toHours(time) ;
+							  Long minutesEngine = TimeUnit.MILLISECONDS.toMinutes(time) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(time));
+							  Long secondsEngine = TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time));
+							  
+							  totalHours = String.valueOf(hoursEngine)+":"+String.valueOf(minutesEngine)+":"+String.valueOf(secondsEngine);
+
+						}
+					      devicesStatus.put("totalHours", totalHours);
+					  }
+				  }
+				  if(devicesStatus.size() > 0) {
+					  dataAll.add(devicesStatus);
+				  }
+
+			  }
+			 
+		  }
+
+		
+
+		getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",dataAll,dataAll.size());
+		logger.info("************************ getNumberDriverWorkingHours ENDED ***************************");
+		return  ResponseEntity.ok().body(getObjectResponse);
+			
 			
 			
 	}

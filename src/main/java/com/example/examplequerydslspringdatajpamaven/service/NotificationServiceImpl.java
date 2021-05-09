@@ -797,21 +797,96 @@ public class NotificationServiceImpl extends RestServiceController implements No
 				if(notification.getDelete_date()==null) {
 					
 					 if(!checkIfParent(notification , user)) {
-							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to delete this notification ",notifications);
-							logger.info("************************ deleteNotification ENDED ***************************");
-							return ResponseEntity.badRequest().body(getObjectResponse);
-						}
+						 
+						 getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "you are not allowed to delete this notification ",notifications);
+						 logger.info("************************ deleteNotification ENDED ***************************");
+						 return ResponseEntity.badRequest().body(getObjectResponse);
+					}
 					 
-					    notification.setDelete_date(currentDate);
-					    notificationRepository.save(notification);
+					 
+					 
+					 TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+
+						SSLContext sslContext = null;
+						try {
+							sslContext = org.apache.http.ssl.SSLContexts.custom()
+							        .loadTrustMaterial(null, acceptingTrustStrategy)
+							        .build();
+						} catch (KeyManagementException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (NoSuchAlgorithmException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (KeyStoreException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+						SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
+
+						CloseableHttpClient httpClient = HttpClients.custom()
+						        .setSSLSocketFactory(csf)
+						        .build();
+
+						HttpComponentsClientHttpRequestFactory requestFactory =
+						        new HttpComponentsClientHttpRequestFactory();
+
+						requestFactory.setHttpClient(httpClient);
+						
+
+						String plainCreds = "admin@fuinco.com:admin";
+						byte[] plainCredsBytes = plainCreds.getBytes();
+						
+						byte[] base64CredsBytes = Base64.getEncoder().encode(plainCredsBytes);
+						String base64Creds = new String(base64CredsBytes);
+
+
+						HttpHeaders headers = new HttpHeaders();
+					    headers.setContentType(MediaType.APPLICATION_JSON);
+						headers.add("Authorization", "Basic " + base64Creds);
+						
+					    String URL = urlNotification+"/"+notification.getId();
+					    RestTemplate restTemplate = new RestTemplate(requestFactory);
+					    restTemplate.getMessageConverters()
+				        .add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
+			        
+					   
+						HttpEntity<String> request = new HttpEntity<String>(headers);
+						ResponseEntity<String> rateResponse = null;
+						
+						try {
+
+							rateResponse = restTemplate.exchange(URL, HttpMethod.DELETE, request, String.class);
+							
+							if (rateResponse.getStatusCode() == HttpStatus.NO_CONTENT) {
+								
+							    notificationRepository.deleteNotificationDeviceId(notificationId);
+							    notificationRepository.deleteNotificationGroupId(notificationId);
+							    notificationRepository.deleteNotificationUserId(notificationId);
+
+								getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Deleted Successfully",notifications);
+								logger.info("************************ deleteNotification ENDED ***************************");
+								return  ResponseEntity.ok().body(getObjectResponse);
+							
+							}
+							else {
+								System.out.println(rateResponse);
+								getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Error in request to server",notifications);
+								logger.info("************************ editNotification ENDED ***************************");
+								return ResponseEntity.badRequest().body(getObjectResponse);
+							}
+							
+						} catch (Exception e) {
+							System.out.println(e);
+							System.out.println(rateResponse);
+
+							getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "Error in server",notifications);
+							logger.info("************************ editNotification ENDED ***************************");
+							return ResponseEntity.badRequest().body(getObjectResponse);
+			            }
+					 
 					    
-					    notificationRepository.deleteNotificationDeviceId(notificationId);
-					    notificationRepository.deleteNotificationGroupId(notificationId);
-					    
-						getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "Deleted Successfully",notifications);
-						logger.info("************************ deleteNotification ENDED ***************************");
-						return  ResponseEntity.ok().body(getObjectResponse);
-					
 					
 					
 

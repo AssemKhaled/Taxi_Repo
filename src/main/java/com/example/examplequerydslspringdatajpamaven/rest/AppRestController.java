@@ -302,11 +302,12 @@ public class AppRestController {
 													 @RequestParam (value = "groupId", defaultValue = "0") Long [] groupId,
 													 @RequestParam (value = "offset", defaultValue = "0") int offset,
 													 @RequestParam (value = "from", defaultValue = "0") String start,
+													 @RequestParam (value = "exportData", defaultValue = "") String exportData,
 													 @RequestParam (value = "to", defaultValue = "0") String end,
 													 @RequestParam (value = "type", defaultValue = "") String type,
 													 @RequestParam (value = "search", defaultValue = "") String search,
 													 @RequestParam (value = "userId",defaultValue = "0")Long userId) {	
-    	return  appService.getEventsReportApp(TOKEN, deviceId,groupId, offset, start, end, type, search, userId);
+    	return  appService.getEventsReportApp(TOKEN, deviceId,groupId, offset, start, end, type, search, userId,exportData);
 
 	}
 	
@@ -316,13 +317,14 @@ public class AppRestController {
 													 @RequestParam (value = "groupId", defaultValue = "0") Long [] groupId,
 													 @RequestParam (value = "offset", defaultValue = "0") int offset,
 													 @RequestParam (value = "from", defaultValue = "0") String start,
+													 @RequestParam (value = "exportData", defaultValue = "") String exportData,
 													 @RequestParam (value = "to", defaultValue = "0") String end,
 													 @RequestParam (value = "search", defaultValue = "") String search,
 													 @RequestParam (value = "userId",defaultValue = "0")Long userId) {
 		
 		
 		
-    	return  appService.getDeviceWorkingHoursApp(TOKEN,deviceId,groupId, offset, start, end,search,userId);
+    	return  appService.getDeviceWorkingHoursApp(TOKEN,deviceId,groupId, offset, start, end,search,userId,exportData);
 
 	}
 	@RequestMapping(value = "/getCustomReportApp", method = RequestMethod.GET)
@@ -330,6 +332,7 @@ public class AppRestController {
 													 @RequestParam (value = "deviceId", defaultValue = "0") Long [] deviceId,
 													 @RequestParam (value = "groupId", defaultValue = "0") Long [] groupId,
 													 @RequestParam (value = "offset", defaultValue = "0") int offset,
+													 @RequestParam (value = "exportData", defaultValue = "") String exportData,
 													 @RequestParam (value = "from", defaultValue = "0") String start,
 													 @RequestParam (value = "to", defaultValue = "0") String end,
 													 @RequestParam (value = "search", defaultValue = "") String search,
@@ -339,7 +342,7 @@ public class AppRestController {
 		
 		
 		
-    	return  appService.getCustomReportApp(TOKEN,deviceId,groupId, offset, start, end,search,userId,custom,value);
+    	return  appService.getCustomReportApp(TOKEN,deviceId,groupId, offset, start, end,search,userId,custom,value,exportData);
 
 	}
 	
@@ -347,6 +350,7 @@ public class AppRestController {
 	public @ResponseBody ResponseEntity<?> getDriverWorkingHoursApp(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 													 @RequestParam (value = "driverId", defaultValue = "0") Long [] driverId,
 													 @RequestParam (value = "groupId", defaultValue = "0") Long [] groupId,
+													 @RequestParam (value = "exportData", defaultValue = "") String exportData,
 													 @RequestParam (value = "offset", defaultValue = "0") int offset,
 													 @RequestParam (value = "from", defaultValue = "0") String start,
 													 @RequestParam (value = "to", defaultValue = "0") String end,
@@ -355,7 +359,7 @@ public class AppRestController {
 		
 		
 		
-    	return  appService.getDriverWorkingHoursApp(TOKEN,driverId,groupId, offset,start, end,search,userId);
+    	return  appService.getDriverWorkingHoursApp(TOKEN,driverId,groupId, offset,start, end,search,userId,exportData);
 
 	}
 	@RequestMapping(value = "/getDriveMoreThanReportApp", method = RequestMethod.GET)
@@ -399,6 +403,7 @@ public class AppRestController {
 													 @RequestParam (value = "deviceId", defaultValue = "0") Long [] deviceId,
 													 @RequestParam (value = "groupId", defaultValue = "0") Long [] groupId,
 													 @RequestParam (value = "offset", defaultValue = "0") int offset,
+													 @RequestParam (value = "exportData", defaultValue = "") String exportData,
 													 @RequestParam (value = "from", defaultValue = "0") String start,
 													 @RequestParam (value = "to", defaultValue = "0") String end,
 													 @RequestParam (value = "search", defaultValue = "") String search,
@@ -406,7 +411,7 @@ public class AppRestController {
 		
 		
 		
-    	return  appService.getSensorsReportApp(TOKEN,deviceId,groupId, offset, start, end,search,userId);
+    	return  appService.getSensorsReportApp(TOKEN,deviceId,groupId, offset, start, end,search,userId,exportData);
 
 	}
 	
@@ -631,14 +636,31 @@ public class AppRestController {
 													 @RequestParam (value = "groupId", defaultValue = "0") Long [] groupId,
 													 @RequestParam (value = "offset", defaultValue = "0") int offset,
 													 @RequestParam (value = "from", defaultValue = "0") String start,
+													 @RequestParam (value = "exportData", defaultValue = "") String exportData,
 													 @RequestParam (value = "to", defaultValue = "0") String end,
 													 @RequestParam (value = "search", defaultValue = "") String search,
 													 @RequestParam (value = "userId",defaultValue = "0")Long userId) {
 		
 		
 		
-    	return  appService.getNumberDriverWorkingHoursApp(TOKEN,driverId,groupId, offset,start, end,search,userId);
+    	return  appService.getNumberDriverWorkingHoursApp(TOKEN,driverId,groupId, offset,start, end,search,userId,exportData);
 
 	}
+	
+	@RequestMapping(value = "/getVehicleTempHumApp", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getVehicleTempHum(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+													  @RequestParam (value = "deviceId", defaultValue = "0") Long [] deviceId,
+													  @RequestParam (value = "groupId", defaultValue = "0") Long [] groupId,
+													  @RequestParam (value = "exportData", defaultValue = "") String exportData,
+													  @RequestParam (value = "offset", defaultValue = "0") int offset,
+													  @RequestParam (value = "start", defaultValue = "0") String start,
+													  @RequestParam (value = "end", defaultValue = "0") String end,
+													  @RequestParam (value = "search", defaultValue = "") String search,
+													  @RequestParam (value = "userId",defaultValue = "0")Long userId) {
+	
+    	return  appService.getVehicleTempHum(TOKEN,deviceId,groupId, offset, start, end,search,userId,exportData);
+
+	}
+
 	
 }

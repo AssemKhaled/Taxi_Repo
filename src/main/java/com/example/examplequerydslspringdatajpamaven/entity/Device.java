@@ -771,10 +771,10 @@ public class Device extends Attributes{
 	private Long user_id;
 	
 	@Column(name = "lastHum")
-	private Double lastHum;
+	private Double lastHum = 0.0;
 	
 	@Column(name = "lastTemp")
-	private Double lastTemp;
+	private Double lastTemp = 0.0;
 		
 	
 	@JsonIgnore 
@@ -1493,16 +1493,11 @@ public class Device extends Attributes{
 		return lastTemp;
 	}
 
-
-
+	
 	public void setLastTemp(Double lastTemp) {
 		this.lastTemp = lastTemp;
 	}
 
-	
-
-
-	
 	
 	
 }
