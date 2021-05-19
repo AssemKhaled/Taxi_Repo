@@ -328,11 +328,22 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			return ResponseEntity.status(404).body(getObjectResponse);
 		 }
 		
+          String activity = "DEFAULT";
+		  JSONObject obj = new JSONObject();
+		  if(user.getAttributes() != null) {
+			  if(user.getAttributes().toString().startsWith("{")) {
+				  obj = new JSONObject(user.getAttributes().toString());
+	          	  if(obj.has("activity")) {
+	          		activity = obj.getString("activity");
+
+	        	  }
+			  }
+		  }
 
 		  Map body = new HashMap();
 		  Map bodyToMiddleWare = new HashMap();
 		  
-		  String url = elmCompanies+"/"+user.getReference_key();
+		  String url = elmCompanies+"/"+user.getReference_key()+"&activity="+activity;
 		  bodyToMiddleWare.put("dataObject", null);
 		  bodyToMiddleWare.put("url",url);
 		  bodyToMiddleWare.put("methodType","DELETE");
@@ -639,6 +650,18 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			  
 			  companyElmData.setActivity("DEFAULT");
 
+			  JSONObject obj = new JSONObject();
+			  if(user.getAttributes() != null) {
+				  if(user.getAttributes().toString().startsWith("{")) {
+					  obj = new JSONObject(user.getAttributes().toString());
+		          	  if(obj.has("activity")) {
+		          		companyElmData.setActivity(obj.getString("activity"));
+
+		        	  }
+				  }
+			  }
+			  
+
 			  bodyToMiddleWare.put("dataObject", companyElmData);
 
 		  }
@@ -652,7 +675,19 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				  individualHijriElmData.setIdentityNumber(user.getIdentity_num());
 				  individualHijriElmData.setPhoneNumber(user.getCompany_phone());
 				  individualHijriElmData.setDateOfBirthHijri(user.getDateOfBirth());
+				  
 				  individualHijriElmData.setActivity("DEFAULT");
+
+				  JSONObject obj = new JSONObject();
+				  if(user.getAttributes() != null) {
+					  if(user.getAttributes().toString().startsWith("{")) {
+						  obj = new JSONObject(user.getAttributes().toString());
+			          	  if(obj.has("activity")) {
+			          		individualHijriElmData.setActivity(obj.getString("activity"));
+
+			        	  }
+					  }
+				  }
 				  
 				  bodyToMiddleWare.put("dataObject", individualHijriElmData);
 
@@ -665,8 +700,21 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				  individualGregorianElmData.setIdentityNumber(user.getIdentity_num());
 				  individualGregorianElmData.setPhoneNumber(user.getCompany_phone());
 				  individualGregorianElmData.setDateOfBirthGregorian(user.getDateOfBirth());
+				  
 				  individualGregorianElmData.setActivity("DEFAULT");
 
+				  JSONObject obj = new JSONObject();
+				  if(user.getAttributes() != null) {
+					  if(user.getAttributes().toString().startsWith("{")) {
+						  obj = new JSONObject(user.getAttributes().toString());
+			          	  if(obj.has("activity")) {
+			          		individualGregorianElmData.setActivity(obj.getString("activity"));
+
+			        	  }
+					  }
+				  }
+				  
+				  
 				  bodyToMiddleWare.put("dataObject", individualGregorianElmData);
 
 			  }
@@ -1605,8 +1653,23 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			return ResponseEntity.status(404).body(getObjectResponse);
 		 }
 		 
+         String activity = "DEFAULT";
+		 JSONObject obj = new JSONObject();
+		 if(device.getAttributes() != null) {
+			if(device.getAttributes().toString().startsWith("{")) {
+				obj = new JSONObject(device.getAttributes().toString());
+	          	if(obj.has("activity")) {
+	          		activity = obj.getString("activity");
+
+	        	}
+			}
+		}
+		 
+		 
 		  String url = elm+"/operationCompany/"+parent.getReference_key()+"/vehicle/"+device.getReference_key();
 
+		  url = url + "&activity=" + activity;
+		  
 		  Map bodyToMiddleWare = new HashMap();
 		  
 		  bodyToMiddleWare.put("dataObject", null);
@@ -1905,7 +1968,18 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  deviceElmData.setSequenceNumber(device.getSequence_number());
 		  deviceElmData.setVehiclePlate(vehiclePlate);
 		  
+		  deviceElmData.setActivity("DEFAULT");
 
+		  JSONObject obj = new JSONObject();
+		  if(device.getAttributes() != null) {
+			  if(device.getAttributes().toString().startsWith("{")) {
+				  obj = new JSONObject(device.getAttributes().toString());
+	          	  if(obj.has("activity")) {
+	          		deviceElmData.setActivity(obj.getString("activity"));
+
+	        	  }
+			  }
+		  }
 		  
 		  String url = elmCompanies+"/"+parent.getReference_key()+"/vehicles";
 
@@ -2223,6 +2297,19 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			  driverElmDataHijri.setIdentityNumber(driver.getUniqueid());
 			  driverElmDataHijri.setMobileNumber(driver.getMobile_num());
 			  
+			  driverElmDataHijri.setActivity("DEFAULT");
+
+			  JSONObject obj = new JSONObject();
+			  if(driver.getAttributes() != null) {
+				  if(driver.getAttributes().toString().startsWith("{")) {
+					  obj = new JSONObject(driver.getAttributes().toString());
+		          	  if(obj.has("activity")) {
+		          		driverElmDataHijri.setActivity(obj.getString("activity"));
+
+		        	  }
+				  }
+			  }
+			  
 			  bodyToMiddleWare.put("dataObject", driverElmDataHijri);
 			  
 
@@ -2234,6 +2321,19 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			  driverElmDataGregorian.setDateOfBirthGregorian(driver.getBirth_date());
 			  driverElmDataGregorian.setIdentityNumber(driver.getUniqueid());
 			  driverElmDataGregorian.setMobileNumber(driver.getMobile_num());
+			  
+			  driverElmDataGregorian.setActivity("DEFAULT");
+
+			  JSONObject obj = new JSONObject();
+			  if(driver.getAttributes() != null) {
+				  if(driver.getAttributes().toString().startsWith("{")) {
+					  obj = new JSONObject(driver.getAttributes().toString());
+		          	  if(obj.has("activity")) {
+		          		driverElmDataGregorian.setActivity(obj.getString("activity"));
+
+		        	  }
+				  }
+			  }
 			  
 			  bodyToMiddleWare.put("dataObject", driverElmDataGregorian);
 
@@ -2510,7 +2610,21 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		 }
 	 
 		  
+         String activity = "DEFAULT";
+		 JSONObject object = new JSONObject();
+		 if(device.getAttributes() != null) {
+			if(device.getAttributes().toString().startsWith("{")) {
+				object = new JSONObject(device.getAttributes().toString());
+	          	if(object.has("activity")) {
+	          		activity = object.getString("activity");
+
+	        	}
+			}
+		}
+		 
 		 String url = elmVehicles+"?sequenceNumber="+device.getSequence_number();
+		 
+		 url = url + "&activity=" + activity;
 		 
 		 Map bodyToMiddleWare = new HashMap();
 
@@ -2616,6 +2730,11 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  }
           else if(resp.containsKey("resultCode")) {
         	  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),resp.get("resultCode").toString(),data);
+			  logger.info("************************ deviceInquery ENDED ***************************");
+			  return  ResponseEntity.ok().body(getObjectResponse);
+          }
+          else if(resp.containsKey("errorCode")) {
+        	  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),resp.get("errorMsg").toString(),data);
 			  logger.info("************************ deviceInquery ENDED ***************************");
 			  return  ResponseEntity.ok().body(getObjectResponse);
           }
@@ -2790,7 +2909,21 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			
 		}
 			
-		 
+        String activity = "DEFAULT";
+		JSONObject obj = new JSONObject();
+		if(user.getAttributes() != null) {
+			
+			if(user.getAttributes().toString().startsWith("{")) {
+				obj = new JSONObject(user.getAttributes().toString());
+	          	if(obj.has("activity")) {
+	          		activity = obj.getString("activity");
+
+	        	}
+			}
+		}
+		url = url + "&activity="+activity;
+		  
+		  
 		  Map bodyToMiddleWare = new HashMap();
 
 
@@ -2881,23 +3014,24 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  Map resp = new HashMap();
 		  resp = elmReturn.getBody();   
 		  
+		  
 
-         if(resp.containsKey("resultCode")) {
-       	    getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),resp.get("resultCode").toString(),data);
-			logger.info("************************ companyInquery ENDED ***************************");
-			return  ResponseEntity.ok().body(getObjectResponse);
+         if(resp.containsKey("errorCode")) {
+        	 getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),resp.get("errorMsg").toString(),data);
+			 logger.info("************************ companyInquery ENDED ***************************");
+			 return  ResponseEntity.ok().body(getObjectResponse);
+         }
+         else if(resp.containsKey("resultCode")) {
+         	 getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),resp.get("resultCode").toString(),data);
+			 logger.info("************************ deviceInquery ENDED ***************************");
+			 return  ResponseEntity.ok().body(getObjectResponse);
          }
          else {
-        	 if(resp.get("isValid").equals(true)) {
-           	  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"This Company is vaild",data);
-   			  logger.info("************************ companyInquery ENDED ***************************");
-   			  return  ResponseEntity.ok().body(getObjectResponse);
-             }
-             else {
-           	  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"This Company is not vaild",data);
-   			  logger.info("************************ companyInquery ENDED ***************************");
-   			  return  ResponseEntity.ok().body(getObjectResponse);
-             }
+        	 
+           	 getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"This Company is vaild",data);
+   			 logger.info("************************ companyInquery ENDED ***************************");
+   			 return  ResponseEntity.ok().body(getObjectResponse);
+             
  		 }
 	}
 
@@ -3070,8 +3204,24 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			return ResponseEntity.status(404).body(getObjectResponse);
 		 }
 
+         String activity = "DEFAULT";
+		 JSONObject obj = new JSONObject();
+		 if(driver.getAttributes() != null) {
+			if(driver.getAttributes().toString().startsWith("{")) {
+				obj = new JSONObject(driver.getAttributes().toString());
+	          	if(obj.has("activity")) {
+	          		activity = obj.getString("activity");
+
+	        	}
+			}
+		}
+		 
+		 
 		  String url = elm+"/operationCompany/"+parent.getReference_key()+"/driver/"+driver.getReference_key();
 
+		  url = url + "&activity=" + activity;
+
+		  
 		  Map bodyToMiddleWare = new HashMap();
 		  
 		  bodyToMiddleWare.put("dataObject", null);
@@ -3342,7 +3492,21 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		 Map body = new HashMap();
 
 		  
+         String activity = "DEFAULT";
+		 JSONObject object = new JSONObject();
+		 if(driver.getAttributes() != null) {
+			if(driver.getAttributes().toString().startsWith("{")) {
+				object = new JSONObject(driver.getAttributes().toString());
+	          	if(object.has("activity")) {
+	          		activity = object.getString("activity");
+
+	        	}
+			}
+		}
+		 
 		 String url = elmDrivers +"?identityNumber="+driver.getUniqueid();
+		 
+		 url = url + "&activity="+ activity;
 		 
 		 Map bodyToMiddleWare = new HashMap();
 
@@ -3408,7 +3572,6 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				  return  ResponseEntity.ok().body(getObjectResponse);
 			  }
 		  
-		  
 		  ElmReturn elmReturn = rateResponse.getBody();
 
 		  response.put("body", elmReturn.getBody());
@@ -3431,24 +3594,20 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
        	     jsonArr = (List<Map>) resp.get("operatingCompanies");
              Map obj = jsonArr.get(0);	
              
-             if(obj.get("isDriverValid").equals(true)) {
-           	  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"This Driver is valid",data);
-   			  logger.info("************************ driverInquery ENDED ***************************");
-   			  return  ResponseEntity.ok().body(getObjectResponse);
-             }
-             else {
-           	  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),obj.get("driverRejectionReason").toString(),data);
-   			  logger.info("************************ driverInquery ENDED ***************************");
-   			  return  ResponseEntity.ok().body(getObjectResponse);
-             }
+             getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"This Driver is valid",data);
+  			 logger.info("************************ driverInquery ENDED ***************************");
+  			 return  ResponseEntity.ok().body(getObjectResponse);
 
-             
-			  
-		  }
-         else if(resp.containsKey("resultCode")) {
-       	  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),resp.get("resultCode").toString(),data);
+		 }
+         else if(resp.containsKey("errorCode")) {
+       	  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),resp.get("errorMsg").toString(),data);
 			  logger.info("************************ driverInquery ENDED ***************************");
 			  return  ResponseEntity.ok().body(getObjectResponse);
+         }
+         else if(resp.containsKey("resultCode")) {
+         	 getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),resp.get("resultCode").toString(),data);
+			 logger.info("************************ deviceInquery ENDED ***************************");
+			 return  ResponseEntity.ok().body(getObjectResponse);
          }
          else {
  			getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"cann't request to elm",data);

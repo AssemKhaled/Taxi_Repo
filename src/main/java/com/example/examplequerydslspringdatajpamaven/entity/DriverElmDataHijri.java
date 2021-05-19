@@ -5,11 +5,21 @@ public class DriverElmDataHijri {
 	String identityNumber;
 	String mobileNumber;
 	String dateOfBirthHijri;
-	
+	String activity;
+
 	
 	
 	public DriverElmDataHijri() {
 		super();
+	}
+
+
+	public DriverElmDataHijri(String identityNumber, String mobileNumber, String dateOfBirthHijri, String activity) {
+		super();
+		this.identityNumber = identityNumber;
+		this.mobileNumber = mobileNumber;
+		this.dateOfBirthHijri = dateOfBirthHijri;
+		this.activity = activity;
 	}
 
 
@@ -21,6 +31,16 @@ public class DriverElmDataHijri {
 	}
 	
 	
+	public String getActivity() {
+		return activity;
+	}
+
+
+	public void setActivity(String activity) {
+		this.activity = activity;
+	}
+
+
 	public String getIdentityNumber() {
 		return identityNumber;
 	}

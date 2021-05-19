@@ -5,7 +5,8 @@ public class DriverElmDataGregorian {
 	String identityNumber;
 	String mobileNumber;
 	String dateOfBirthGregorian;
-	
+	String activity;
+
 	
 	public DriverElmDataGregorian() {
 		super();
@@ -18,6 +19,23 @@ public class DriverElmDataGregorian {
 		this.dateOfBirthGregorian = dateOfBirthGregorian;
 	}
 	
+	public DriverElmDataGregorian(String identityNumber, String mobileNumber, String dateOfBirthGregorian,
+			String activity) {
+		super();
+		this.identityNumber = identityNumber;
+		this.mobileNumber = mobileNumber;
+		this.dateOfBirthGregorian = dateOfBirthGregorian;
+		this.activity = activity;
+	}
+
+	public String getActivity() {
+		return activity;
+	}
+
+	public void setActivity(String activity) {
+		this.activity = activity;
+	}
+
 	public String getIdentityNumber() {
 		return identityNumber;
 	}

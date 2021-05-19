@@ -7,7 +7,8 @@ public class DeviceElmData {
 	Integer plateType;
 	String imeiNumber;
 	VehiclePlate vehiclePlate;
-	
+	String activity;
+
 	public DeviceElmData() {
 		super();
 	}
@@ -18,7 +19,21 @@ public class DeviceElmData {
 		this.imeiNumber = imeiNumber;
 		this.vehiclePlate = vehiclePlate;
 	}
-	
+	public DeviceElmData(String sequenceNumber, Integer plateType, String imeiNumber, VehiclePlate vehiclePlate,
+			String activity) {
+		super();
+		this.sequenceNumber = sequenceNumber;
+		this.plateType = plateType;
+		this.imeiNumber = imeiNumber;
+		this.vehiclePlate = vehiclePlate;
+		this.activity = activity;
+	}
+	public String getActivity() {
+		return activity;
+	}
+	public void setActivity(String activity) {
+		this.activity = activity;
+	}
 	public String getSequenceNumber() {
 		return sequenceNumber;
 	}

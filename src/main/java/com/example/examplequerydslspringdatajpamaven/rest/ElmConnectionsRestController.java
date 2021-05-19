@@ -100,8 +100,6 @@ public class ElmConnectionsRestController {
 		return elmServiceImpl.driverUpdate(TOKEN,data,driverId,userId);
 	}
 	
-	
-	
 	@GetMapping(path ="/deviceInquery")
 	public ResponseEntity<?> deviceInquery(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 			                                     @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
