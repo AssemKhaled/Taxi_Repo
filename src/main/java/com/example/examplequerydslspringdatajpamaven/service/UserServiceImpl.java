@@ -621,13 +621,6 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 				}
 		}
 		 
-		if(user.getExp_date() != null) {
-			if(loggedUser.getAccountType() != 2) {
-				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Vendor only can set Expiration Date",null);
-		    	logger.info("************************createUser ENDED ***************************");
-		    	return ResponseEntity.ok().body(getObjectResponse);
-			}
-		}
 			
 			if(user.getIsCompany() == 1) {
 				if(user.getId() == null || user.getId() == 0 || user.getEmail() == null || user.getEmail() == "" 

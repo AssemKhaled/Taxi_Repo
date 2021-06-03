@@ -839,11 +839,11 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 					  return  ResponseEntity.ok().body(getObjectResponse);
 			  }
 			  else {
-
-				  user.setReject_reason(resp.get("resultMsg").toString());
+				  
+				  user.setReject_reason(resp.get("resultCode").toString());
 				  userRepository.save(user);
 				  
-				  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),resp.get("resultMsg").toString(),data);
+				  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),resp.get("resultCode").toString(),data);
 				  logger.info("************************ companyRegistrtaion ENDED ***************************");
 				  return  ResponseEntity.ok().body(getObjectResponse);
 			  }
@@ -1453,7 +1453,6 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 					  device.setReject_reason(null);
 					  device.setUniqueid(dataObject.get("imeiNumber"));
 					  device.setSequence_number(dataObject.get("sequenceNumber"));
-					  device.setUpdate_date_in_elm(dateRegUpdate);
 					  device.setExpired(0);
 					  device.setDelete_from_elm_date(null);
 
