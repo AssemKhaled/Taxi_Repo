@@ -8,5 +8,6 @@ public interface LoginService {
 
 	public ResponseEntity<?> login(String authorization);
 	public ResponseEntity<?> logout(String token);
+	
 		
 }

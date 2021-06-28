@@ -219,7 +219,5 @@ public class LoginServiceImpl extends RestServiceController implements LoginServ
 
 	
 	
-	
-	
 
 }

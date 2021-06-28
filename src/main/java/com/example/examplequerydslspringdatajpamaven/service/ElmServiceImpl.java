@@ -3965,7 +3965,8 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		List<ElmReturn> data = new ArrayList<ElmReturn>();
 		if(dataArray.size() > 0) {
 	    	 Map body = new HashMap();
-	
+	    	 
+	    	 body.put("activity","DEFAULT");
 			 body.put("vehicleLocations", dataArray);
 			
 			  TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
