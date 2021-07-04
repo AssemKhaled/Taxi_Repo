@@ -144,13 +144,13 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	
 	
 	@Query(nativeQuery = true, name = "getDevicesLiveData")
-    List<CustomDeviceLiveData> getAllDevicesLiveData(@Param("userIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
+	public List<CustomDeviceLiveData> getAllDevicesLiveData(@Param("userIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
 
 	@Query(nativeQuery = true, name = "getDevicesData")
-    List<CustomDeviceLiveData> getAllDevicesData(@Param("userIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
+	public List<CustomDeviceLiveData> getAllDevicesData(@Param("userIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
 
 	@Query(nativeQuery = true, name = "getDevicesDataByIds")
-    List<CustomDeviceLiveData> getAllDevicesDataByIds(@Param("deviceIds")List<Long> deviceIds,@Param("offset") int offset,@Param("search") String search);
+	public List<CustomDeviceLiveData> getAllDevicesDataByIds(@Param("deviceIds")List<Long> deviceIds,@Param("offset") int offset,@Param("search") String search);
 
 	
 	@Query(value = " SELECT  count(tc_devices.id) FROM tc_devices " + 
@@ -165,13 +165,13 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	public Integer getAllDevicesLiveDataSizeByIds(@Param("deviceIds")List<Long> deviceIds,@Param("search") String search);
 	
 	@Query(nativeQuery = true, name = "getDevicesLiveDataMap")
- 	List<CustomDeviceLiveData> getAllDevicesLiveDataMap(@Param("userIds")List<Long> userIds);
+	public List<CustomDeviceLiveData> getAllDevicesLiveDataMap(@Param("userIds")List<Long> userIds);
 	
 	@Query(nativeQuery = true, name = "getDevicesDataMapNoPosition")
- 	List<CustomMapData> getAllDevicesDataMap(@Param("userIds")List<Long> userIds);
+	public List<CustomMapData> getAllDevicesDataMap(@Param("userIds")List<Long> userIds);
 	
 	@Query(nativeQuery = true, name = "getDevicesDataMapByIdsNoPosition")
- 	List<CustomMapData> getAllDevicesDataMapByIds(@Param("deviceIds")List<Long> deviceIds);
+	public List<CustomMapData> getAllDevicesDataMapByIds(@Param("deviceIds")List<Long> deviceIds);
 
 	@Query(nativeQuery = true, name = "vehicleInfo")
 	public List<CustomDeviceList> vehicleInfo(@Param("deviceId")Long deviceId);
