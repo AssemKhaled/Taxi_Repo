@@ -525,11 +525,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 	query="SELECT tc_devices.id as id ,tc_devices.name as deviceName , tc_devices.lastupdate as lastUpdate,"
 			+ "tc_devices.positionid as positionId , 5 as status , 3 as vehicleStatus "
 			+ " , tc_devices.lastTemp as temperature , tc_devices.lastHum as humidity "
+			+ " , tc_devices.icon as icon"
 			+ " FROM tc_devices " + 
 			" where tc_devices.id IN(:deviceIds) and tc_devices.delete_date is null and tc_devices.positionid is null "
 			+ " GROUP BY tc_devices.id"),
-	
-	
+
+
 	
 	@NamedNativeQuery(name="vehicleInfo", 
 	resultSetMapping="vehicleInfoData", 
@@ -775,7 +776,7 @@ public class Device extends Attributes{
 	
 	@Column(name = "lastTemp")
 	private Double lastTemp = 0.0;
-		
+
 	
 	@JsonIgnore 
 	@ManyToMany(

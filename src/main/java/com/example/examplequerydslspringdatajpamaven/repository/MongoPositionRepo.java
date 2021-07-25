@@ -2580,10 +2580,6 @@ public class MongoPositionRepo {
 	}
 	
 	public List<CustomMapData> getOfflineList(List<String> positionIds){
-
-		
-
-		
 		List<CustomMapData> positions = new ArrayList<CustomMapData>();
 
 		List<ObjectId> ids = new ArrayList<ObjectId>();
@@ -2877,7 +2873,12 @@ public class MongoPositionRepo {
 					if(object.containsField("longitude") && object.get("longitude") != null) {
 	            		position.setLongitude(object.getDouble("longitude"));
 	
-	            	} 
+	            	}
+
+					if(object.containsField("icon") && object.get("icon") != null) {
+						position.setIcon(object.getString("icon"));
+
+					}
 
 					if(object.containsField("speed") && object.get("speed") != null) {
 	            		position.setSpeed(object.getDouble("speed") * (1.852) );

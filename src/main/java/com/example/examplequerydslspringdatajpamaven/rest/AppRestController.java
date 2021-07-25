@@ -6,15 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
@@ -72,6 +64,13 @@ public class AppRestController {
 			                                       @RequestParam (value = "userId", defaultValue = "0") Long userId
 			                                       ){		
 		return appService.getAllDeviceLiveDataMapApp(TOKEN,userId);
+	}
+
+	@GetMapping(path = "/getAllDevicesMapAppNew")
+	public ResponseEntity<?> getAllDevicesLastInfoMapAppNew(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+														 @RequestParam (value = "userId", defaultValue = "0") Long userId
+	){
+		return appService.getAllDeviceLiveDataMapAppNew(TOKEN,userId);
 	}
 	
 	@RequestMapping(value = "/vehicleInfoApp", method = RequestMethod.GET)
@@ -606,6 +605,25 @@ public class AppRestController {
 		
 		return appService.getStatusApp(TOKEN,userId);
 	}
+
+
+	@GetMapping(path ="/getDeviceLastLocations")
+	public ResponseEntity<?> getDeviceLastLocations(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+										  @RequestParam (value = "userId", defaultValue = "0") Long userId,
+										  @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId){
+
+		return appService.getVehicleInfoAndLastLocations(TOKEN,deviceId,userId);
+	}
+
+	@PutMapping(path ="/changeIcon")
+	public ResponseEntity<?> changeDeviceIcon(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+													@RequestParam (value = "userId", defaultValue = "0") Long userId,
+													@RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+											  		@RequestParam(value = "icon", defaultValue = "") String icon){
+
+		return appService.changeDeviceIcon(TOKEN,deviceId,userId,icon);
+	}
+
 	
 	@RequestMapping(value = "/getMergeHoursIgnitionApp", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> getMergeHoursIgnitionApp(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,

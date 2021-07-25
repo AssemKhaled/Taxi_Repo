@@ -22,6 +22,7 @@ public interface AppService {
 	public ResponseEntity<?> loginApp(String authorization);
 	public ResponseEntity<?> logoutApp(String TOKEN);
 
+	 ResponseEntity<?> getAllDeviceLiveDataMapAppNew(String TOKEN, Long userId);
 	public ResponseEntity<?> getAllDeviceLiveDataMapApp(String TOKEN,Long userId);
 	public ResponseEntity<?> vehicleInfoApp(String TOKEN,Long deviceId,Long userId);
 
@@ -78,7 +79,10 @@ public interface AppService {
 	public ResponseEntity<?> getMergeHoursIgnitionApp(String TOKEN,Long userId);
 	public ResponseEntity<?> getDistanceFuelEngineApp(String TOKEN,Long userId);
 	public ResponseEntity<?> getNotificationsChartApp(String TOKEN,Long userId);
-	
+
+	ResponseEntity<?> getVehicleInfoAndLastLocations(String TOKEN , Long deviceId, Long userId);
+	ResponseEntity<?> changeDeviceIcon(String TOKEN , Long deviceId, Long userId, String icon);
+
 	public ResponseEntity<?> registerToken(String TOKEN,Map<Object, Object> data);
 	public ResponseEntity<?> logoutTokenApp(String TOKEN,Map<Object, Object> data);
 

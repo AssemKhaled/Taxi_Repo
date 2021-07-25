@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import com.example.examplequerydslspringdatajpamaven.service.ProfileServiceImpl;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 
 /**
@@ -18,7 +17,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @SpringBootApplication 
 @Configuration
 @ComponentScan(basePackages = { "com.example.examplequerydslspringdatajpamaven.*"})
-@EnableSwagger2
 public class ExampleQuerydslSpringDataJpaMavenApplication  {
 
 	public static void main(String[] args) {

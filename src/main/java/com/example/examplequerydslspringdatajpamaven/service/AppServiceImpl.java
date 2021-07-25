@@ -8,22 +8,15 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.net.ssl.SSLContext;
 
+import com.example.examplequerydslspringdatajpamaven.responses.DevicesMapResponse;
+import com.example.examplequerydslspringdatajpamaven.responses.VehicleInfoAndLastLocationsResponse;
+import io.radanalytics.operator.common.AnsiColors;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -96,6 +89,8 @@ import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 import com.example.examplequerydslspringdatajpamaven.tokens.TokenSecurity;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import static org.reflections.util.ConfigurationBuilder.build;
 
 /**
  * services functionality related to app
@@ -192,7 +187,9 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	
 	@Autowired
 	private UserRoleService userRoleService;
-	
+
+	@Autowired
+	private DeviceServiceImpl deviceService;
 	
 	
 	/**
@@ -349,7 +346,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	 * get data of all devices on map
 	 */
 	@Override
-	public ResponseEntity<?> getAllDeviceLiveDataMapApp(String TOKEN, Long userId) {
+	public ResponseEntity<?> getAllDeviceLiveDataMapAppNew(String TOKEN, Long userId) {
 
 		// TODO Auto-generated method stub
 		if(TOKEN.equals("")) {
@@ -383,11 +380,11 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	    if(loggedUser.getAccountType().equals(4)) {
 			 
 			List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(userId);
-			List<CustomMapData> allDevicesLiveDataNoPosition = new ArrayList<CustomMapData>();
-            List<CustomMapData> allDevices = new ArrayList<CustomMapData>();
+			List<DevicesMapResponse> allDevicesLiveDataNoPosition = new ArrayList<>();
+            List<DevicesMapResponse> allDevices = new ArrayList<>();
 
 			if(deviceIds.size()>0) {
-				allDevicesLiveDataNoPosition =	deviceRepository.getAllDevicesDataMapByIds(deviceIds);
+				allDevicesLiveDataNoPosition =	deviceRepository.getAllDevicesMapDataByIds(deviceIds);
 				allDevices.addAll(allDevicesLiveDataNoPosition);
 
 				List<String> positionIdsOffline =  deviceRepository.getNumberOfOfflineDevicesListByIds(deviceIds);
@@ -395,22 +392,60 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				List<String> positionIdsOnline =  deviceRepository.getNumberOfOnlineDevicesListByIds(deviceIds);
 
 
-
 				if(positionIdsOffline.size() > 0 ) {
 					List<CustomMapData> allDevicesPositionOffline = mongoPositionRepo.getOfflineList(positionIdsOffline);
-					allDevices.addAll(allDevicesPositionOffline);
+					List<DevicesMapResponse> allDevicesPositionOfflineResponse = new ArrayList<>();
+					for(CustomMapData device : allDevicesPositionOffline){
+						Device deviceRecord = deviceRepository.findOne(device.getId());
+						allDevicesPositionOfflineResponse.add(DevicesMapResponse.builder()
+								.id(device.getId())
+								.deviceName(device.getDeviceName())
+								.latitude(device.getLatitude())
+								.longitude(device.getLongitude())
+								.vehicleStatus(device.getVehicleStatus())
+								.speed(Math.round(device.getSpeed() * 100.00) / 100.00)
+								.icon(deviceRecord.getIcon())
+								.build());
+					}
+					allDevices.addAll(allDevicesPositionOfflineResponse);
 
 				}
 				
 				if(positionIdsOutOfNetwork.size() > 0 ) {
 					List<CustomMapData> allDevicesPositionOutOfNetwork= mongoPositionRepo.getOutOfNetworkList(positionIdsOutOfNetwork);
-					allDevices.addAll(allDevicesPositionOutOfNetwork);
+					List<DevicesMapResponse> allDevicesPositionOutOfNetworkResponse = new ArrayList<>();
+					for(CustomMapData device : allDevicesPositionOutOfNetwork){
+						Device deviceRecord = deviceRepository.findOne(device.getId());
+						allDevicesPositionOutOfNetworkResponse.add(DevicesMapResponse.builder()
+								.id(device.getId())
+								.deviceName(device.getDeviceName())
+								.latitude(device.getLatitude())
+								.longitude(device.getLongitude())
+								.vehicleStatus(device.getVehicleStatus())
+								.speed(Math.round(device.getSpeed() * 100.00) / 100.00)
+								.icon(deviceRecord.getIcon())
+								.build());
+					}
+					allDevices.addAll(allDevicesPositionOutOfNetworkResponse);
 
 				}
 				
 				if(positionIdsOnline.size() > 0 ) {
 					List<CustomMapData> allDevicesPositionOnline= mongoPositionRepo.getOnlineList(positionIdsOnline);
-					allDevices.addAll(allDevicesPositionOnline);
+					List<DevicesMapResponse> allDevicesPositionOnlineResponse = new ArrayList<>();
+					for(CustomMapData device : allDevicesPositionOnline){
+						Device deviceRecord = deviceRepository.findOne(device.getId());
+						allDevicesPositionOnlineResponse.add(DevicesMapResponse.builder()
+								.id(device.getId())
+								.deviceName(device.getDeviceName())
+								.latitude(device.getLatitude())
+								.longitude(device.getLongitude())
+								.vehicleStatus(device.getVehicleStatus())
+								.speed(Math.round(device.getSpeed() * 100.00) / 100.00)
+								.icon(deviceRecord.getIcon())
+								.build());
+					}
+					allDevices.addAll(allDevicesPositionOnlineResponse);
 
 				}
 
@@ -436,13 +471,185 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				 }
 			 }
 	    
-            List<CustomMapData> allDevices = new ArrayList<CustomMapData>();
+            List<DevicesMapResponse> allDevices = new ArrayList<>();
+
+			List<DevicesMapResponse> allDevicesNoPosition = deviceRepository.getAllDevicesMapDataByIds(usersIds);
+			allDevices.addAll(allDevicesNoPosition);
+			List<String> positionIdsOffline =  deviceRepository.getNumberOfOfflineDevicesList(usersIds);
+			List<String> positionIdsOutOfNetwork =  deviceRepository.getNumberOfOutOfNetworkDevicesList(usersIds);
+			List<String> positionIdsOnline =  deviceRepository.getNumberOfOnlineDevicesList(usersIds);
+
+			if(positionIdsOffline.size() > 0 ) {
+				List<CustomMapData> allDevicesPositionOffline = mongoPositionRepo.getOfflineList(positionIdsOffline);
+				List<DevicesMapResponse> allDevicesPositionOfflineResponse = new ArrayList<>();
+				for(CustomMapData device : allDevicesPositionOffline){
+					Device deviceRecord = deviceRepository.findOne(device.getId());
+					allDevicesPositionOfflineResponse.add(DevicesMapResponse.builder()
+							.id(device.getId())
+							.deviceName(device.getDeviceName())
+							.latitude(device.getLatitude())
+							.longitude(device.getLongitude())
+							.vehicleStatus(device.getVehicleStatus())
+							.speed(Math.round(device.getSpeed() * 100.00) / 100.00)
+							.icon(deviceRecord.getIcon())
+							.build());
+				}
+				allDevices.addAll(allDevicesPositionOfflineResponse);
+
+			}
+			
+			if(positionIdsOutOfNetwork.size() > 0 ) {
+				List<CustomMapData> allDevicesPositionOutOfNetwork= mongoPositionRepo.getOutOfNetworkList(positionIdsOutOfNetwork);
+				List<DevicesMapResponse> allDevicesPositionOutOfNetworkResponse = new ArrayList<>();
+				for(CustomMapData device : allDevicesPositionOutOfNetwork){
+					Device deviceRecord = deviceRepository.findOne(device.getId());
+					allDevicesPositionOutOfNetworkResponse.add(DevicesMapResponse.builder()
+							.id(device.getId())
+							.deviceName(device.getDeviceName())
+							.latitude(device.getLatitude())
+							.longitude(device.getLongitude())
+							.vehicleStatus(device.getVehicleStatus())
+							.speed(Math.round(device.getSpeed() * 100.00) / 100.00)
+							.icon(deviceRecord.getIcon())
+							.build());
+				}
+				allDevices.addAll(allDevicesPositionOutOfNetworkResponse);
+
+			}
+			
+			if(positionIdsOnline.size() > 0 ) {
+				List<CustomMapData> allDevicesPositionOnline= mongoPositionRepo.getOnlineList(positionIdsOnline);
+				List<DevicesMapResponse> allDevicesPositionOnlineResponse = new ArrayList<>();
+				for(CustomMapData device : allDevicesPositionOnline){
+					Device deviceRecord = deviceRepository.findOne(device.getId());
+					allDevicesPositionOnlineResponse.add(DevicesMapResponse.builder()
+							.id(device.getId())
+							.deviceName(device.getDeviceName())
+							.latitude(device.getLatitude())
+							.longitude(device.getLongitude())
+							.vehicleStatus(device.getVehicleStatus())
+							.speed(Math.round(device.getSpeed() * 100.00) / 100.00)
+							.icon(deviceRecord.getIcon())
+							.build());
+				}
+				allDevices.addAll(allDevicesPositionOnlineResponse);
+
+			}
+		    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevices);
+			
+			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+	    }
+
+	}
+
+
+	/*****
+	 * Old Get All Devices Map App
+	 * Old Get All Devices Map App
+	 * Old Get All Devices Map App
+	 * Old Get All Devices Map App
+	 * Old Get All Devices Map App
+	 * Old Get All Devices Map App
+	 * Old Get All Devices Map App
+	 */
+
+
+	@Override
+	public ResponseEntity<?> getAllDeviceLiveDataMapApp(String TOKEN, Long userId) {
+
+		// TODO Auto-generated method stub
+		if(TOKEN.equals("")) {
+			List<Device> devices = null;
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+		if(userId.equals(0)) {
+			List<CustomDeviceLiveData> allDevicesLiveData=	null;
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is required",allDevicesLiveData);
+
+			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		User loggedUser = userServiceImpl.findById(userId);
+		if( loggedUser == null) {
+			List<CustomDeviceLiveData> allDevicesLiveData=	null;
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Logged user is not found ",allDevicesLiveData);
+
+			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+		userServiceImpl.resetChildernArray();
+		List<Long>usersIds= new ArrayList<>();
+
+		if(loggedUser.getAccountType().equals(4)) {
+
+			List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(userId);
+			List<CustomMapData> allDevicesLiveDataNoPosition = new ArrayList<CustomMapData>();
+			List<CustomMapData> allDevices = new ArrayList<CustomMapData>();
+
+			if(deviceIds.size()>0) {
+				allDevicesLiveDataNoPosition =	deviceRepository.getAllDevicesDataMapByIds(deviceIds);
+				allDevices.addAll(allDevicesLiveDataNoPosition);
+
+				List<String> positionIdsOffline =  deviceRepository.getNumberOfOfflineDevicesListByIds(deviceIds);
+				List<String> positionIdsOutOfNetwork =  deviceRepository.getNumberOfOutOfNetworkDevicesListByIds(deviceIds);
+				List<String> positionIdsOnline =  deviceRepository.getNumberOfOnlineDevicesListByIds(deviceIds);
+
+
+
+				if(positionIdsOffline.size() > 0 ) {
+					List<CustomMapData> allDevicesPositionOffline = mongoPositionRepo.getOfflineList(positionIdsOffline);
+					allDevices.addAll(allDevicesPositionOffline);
+
+				}
+
+				if(positionIdsOutOfNetwork.size() > 0 ) {
+					List<CustomMapData> allDevicesPositionOutOfNetwork= mongoPositionRepo.getOutOfNetworkList(positionIdsOutOfNetwork);
+					allDevices.addAll(allDevicesPositionOutOfNetwork);
+
+				}
+
+				if(positionIdsOnline.size() > 0 ) {
+					List<CustomMapData> allDevicesPositionOnline= mongoPositionRepo.getOnlineList(positionIdsOnline);
+					allDevices.addAll(allDevicesPositionOnline);
+
+				}
+
+
+			}
+
+
+			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevices);
+
+			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+
+		}
+		else {
+			List<User>childernUsers = userServiceImpl.getAllChildernOfUser(userId);
+			if(childernUsers.isEmpty()) {
+				usersIds.add(userId);
+			}
+			else {
+				usersIds.add(userId);
+				for(User object : childernUsers) {
+					usersIds.add(object.getId());
+				}
+			}
+
+			List<CustomMapData> allDevices = new ArrayList<CustomMapData>();
 
 			List<CustomMapData> allDevicesNoPosition = deviceRepository.getAllDevicesDataMap(usersIds);
 			allDevices.addAll(allDevicesNoPosition);
 
-			
-			
+
+
 
 			List<String> positionIdsOffline =  deviceRepository.getNumberOfOfflineDevicesList(usersIds);
 			List<String> positionIdsOutOfNetwork =  deviceRepository.getNumberOfOutOfNetworkDevicesList(usersIds);
@@ -453,25 +660,35 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				allDevices.addAll(allDevicesPositionOffline);
 
 			}
-			
+
 			if(positionIdsOutOfNetwork.size() > 0 ) {
 				List<CustomMapData> allDevicesPositionOutOfNetwork= mongoPositionRepo.getOutOfNetworkList(positionIdsOutOfNetwork);
 				allDevices.addAll(allDevicesPositionOutOfNetwork);
 
 			}
-			
+
 			if(positionIdsOnline.size() > 0 ) {
 				List<CustomMapData> allDevicesPositionOnline= mongoPositionRepo.getOnlineList(positionIdsOnline);
 				allDevices.addAll(allDevicesPositionOnline);
 
 			}
-		    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevices);
-			
+			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevices);
+
 			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
 			return ResponseEntity.ok().body(getObjectResponse);
-	    }
+		}
 
 	}
+
+	/**
+	 * End Old Get All Devices Map App
+	 * End Old Get All Devices Map App
+	 * End Old Get All Devices Map App
+	 * End Old Get All Devices Map App
+	 * End Old Get All Devices Map App
+	 * End Old Get All Devices Map App
+	 */
+
 	public static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) 
     {
         long diffInMillies = date2.getTime() - date1.getTime();
@@ -10507,20 +10724,21 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 						  }
 
 					      devicesStatus.put("totalHours", totalHours);
-						  
 
+						  if (driverH.getAttributes() != null){
+							  JSONObject obj = new JSONObject(driverH.getAttributes().toString());
 
-						JSONObject obj = new JSONObject(driverH.getAttributes().toString());
+							  if(obj.has("todayHours")) {
+								  time += Math.abs(  obj.getLong("todayHours") );
+								  Long hoursEngine =   TimeUnit.MILLISECONDS.toHours(time) ;
+								  Long minutesEngine = TimeUnit.MILLISECONDS.toMinutes(time) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(time));
+								  Long secondsEngine = TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time));
 
-						if(obj.has("todayHours")) {
-							  time += Math.abs(  obj.getLong("todayHours") );
-							  Long hoursEngine =   TimeUnit.MILLISECONDS.toHours(time) ;
-							  Long minutesEngine = TimeUnit.MILLISECONDS.toMinutes(time) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(time));
-							  Long secondsEngine = TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time));
-							  
-							  totalHours = String.valueOf(hoursEngine)+":"+String.valueOf(minutesEngine)+":"+String.valueOf(secondsEngine);
+								  totalHours = String.valueOf(hoursEngine)+":"+String.valueOf(minutesEngine)+":"+String.valueOf(secondsEngine);
 
-						}
+							  }
+						  }
+
 					      devicesStatus.put("totalHours", totalHours);
 					  }
 				  }
@@ -10965,6 +11183,68 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		
 	}
 
-	
+	@Override
+	public ResponseEntity<?> getVehicleInfoAndLastLocations(String TOKEN , Long deviceId, Long userId){
+		logger.info("************************ vehicleInfoAndLastLocations STARTED ***************************");
+		GetObjectResponse response  = (GetObjectResponse) deviceService.vehicleInfo(TOKEN,deviceId,userId).getBody();
+		List<CustomDeviceList> vehicleData = (List<CustomDeviceList>) response.getEntity();
+		List<VehicleInfoAndLastLocationsResponse> vehicleInfoAndLastLocationsResponseList = new ArrayList<>();
+		for(CustomDeviceList vehicle : vehicleData){
+			vehicleInfoAndLastLocationsResponseList.add(
+					VehicleInfoAndLastLocationsResponse.builder()
+							.id((long) vehicle.getId())
+							.lastUpdate(vehicle.getLastUpdate())
+							.lastUpdateApp(vehicle.getLastUpdate())
+							.positionId(vehicle.getPositionId())
+							.power(vehicle.getPower())
+							.address(vehicle.getAddress())
+							.lastPoints(vehicle.getLastPoints())
+							.driverName(vehicle.getDriverName())
+							.build());
+		}
+		getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",vehicleInfoAndLastLocationsResponseList,vehicleInfoAndLastLocationsResponseList.size());
+		logger.info("************************ vehicleInfoAndLastLocations ENDED ***************************");
+		return ResponseEntity.ok().body(getObjectResponse);
+	}
 
+	@Override
+	public ResponseEntity<?> changeDeviceIcon(String TOKEN , Long deviceId, Long userId, String icon) {
+		logger.info("************************changeDeviceIcon STARTED ***************************");
+
+		if(TOKEN.equals("")) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
+			logger.info("************************registerToken ENDED ***************************");
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+
+		Optional<User> user = Optional.ofNullable(userRepository.findOne(userId));
+		if(!user.isPresent()) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "user Id is required",null);
+			logger.info("************************registerToken ENDED ***************************");
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+
+		Optional<Device> device = Optional.ofNullable(deviceRepository.findOne(deviceId));
+		if(!device.isPresent()) {
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device Id is required",null);
+			logger.info("************************registerToken ENDED ***************************");
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+
+		if(!icon.equals("")){
+			Device deviceRecord = device.get();
+			deviceRecord.setIcon(icon);
+			List<Device> deviceList = new ArrayList<>() ;
+			deviceList.add(deviceRecord);
+			deviceRepository.save(deviceRecord);
+			getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",deviceList,deviceList.size());
+			logger.info("************************ vehicleInfoAndLastLocations ENDED ***************************");
+			return ResponseEntity.ok().body(getObjectResponse);
+		}
+
+		getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Icon is required",null);
+		logger.info("************************changeDeviceIcon ENDED ***************************");
+		return  ResponseEntity.badRequest().body(getObjectResponse);
+
+	}
 }
