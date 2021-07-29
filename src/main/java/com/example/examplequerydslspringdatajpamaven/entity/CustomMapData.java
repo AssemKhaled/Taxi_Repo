@@ -100,7 +100,7 @@ public class CustomMapData {
 		this.operator = operator;
 		this.latitude = latitude;
 		this.longitude = longitude;
-		this.speed = Math.round(speed * 100.0) / 100.0;
+		this.speed = speed ;
 	}
 
 	public CustomMapData(Long id, String deviceName, String lastUpdate, String positionId, Integer status,
@@ -119,7 +119,7 @@ public class CustomMapData {
 		this.operator = operator;
 		this.latitude = latitude;
 		this.longitude = longitude;
-		this.speed = Math.round(speed * 100.0) / 100.0;
+		this.speed = speed ;
 		this.address = address;
 	}
 	
@@ -141,7 +141,7 @@ public class CustomMapData {
 		this.operator = operator;
 		this.latitude = latitude;
 		this.longitude = longitude;
-		this.speed =  Math.round(speed * 100.0) / 100.0;
+		this.speed = speed;
 		this.address = address;
 	}
 	public Long getId() {
@@ -241,11 +241,11 @@ public class CustomMapData {
 	}
 
 	public Double getSpeed() {
-		return  Math.round(speed * 100.0) / 100.0;
+		return  speed ;
 	}
 
 	public void setSpeed(Double speed) {
-		this.speed =  Math.round(speed * 100.0) / 100.0;;
+		this.speed =  speed ;
 	}
 	public String getAddress() {
 		return address;

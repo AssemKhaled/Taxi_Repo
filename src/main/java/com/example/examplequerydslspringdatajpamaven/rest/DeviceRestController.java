@@ -1,7 +1,12 @@
 package com.example.examplequerydslspringdatajpamaven.rest;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -263,6 +268,25 @@ public class DeviceRestController {
 		return deviceService.updatePositionData();
 	}
 	
+	@GetMapping(value ="/testDate")
+	public  ResponseEntity<?> testDate() {
+		Date now = new Date();
+		SimpleDateFormat sdf
+	      = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//		System.out.println("nowString"+now.toString());
+		String date = sdf.format(now);
+		 Date endDate = null;
+		 try {
+			endDate = DateUtils
+				      .addDays(sdf.parse(date), 365);
+			System.out.println("Date"+endDate);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 System.out.println("noDate"+endDate);
+		 return null;
+	}
 	
 	
 }

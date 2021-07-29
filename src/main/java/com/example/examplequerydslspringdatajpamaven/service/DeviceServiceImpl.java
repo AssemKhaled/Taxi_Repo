@@ -30,6 +30,8 @@ import javax.net.ssl.SSLContext;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
@@ -213,10 +215,25 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		logger.info("************************ createDevice STARTED ***************************");
 		device.setUser_id(userId);
 		Date now = new Date();
+		device.setStart_date(now);
 		SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String nowTime = isoFormat.format(now);
-		
+		 SimpleDateFormat sdf
+	      = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		 Date endDate;
+		 
+		try {
+			String date = sdf.format(now);
+			endDate = DateUtils
+				      .addDays(sdf.parse(date), 365);
+			device.setEnd_date(endDate);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		device.setCreate_date(nowTime);
+		
+		
 				
 		String image = device.getPhoto();
 		device.setPhoto("not_available.png");
