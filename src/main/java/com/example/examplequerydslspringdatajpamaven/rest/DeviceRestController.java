@@ -268,25 +268,25 @@ public class DeviceRestController {
 		return deviceService.updatePositionData();
 	}
 	
-	@GetMapping(value ="/testDate")
-	public  ResponseEntity<?> testDate() {
-		Date now = new Date();
-		SimpleDateFormat sdf
-	      = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//		System.out.println("nowString"+now.toString());
-		String date = sdf.format(now);
-		 Date endDate = null;
-		 try {
-			endDate = DateUtils
-				      .addDays(sdf.parse(date), 365);
-			System.out.println("Date"+endDate);
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		 System.out.println("noDate"+endDate);
-		 return null;
-	}
+//	@GetMapping(value ="/testDate")
+//	public  ResponseEntity<?> testDate() {
+//		Date now = new Date();
+//		SimpleDateFormat sdf
+//	      = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+////		System.out.println("nowString"+now.toString());
+//		String date = sdf.format(now);
+//		 Date endDate = null;
+//		 try {
+//			endDate = DateUtils
+//				      .addDays(sdf.parse(date), 365);
+//			System.out.println("Date"+endDate);
+//		} catch (ParseException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		 System.out.println("noDate"+endDate);
+//		 return null;
+//	}
 	
 	
 }

@@ -515,6 +515,32 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				logger.info("************************ editDevice ENDED ***************************");
 				return ResponseEntity.badRequest().body(getObjectResponse);
 			}
+			
+			// check for user allowed to set starst date
+			if(loggedUser.getAccountType()!= 1 && loggedUser.getAccountType() != 2 && device.getStart_date() != null) {
+				getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "You are not allowed to edit activation date",null);
+				logger.info("************************ editDevice ENDED ***************************");
+				return ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			else {
+				if(loggedUser.getAccountType()==1 && loggedUser.getAccountType() == 2) {
+					Date start_date = device.getStart_date();
+					 SimpleDateFormat sdf
+				      = new SimpleDateFormat("yyyy-MM-dd");
+					 Date endDate;
+					 
+					try {
+						String date = sdf.format(start_date);
+						endDate = DateUtils
+							      .addDays(sdf.parse(date), 365);
+						device.setEnd_date(endDate);
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+				}
+			}
 			Set<User> userCreater=new HashSet<>();
 			userCreater = oldDevice.getUser();
 	        device.setUser(userCreater);
