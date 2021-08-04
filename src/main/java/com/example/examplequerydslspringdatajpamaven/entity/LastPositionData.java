@@ -22,6 +22,8 @@ public class LastPositionData {
 	private Double speed;
 	
 	private Double weight;
+	
+	private String address;
 
 		
 	private Object attributes;
@@ -149,6 +151,30 @@ public class LastPositionData {
 		this.speed = speed;
 		this.weight = weight;
 		this.attributes = attributes;
+	}
+	public LastPositionData(String positionId, String servertime, String devicetime, String fixtime, Double latitude,
+			Double longitude, Double speed, Double weight, Object attributes,String address) {
+		super();
+		this.positionId = positionId;
+		this.servertime = servertime;
+		this.devicetime = devicetime;
+		this.fixtime = fixtime;
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.speed = speed;
+		this.weight = weight;
+		this.attributes = attributes;
+		this.address = address;
+	}
+
+
+	public String getAddress() {
+		return address;
+	}
+
+
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
 	

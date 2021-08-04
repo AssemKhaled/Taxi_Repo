@@ -29,7 +29,7 @@ public interface UserClientDeviceRepository extends JpaRepository<userClientDevi
 	@Query(value = "select * from tc_user_client_device where tc_user_client_device.userid=:userId", nativeQuery = true)
 	public List<userClientDevice> getDevicesOfUser(@Param("userId") Long userId);
 	
-	@Query(value = "select tc_user_client_device.deviceid from tc_user_client_device where tc_user_client_device.userid=:userId", nativeQuery = true)
+	@Query(value = "select tc_user_client_device.deviceid from tc_user_client_device where tc_user_client_device.userid=:userId AND (TIMESTAMPDIFF(day ,tc_devices.end_date,CURDATE()) >=0", nativeQuery = true)
 	public List<Long> getDevicesIds(@Param("userId") Long userId);
 	
 	@Query(value = "select tc_user_client_device.deviceid from tc_user_client_device "

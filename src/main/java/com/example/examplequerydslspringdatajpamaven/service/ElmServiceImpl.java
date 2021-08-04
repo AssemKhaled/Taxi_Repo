@@ -4393,7 +4393,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		// TODO Auto-generated method stub
 		
 
-		List<ExpiredVehicles> devicList = new ArrayList<>();
+		List<Device> deviceList = new ArrayList<>();
 
 		Date date = new Date();
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -4412,117 +4412,184 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			e.printStackTrace();
 		}
 		 
-		devicList = deviceRepository.getAllExpiredIds(dateCheck);
-		
-		if(devicList.size()>0) {
-			for(ExpiredVehicles ExpiredDevice:devicList) {
-
-				Device device = deviceRepository.findOne(ExpiredDevice.getDeviceId());
+//		devicList = deviceRepository.getAllExpiredIds(dateCheck);
+		 deviceList = deviceRepository.getAllDevicesExpiredNew();
+		if(deviceList.size()>0) {
+			for(Device ExpiredDevice:deviceList) {
+//
+				Device device = deviceRepository.findOne(ExpiredDevice.getId());
 				
-				device.setExpired(1);
+//				device.setExpired(1);
+				device.setDelete_from_elm_date(date);
 				deviceRepository.save(device);
-
-				if(ExpiredDevice.getUser_referenceKey() != null && ExpiredDevice.getUser_referenceKey() != "" 
-						&& ExpiredDevice.getVehicle_referenceKey() != null && ExpiredDevice.getVehicle_referenceKey() != ""){
-					
-					
-				  String url = elm+"/operationCompany/"+ExpiredDevice.getUser_referenceKey()+"/vehicle/"+ExpiredDevice.getVehicle_referenceKey();
-
-				  Map bodyToMiddleWare = new HashMap();
+//				mongoPositionRepo.get
+//				if(ExpiredDevice.getUser_referenceKey() != null && ExpiredDevice.getUser_referenceKey() != "" 
+//						&& ExpiredDevice.getVehicle_referenceKey() != null && ExpiredDevice.getVehicle_referenceKey() != ""){
+//					
+			//disable delete vehicle from elm when it expire from elm 		
+//				  String url = elm+"/operationCompany/"+ExpiredDevice.getUser_referenceKey()+"/vehicle/"+ExpiredDevice.getVehicle_referenceKey();
+//
+//				  Map bodyToMiddleWare = new HashMap();
 				  
-				  bodyToMiddleWare.put("dataObject", null);
-				  bodyToMiddleWare.put("url",url);
-				  bodyToMiddleWare.put("methodType","DELETE");
+//				  bodyToMiddleWare.put("dataObject", null);
+//				  bodyToMiddleWare.put("url",url);
+//				  bodyToMiddleWare.put("methodType","DELETE");
 				 		  
-				  requet = bodyToMiddleWare;
-				  TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+//				  requet = bodyToMiddleWare;
+//				  TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+//
+//					SSLContext sslContext = null;
+//					try {
+//						sslContext = org.apache.http.ssl.SSLContexts.custom()
+//						        .loadTrustMaterial(null, acceptingTrustStrategy)
+//						        .build();
+//					} catch (KeyManagementException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					} catch (NoSuchAlgorithmException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					} catch (KeyStoreException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//
+//					SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
+//
+//					CloseableHttpClient httpClient = HttpClients.custom()
+//					        .setSSLSocketFactory(csf)
+//					        .build();
+//
+//					HttpComponentsClientHttpRequestFactory requestFactory =
+//					        new HttpComponentsClientHttpRequestFactory();
+//
+//					requestFactory.setHttpClient(httpClient);
+//
+//					RestTemplate restTemplate = new RestTemplate(requestFactory);
+//					
+//					
+//					  restTemplate.getMessageConverters()
+//				        .add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
+//					  
+//				  HttpEntity<Object> entity = new HttpEntity<Object>(bodyToMiddleWare);
 
-					SSLContext sslContext = null;
-					try {
-						sslContext = org.apache.http.ssl.SSLContexts.custom()
-						        .loadTrustMaterial(null, acceptingTrustStrategy)
-						        .build();
-					} catch (KeyManagementException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (NoSuchAlgorithmException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (KeyStoreException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-					SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
-
-					CloseableHttpClient httpClient = HttpClients.custom()
-					        .setSSLSocketFactory(csf)
-					        .build();
-
-					HttpComponentsClientHttpRequestFactory requestFactory =
-					        new HttpComponentsClientHttpRequestFactory();
-
-					requestFactory.setHttpClient(httpClient);
-
-					RestTemplate restTemplate = new RestTemplate(requestFactory);
-					
-					
-					  restTemplate.getMessageConverters()
-				        .add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
-					  
-				  HttpEntity<Object> entity = new HttpEntity<Object>(bodyToMiddleWare);
-
-				  ResponseEntity<ElmReturn> rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
-
-				  
-				  ElmReturn elmReturn = rateResponse.getBody();
+//				  ResponseEntity<ElmReturn> rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
 
 				  
-				  response.put("body", elmReturn.getBody());
-				  response.put("statusCode", elmReturn.getStatusCode());
-				  response.put("message", elmReturn.getMessage());
+//				  ElmReturn elmReturn = rateResponse.getBody();
+
+				  
+//				  response.put("body", elmReturn.getBody());
+//				  response.put("statusCode", elmReturn.getStatusCode());
+//				  response.put("message", elmReturn.getMessage());
 
 
-				  MongoElmLogs elmLogs = new MongoElmLogs(null,ExpiredDevice.getUserId(),ExpiredDevice.getUserName(),null,null,ExpiredDevice.getDeviceId(),ExpiredDevice.getDeviceName(),currentDate,type,requet,response);
-				  elmLogsRepository.save(elmLogs);
+//				  MongoElmLogs elmLogs = new MongoElmLogs(null,ExpiredDevice.getUserId(),ExpiredDevice.getUserName(),null,null,ExpiredDevice.getDeviceId(),ExpiredDevice.getDeviceName(),currentDate,type,requet,response);
+//				  elmLogsRepository.save(elmLogs);
 				  
 				  
 				  
-				  Map resp = new HashMap();
-				  resp = elmReturn.getBody();
-				  
-		        if(resp.containsKey("errorCode")) {
-					  
-					  device.setReject_reason(resp.get("errorMsg").toString());
-					  deviceRepository.save(device);
-
-				  }
-				  else if(resp.containsKey("resultCode")) {
-					  if(resp.get("success").equals(true)) {
+//				  Map resp = new HashMap();
+//				  resp = elmReturn.getBody();
+//				  
+//		        if(resp.containsKey("errorCode")) {
+//					  
+//					  device.setReject_reason(resp.get("errorMsg").toString());
+//					  deviceRepository.save(device);
+//
+//				  }
+//				  else if(resp.containsKey("resultCode")) {
+//					  if(resp.get("success").equals(true)) {
 						  
-						  device.setReject_reason(null);
-						  device.setDelete_from_elm_date(dateCheck);
-						  device.setDelete_from_elm(resp.get("resultCode").toString());
+//						  device.setReject_reason(null);
+//						  device.setDelete_from_elm_date(dateCheck);
+//						  device.setDelete_from_elm(resp.get("resultCode").toString());
 						  
-						  deviceRepository.save(device);
+//						  deviceRepository.save(device);
 						  
 						
-					  }
-					  else {
-							device.setReject_reason(resp.get("resultCode").toString());
-							deviceRepository.save(device);
-
-					  }
+//					  }
+//					  else {
+//							device.setReject_reason(resp.get("resultCode").toString());
+//							deviceRepository.save(device);
+//
+//					  }
 					  
 					 
-				  }
+//				  }
 					
 					
-				}
+//				}
 			}
+			
+		ArrayList<Map<Object,Object>> data = mongoPositionRepo.getVehiclesLastPositionByIds(null);
+		Map body = new HashMap();
+    	 
+    	 body.put("activity","DEFAULT");
+		 body.put("vehicleLocations", data);
+		 System.out.println(body);
+		  TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+			
+			SSLContext sslContext = null;
+			try {
+				sslContext = org.apache.http.ssl.SSLContexts.custom()
+				        .loadTrustMaterial(null, acceptingTrustStrategy)
+				        .build();
+			} catch (KeyManagementException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchAlgorithmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (KeyStoreException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
+
+			CloseableHttpClient httpClient = HttpClients.custom()
+			        .setSSLSocketFactory(csf)
+			        .build();
+
+			HttpComponentsClientHttpRequestFactory requestFactory =
+			        new HttpComponentsClientHttpRequestFactory();
+
+			requestFactory.setHttpClient(httpClient);
+
+			RestTemplate restTemplate = new RestTemplate(requestFactory);
+			
+			
+			  restTemplate.getMessageConverters()
+		        .add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
+			  
+			  Map bodyToMiddleWare = new HashMap();
+
+
+			  
+
+			  bodyToMiddleWare.put("dataObject", body);
+			  bodyToMiddleWare.put("url",elmLocations);
+			  bodyToMiddleWare.put("methodType","POST");
+			  
+			  
+		  HttpEntity<Object> entity1 = new HttpEntity<Object>(bodyToMiddleWare);
+
+		  ResponseEntity<ElmReturn> rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity1, ElmReturn.class);
+		  System.out.println("hereeeee");
+		  ElmReturn elmReturn = rateResponse.getBody();
+		  System.out.println(elmReturn);
+
+			 if(rateResponse.getStatusCode().OK == null) {
+				  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),elmReturn.getMessage(),null);
+				  logger.info("************************ companyRegistrtaion ENDED ***************************");
+				  return  ResponseEntity.ok().body(getObjectResponse);
+			  }
 		}
 		
 		
+//		  data.add(elmReturn);
+
 		
 		
 		getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",null);

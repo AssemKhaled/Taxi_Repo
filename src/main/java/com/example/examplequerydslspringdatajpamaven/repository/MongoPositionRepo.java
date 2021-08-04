@@ -3561,5 +3561,53 @@ public class MongoPositionRepo {
 		return size;
 	}
 	
-    
+
+	public ArrayList<Map<Object,Object>>  getVehiclesLastPositionByIds(ArrayList<String> ids) {
+		ArrayList<Map<Object,Object>> lastPoints = new ArrayList<Map<Object,Object>>();
+	
+		ArrayList<ObjectId>arr = new ArrayList();
+		
+		for(int i= 0; i >= ids.size();i++) {
+			arr.add(new ObjectId(ids.get(i)));
+		}
+		        Criteria criteria = Criteria.where("_id").in(arr);
+		        AggregationOperation match = Aggregation.match(criteria);   
+
+		        List<AggregationOperation> aggregationoperations = new ArrayList <AggregationOperation>();  
+		        aggregationoperations.add(match);
+		        aggregationoperations.add(Aggregation.project("deviceReferenceKey",
+		        											  	"driverReferenceKey",
+		        											  	"weight",
+		        											  	"address",
+		        											  	"latitude",
+		        											  	"longitude",
+		        											  	"devicetime",
+		        											  	"speed"
+		        											  	).andExpression("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%SZ").as("locationTime"));
+	        AggregationResults<BasicDBObject> groupResults
+	            = mongoTemplate.aggregate(Aggregation.newAggregation(aggregationoperations),"tc_positions", BasicDBObject.class);
+
+		        if(groupResults.getMappedResults().size() > 0) {
+		        	
+		            Iterator<BasicDBObject> iterator = groupResults.getMappedResults().iterator();
+		            while (iterator.hasNext()) {
+		            	BasicDBObject object = (BasicDBObject) iterator.next();
+		            	
+		            	Map<Object,Object> points = new HashMap<Object, Object>();
+		            	points.put("latitude", object.getDouble("latitude"));
+		            	points.put("longitude", object.getDouble("longitude"));
+		            	points.put("velocity", object.getDouble("speed"));
+		            	points.put("roleCode", "T1");
+		            	points.put("vehicleStatus", "DEVICE_NO_SIGNAL");
+		            	points.put("referenceKey",object.getString("deviceReferenceKey"));
+		            	points.put("driverReferenceKey", object.getString("driverReferenceKey"));
+		            	points.put("address", object.getString("address"));
+		            	points.put("weight", object.getInt("weight"));
+		            	
+		            	lastPoints.add(points);
+		            	
+		            }
+		        }
+		        return lastPoints;
+	}
 }

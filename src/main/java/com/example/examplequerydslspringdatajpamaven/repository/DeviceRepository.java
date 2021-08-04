@@ -36,9 +36,14 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	
 	@Query(nativeQuery = true, name = "getDevicesList")
 	List<CustomDeviceList> getDevicesList(@Param("userIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
+	
+	@Query(nativeQuery = true, name = "getDevicesListForAdminAndVendor")
+	List<CustomDeviceList> getDevicesListForAdminAndVendor(@Param("userIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
 
 	@Query(nativeQuery = true, name = "getDevicesListExport")
 	List<CustomDeviceList> getDevicesListExport(@Param("userIds")List<Long> userIds,@Param("search") String search);
+	@Query(nativeQuery = true, name = "getDevicesListExportForAdminAndVendor")
+	List<CustomDeviceList> getDevicesListExportForAdminAndVendor(@Param("userIds")List<Long> userIds,@Param("search") String search);
 
 	@Query(nativeQuery = true, name = "getDevicesListByIds")
 	List<CustomDeviceList> getDevicesListByIds(@Param("deviceIds")List<Long> userIds,@Param("offset") int offset,@Param("search") String search);
@@ -194,12 +199,27 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
      		+ " LEFT JOIN  tc_geofences ON tc_geofences.id=tc_device_geofence.geofenceid and tc_geofences.delete_date"
      		+ " is null INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id "
      		+ " LEFT JOIN tc_users ON tc_user_device.userid = tc_users.id" 
-     		+ " where tc_user_device.userid IN(:userIds) and tc_devices.delete_date is null"
+     		+ " where tc_user_device.userid IN(:userIds) and (TIMESTAMPDIFF(day ,CURDATE(),tc_devices.end_date) >=0)"
      		+ " AND ( tc_devices.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.uniqueid LIKE LOWER(CONCAT('%',:search, '%')) "
      		+ " OR tc_devices.reference_key LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.sequence_number LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))"
      		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_users.name LIKE LOWER(CONCAT('%',:search, '%')) ) "
      		+ " GROUP BY tc_devices.id,tc_drivers.id,tc_users.id ) Y" ,nativeQuery = true )
 	public Integer getDevicesListSize(@Param("userIds")List<Long> userIds,@Param("search") String search);
+	
+	@Query(value = " SELECT count(*) From ( "
+			+ "SELECT count(*) X "
+     		+ " FROM tc_devices LEFT JOIN  tc_device_driver ON tc_devices.id=tc_device_driver.deviceid"
+     		+ " LEFT JOIN  tc_drivers ON tc_drivers.id=tc_device_driver.driverid and tc_drivers.delete_date is null" 
+     		+ " LEFT JOIN  tc_device_geofence ON tc_devices.id=tc_device_geofence.deviceid" 
+     		+ " LEFT JOIN  tc_geofences ON tc_geofences.id=tc_device_geofence.geofenceid and tc_geofences.delete_date"
+     		+ " is null INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id "
+     		+ " LEFT JOIN tc_users ON tc_user_device.userid = tc_users.id" 
+     		+ " where tc_user_device.userid IN(:userIds) "
+     		+ " AND ( tc_devices.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.uniqueid LIKE LOWER(CONCAT('%',:search, '%')) "
+     		+ " OR tc_devices.reference_key LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.sequence_number LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))"
+     		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_users.name LIKE LOWER(CONCAT('%',:search, '%')) ) "
+     		+ " GROUP BY tc_devices.id,tc_drivers.id,tc_users.id ) Y" ,nativeQuery = true )
+	public Integer getDevicesListSizeForAdminAndVendor(@Param("userIds")List<Long> userIds,@Param("search") String search);
 	
 	
 	@Query(value = " SELECT count(*) From ( "
@@ -287,6 +307,10 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 			" or (tc_devices.update_date_in_elm IS NULL) )"
 			+ "order by tc_devices.id LIMIT 100,100", nativeQuery = true)
 	public List<Long> getAllDevicesExpired();
+	
+	@Query(value = "SELECT * FROM tc_devices WHERE reference_key IS NOT NULL AND delete_from_elm_date IS NULL AND(TIMESTAMPDIFF(day ,tc_devices.update_date_in_elm,CURDATE()) >= 275)",nativeQuery = true)
+//	@Query(nativeQuery = true, name = "getExpiredVehiclesNew")
+	public List<Device> getAllDevicesExpiredNew();
 	
 	
 	@Query(value = " SELECT tc_devices.id FROM tc_devices " + 
