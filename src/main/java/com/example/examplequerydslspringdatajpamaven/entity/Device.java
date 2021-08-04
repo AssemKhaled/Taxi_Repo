@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.Column;
+
 import javax.persistence.CascadeType;
 import javax.persistence.ColumnResult;
 import javax.persistence.ConstructorResult;
@@ -19,7 +20,10 @@ import javax.persistence.NamedNativeQuery;
 import javax.persistence.SqlResultSetMapping;
 import javax.persistence.SqlResultSetMappings;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @SqlResultSetMappings({
 	@SqlResultSetMapping(
@@ -346,17 +350,37 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 	     		+ " ,tc_devices.reference_key as referenceKey, tc_devices.expired as expired, "
 	     		+ " tc_drivers.name as driverName,tc_users.name as companyName,tc_users.id as companyId ,GROUP_CONCAT(tc_geofences.name )AS geofenceName"
 	     		+ " ,tc_devices.create_date as create_date ,tc_devices.delete_from_elm_date as delete_date_elm "
-	     		+ " ,tc_devices.update_date_in_elm as update_date_elm , DATEDIFF(DATE_ADD(tc_devices.update_date_in_elm, INTERVAL 275 DAY),CURDATE()) as leftDays FROM tc_devices LEFT JOIN  tc_device_driver ON tc_devices.id=tc_device_driver.deviceid"
+	     		+ " ,tc_devices.update_date_in_elm as update_date_elm , (TIMESTAMPDIFF(day ,CURDATE(),tc_devices.end_date)) as leftDays FROM tc_devices LEFT JOIN  tc_device_driver ON tc_devices.id=tc_device_driver.deviceid"
 	     		+ " LEFT JOIN  tc_drivers ON tc_drivers.id=tc_device_driver.driverid and tc_drivers.delete_date is null" 
 	     		+ " LEFT JOIN  tc_device_geofence ON tc_devices.id=tc_device_geofence.deviceid" 
 	     		+ " LEFT JOIN  tc_geofences ON tc_geofences.id=tc_device_geofence.geofenceid and tc_geofences.delete_date"
 	     		+ " is null INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id "
 	     		+ " LEFT JOIN tc_users ON tc_user_device.userid = tc_users.id" 
-	     		+ " where tc_user_device.userid IN(:userIds) and tc_devices.delete_date is null"
+	     		+ " where tc_user_device.userid IN(:userIds) and ((TIMESTAMPDIFF(day ,CURDATE(),tc_devices.end_date))>=0)"
 	     		+ " AND ( tc_devices.simcardNumber LIKE LOWER(CONCAT('%',:search, '%')) OR  tc_devices.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.uniqueid LIKE LOWER(CONCAT('%',:search, '%')) "
 	     		+ " OR tc_devices.reference_key LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.sequence_number LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))"
 	     		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_users.name LIKE LOWER(CONCAT('%',:search, '%')) ) "
 	     		+ " GROUP BY tc_devices.id,tc_drivers.id,tc_users.id LIMIT :offset,10"),
+	
+	@NamedNativeQuery(name="getDevicesListForAdminAndVendor", 
+    resultSetMapping="DevicesList", 
+    query=" SELECT tc_devices.id as id ,tc_devices.name as deviceName, tc_devices.simcardNumber as simcardNumber, tc_devices.uniqueid as uniqueId,"
+    		+ " tc_devices.sequence_number as sequenceNumber ,tc_devices.lastupdate as lastUpdate "
+    		+ " ,tc_devices.reference_key as referenceKey, tc_devices.expired as expired, "
+    		+ " tc_drivers.name as driverName,tc_users.name as companyName,tc_users.id as companyId ,GROUP_CONCAT(tc_geofences.name )AS geofenceName"
+    		+ " ,tc_devices.create_date as create_date ,tc_devices.delete_from_elm_date as delete_date_elm "
+    		+ " ,tc_devices.update_date_in_elm as update_date_elm , (TIMESTAMPDIFF(day ,CURDATE(),tc_devices.end_date)) as leftDays  FROM tc_devices LEFT JOIN  tc_device_driver ON tc_devices.id=tc_device_driver.deviceid"
+    		+ " LEFT JOIN  tc_drivers ON tc_drivers.id=tc_device_driver.driverid and tc_drivers.delete_date is null" 
+    		+ " LEFT JOIN  tc_device_geofence ON tc_devices.id=tc_device_geofence.deviceid" 
+    		+ " LEFT JOIN  tc_geofences ON tc_geofences.id=tc_device_geofence.geofenceid and tc_geofences.delete_date"
+    		+ " is null INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id "
+    		+ " LEFT JOIN tc_users ON tc_user_device.userid = tc_users.id" 
+    		+ " where tc_user_device.userid IN(:userIds)"
+    		+ " AND ( tc_devices.simcardNumber LIKE LOWER(CONCAT('%',:search, '%')) OR  tc_devices.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.uniqueid LIKE LOWER(CONCAT('%',:search, '%')) "
+    		+ " OR tc_devices.reference_key LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.sequence_number LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))"
+    		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_users.name LIKE LOWER(CONCAT('%',:search, '%')) ) "
+    		+ " GROUP BY tc_devices.id,tc_drivers.id,tc_users.id LIMIT :offset,10"),
+	
 	
 	@NamedNativeQuery(name="getDevicesListExport", 
     resultSetMapping="DevicesList", 
@@ -371,11 +395,31 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
     		+ " LEFT JOIN  tc_geofences ON tc_geofences.id=tc_device_geofence.geofenceid and tc_geofences.delete_date"
     		+ " is null INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id "
     		+ " LEFT JOIN tc_users ON tc_user_device.userid = tc_users.id" 
-    		+ " where tc_user_device.userid IN(:userIds) and tc_devices.delete_date is null"
+    		+ " where tc_user_device.userid IN(:userIds) and (TIMESTAMPDIFF(day ,tc_devices.end_date,CURDATE()) >= 0)"
     		+ " AND ( tc_devices.simcardNumber LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.uniqueid LIKE LOWER(CONCAT('%',:search, '%')) "
     		+ " OR tc_devices.reference_key LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.sequence_number LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))"
     		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_users.name LIKE LOWER(CONCAT('%',:search, '%')) ) "
     		+ " GROUP BY tc_devices.id,tc_drivers.id,tc_users.id "),
+	
+	@NamedNativeQuery(name="getDevicesListExportForAdminAndVendor", 
+    resultSetMapping="DevicesList", 
+    query=" SELECT tc_devices.id as id ,tc_devices.name as deviceName,tc_devices.simcardNumber as simcardNumber, tc_devices.uniqueid as uniqueId,"
+    		+ " tc_devices.sequence_number as sequenceNumber ,tc_devices.lastupdate as lastUpdate "
+    		+ " ,tc_devices.reference_key as referenceKey, tc_devices.expired as expired, "
+    		+ " tc_drivers.name as driverName,tc_users.name as companyName,tc_users.id as companyId ,GROUP_CONCAT(tc_geofences.name )AS geofenceName"
+    		+ " ,tc_devices.create_date as create_date ,tc_devices.delete_from_elm_date as delete_date_elm  "
+    		+ " ,tc_devices.update_date_in_elm as update_date_elm , DATEDIFF(DATE_ADD(tc_devices.update_date_in_elm, INTERVAL 275 DAY),CURDATE()) as leftDays FROM tc_devices LEFT JOIN  tc_device_driver ON tc_devices.id=tc_device_driver.deviceid"
+    		+ " LEFT JOIN  tc_drivers ON tc_drivers.id=tc_device_driver.driverid and tc_drivers.delete_date is null" 
+    		+ " LEFT JOIN  tc_device_geofence ON tc_devices.id=tc_device_geofence.deviceid" 
+    		+ " LEFT JOIN  tc_geofences ON tc_geofences.id=tc_device_geofence.geofenceid and tc_geofences.delete_date"
+    		+ " is null INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id "
+    		+ " LEFT JOIN tc_users ON tc_user_device.userid = tc_users.id" 
+    		+ " where tc_user_device.userid IN(:userIds) "
+    		+ " AND ( tc_devices.simcardNumber LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.uniqueid LIKE LOWER(CONCAT('%',:search, '%')) "
+    		+ " OR tc_devices.reference_key LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.sequence_number LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))"
+    		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_users.name LIKE LOWER(CONCAT('%',:search, '%')) ) "
+    		+ " GROUP BY tc_devices.id,tc_drivers.id,tc_users.id "),
+	
 	
 	@NamedNativeQuery(name="getDevicesListByIds", 
 	resultSetMapping="DevicesList",
@@ -571,6 +615,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 			" AND tc_users.delete_date IS NULL " + 
 			" AND tc_devices.reference_key IS NOT NULL" ),
 	
+	
 	@NamedNativeQuery(name="getExpiredVehicles", 
 	resultSetMapping="ExpiredVehiclesList", 
 	query=  "SELECT tc_devices.id as deviceId,tc_users.id as userId, " + 
@@ -588,7 +633,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 			" or (tc_devices.update_date_in_elm IS NULL) ) " + 
 			" ORDER BY tc_devices.create_date ASC LIMIT 1000 " ),
 	
-	
+//	@NamedNativeQuery(name="getExpiredVehiclesNew", 
+//	resultSetMapping="ExpiredVehiclesNewList", 
+//	query=  "SELECT * FROM tc_devices WHERE reference_key IS NOT NULL AND delete_from_elm_date IS NULL AND(TIMESTAMPDIFF(day ,tc_devices.update_date_in_elm,CURDATE()) >= 275)" ),
+//	
 	@NamedNativeQuery(name="getVehicleInfoData", 
 	resultSetMapping="vehicleInfo",
 	query=" SELECT tc_drivers.id as driverId,tc_drivers.uniqueid as driverUniqueId,tc_drivers.name as driverName,tc_drivers.photo as driverPhoto," + 
@@ -782,6 +830,9 @@ public class Device extends Attributes{
 	
 	@Column(name = "end_date")
 	private Date end_date;
+	
+	@Transient
+	private Boolean activate_to_elm;
 	
 	
 	
@@ -1530,6 +1581,18 @@ public class Device extends Attributes{
 
 	public void setEnd_date(Date end_date) {
 		this.end_date = end_date;
+	}
+
+
+
+	public Boolean getActivate_to_elm() {
+		return activate_to_elm;
+	}
+
+
+
+	public void setActivate_to_elm(Boolean activate_to_elm) {
+		this.activate_to_elm = activate_to_elm;
 	}
 
 	

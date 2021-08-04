@@ -78,6 +78,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class DeviceServiceImpl extends RestServiceController implements DeviceService {
 
 	private static final Log logger = LogFactory.getLog(DeviceServiceImpl.class);
+
+	private static final Boolean True = true;
+
+	private static final Boolean False = false;
 	
 	@Autowired
 	private MongoPositionRepo mongoPositionRepo;
@@ -188,15 +192,29 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				 }
 			 }
 		 
-		 
-		     if(exportData.equals("exportData")) {
-		    	 devices= deviceRepository.getDevicesListExport(usersIds,search);
+			 if(loggedUser.getAccountType().equals(3)) {
+				 if(exportData.equals("exportData")) {
+			    	 devices= deviceRepository.getDevicesListExport(usersIds,search);
 
-		     }
-		     else {
-		    	 devices= deviceRepository.getDevicesList(usersIds,offset,search);
-				 size=  deviceRepository.getDevicesListSize(usersIds,search); 
-		     }
+			     }
+			     else {
+			    	 devices= deviceRepository.getDevicesList(usersIds,offset,search);
+					 size=  deviceRepository.getDevicesListSize(usersIds,search); 
+			     }
+			 }
+			 else {
+				 if(exportData.equals("exportData")) {
+			    	 devices= deviceRepository.getDevicesListExportForAdminAndVendor(usersIds,search);
+
+			     }
+			     else {
+			    	 devices= deviceRepository.getDevicesListForAdminAndVendor(usersIds,offset,search);
+					 size=  deviceRepository.getDevicesListSizeForAdminAndVendor(usersIds,search); 
+//			    	 devices= deviceRepository.getDevicesList(usersIds,offset,search);
+//					 size=  deviceRepository.getDevicesListSize(usersIds,search); 
+			     }
+			 }
+		     
 		 
 			 
 
@@ -215,22 +233,22 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		logger.info("************************ createDevice STARTED ***************************");
 		device.setUser_id(userId);
 		Date now = new Date();
-		device.setStart_date(now);
+//		device.setStart_date(now);
 		SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String nowTime = isoFormat.format(now);
 		 SimpleDateFormat sdf
 	      = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		 Date endDate;
+//		 Date endDate;
 		 
-		try {
-			String date = sdf.format(now);
-			endDate = DateUtils
-				      .addDays(sdf.parse(date), 365);
-			device.setEnd_date(endDate);
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			String date = sdf.format(now);
+//			endDate = DateUtils
+//				      .addDays(sdf.parse(date), 365);
+//			device.setEnd_date(endDate);
+//		} catch (ParseException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		device.setCreate_date(nowTime);
 		
 		
@@ -523,23 +541,26 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				return ResponseEntity.badRequest().body(getObjectResponse);
 			}
 			else {
-				if(loggedUser.getAccountType()==1 && loggedUser.getAccountType() == 2) {
-					Date start_date = device.getStart_date();
-					 SimpleDateFormat sdf
-				      = new SimpleDateFormat("yyyy-MM-dd");
-					 Date endDate;
+				if(loggedUser.getAccountType()!=1 && loggedUser.getAccountType() != 2) {
+//					Date start_date = device.getStart_date();
+//					 SimpleDateFormat sdf
+//				      = new SimpleDateFormat("yyyy-MM-dd");
+//					 Date endDate;
 					 
-					try {
-						String date = sdf.format(start_date);
-						endDate = DateUtils
-							      .addDays(sdf.parse(date), 365);
-						device.setEnd_date(endDate);
-					} catch (ParseException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+//					try {
+//						String date = sdf.format(start_date);
+//						endDate = DateUtils
+//							      .addDays(sdf.parse(date), 365);
+//						device.setEnd_date(endDate);
+//					} catch (ParseException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+					device.setStart_date(oldDevice.getStart_date());
+					device.setEnd_date(oldDevice.getEnd_date());
 					
 				}
+//					
 			}
 			Set<User> userCreater=new HashSet<>();
 			userCreater = oldDevice.getUser();
@@ -564,6 +585,13 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	        Set<Notification> notificationDevice=new HashSet<>();
 	        notificationDevice = oldDevice.getNotificationDevice();
 	        device.setNotificationDevice(notificationDevice);
+	        //check activate to elm 
+	        if(device.getActivate_to_elm() == True) {
+	        	device.setDelete_from_elm_date(null);
+	        }
+	        else {
+	        	device.setDelete_from_elm_date(oldDevice.getDelete_from_elm_date());
+	        }
 	        
 	        List<Integer> duplictionList = checkDeviceDuplication(device);
 	        if(duplictionList.size()>0)
@@ -925,6 +953,13 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					return ResponseEntity.badRequest().body(getObjectResponse);
 			   }
 				List<Device> devices = new ArrayList<>();
+				if(device.getUpdate_date_in_elm() != null && device.getDelete_from_elm_date() == null) {
+					device.setActivate_to_elm(True);
+				}
+				else {
+					device.setActivate_to_elm(False);
+				}
+				System.out.println("deviceactivate"+device.getActivate_to_elm());
 				devices.add(device);
 				getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
 				logger.info("************************ getDeviceById ENDED ***************************");
