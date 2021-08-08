@@ -181,8 +181,8 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	@Query(nativeQuery = true, name = "getDevicesDataMapByIdsNoPosition")
  	List<CustomMapData> getAllDevicesDataMapByIds(@Param("deviceIds")List<Long> deviceIds);
 
-	@Query(nativeQuery = true, name = "getDevicesDataMapByIdsNoPosition")
-	List<DevicesMapResponse> getAllDevicesMapDataByIds(@Param("deviceIds")List<Long> deviceIds);
+//	@Query(nativeQuery = true, name = "getDevicesDataMapByIdsNoPositionNew")
+//	List<DevicesMapResponse> getAllDevicesMapDataByIds(@Param("deviceIds")List<Long> deviceIds);
 
 
 	@Query(nativeQuery = true, name = "vehicleInfo")
