@@ -575,8 +575,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 			+ " GROUP BY tc_devices.id"),
 
 
-	
-	@NamedNativeQuery(name="vehicleInfo", 
+//
+//		@NamedNativeQuery(name="getDevicesDataMapByIdsNoPositionNew",
+//				resultSetMapping="DevicesDataMap",
+//				query="SELECT tc_devices.id as id ,tc_devices.name as deviceName , "
+//						+ " 3 as vehicleStatus "
+//						+ " , tc_devices.icon as icon"
+//						+ " FROM tc_devices " +
+//						" where tc_devices.id IN(:deviceIds) and tc_devices.delete_date is null and tc_devices.positionid is null "
+//						+ " GROUP BY tc_devices.id"),
+
+
+
+		@NamedNativeQuery(name="vehicleInfo",
 	resultSetMapping="vehicleInfoData", 
 	query=" SELECT tc_drivers.id as driverId,tc_drivers.uniqueid as driverUniqueId,tc_drivers.name as driverName,tc_drivers.photo as driverPhoto," + 
 			" tc_devices.id as id,tc_devices.name as deviceName,tc_devices.uniqueid as uniqueId,tc_devices.sequence_number as sequenceNumber," + 
