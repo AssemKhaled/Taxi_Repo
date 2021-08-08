@@ -27,7 +27,9 @@ import com.example.examplequerydslspringdatajpamaven.entity.LastLocationsList;
  */
 @Component
 public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDslPredicateExecutor<Device> {
-	
+
+	List<Device> findAllByUser_id(long userID);
+
 	@Query(value = "SELECT * from tc_devices where tc_devices.simcardNumber=:simcardNumber and tc_devices.delete_date is null",nativeQuery = true)
 	public List<Device> checkSIMCard(@Param("simcardNumber")String simcardNumber);
 	

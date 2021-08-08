@@ -20,6 +20,9 @@ import com.example.examplequerydslspringdatajpamaven.entity.userClientDevice;
 @Component
 public interface UserClientDeviceRepository extends JpaRepository<userClientDevice, Long>, QueryDslPredicateExecutor<userClientDevice>{
 
+
+	List<userClientDevice> findAllByUserid(Long userId);
+
 	@Transactional
     @Modifying
 	@Query(value = "Delete from tc_user_client_device where tc_user_client_device.userid=:userId", nativeQuery = true)
@@ -38,7 +41,7 @@ public interface UserClientDeviceRepository extends JpaRepository<userClientDevi
 	
 	@Query(value = "select tc_devices.id as id , tc_devices.name as name from tc_devices "
 			+ " INNER JOIN tc_user_client_device ON tc_user_client_device.deviceid=tc_devices.id "
-			+ "  where tc_user_client_device.userid=:userId ", nativeQuery = true)
+			+ "  where tc_user_client_device.userid=:userId and tc_devices.delete_date is null ", nativeQuery = true)
 	public List<DeviceSelect> getDeviceOfUserList(@Param("userId") Long userId);
 	
 	@Query(value = "select * from tc_user_client_device where tc_user_client_device.deviceid IN (:deviceIds) and tc_user_client_device.userid !=:userId", nativeQuery = true)

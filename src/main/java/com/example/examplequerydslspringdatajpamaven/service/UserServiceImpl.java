@@ -3,16 +3,15 @@ package com.example.examplequerydslspringdatajpamaven.service;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
+
+import com.example.examplequerydslspringdatajpamaven.repository.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
@@ -22,12 +21,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.entity.UserRole;
 import com.example.examplequerydslspringdatajpamaven.entity.UserSelect;
-import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.UserRoleRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 import com.example.examplequerydslspringdatajpamaven.tokens.TokenSecurity;
@@ -40,6 +36,11 @@ import com.example.examplequerydslspringdatajpamaven.tokens.TokenSecurity;
 @Component
 @Service
 public class UserServiceImpl extends RestServiceController implements IUserService {
+
+	private final DeviceRepository deviceRepository ;
+
+	private final UserClientDriverRepository userClientDriverRepository;
+	private final UserClientDeviceRepository userClientDeviceRepository;
 
 	@Autowired
 	private UserRepository userRepository;
@@ -56,6 +57,12 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	private static final Log logger = LogFactory.getLog(UserServiceImpl.class);
 	
 	private GetObjectResponse getObjectResponse;
+
+	public UserServiceImpl(DeviceRepository deviceRepository, UserClientDriverRepository userClientDriverRepository, UserClientDeviceRepository userClientDeviceRepository) {
+		this.deviceRepository = deviceRepository;
+		this.userClientDriverRepository = userClientDriverRepository;
+		this.userClientDeviceRepository = userClientDeviceRepository;
+	}
 
 	@Override
 	public User getName() {
@@ -1270,8 +1277,12 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	   				
 
 	   				 if(deletedUser.getAccountType() == 4) {
-	   					tokenSecurity.removeActiveUserById(deleteUserId);
+
+						userClientDeviceRepository.deleteDevicesByUserId(deletedUser.getId());
+						userClientDriverRepository.deleteDriversByUserId(deletedUser.getId());
+						tokenSecurity.removeActiveUserById(deleteUserId);
 	   				    //TokenSecurity.getInstance().removeActiveUserById(deleteUserId);
+
 	   				 }else {
 	   					tokenSecurity.removeActiveUserById(deleteUserId);
 	   				    //TokenSecurity.getInstance().removeActiveUserById(deleteUserId);
