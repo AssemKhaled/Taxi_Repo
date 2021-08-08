@@ -347,6 +347,30 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	 */
 	@Override
 	public ResponseEntity<?> getAllDeviceLiveDataMapAppNew(String TOKEN, Long userId) {
+//		 ResponseEntity returnData= getAllDeviceLiveDataMapApp(TOKEN,userId);
+//		 if(returnData.getStatusCode()==HttpStatus.OK){
+//		 	GetObjectResponse returnObj =(GetObjectResponse) returnData.getBody();
+//		 	List<CustomMapData> allDataList = (List<CustomMapData>) returnObj.getEntity();
+//		 	List<DevicesMapResponse> theRespone = new ArrayList<>();
+//		 	for(CustomMapData device : allDataList){
+//		 		theRespone.add(
+//						DevicesMapResponse.builder()
+//								.id(device.getId())
+//								.deviceName(device.getDeviceName())
+//								.latitude(device.getLatitude())
+//								.longitude(device.getLongitude())
+//								.vehicleStatus(device.getVehicleStatus())
+//								.icon(device.getIcon())
+//								.speed(device.getSpeed()==null?0:Math.round(device.getSpeed() * 100.00) / 100.00)
+//						.build());
+//			}
+//			 getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",theRespone);
+//			 logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
+//			 return ResponseEntity.ok().body(getObjectResponse);
+//
+//		 }else{
+//		 	return returnData;
+//		 }
 
 		// TODO Auto-generated method stub
 		if(TOKEN.equals("")) {
@@ -354,7 +378,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
-		
+
 		if(super.checkActive(TOKEN)!= null)
 		{
 			return super.checkActive(TOKEN);
@@ -362,7 +386,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		if(userId.equals(0)) {
 			 List<CustomDeviceLiveData> allDevicesLiveData=	null;
 		    getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is required",allDevicesLiveData);
-			
+
 			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
 			return ResponseEntity.badRequest().body(getObjectResponse);
 		}
@@ -370,7 +394,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 	    if( loggedUser == null) {
 	    	 List<CustomDeviceLiveData> allDevicesLiveData=	null;
 			    getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Logged user is not found ",allDevicesLiveData);
-				
+
 				logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
 				return ResponseEntity.status(404).body(getObjectResponse);
 	    }
@@ -378,14 +402,26 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 		 List<Long>usersIds= new ArrayList<>();
 
 	    if(loggedUser.getAccountType().equals(4)) {
-			 
+
 			List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(userId);
-			List<DevicesMapResponse> allDevicesLiveDataNoPosition = new ArrayList<>();
+			List<CustomMapData> allDevicesLiveDataNoPosition = new ArrayList<>();
             List<DevicesMapResponse> allDevices = new ArrayList<>();
 
+
 			if(deviceIds.size()>0) {
-				allDevicesLiveDataNoPosition =	deviceRepository.getAllDevicesMapDataByIds(deviceIds);
-				allDevices.addAll(allDevicesLiveDataNoPosition);
+				allDevicesLiveDataNoPosition =	deviceRepository.getAllDevicesDataMapByIds(deviceIds);
+
+				for(CustomMapData device : allDevicesLiveDataNoPosition){
+					allDevices.add(DevicesMapResponse.builder()
+							.id(device.getId())
+							.deviceName(device.getDeviceName())
+							.latitude(device.getLatitude())
+							.longitude(device.getLongitude())
+							.vehicleStatus(device.getVehicleStatus())
+							.icon(device.getIcon())
+							.build());
+				}
+
 
 				List<String> positionIdsOffline =  deviceRepository.getNumberOfOfflineDevicesListByIds(deviceIds);
 				List<String> positionIdsOutOfNetwork =  deviceRepository.getNumberOfOutOfNetworkDevicesListByIds(deviceIds);
@@ -410,7 +446,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 					allDevices.addAll(allDevicesPositionOfflineResponse);
 
 				}
-				
+
 				if(positionIdsOutOfNetwork.size() > 0 ) {
 					List<CustomMapData> allDevicesPositionOutOfNetwork= mongoPositionRepo.getOutOfNetworkList(positionIdsOutOfNetwork);
 					List<DevicesMapResponse> allDevicesPositionOutOfNetworkResponse = new ArrayList<>();
@@ -429,10 +465,11 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 					allDevices.addAll(allDevicesPositionOutOfNetworkResponse);
 
 				}
-				
+
 				if(positionIdsOnline.size() > 0 ) {
 					List<CustomMapData> allDevicesPositionOnline= mongoPositionRepo.getOnlineList(positionIdsOnline);
 					List<DevicesMapResponse> allDevicesPositionOnlineResponse = new ArrayList<>();
+					System.out.println(allDevicesPositionOnline.size());
 					for(CustomMapData device : allDevicesPositionOnline){
 						Device deviceRecord = deviceRepository.findOne(device.getId());
 						allDevicesPositionOnlineResponse.add(DevicesMapResponse.builder()
@@ -449,15 +486,15 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 				}
 
-			
+
 			}
-			
-			
+
+
 		    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevices);
-			
+
 			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
 			return ResponseEntity.ok().body(getObjectResponse);
-	    	
+
 		 }
 	    else {
 	    	 List<User>childernUsers = userServiceImpl.getAllChildernOfUser(userId);
@@ -470,11 +507,22 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 					 usersIds.add(object.getId());
 				 }
 			 }
-	    
+
             List<DevicesMapResponse> allDevices = new ArrayList<>();
 
-			List<DevicesMapResponse> allDevicesNoPosition = deviceRepository.getAllDevicesMapDataByIds(usersIds);
-			allDevices.addAll(allDevicesNoPosition);
+			List<CustomMapData> allDevicesNoPosition = deviceRepository.getAllDevicesDataMapByIds(usersIds);
+
+			for (CustomMapData device : allDevicesNoPosition){
+				allDevices.add(DevicesMapResponse.builder()
+						.id(device.getId())
+						.deviceName(device.getDeviceName())
+						.latitude(device.getLatitude())
+						.longitude(device.getLongitude())
+						.vehicleStatus(device.getVehicleStatus())
+						.icon(device.getIcon())
+						.build());
+			}
+//			allDevices.addAll(allDevicesNoPosition);
 			List<String> positionIdsOffline =  deviceRepository.getNumberOfOfflineDevicesList(usersIds);
 			List<String> positionIdsOutOfNetwork =  deviceRepository.getNumberOfOutOfNetworkDevicesList(usersIds);
 			List<String> positionIdsOnline =  deviceRepository.getNumberOfOnlineDevicesList(usersIds);
@@ -497,7 +545,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				allDevices.addAll(allDevicesPositionOfflineResponse);
 
 			}
-			
+
 			if(positionIdsOutOfNetwork.size() > 0 ) {
 				List<CustomMapData> allDevicesPositionOutOfNetwork= mongoPositionRepo.getOutOfNetworkList(positionIdsOutOfNetwork);
 				List<DevicesMapResponse> allDevicesPositionOutOfNetworkResponse = new ArrayList<>();
@@ -516,7 +564,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 				allDevices.addAll(allDevicesPositionOutOfNetworkResponse);
 
 			}
-			
+
 			if(positionIdsOnline.size() > 0 ) {
 				List<CustomMapData> allDevicesPositionOnline= mongoPositionRepo.getOnlineList(positionIdsOnline);
 				List<DevicesMapResponse> allDevicesPositionOnlineResponse = new ArrayList<>();
@@ -536,7 +584,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 			}
 		    getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",allDevices);
-			
+
 			logger.info("************************ getDevicesStatusAndDrives ENDED ***************************");
 			return ResponseEntity.ok().body(getObjectResponse);
 	    }
