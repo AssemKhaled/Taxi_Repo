@@ -471,7 +471,6 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			
 			if(device.getSimcardNumber() != null) {
 				List<Device> SIM = deviceRepository.checkSIMCardEdit(device.getSimcardNumber(),device.getId());
-				
 				if(SIM.size() > 0) {
 				    List<Integer> duplictionList = new ArrayList<Integer>();
 				    duplictionList.add(5);
