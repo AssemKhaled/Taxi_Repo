@@ -1680,18 +1680,22 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		 if(loggedUser.getAccountType().equals(4)) {
 			 
 			 List<Long> deviceIds = userClientDeviceRepository.getDevicesIds(userId);
-
+			 System.out.println("11");
 
 			 if(deviceIds.size()>0) {
 				 List<String> onlineDeviceIds = deviceRepository.getNumberOfOnlineDevicesListByIds(deviceIds);
+				 System.out.println("22");
 				 List<String> OutDeviceIds = deviceRepository.getNumberOfOutOfNetworkDevicesListByIds(deviceIds);
+				 System.out.println("33");
 
 				 onlineDevices = onlineDeviceIds.size();
 				 outOfNetworkDevices = OutDeviceIds.size();
 					
 			     totalDevices = deviceRepository.getTotalNumberOfUserDevicesByIds(deviceIds);
+				 System.out.println("44");
 				 offlineDevices = totalDevices - onlineDevices - outOfNetworkDevices;
 				 drivers = userClientDriverRepository.getDriverIds(userId).size();
+				 System.out.println("55");
 
 			
 				 ignitionON = mongoPositionRepo.getCountFromAttrbuites(onlineDeviceIds, "ignition", true);
