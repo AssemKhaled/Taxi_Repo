@@ -526,7 +526,7 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 			List<String> positionIdsOffline =  deviceRepository.getNumberOfOfflineDevicesList(usersIds);
 			List<String> positionIdsOutOfNetwork =  deviceRepository.getNumberOfOutOfNetworkDevicesList(usersIds);
 			List<String> positionIdsOnline =  deviceRepository.getNumberOfOnlineDevicesList(usersIds);
-
+			System.out.println("222:--->"+positionIdsOffline.size());
 			if(positionIdsOffline.size() > 0 ) {
 				List<CustomMapData> allDevicesPositionOffline = mongoPositionRepo.getOfflineList(positionIdsOffline);
 				List<DevicesMapResponse> allDevicesPositionOfflineResponse = new ArrayList<>();
