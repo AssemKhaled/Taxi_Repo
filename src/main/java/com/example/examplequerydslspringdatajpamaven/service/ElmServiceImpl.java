@@ -3942,15 +3942,16 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 		List<MongoElmLastLocations> elm_connection_logs = new ArrayList<MongoElmLastLocations>();
 		List<MongoElmLiveLocation> positions = mongoElmLiveLocationRepository.findByIdsIn(new PageRequest(0, 1000));
-		
+
+
 		for(MongoElmLiveLocation position:positions) {
 			Map record = new HashMap();
-			
+
 			record.put("referenceKey", position.getReferenceKey());
 			record.put("driverReferenceKey", position.getDriverReferenceKey());
 			record.put("latitude", position.getLatitude());
 			record.put("longitude", position.getLongitude());
-			record.put("velocity", position.getVelocity() * (1.852) );
+			record.put("velocity", (Math.round((position.getVelocity() * (1.852) )*100.0)/100.0) );
 			record.put("weight", position.getWeight());
 			record.put("locationTime", position.getLocationTime());
 			record.put("vehicleStatus", position.getVehicleStatus());
@@ -3962,15 +3963,16 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			dataArray.add(record);
 			
 		}
+
 		List<ElmReturn> data = new ArrayList<ElmReturn>();
 		if(dataArray.size() > 0) {
 	    	 Map body = new HashMap();
-	    	 
-	    	 body.put("activity","DEFAULT");
+
+//	    	 body.put("activity","DEFAULT");
 			 body.put("vehicleLocations", dataArray);
-			
+
 			  TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
-	
+
 				SSLContext sslContext = null;
 				try {
 					sslContext = org.apache.http.ssl.SSLContexts.custom()
@@ -3986,61 +3988,90 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-	
+
 				SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
-	
+
 				CloseableHttpClient httpClient = HttpClients.custom()
 				        .setSSLSocketFactory(csf)
 				        .build();
-	
+
 				HttpComponentsClientHttpRequestFactory requestFactory =
 				        new HttpComponentsClientHttpRequestFactory();
-	
+
 				requestFactory.setHttpClient(httpClient);
-	
+
 				RestTemplate restTemplate = new RestTemplate(requestFactory);
-				
-				
+
+
 				  restTemplate.getMessageConverters()
 			        .add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
-				  
+
 				  Map bodyToMiddleWare = new HashMap();
-	
-	
-				  
-	
+
+
+
+
 				  bodyToMiddleWare.put("dataObject", body);
 				  bodyToMiddleWare.put("url",elmLocations);
 				  bodyToMiddleWare.put("methodType","POST");
-				  
+
 			  HttpEntity<Object> entity = new HttpEntity<Object>(bodyToMiddleWare);
-	
-			  ResponseEntity<ElmReturn> rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
-				  
-			  ElmReturn elmReturn = rateResponse.getBody();
-	
-			  data.add(elmReturn);
-	
-			 if(rateResponse.getStatusCode().OK == null) {
-				  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),elmReturn.getMessage(),data);
-				  logger.info("************************ companyRegistrtaion ENDED ***************************");
-				  return  ResponseEntity.ok().body(getObjectResponse);
+			  ResponseEntity<ElmReturn> rateResponse = null;
+			  ElmReturn elmReturn = null;
+
+			  try {
+				 rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
+				 elmReturn = rateResponse.getBody();
+
+				  data.add(elmReturn);
+				  Map resp = new HashMap();
+				  resp = elmReturn.getBody();
+				  requet = bodyToMiddleWare;
+				  ElmReturn elmReturnd = rateResponse.getBody();
+
+				  response.put("body", elmReturnd.getBody());
+				  response.put("statusCode", elmReturnd.getStatusCode());
+				  response.put("message", elmReturnd.getMessage());
+
+				  MongoElmLogs elmLogs = new MongoElmLogs(null,null,null,null,null,null,null,time,type,requet,response);
+				  elmLogsRepository.save(elmLogs);
+				  mongoElmLiveLocationRepository.deleteByIdIn(ids);
+
+			  }catch (Exception |Error e){
+				  logger.info("************************ "+e.getMessage()+" ***************************");
+
+//				  Map resp = new HashMap();
+//				  resp = elmReturn.getBody();
+				  requet = bodyToMiddleWare;
+//				  ElmReturn elmReturnd = rateResponse.getBody();
+
+				  response.put("body", dataArray);
+				  response.put("statusCode", 500);
+				  response.put("message", e.getMessage());
+				  type = "Internal Server Error";
+				  logger.info("************************ Internal Server Error 500 ***************************");
+//				  logger.info("************************ "+requet.get("dataObject")+" ***************************");
+//				  for(Map datas : dataArray){
+//					  System.out.println("address  :  " + datas.get("address"));
+//					  System.out.println("driverReferenceKey  :  " + datas.get("driverReferenceKey"));
+//					  System.out.println("locationTime  :  " +datas.get("locationTime"));
+//					  System.out.println("latitude  :  " +datas.get("latitude"));
+//					  System.out.println("roleCode  :  " +datas.get("roleCode"));
+//					  System.out.println("weight  :  " +datas.get("weight"));
+//					  System.out.println("velocity  :  " +datas.get("velocity"));
+//					  System.out.println("referenceKey  :  " +datas.get("referenceKey"));
+//					  System.out.println("longitude  :  " +datas.get("longitude"));
+//					  System.out.println("vehicleStatus  :  " +datas.get("vehicleStatus"));
+//					  System.out.println("*******************Data Break ******************");
+//					  System.out.println("*******************Data Break ******************");
+//					  System.out.println("*******************Data Break ******************");
+//				  }
+
+				  MongoElmLogs elmLogs = new MongoElmLogs(null,null,null,null,null,null,null,time,type,requet,response);
+				  elmLogsRepository.save(elmLogs);
+				  mongoElmLiveLocationRepository.deleteByIdIn(ids);
 			  }
-			  
-			  Map resp = new HashMap();
-			  resp = elmReturn.getBody();  
-			  
-			  requet = bodyToMiddleWare;
-			  ElmReturn elmReturnd = rateResponse.getBody();
-	
-			  response.put("body", elmReturnd.getBody());
-			  response.put("statusCode", elmReturnd.getStatusCode());
-			  response.put("message", elmReturnd.getMessage());
-			  
-			  MongoElmLogs elmLogs = new MongoElmLogs(null,null,null,null,null,null,null,time,type,requet,response);
-			  elmLogsRepository.save(elmLogs);
-			  mongoElmLiveLocationRepository.deleteByIdIn(ids);
-	
+
 		}
 		  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",data,dataArray.size());
 		  logger.info("************************ lastLocations ENDED ***************************");
