@@ -36,4 +36,6 @@ public interface ElmService {
 	
 	public ResponseEntity<?> deleteOldExpiredData();
 
+	ResponseEntity<?> lastLocationsForTowCar();
+
 }

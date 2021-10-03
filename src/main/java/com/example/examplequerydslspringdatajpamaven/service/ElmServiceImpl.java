@@ -7,14 +7,11 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import javax.net.ssl.SSLContext;
+
+import com.example.examplequerydslspringdatajpamaven.entity.*;
+import com.example.examplequerydslspringdatajpamaven.repository.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -25,6 +22,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -36,39 +34,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.example.examplequerydslspringdatajpamaven.entity.CompanyElmData;
-import com.example.examplequerydslspringdatajpamaven.entity.CompanyElmDataUpdate;
-import com.example.examplequerydslspringdatajpamaven.entity.Device;
-import com.example.examplequerydslspringdatajpamaven.entity.DeviceElmData;
-import com.example.examplequerydslspringdatajpamaven.entity.DeviceElmDataUpdate;
-import com.example.examplequerydslspringdatajpamaven.entity.User;
-import com.example.examplequerydslspringdatajpamaven.entity.VehiclePlate;
-import com.example.examplequerydslspringdatajpamaven.entity.Driver;
-import com.example.examplequerydslspringdatajpamaven.entity.DriverElmDataGregorian;
-import com.example.examplequerydslspringdatajpamaven.entity.DriverElmDataHijri;
-import com.example.examplequerydslspringdatajpamaven.entity.DriverElmDataUpdate;
-import com.example.examplequerydslspringdatajpamaven.entity.ElmReturn;
-import com.example.examplequerydslspringdatajpamaven.entity.ExpiredVehicles;
-import com.example.examplequerydslspringdatajpamaven.entity.IndividualGregorianElmData;
-import com.example.examplequerydslspringdatajpamaven.entity.IndividualHijriElmData;
-import com.example.examplequerydslspringdatajpamaven.entity.LastElmData;
-import com.example.examplequerydslspringdatajpamaven.entity.LastPositionData;
-import com.example.examplequerydslspringdatajpamaven.entity.MongoElmLastLocations;
-import com.example.examplequerydslspringdatajpamaven.entity.MongoElmLiveLocation;
-import com.example.examplequerydslspringdatajpamaven.entity.MongoElmLogs;
-import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.DriverRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.MongoElmLastLocationsRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.MongoElmLiveLocationRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.MongoElmLogsRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.MongoEventsRepo;
-import com.example.examplequerydslspringdatajpamaven.repository.MongoEventsRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionRepo;
-import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionsElmRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionsRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.UserClientDeviceRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.UserClientDriverRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 
@@ -103,6 +68,8 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	
 	@Value("${elm}")
 	private String elm;
+
+	private final MongoTowCarLiveLocationRepository mongoTowCarLiveLocationRepository;
 	
 	@Autowired
 	private MongoPositionsElmRepository mongoPositionsElmRepository;
@@ -157,7 +124,12 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	
 	@Autowired
 	private DriverServiceImpl driverServiceImpl;
-	
+
+	public ElmServiceImpl(MongoTowCarLiveLocationRepository mongoTowCarLiveLocationRepository) {
+		this.mongoTowCarLiveLocationRepository = mongoTowCarLiveLocationRepository;
+	}
+
+
 	/**
 	 * delete company from elm using id to get reference key
 	 */
@@ -3968,7 +3940,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		if(dataArray.size() > 0) {
 	    	 Map body = new HashMap();
 
-//	    	 body.put("activity","DEFAULT");
+	    	 body.put("activity","DEFAULT");
 			 body.put("vehicleLocations", dataArray);
 
 			  TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
@@ -3999,7 +3971,6 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				        new HttpComponentsClientHttpRequestFactory();
 
 				requestFactory.setHttpClient(httpClient);
-
 				RestTemplate restTemplate = new RestTemplate(requestFactory);
 
 
@@ -4050,22 +4021,6 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				  response.put("message", e.getMessage());
 				  type = "Internal Server Error";
 				  logger.info("************************ Internal Server Error 500 ***************************");
-//				  logger.info("************************ "+requet.get("dataObject")+" ***************************");
-//				  for(Map datas : dataArray){
-//					  System.out.println("address  :  " + datas.get("address"));
-//					  System.out.println("driverReferenceKey  :  " + datas.get("driverReferenceKey"));
-//					  System.out.println("locationTime  :  " +datas.get("locationTime"));
-//					  System.out.println("latitude  :  " +datas.get("latitude"));
-//					  System.out.println("roleCode  :  " +datas.get("roleCode"));
-//					  System.out.println("weight  :  " +datas.get("weight"));
-//					  System.out.println("velocity  :  " +datas.get("velocity"));
-//					  System.out.println("referenceKey  :  " +datas.get("referenceKey"));
-//					  System.out.println("longitude  :  " +datas.get("longitude"));
-//					  System.out.println("vehicleStatus  :  " +datas.get("vehicleStatus"));
-//					  System.out.println("*******************Data Break ******************");
-//					  System.out.println("*******************Data Break ******************");
-//					  System.out.println("*******************Data Break ******************");
-//				  }
 
 				  MongoElmLogs elmLogs = new MongoElmLogs(null,null,null,null,null,null,null,time,type,requet,response);
 				  elmLogsRepository.save(elmLogs);
@@ -4076,6 +4031,143 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		  getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",data,dataArray.size());
 		  logger.info("************************ lastLocations ENDED ***************************");
 		  return  ResponseEntity.ok().body(getObjectResponse);
+	}
+
+
+	@Override
+	public ResponseEntity<?> lastLocationsForTowCar() {
+
+		// TODO Auto-generated method stub
+
+		Date date = new Date();
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String time = formatter.format(date);
+		String type = "Tow Car Location";
+		Map requet = new HashMap();
+		Map response = new HashMap();
+
+		logger.info("************************ lastLocationsForTowCar STARTED ***************************");
+
+		List<Map> dataArray = new ArrayList<>();
+		List<String> ids = new ArrayList<>();
+
+		Page<MongoTowCarLiveLocationEntity> positions = mongoTowCarLiveLocationRepository.findAll(new PageRequest(0, 1000));
+
+		positions.forEach(mongoTowCarLiveLocationEntity -> {
+			Map record = new HashMap();
+
+			record.put("referenceKey", mongoTowCarLiveLocationEntity.getReferenceKey());
+			record.put("driverReferenceKey", mongoTowCarLiveLocationEntity.getDriverReferenceKey());
+			record.put("latitude", mongoTowCarLiveLocationEntity.getLatitude());
+			record.put("longitude", mongoTowCarLiveLocationEntity.getLongitude());
+			record.put("velocity", (Math.round((mongoTowCarLiveLocationEntity.getVelocity() * (1.852) )*100.0)/100.0) );
+			record.put("weight", mongoTowCarLiveLocationEntity.getWeight());
+			record.put("locationTime", mongoTowCarLiveLocationEntity.getLocationTime());
+			record.put("vehicleStatus", mongoTowCarLiveLocationEntity.getVehicleStatus());
+			record.put("address", mongoTowCarLiveLocationEntity.getAddress());
+			record.put("roleCode", mongoTowCarLiveLocationEntity.getRoleCode());
+
+			ids.add(mongoTowCarLiveLocationEntity.get_id().toString());
+
+			dataArray.add(record);
+		});
+
+
+		List<ElmReturn> data = new ArrayList<ElmReturn>();
+		if(dataArray.size() > 0) {
+			Map body = new HashMap();
+
+			body.put("activity","TOW_CAR");
+			body.put("vehicleLocations", dataArray);
+
+			TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+
+			SSLContext sslContext = null;
+			try {
+				sslContext = org.apache.http.ssl.SSLContexts.custom()
+						.loadTrustMaterial(null, acceptingTrustStrategy)
+						.build();
+			} catch (KeyManagementException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchAlgorithmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (KeyStoreException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
+
+			CloseableHttpClient httpClient = HttpClients.custom()
+					.setSSLSocketFactory(csf)
+					.build();
+
+			HttpComponentsClientHttpRequestFactory requestFactory =
+					new HttpComponentsClientHttpRequestFactory();
+
+			requestFactory.setHttpClient(httpClient);
+			RestTemplate restTemplate = new RestTemplate(requestFactory);
+
+
+			restTemplate.getMessageConverters()
+					.add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
+
+			Map bodyToMiddleWare = new HashMap();
+
+
+
+
+			bodyToMiddleWare.put("dataObject", body);
+			bodyToMiddleWare.put("url",elmLocations);
+			bodyToMiddleWare.put("methodType","POST");
+
+			HttpEntity<Object> entity = new HttpEntity<Object>(bodyToMiddleWare);
+			ResponseEntity<ElmReturn> rateResponse = null;
+			ElmReturn elmReturn = null;
+
+			try {
+				rateResponse = restTemplate.exchange(middleWare, HttpMethod.POST, entity, ElmReturn.class);
+				elmReturn = rateResponse.getBody();
+
+				data.add(elmReturn);
+				Map resp = new HashMap();
+				resp = elmReturn.getBody();
+				requet = bodyToMiddleWare;
+				ElmReturn elmReturnd = rateResponse.getBody();
+
+				response.put("body", elmReturnd.getBody());
+				response.put("statusCode", elmReturnd.getStatusCode());
+				response.put("message", elmReturnd.getMessage());
+
+				MongoElmLogs elmLogs = new MongoElmLogs(null,null,null,null,null,null,null,time,type,requet,response);
+				elmLogsRepository.save(elmLogs);
+				mongoElmLiveLocationRepository.deleteByIdIn(ids);
+
+			}catch (Exception |Error e){
+				logger.info("************************ "+e.getMessage()+" ***************************");
+
+//				  Map resp = new HashMap();
+//				  resp = elmReturn.getBody();
+				requet = bodyToMiddleWare;
+//				  ElmReturn elmReturnd = rateResponse.getBody();
+
+				response.put("body", dataArray);
+				response.put("statusCode", 500);
+				response.put("message", e.getMessage());
+				type = "Internal Server Error";
+				logger.info("************************ Internal Server Error 500 ***************************");
+
+				MongoElmLogs elmLogs = new MongoElmLogs(null,null,null,null,null,null,null,time,type,requet,response);
+				elmLogsRepository.save(elmLogs);
+				mongoElmLiveLocationRepository.deleteByIdIn(ids);
+			}
+
+		}
+		getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",data,dataArray.size());
+		logger.info("************************ lastLocationsForTowCar ENDED ***************************");
+		return  ResponseEntity.ok().body(getObjectResponse);
 	}
 
 	/**
