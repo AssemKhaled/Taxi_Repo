@@ -146,9 +146,8 @@ public class ElmConnectionsRestController {
 	}
 	
 	@GetMapping(path ="/lastLocations")
-//	@Scheduled(fixedRate = 10000)
+	//@Scheduled(fixedRate = 30000)
 	public ResponseEntity<?> lastLocations(){
-		
 		return elmServiceImpl.lastLocations();
 	}
 
