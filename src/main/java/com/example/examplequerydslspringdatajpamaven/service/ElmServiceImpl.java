@@ -66,6 +66,12 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	@Value("${middleWare}")
 	private String middleWare;
 
+	@Value("${middleWareHelper1}")
+	private String middleWareHelper1;
+
+	@Value("${middleWareHelper2}")
+	private String middleWareHelper2;
+
 	@Value("${middleWare2}")
 	private String middleWare2;
 	
@@ -3905,6 +3911,13 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		int positionSize = positions.size();
 		lastLocationsThrids(positions.subList(0,positionSize/2),middleWare);
 		return lastLocationsThrids(positions.subList(positionSize/2,positionSize),middleWare2);
+	}
+
+	public ResponseEntity<?> lastLocationsHelper1() {
+		List<MongoElmLiveLocation> positions = mongoElmLiveLocationRepository.findByIdsIn(new PageRequest(0, 2000));
+		int positionSize = positions.size();
+		lastLocationsThrids(positions.subList(0,positionSize/2),middleWareHelper1);
+		return lastLocationsThrids(positions.subList(positionSize/2,positionSize),middleWareHelper2);
 	}
 
 	public ResponseEntity<?> lastLocationsThrids(List<MongoElmLiveLocation> positions , String middleWareTransfare ){

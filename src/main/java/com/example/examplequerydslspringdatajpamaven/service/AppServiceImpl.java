@@ -1036,10 +1036,10 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 					} catch (ParseException e) {
 						e.printStackTrace();
 					}
-					if(minutes < 3) {
+					if(minutes <= 3) {
 						devices.get(i).setStatus("online");
 					}
-					if(minutes > 8) {
+					if(minutes >= 8) {
 						devices.get(i).setStatus("unknown");
 					}
 					if(minutes < 8 && minutes > 3) {

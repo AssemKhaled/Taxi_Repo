@@ -1842,10 +1842,10 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 								e.printStackTrace();
 							}
 							
-							if(minutes < 3) {
+							if(minutes <= 3) {
 		                    	allDevicesLiveData.get(i).setVehicleStatus("online");
 							}
-							if(minutes > 8) {
+							if(minutes >= 8) {
 		                    	allDevicesLiveData.get(i).setVehicleStatus("offline");
 							}
 							if(minutes < 8 && minutes > 3) {
