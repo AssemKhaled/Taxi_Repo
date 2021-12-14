@@ -28,6 +28,8 @@ public interface MongoElmLiveLocationRepository extends MongoRepository<MongoElm
 
 
 	List<MongoElmLiveLocation> findByOrderByLocationTimeAsc( Pageable pageable );
+	List<MongoElmLiveLocation> findTop1000ByOrderByLocationTimeAsc( );
+	List<MongoElmLiveLocation> findTop500ByOrderByLocationTimeAsc( );
 //	List<MongoElmLiveLocation> findByOrderByLocationTimeDesc();
 
 	Long deleteAllByIdIn(List<ObjectId> ids);

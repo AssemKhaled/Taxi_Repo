@@ -224,4 +224,12 @@ public class ElmConnectionsRestController {
 		return elmServiceImpl.deviceInqueryIssue(TOKEN,userId);
 	}
 
+	@GetMapping(path = "elm/findLastPositionsSequenceNumberSpeedZero")
+	public ResponseEntity<?> findLastPositionsSequenceNumberSpeedZero(
+			@RequestParam (value = "sequenceNumber", defaultValue = "") String sequenceNumber){
+
+		return elmServiceImpl.findLastPositionsSequenceNumberSpeedZero(sequenceNumber);
+	}
+
+
 }

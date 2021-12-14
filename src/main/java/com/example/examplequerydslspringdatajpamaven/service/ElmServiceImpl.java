@@ -34,6 +34,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsAsyncClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.AsyncRestTemplate;
@@ -3980,18 +3981,35 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	 * send locations of devices from mongo collection tc_positions_elm
 	 */
 
+	private static boolean binding = false;
 	@Override
 	public void lastLocations() {
+//		List<MongoElmLiveLocation> positions = mongoElmLiveLocationRepository.findByIdsIn(new PageRequest(0, 1000));
+//
+//		if(positions.size()>0){
+//			lastLocationsThrids(positions,middleWareReg);
+//			lastLocations();
+//		}
+	}
+	@Scheduled(fixedRate = 3000)
+	public void lastLocations2() {
+		if(!binding){
+			binding = true;
+			List<MongoElmLiveLocation> positions = mongoElmLiveLocationRepository
+					.findTop1000ByOrderByLocationTimeAsc();
 
-		List<MongoElmLiveLocation> positions = mongoElmLiveLocationRepository.findByIdsIn(new PageRequest(0, 2000));
+			if(positions.size()>0){
+				System.out.println("Size Before : "+positions.size());
+				lastLocationsThrids(positions,middleWareReg);
 
-		if(positions.size()>0){
-			lastLocationsThrids(positions,middleWareReg);
-			lastLocations();
+			}else {
+				binding = false ;
+			}
 		}
 
-
 	}
+
+
 
 //	public void lastLocationsHelper1() {
 //		List<MongoElmLiveLocation> positions = mongoElmLiveLocationRepository.findByIdsIn(new PageRequest(0, 1000));
@@ -4041,6 +4059,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 		}
 		System.out.println(mongoElmLiveLocationRepository.deleteAllByIdIn(ids));
+		binding = false;
 
 		List<ElmReturn> data = new ArrayList<ElmReturn>();
 		if(dataArray.size() > 0) {
@@ -4847,7 +4866,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		
 		
 		 List<Map<Object,Object>> result = new ArrayList<Map<Object,Object>>();
-		 
+
 		 
 	     Map dataFinal= new HashMap();
 
@@ -4915,8 +4934,8 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 		 position = mongoPositionRepo.getLastPosition(device.getId());
 		 	     
-	     positionsZeroSpeed = mongoPositionRepo.getLastPositionSpeedZero(device.getId());
-	     positionsGreaterZeroSpeed = mongoPositionRepo.getLastPositionGreaterSpeedZero(device.getId());
+//	     positionsZeroSpeed = mongoPositionRepo.getLastPositionSpeedZero(device.getId());
+//	     positionsGreaterZeroSpeed = mongoPositionRepo.getLastPositionGreaterSpeedZero(device.getId());
 
 	     if(device.getReference_key() != null && position.getPositionId() != null) {
 	    	 
@@ -4943,7 +4962,26 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 	}
 
+	@Override
+	public ResponseEntity<?> findLastPositionsSequenceNumberSpeedZero(String sequenceNumber) {
+		logger.info("************************ findLastPositionsSequenceNumberSpeedZero Started ***************************");
 
+		Device device = deviceRepository.getDeviceBySequenceNumber(sequenceNumber);
+		List<MongoPositions> positionsZeroSpeed = mongoPositionsRepository
+				.findTop10ByDeviceidAndSpeedOrderByServertimeAsc(device.getId(),0.0);
+		logger.info("************************ findLastPositionsSequenceNumberSpeedZero Get Data With Size "+positionsZeroSpeed.size()+" ***************************");
+
+		Map dataFinal= new HashMap();
+		dataFinal.put("positionZeroSpeed", positionsZeroSpeed);
+		List<Map<Object,Object>> result = new ArrayList<Map<Object,Object>>();
+		result.add(dataFinal);
+
+		logger.info("************************ findLastPositionsSequenceNumberSpeedZero ENDED ***************************");
+
+		getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",result);
+		return  ResponseEntity.ok().body(getObjectResponse);
+
+	}
 
 
 	/**

@@ -32,6 +32,8 @@ public interface ElmService {
 	public ResponseEntity<?> getRemoveOldEvents();
 	public ResponseEntity<?> checkBySequenceNumber(String sequenceNumber);
 
+	ResponseEntity<?> findLastPositionsSequenceNumberSpeedZero(String sequenceNumber);
+
 	public ResponseEntity<?> getLogs(String TOKEN,Long id,Long userId,Long driverId,Long deviceId,int offset,String search);
 	
 	public ResponseEntity<?> deleteOldExpiredData();

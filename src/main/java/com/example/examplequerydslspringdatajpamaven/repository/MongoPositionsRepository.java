@@ -28,8 +28,9 @@ public interface MongoPositionsRepository extends MongoRepository<MongoPositions
 	
 	@Query("{ 'deviceid' : { $in: ?0 } , 'deviceName' : { $exists : false }}")
 	public List<MongoPositions> findByDeviceIdIn(List<Long> deviceIds,Pageable pageable);
-	
 
+
+	List<MongoPositions> findTop10ByDeviceidAndSpeedOrderByServertimeAsc(Long deviceId , double speed);
 	
 
 }

@@ -32,7 +32,6 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>, QueryDsl
 	List<Device> findAllDeletedDevicesFromElm();
 
 
-
 	List<Device> findAllByUser_id(long userID);
 
 	@Query(value = "SELECT * from tc_devices where tc_devices.simcardNumber=:simcardNumber and tc_devices.delete_date is null",nativeQuery = true)
