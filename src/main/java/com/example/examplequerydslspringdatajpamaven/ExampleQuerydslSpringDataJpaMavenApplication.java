@@ -1,12 +1,16 @@
 package com.example.examplequerydslspringdatajpamaven;
 
 import java.io.File;
+
+import com.example.examplequerydslspringdatajpamaven.rest.ElmConnectionsRestController;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import com.example.examplequerydslspringdatajpamaven.service.ProfileServiceImpl;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 
 /**
@@ -19,9 +23,12 @@ import com.example.examplequerydslspringdatajpamaven.service.ProfileServiceImpl;
 @ComponentScan(basePackages = { "com.example.examplequerydslspringdatajpamaven.*"})
 public class ExampleQuerydslSpringDataJpaMavenApplication  {
 
+
+
+
 	public static void main(String[] args) {
 
-		
+
 		String directoryPath = "/var/www/html/sareb_photo";
 		String user = "/var/www/html/sareb_photo/user_photos";
 		String driver = "/var/www/html/sareb_photo/driver_photos";
@@ -96,8 +103,9 @@ public class ExampleQuerydslSpringDataJpaMavenApplication  {
 			pointsFile.mkdirs();
 
 		}
-		
+
 		SpringApplication.run(ExampleQuerydslSpringDataJpaMavenApplication.class, args);
+
 	}
 	
 	@Bean

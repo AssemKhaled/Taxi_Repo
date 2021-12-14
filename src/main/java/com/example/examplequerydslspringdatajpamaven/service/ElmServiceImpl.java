@@ -1,5 +1,6 @@
 package com.example.examplequerydslspringdatajpamaven.service;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -8,6 +9,7 @@ import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import javax.net.ssl.SSLContext;
 
 import com.example.examplequerydslspringdatajpamaven.entity.*;
@@ -18,6 +20,7 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.bson.types.ObjectId;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +31,24 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsAsyncClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.AsyncRestTemplate;
 import org.springframework.web.client.RestTemplate;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.AsyncClientHttpRequest;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.web.client.AsyncRequestCallback;
+import org.springframework.web.client.AsyncRestTemplate;
+import org.springframework.web.client.ResponseExtractor;
 
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
@@ -65,6 +81,9 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	
 	@Value("${middleWare}")
 	private String middleWare;
+
+	@Value("${middleWareReg}")
+	private String middleWareReg;
 
 	@Value("${middleWareHelper1}")
 	private String middleWareHelper1;
@@ -2456,6 +2475,62 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	/**
 	 * Verify data of device in elm by id to get reference key
 	 */
+	public int deviceInqueryIssue(String TOKEN , long userId){
+		List<Device> allDeletedFromElmDevices = deviceRepository.findAllDeletedDevicesFromElm();
+		System.out.println(allDeletedFromElmDevices.size());
+		int i = 0 ;
+		if(allDeletedFromElmDevices.size()>0){
+			for (Device device :allDeletedFromElmDevices){
+				ResponseEntity<?> response  = deviceInquery(TOKEN,device.getId(),userId);
+				if(response.getStatusCode() == HttpStatus.OK){
+					GetObjectResponse responseObj = (GetObjectResponse) response.getBody();
+					if(responseObj.getEntity().size()>0){
+						ElmReturn elmReturn = (ElmReturn) responseObj.getEntity().get(0);
+						if(elmReturn.getStatusCode() == 200){
+							if(responseObj.getMessage().equals("This vehicle is valid")
+									||responseObj.getMessage().equals("no_operation_card_found")
+									||responseObj.getMessage().equals("latitude_not_send")
+									||responseObj.getMessage().equals("weight_not_send")
+							){
+								i++;
+								device.setDelete_from_elm_date(null);
+								deviceRepository.save(device);
+								System.out.println(i);
+								System.out.println(device.getSequence_number());
+							}
+						}
+					}
+
+
+
+				}
+			}
+			System.out.println(i);
+		}
+		return i ;
+	}
+
+
+	public boolean deviceInqueryIssueBySequanceNumber(String TOKEN , long userId, String sequenceNumber){
+//		List<Device> allDeletedFromElmDevices = deviceRepository.findAllDeletedDevicesFromElm();
+		Device device = deviceRepository.getDeviceBySequenceNumber(sequenceNumber);
+				ResponseEntity<?> response  = deviceInquery(TOKEN,device.getId(),userId);
+				if(response.getStatusCode() == HttpStatus.OK){
+					GetObjectResponse responseObj = (GetObjectResponse) response.getBody();
+					if(responseObj.getMessage().equals("This vehicle is valid")
+							||responseObj.getMessage().equals("no_operation_card_found")
+							||responseObj.getMessage().equals("latitude_not_send")
+							||responseObj.getMessage().equals("weight_not_send")
+					){
+						device.setDelete_from_elm_date(null);
+						deviceRepository.save(device);
+						System.out.println(device.getSequence_number());
+						return true;
+					}
+				}
+				return false;
+	}
+
 	@Override
 	public ResponseEntity<?> deviceInquery(String TOKEN, Long deviceId,Long userId) {
 		logger.info("************************ deviceInquery STARTED ***************************");
@@ -3904,24 +3979,35 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	/**
 	 * send locations of devices from mongo collection tc_positions_elm
 	 */
+
 	@Override
-	public ResponseEntity<?> lastLocations() {
+	public void lastLocations() {
 
 		List<MongoElmLiveLocation> positions = mongoElmLiveLocationRepository.findByIdsIn(new PageRequest(0, 2000));
-		int positionSize = positions.size();
-		lastLocationsThrids(positions.subList(0,positionSize/2),middleWare);
-		return lastLocationsThrids(positions.subList(positionSize/2,positionSize),middleWare2);
+
+		if(positions.size()>0){
+			lastLocationsThrids(positions,middleWareReg);
+			lastLocations();
+		}
+
+
 	}
 
-	public ResponseEntity<?> lastLocationsHelper1() {
-		List<MongoElmLiveLocation> positions = mongoElmLiveLocationRepository.findByIdsIn(new PageRequest(0, 2000));
-		int positionSize = positions.size();
-		lastLocationsThrids(positions.subList(0,positionSize/2),middleWareHelper1);
-		return lastLocationsThrids(positions.subList(positionSize/2,positionSize),middleWareHelper2);
-	}
+//	public void lastLocationsHelper1() {
+//		List<MongoElmLiveLocation> positions = mongoElmLiveLocationRepository.findByIdsIn(new PageRequest(0, 1000));
+//		System.out.println("Sec"+positions.size());
+//		if(positions.size()>0 && blockk == false){
+////			mongoElmLiveLocationRepository.deleteByIdIn2(positions);
+//			blockk = true;
+//			lastLocationsThrids(positions,middleWareHelper1);
+////			lastLocations();
+//		}
+//
+//	}
 
-	public ResponseEntity<?> lastLocationsThrids(List<MongoElmLiveLocation> positions , String middleWareTransfare ){
+	public void lastLocationsThrids(List<MongoElmLiveLocation> positions , String middleWareTransfare ){
 		// TODO Auto-generated method stub
+
 		Date date = new Date();
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String time = formatter.format(date);
@@ -3929,10 +4015,10 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		Map requet = new HashMap();
 		Map response = new HashMap();
 
-		logger.info("************************ lastLocations STARTED ***************************");
+		logger.info("******** lastLocations STARTED *********");
 
 		List<Map> dataArray = new ArrayList<>();
-		List<String> ids = new ArrayList<>();
+		List<ObjectId> ids = new ArrayList<>();
 
 		List<MongoElmLastLocations> elm_connection_logs = new ArrayList<MongoElmLastLocations>();
 		for(MongoElmLiveLocation position:positions) {
@@ -3949,11 +4035,12 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			record.put("address", position.getAddress());
 			record.put("roleCode", position.getRoleCode());
 
-			ids.add(position.get_id().toString());
+			ids.add(position.getId());
 
 			dataArray.add(record);
 
 		}
+		System.out.println(mongoElmLiveLocationRepository.deleteAllByIdIn(ids));
 
 		List<ElmReturn> data = new ArrayList<ElmReturn>();
 		if(dataArray.size() > 0) {
@@ -4024,7 +4111,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				mongoElmLiveLocationRepository.deleteByIdIn(ids);
 
 			}catch (Exception |Error e){
-				logger.info("************************ "+e.getMessage()+" ***************************");
+				logger.info("******** "+e.getMessage()+" *********");
 
 //				  Map resp = new HashMap();
 //				  resp = elmReturn.getBody();
@@ -4035,7 +4122,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 				response.put("statusCode", 500);
 				response.put("message", e.getMessage());
 				type = "Internal Server Error";
-				logger.info("************************ Internal Server Error 500 ***************************");
+				logger.info("******** Internal Server Error 500 *********");
 
 				MongoElmLogs elmLogs = new MongoElmLogs(null,null,null,null,null,null,null,time,type,requet,response);
 				elmLogsRepository.save(elmLogs);
@@ -4043,9 +4130,9 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 			}
 
 		}
-		getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",data,dataArray.size());
-		logger.info("************************ lastLocations ENDED ***************************");
-		return  ResponseEntity.ok().body(getObjectResponse);
+//		getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",data,dataArray.size());
+		logger.info("******** lastLocations ENDED *********");
+//		return  ResponseEntity.ok().body(getObjectResponse);
 	}
 
 

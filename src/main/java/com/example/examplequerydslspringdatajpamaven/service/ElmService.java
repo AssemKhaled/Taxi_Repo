@@ -25,7 +25,7 @@ public interface ElmService {
 	public ResponseEntity<?> companyInquery(String TOKEN,Long userId,Long loggedUserId);
 	public ResponseEntity<?> driverInquery(String TOKEN,Long driverId,Long userId);
 
-	public ResponseEntity<?> lastLocations();
+	public void lastLocations();
 	public ResponseEntity<?> getExpiredVehicles();
 	public ResponseEntity<?> getRemoveOldLogs();
 	public ResponseEntity<?> getRemoveOldPositions();

@@ -4,6 +4,7 @@ package com.example.examplequerydslspringdatajpamaven.entity;
 import javax.persistence.Id;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
  * Data Of Elm that sending from position live
@@ -14,7 +15,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class MongoElmLiveLocation {
 
 	@Id
-	private ObjectId _id;
+	@Field("_id")
+	private ObjectId id;
 	
 	private String referenceKey;
 	
@@ -42,11 +44,11 @@ public class MongoElmLiveLocation {
 		
 	}
 	
-	public MongoElmLiveLocation(ObjectId _id, String referenceKey, String driverReferenceKey, Double latitude,
-			Double longitude, Double velocity, Double weight, String locationTime, String vehicleStatus, String address,
-			String roleCode) {
+	public MongoElmLiveLocation(ObjectId id, String referenceKey, String driverReferenceKey, Double latitude,
+								Double longitude, Double velocity, Double weight, String locationTime, String vehicleStatus, String address,
+								String roleCode) {
 		super();
-		this._id = _id;
+		this.id = id;
 		this.referenceKey = referenceKey;
 		this.driverReferenceKey = driverReferenceKey;
 		this.latitude = latitude;
@@ -59,12 +61,12 @@ public class MongoElmLiveLocation {
 		this.roleCode = roleCode;
 	}
 
-	public ObjectId get_id() {
-		return _id;
+	public ObjectId getId() {
+		return id;
 	}
 
-	public void set_id(ObjectId _id) {
-		this._id = _id;
+	public void setId(ObjectId id) {
+		this.id = id;
 	}
 
 	public String getReferenceKey() {

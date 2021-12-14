@@ -144,20 +144,26 @@ public class ElmConnectionsRestController {
     	return  elmServiceImpl.getLogs(TOKEN,id,userId,driverId,deviceId,offset,search);
 
 	}
+	boolean start = true;
 	
 	@GetMapping(path ="/lastLocations")
 	@Scheduled(fixedRate = 10000)
-	public ResponseEntity<?> lastLocations(){
-		return elmServiceImpl.lastLocations();
+	public void lastLocations(){
+		if(start){
+			start = false;
+			elmServiceImpl.lastLocations();
+		}
+//		return null;
+
 	}
 
-	@Scheduled(fixedRate = 15000)
-	public ResponseEntity<?> lastLocations2(){
-		return elmServiceImpl.lastLocationsHelper1();
-	}
+//	@Scheduled(fixedRate = 6000)
+//	public void lastLocations2(){
+//		elmServiceImpl.lastLocationsHelper1();
+//	}
 
 	@GetMapping(path ="/lastLocations/tow")
-	@Scheduled(fixedRate = 30000)
+//	@Scheduled(fixedRate = 30000)
 	public ResponseEntity<?> lastLocationsForTowCar(){
 		return elmServiceImpl.lastLocationsForTowCar();
 	}
@@ -208,4 +214,14 @@ public class ElmConnectionsRestController {
 		
 		return elmServiceImpl.deleteOldExpiredData();
 	}
+
+
+	@GetMapping(path ="/scripts/deviceInquery/issue")
+	public int deviceInqueryIssue(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+										   @RequestParam (value = "deviceId", defaultValue = "0") Long deviceId,
+										   @RequestParam (value = "userId", defaultValue = "0") Long userId){
+
+		return elmServiceImpl.deviceInqueryIssue(TOKEN,userId);
+	}
+
 }
