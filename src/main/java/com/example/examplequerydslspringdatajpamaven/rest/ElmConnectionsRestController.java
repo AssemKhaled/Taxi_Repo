@@ -1,6 +1,9 @@
 package com.example.examplequerydslspringdatajpamaven.rest;
 
 import java.util.Map;
+
+import com.example.examplequerydslspringdatajpamaven.entity.ElmReturn;
+import com.example.examplequerydslspringdatajpamaven.responses.ElmRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -161,11 +164,20 @@ public class ElmConnectionsRestController {
 //	public void lastLocations2(){
 //		elmServiceImpl.lastLocationsHelper1();
 //	}
+	@GetMapping(path ="/lastLocations/test")
+	public ResponseEntity<?> lastLocationTest(@RequestParam(value = "size", defaultValue = "0") int size){
+		return elmServiceImpl.lastLocationsTest(size);
+	}
 
 	@GetMapping(path ="/lastLocations/tow")
-//	@Scheduled(fixedRate = 30000)
+//	@Scheduled(fixedRate = 10000)
 	public ResponseEntity<?> lastLocationsForTowCar(){
 		return elmServiceImpl.lastLocationsForTowCar();
+	}
+
+	@PostMapping("/elmReturnTest")
+	public ResponseEntity<?> elmReturnTest(@RequestBody ElmRequest elmReturn){
+		return elmServiceImpl.lastLocationsSaveResponseTeElm(elmReturn);
 	}
 	
 	@GetMapping(path ="/getExpiredVehicles")
@@ -224,12 +236,47 @@ public class ElmConnectionsRestController {
 		return elmServiceImpl.deviceInqueryIssue(TOKEN,userId);
 	}
 
-	@GetMapping(path = "elm/findLastPositionsSequenceNumberSpeedZero")
+	@GetMapping(path = "/findLastPositionsSequenceNumberSpeedZero")
 	public ResponseEntity<?> findLastPositionsSequenceNumberSpeedZero(
 			@RequestParam (value = "sequenceNumber", defaultValue = "") String sequenceNumber){
 
 		return elmServiceImpl.findLastPositionsSequenceNumberSpeedZero(sequenceNumber);
 	}
 
+	@GetMapping(path = "/findLastPositionsSequenceNumberNoneSpeedZero")
+	public ResponseEntity<?> findLastPositionsSequenceNumberNoneSpeedZero(
+			@RequestParam (value = "sequenceNumber", defaultValue = "") String sequenceNumber){
+
+		return elmServiceImpl.findLastPositionsSequenceNumberNoneSpeedZero(sequenceNumber);
+	}
+
+
+	@GetMapping(path = "/findLastNoneZeroVelocityPositionsBySequenceNumber")
+	public ResponseEntity<?> findLastNoneZeroVelocityPositionsBySequenceNumber(
+			@RequestParam (value = "sequenceNumber", defaultValue = "") String sequenceNumber){
+
+		return elmServiceImpl.findLastNoneZeroVelocityPositionsBySequenceNumber(sequenceNumber);
+	}
+
+	@GetMapping(path = "/findLastZeroVelocityPositionsBySequenceNumber")
+	public ResponseEntity<?> findLastZeroVelocityPositionsBySequenceNumber(
+			@RequestParam (value = "sequenceNumber", defaultValue = "") String sequenceNumber){
+
+		return elmServiceImpl.findLastZeroVelocityPositionsBySequenceNumber(sequenceNumber);
+	}
+
+
+	@GetMapping(path ="/findDeviceData")
+	public ResponseEntity<?> findDeviceData(
+			@RequestParam (value = "sequenceNumber", defaultValue = "") String sequenceNumber){
+
+		return elmServiceImpl.findDeviceData(sequenceNumber);
+	}
+	@GetMapping(path ="/findDeviceLastPosition")
+	public ResponseEntity<?> findDeviceLastPosition(
+			@RequestParam (value = "sequenceNumber", defaultValue = "") String sequenceNumber){
+
+		return elmServiceImpl.findDeviceLastPosition(sequenceNumber);
+	}
 
 }

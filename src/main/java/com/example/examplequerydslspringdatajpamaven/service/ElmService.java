@@ -34,9 +34,19 @@ public interface ElmService {
 
 	ResponseEntity<?> findLastPositionsSequenceNumberSpeedZero(String sequenceNumber);
 
-	public ResponseEntity<?> getLogs(String TOKEN,Long id,Long userId,Long driverId,Long deviceId,int offset,String search);
+	ResponseEntity<?> findLastPositionsSequenceNumberNoneSpeedZero(String sequenceNumber);
+
+	ResponseEntity<?> findLastZeroVelocityPositionsBySequenceNumber(String sequenceNumber) ;
+
+	ResponseEntity<?> findLastNoneZeroVelocityPositionsBySequenceNumber(String sequenceNumber) ;
+
+	ResponseEntity<?> findDeviceData(String sequenceNumber);
+
+	ResponseEntity<?> findDeviceLastPosition(String sequenceNumber);
+
+	ResponseEntity<?> getLogs(String TOKEN,Long id,Long userId,Long driverId,Long deviceId,int offset,String search);
 	
-	public ResponseEntity<?> deleteOldExpiredData();
+	ResponseEntity<?> deleteOldExpiredData();
 
 	ResponseEntity<?> lastLocationsForTowCar();
 

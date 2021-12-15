@@ -2320,14 +2320,14 @@ public class MongoPositionRepo {
 						
 	    Aggregation aggregation = newAggregation(
 
-				match(Criteria.where("type").in("Location")
-						.and("requet.dataObject.vehicleLocations").elemMatch(Criteria.where("referenceKey").in(referenceKey))
+				match(Criteria.where("type").in("Location Test")
+						.and("requet.vehicleLocations").elemMatch(Criteria.where("referenceKey").in(referenceKey))
 						),
-	            sort(Sort.Direction.DESC, "_id"),
-	            unwind("requet.dataObject.vehicleLocations", "arrayIndex"),
-	            match(Criteria.where("requet.dataObject.vehicleLocations.referenceKey").in(referenceKey)
-	            		.and("requet.dataObject.vehicleLocations.velocity").in(0)),
-	            project("time").and("requet.dataObject.vehicleLocations").as("locations"),
+	            sort(Sort.Direction.DESC, "requet.vehicleLocations.locationTime"),
+	            unwind("requet.vehicleLocations", "arrayIndex"),
+	            match(Criteria.where("requet.vehicleLocations.referenceKey").in(referenceKey)
+	            		.and("requet.vehicleLocations.velocity").in(0)),
+	            project("time").and("requet.vehicleLocations").as("locations"),
 	            skip(0),
 	            limit(10)
 	            
@@ -2368,14 +2368,14 @@ public class MongoPositionRepo {
 						
 		Aggregation aggregation = newAggregation(
 
-				match(Criteria.where("type").in("Location")
-						.and("requet.dataObject.vehicleLocations").elemMatch(Criteria.where("referenceKey").in(referenceKey))
+				match(Criteria.where("type").in("Location Test")
+						.and("requet.vehicleLocations").elemMatch(Criteria.where("referenceKey").in(referenceKey))
 						),
-	            sort(Sort.Direction.DESC, "_id"),
-	            unwind("requet.dataObject.vehicleLocations", "arrayIndex"),
-	            match(Criteria.where("requet.dataObject.vehicleLocations.referenceKey").in(referenceKey)
-	            		.and("requet.dataObject.vehicleLocations.velocity").gt(0)),
-	            project("time").and("requet.dataObject.vehicleLocations").as("locations"),
+	            sort(Sort.Direction.DESC, "requet.vehicleLocations.locationTime"),
+	            unwind("requet.vehicleLocations", "arrayIndex"),
+	            match(Criteria.where("requet.vehicleLocations.referenceKey").in(referenceKey)
+	            		.and("requet.vehicleLocations.velocity").gt(0)),
+	            project("time").and("requet.vehicleLocations").as("locations"),
 	            skip(0),
 	            limit(10)
 
