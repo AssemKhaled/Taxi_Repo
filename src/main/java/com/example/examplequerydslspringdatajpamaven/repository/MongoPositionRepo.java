@@ -130,9 +130,8 @@ public class MongoPositionRepo {
 				
 	    Aggregation aggregation = newAggregation(
 	            match(Criteria.where("deviceid").in(deviceId).and("devicetime").gte(start).lte(end)),
-	            project("deviceid","latitude","longitude").and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("devicetime")
-	            
-	    		).withOptions(newAggregationOptions().allowDiskUse(true).build());
+	            project("deviceid","latitude","longitude").and("devicetime").dateAsFormattedString("%Y-%m-%dT%H:%M:%S.%LZ").as("devicetime"),
+				sort(Sort.Direction.ASC, "devicetime")).withOptions(newAggregationOptions().allowDiskUse(true).build());
 
 	    
 	        AggregationResults<BasicDBObject> groupResults

@@ -2,6 +2,8 @@ package com.example.examplequerydslspringdatajpamaven.entity;
 
 import java.util.Date;
 import javax.persistence.Id;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -21,10 +23,13 @@ public class MongoPositions {
 	
 	private Long deviceid;
 
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date servertime;
-	
+
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date devicetime;
-	
+
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date fixtime;
 	
 	private Boolean valid;

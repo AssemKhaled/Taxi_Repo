@@ -150,7 +150,7 @@ public class ElmConnectionsRestController {
 	boolean start = true;
 	
 	@GetMapping(path ="/lastLocations")
-	@Scheduled(fixedRate = 10000)
+//	@Scheduled(fixedRate = 10000)
 	public void lastLocations(){
 		if(start){
 			start = false;
@@ -175,9 +175,18 @@ public class ElmConnectionsRestController {
 		return elmServiceImpl.lastLocationsForTowCar();
 	}
 
+	@GetMapping(path ="/lastLocations/tow/pythonCalls")
+	public ResponseEntity<?> lastLocationsForTowCarForPython(@RequestParam(value = "size", defaultValue = "0") int size){
+		return elmServiceImpl.lastLocationsForTowCarForPythonCall(size);
+	}
+
 	@PostMapping("/elmReturnTest")
 	public ResponseEntity<?> elmReturnTest(@RequestBody ElmRequest elmReturn){
 		return elmServiceImpl.lastLocationsSaveResponseTeElm(elmReturn);
+	}
+	@PostMapping("/elmReturn/tow")
+	public ResponseEntity<?> elmReturnForTowCars(@RequestBody ElmRequest elmReturn){
+		return elmServiceImpl.towCarsLastLocationsSaveResponseTeElm(elmReturn);
 	}
 	
 	@GetMapping(path ="/getExpiredVehicles")

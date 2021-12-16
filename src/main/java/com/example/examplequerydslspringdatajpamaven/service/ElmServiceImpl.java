@@ -4167,13 +4167,6 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	public ResponseEntity<?> lastLocationsThridsForTest(List<MongoElmLiveLocation> positions , String middleWareTransfare ){
 		// TODO Auto-generated method stub
 
-		Date date = new Date();
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		String time = formatter.format(date);
-		String type = "Location";
-		Map requet = new HashMap();
-		Map response = new HashMap();
-
 		logger.info("******** lastLocationsThridsForTest STARTED *********");
 
 		List<Map> dataArray = new ArrayList<>();
@@ -4199,26 +4192,10 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 		}
 		System.out.println(mongoElmLiveLocationRepository.deleteAllByIdIn(ids));
-		binding = false;
 
-		List<ElmReturn> data = new ArrayList<ElmReturn>();
+
 		if(dataArray.size() > 0) {
-			Map body = new HashMap();
-
-
-			body.put("activity","DEFAULT");
-			body.put("vehicleLocations", dataArray);
-
-
-			Map bodyToMiddleWare = new HashMap();
-			bodyToMiddleWare.put("dataObject", body);
-			bodyToMiddleWare.put("url",elmLocations);
-			bodyToMiddleWare.put("methodType","POST");
-
-
 			mongoElmLiveLocationRepository.deleteByIdIn(ids);
-
-
 		}
 		getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",dataArray,dataArray.size());
 		logger.info("******** lastLocationsThridsForTest ENDED *********");
@@ -4245,8 +4222,6 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		logger.info("******** lastLocationsSaveResponseTeElm ENDED *********");
 		return  ResponseEntity.ok().body(getObjectResponse);
 	}
-
-
 
 	@Override
 	public ResponseEntity<?> lastLocationsForTowCar() {
@@ -4383,6 +4358,67 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 		logger.info("************************ lastLocationsForTowCar ENDED ***************************");
 		return  ResponseEntity.ok().body(getObjectResponse);
 	}
+
+	@Override
+    public ResponseEntity<?> lastLocationsForTowCarForPythonCall(int size) {
+        // TODO Auto-generated method stub
+
+        logger.info("************************ lastLocationsForTowCarForPythonCall STARTED ***************************");
+
+        List<Map> dataArray = new ArrayList<>();
+        List<String> ids = new ArrayList<>();
+
+        Page<MongoTowCarLiveLocationEntity> positions = mongoTowCarLiveLocationRepository.findAll(new PageRequest(0, size));
+
+        positions.forEach(mongoTowCarLiveLocationEntity -> {
+            Map record = new HashMap();
+
+            record.put("referenceKey", mongoTowCarLiveLocationEntity.getReferenceKey());
+            record.put("driverReferenceKey", mongoTowCarLiveLocationEntity.getDriverReferenceKey());
+            record.put("latitude", mongoTowCarLiveLocationEntity.getLatitude());
+            record.put("longitude", mongoTowCarLiveLocationEntity.getLongitude());
+            record.put("velocity", (Math.round((mongoTowCarLiveLocationEntity.getVelocity() * (1.852) )*100.0)/100.0) );
+            record.put("weight", mongoTowCarLiveLocationEntity.getWeight());
+            record.put("locationTime", mongoTowCarLiveLocationEntity.getLocationTime());
+            record.put("vehicleStatus", mongoTowCarLiveLocationEntity.getVehicleStatus());
+            record.put("address", mongoTowCarLiveLocationEntity.getAddress());
+            record.put("roleCode", mongoTowCarLiveLocationEntity.getRoleCode());
+
+            ids.add(mongoTowCarLiveLocationEntity.get_id().toString());
+
+            dataArray.add(record);
+        });
+
+		mongoTowCarLiveLocationRepository.deleteByIdIn(ids);
+
+        getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",dataArray,dataArray.size());
+        logger.info("************************ lastLocationsForTowCarForPythonCall ENDED ***************************");
+        return  ResponseEntity.ok().body(getObjectResponse);
+    }
+
+
+	public ResponseEntity<?> towCarsLastLocationsSaveResponseTeElm(ElmRequest elmReturn ){
+		// TODO Auto-generated method stub
+
+		Date date = new Date();
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String time = formatter.format(date);
+		String type = "Tow Car Location";
+
+		Map requet = elmReturn.getRequestData();
+		Map response = elmReturn.getResponseData();
+
+		logger.info("******** towCarsLastLocationsSaveResponseTeElm STARTED *********");
+
+		MongoElmLogs elmLogs = new MongoElmLogs(null,null,null,null,null,null,null,time,type,requet,response);
+		elmLogsRepository.save(elmLogs);
+
+		getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(),"success",null,0);
+		logger.info("******** towCarsLastLocationsSaveResponseTeElm ENDED *********");
+		return  ResponseEntity.ok().body(getObjectResponse);
+	}
+
+
 
 	/**
 	 * get logs of driver company or device by ids

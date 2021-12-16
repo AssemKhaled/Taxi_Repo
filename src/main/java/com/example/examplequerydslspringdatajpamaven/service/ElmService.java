@@ -50,4 +50,6 @@ public interface ElmService {
 
 	ResponseEntity<?> lastLocationsForTowCar();
 
+	ResponseEntity<?> lastLocationsForTowCarForPythonCall(int size);
+
 }
