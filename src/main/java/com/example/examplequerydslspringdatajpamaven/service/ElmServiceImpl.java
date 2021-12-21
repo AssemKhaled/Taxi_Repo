@@ -5097,7 +5097,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 		Device device = deviceRepository.getDeviceBySequenceNumber(sequenceNumber);
 		List<MongoPositions> positionsZeroSpeed = mongoPositionsRepository
-				.findTop10ByDeviceidAndSpeedOrderByServertimeAsc(device.getId(),0.0);
+				.findTop10ByDeviceidAndSpeedOrderByServertimeDesc(device.getId(),0.0);
 		logger.info("************************ findLastPositionsSequenceNumberSpeedZero Get Data With Size "+positionsZeroSpeed.size()+" ***************************");
 
 		Map dataFinal= new HashMap();
@@ -5118,7 +5118,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 
 		Device device = deviceRepository.getDeviceBySequenceNumber(sequenceNumber);
 		List<MongoPositions> positionsZeroSpeed = mongoPositionsRepository
-				.findTop10ByDeviceidAndSpeedAfterOrderByServertimeAsc(device.getId(),0.0);
+				.findTop10ByDeviceidAndSpeedAfterOrderByServertimeDesc(device.getId(),0.0);
 		logger.info("************************ findLastPositionsSequenceNumberNoneSpeedZero Get Data With Size "+positionsZeroSpeed.size()+" ***************************");
 
 		Map dataFinal= new HashMap();

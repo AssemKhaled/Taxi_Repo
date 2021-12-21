@@ -30,9 +30,9 @@ public interface MongoPositionsRepository extends MongoRepository<MongoPositions
 	public List<MongoPositions> findByDeviceIdIn(List<Long> deviceIds,Pageable pageable);
 
 
-	List<MongoPositions> findTop10ByDeviceidAndSpeedOrderByServertimeAsc(Long deviceId , double speed);
+	List<MongoPositions> findTop10ByDeviceidAndSpeedOrderByServertimeDesc(Long deviceId , double speed);
 
-	List<MongoPositions> findTop10ByDeviceidAndSpeedAfterOrderByServertimeAsc(Long deviceId , double speed);
+	List<MongoPositions> findTop10ByDeviceidAndSpeedAfterOrderByServertimeDesc(Long deviceId , double speed);
 
 
 }

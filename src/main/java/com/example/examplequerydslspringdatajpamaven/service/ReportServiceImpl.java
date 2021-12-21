@@ -5908,7 +5908,6 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			getObjectResponse= new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Device ID is not found",positions);
 			logger.info("************************ getviewTrip ENDED ***************************");
 			return  ResponseEntity.status(404).body(getObjectResponse);
-
 		}
 		
 	}
