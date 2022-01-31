@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.example.examplequerydslspringdatajpamaven.entity.Notification;
 
-@Service
+//@Service
 public interface NotificationService {
 	public ResponseEntity<?> createNotification(String TOKEN,String authorization,Notification notification,Long userId);
 	public ResponseEntity<?> getAllNotifications(String TOKEN,Long id,int offset,String search,String exportData);

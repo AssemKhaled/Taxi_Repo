@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.example.examplequerydslspringdatajpamaven.entity.Schedule;
 
-@Service
+//@Service
 public interface ScheduledService {
 	
 	public ResponseEntity<?> createScheduled(String TOKEN,Schedule schedule,Long userId);

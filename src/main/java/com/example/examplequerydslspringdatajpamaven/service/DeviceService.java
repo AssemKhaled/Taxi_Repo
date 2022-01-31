@@ -6,11 +6,12 @@ import java.util.Map;
 
 import org.json.JSONArray;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
-
-@Service
+//@Component
+//@Service
 public interface DeviceService {
 	
 	public Device findById(Long deviceId);

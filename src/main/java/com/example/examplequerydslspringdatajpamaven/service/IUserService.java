@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 
 @Service
@@ -38,7 +37,7 @@ public interface IUserService {
 	public void resetChildernArray();
 
 	public ResponseEntity<?> getUserSelectWithChild(String TOKEN,Long userId);
-
+	public  String getMd5(String input);
 
 
 }

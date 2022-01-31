@@ -24,7 +24,6 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,7 +35,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -57,7 +55,7 @@ import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
  * @author fuinco
  *
  */
-@Component
+//@Component
 @Service
 public class NotificationServiceImpl extends RestServiceController implements NotificationService{
 	private static final Log logger = LogFactory.getLog(NotificationServiceImpl.class);
@@ -88,8 +86,11 @@ public class NotificationServiceImpl extends RestServiceController implements No
 	
 	@Autowired 
 	DeviceServiceImpl deviceServiceImpl;
-	
-	/**
+
+    public NotificationServiceImpl() {
+    }
+
+    /**
 	 * create notification using data in body
 	 */
 	@Override

@@ -1,8 +1,11 @@
 package com.example.examplequerydslspringdatajpamaven.rest;
 
 
+import com.example.examplequerydslspringdatajpamaven.entity.User;
+import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,13 +18,15 @@ import com.example.examplequerydslspringdatajpamaven.service.DeviceServiceImpl;
 import com.example.examplequerydslspringdatajpamaven.service.ReportServiceImpl;
 import com.example.examplequerydslspringdatajpamaven.service.UserServiceImpl;
 
+import java.util.List;
+
 /**
  * Services of Dashboard component
  * @author fuinco
  *
  */
 @CrossOrigin
-@Component
+//@Component
 @RequestMapping(path = "/home")
 public class DashBoardRestController {
 	
@@ -30,6 +35,9 @@ public class DashBoardRestController {
 		
 	@Autowired
 	private ReportServiceImpl reportServiceImpl;
+
+	@Autowired
+	private UserRepository userRepository;
 	
  
 	@GetMapping(path ="/getDevicesStatuesAndAllDrivers")
@@ -76,5 +84,10 @@ public class DashBoardRestController {
 
 	}
 
-	
+
+
+
+
+
+
 }

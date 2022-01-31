@@ -19,7 +19,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.UserSelect;
  *
  */
 @Component
-public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredicateExecutor<User> {
+public interface UserRepository extends JpaRepository<User, Long> {
 	@Modifying
     @Transactional
 	@Query(value = "UPDATE tc_users SET exp_date = DATE_ADD(create_date, INTERVAL 1 YEAR) where accountType not in(1,2,0) and create_date is not null", nativeQuery = true )
@@ -79,6 +79,9 @@ public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredi
 	
 	@Query(value = "SELECT tc_users.* FROM tc_user_user inner join tc_users on tc_user_user.manageduserid=tc_users.id where tc_user_user.userid = :userId and delete_date is null ", nativeQuery = true)
 	public List<User> getChildrenOfUser(@Param("userId") Long userId);
+
+//	@Query(value = "SELECT tc_user_user.userid FROM tc_user_user where tc_user_user.manageduserid = :userId ", nativeQuery = true)
+//	public List<Long> getChildrenIdsOfUser(@Param("userId") Long userId);
 	
 	@Query(value = "SELECT tc_users.* FROM tc_user_user inner join tc_users on tc_user_user.manageduserid=tc_users.id where tc_user_user.userid = :userId ", nativeQuery = true)
 	public List<User> getActiveAndInactiveChildrenOfUser(@Param("userId") Long userId);

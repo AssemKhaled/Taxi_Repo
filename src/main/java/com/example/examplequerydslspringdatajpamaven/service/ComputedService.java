@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.example.examplequerydslspringdatajpamaven.entity.Attribute;
 
-@Service
+//@Service
 public interface ComputedService {
 	public ResponseEntity<?> createComputed(String TOKEN,Attribute attribute,Long userId);
 	public ResponseEntity<?> getAllComputed(String TOKEN,Long id,int offset,String search,String exportData);

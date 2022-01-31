@@ -34,8 +34,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceTempHum;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceWorkingHours;
@@ -58,8 +56,8 @@ import com.example.examplequerydslspringdatajpamaven.rest.ScheduledTasksRestCont
  * @author fuinco
  *
  */
-@Component
-@Service
+//@Component
+//@Service
 public class ScheduledServiceImpl extends RestServiceController implements ScheduledService{
 
 	private static final Log logger = LogFactory.getLog(ScheduledServiceImpl.class);
@@ -103,9 +101,12 @@ public class ScheduledServiceImpl extends RestServiceController implements Sched
 	
 	 @Value("${spring.mail.username}")
 	 private String emaiFrom;
-	 
-	 
-	 /**
+
+    public ScheduledServiceImpl() {
+    }
+
+
+    /**
 	  * create schedule by data in body 
 	  */
 	@Override

@@ -191,10 +191,142 @@ public class Driver extends Attributes{
 	
 	@Column(name = "delete_from_elm_date")
 	private Date delete_from_elm_date;
-	
+
 	@Column(name = "update_date_in_elm")
 	private Date update_date_in_elm;
-	
+
+	@Column(name = "password")
+	private String password;
+
+	@Column(name = "license_no")
+	private String license_no;
+
+	@Column(name = "gender")
+	private String gender;
+
+	@Column(name = "license_expiry_date")
+	private String license_expiry_date;
+
+	@Column(name = "activity")
+	private String activity;
+
+	@Column(name = "companyId")
+	private Integer companyId;
+
+	@Column(name = "vehicleId")
+	private Integer vehicleId;
+
+	@Column(name = "num_of_trips")
+	private Integer num_of_trips;
+
+	@Column(name = "token")
+	private String token;
+
+	@Column(name = "create_date")
+	private Date create_date;
+
+	@Column(name = "language")
+	private String language;
+
+	@Column(name = "rfid")
+	private String rfid;
+
+	public String getActivity() {
+		return activity;
+	}
+
+	public void setActivity(String activity) {
+		this.activity = activity;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public String getLicense_no() {
+		return license_no;
+	}
+
+	public void setLicense_no(String license_no) {
+		this.license_no = license_no;
+	}
+
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public String getLicense_expiry_date() {
+		return license_expiry_date;
+	}
+
+	public void setLicense_expiry_date(String license_expiry_date) {
+		this.license_expiry_date = license_expiry_date;
+	}
+
+	public Integer getCompanyId() {
+		return companyId;
+	}
+
+	public void setCompanyId(Integer companyId) {
+		this.companyId = companyId;
+	}
+
+	public Integer getVehicleId() {
+		return vehicleId;
+	}
+
+	public void setVehicleId(Integer vehicleId) {
+		this.vehicleId = vehicleId;
+	}
+
+	public Integer getNum_of_trips() {
+		return num_of_trips;
+	}
+
+	public void setNum_of_trips(Integer num_of_trips) {
+		this.num_of_trips = num_of_trips;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	public Date getCreate_date() {
+		return create_date;
+	}
+
+	public void setCreate_date(Date create_date) {
+		this.create_date = create_date;
+	}
+
+	public String getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(String language) {
+		this.language = language;
+	}
+
+	public String getRfid() {
+		return rfid;
+	}
+
+	public void setRfid(String rfid) {
+		this.rfid = rfid;
+	}
+
 	@ManyToMany(
             fetch = FetchType.LAZY,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE},

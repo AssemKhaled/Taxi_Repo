@@ -25,7 +25,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
@@ -61,7 +60,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author fuinco
  *
  */
-@Component
+//@Component
 @Service
 public class ReportServiceImpl extends RestServiceController implements ReportService {
 	
@@ -120,9 +119,12 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	
 	@Autowired
 	private MongoPositionRepo mongoPositionRepo;
-	
-	
-	/**
+
+    public ReportServiceImpl() {
+    }
+
+
+    /**
 	 * get data of events of one or more device and group from mongo collection tc_events
 	 */
 	@Override

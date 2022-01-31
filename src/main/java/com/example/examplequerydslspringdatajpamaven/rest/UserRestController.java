@@ -30,7 +30,6 @@ public class UserRestController {
 
 	
 	@Autowired
-
 	UserServiceImpl userService;
 	
 	@RequestMapping(value = "/")

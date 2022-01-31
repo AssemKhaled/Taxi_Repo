@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -21,12 +22,13 @@ import com.example.examplequerydslspringdatajpamaven.repository.UserTokensReposi
  * @author fuinco
  *
  */
-@Component
+//@Component
 @Service
+//	@Configuration
 public class TokenSecurity {
 
 	 @Autowired
-	 private UserTokensRepository userTokensRepository;
+	 public UserTokensRepository userTokensRepository;
 	  
 	//private List<Token> ActiveUsers;
 	

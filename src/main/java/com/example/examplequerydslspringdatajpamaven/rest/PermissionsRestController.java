@@ -18,7 +18,7 @@ import com.example.examplequerydslspringdatajpamaven.service.PermissionService;
  *
  */
 @CrossOrigin
-@Component
+//@Component
 @RequestMapping(path = "/permissions")
 public class PermissionsRestController {
 

@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.example.examplequerydslspringdatajpamaven.entity.Group;
 
-@Service
+//@Service
 public interface GroupsService {
 	
 	public ResponseEntity<?> createGroup(String TOKEN,Group group,Long userId);

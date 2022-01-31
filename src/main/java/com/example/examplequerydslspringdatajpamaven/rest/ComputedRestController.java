@@ -24,7 +24,7 @@ import com.example.examplequerydslspringdatajpamaven.service.ComputedServiceImpl
  *
  */
 @CrossOrigin
-@Component
+//@Component
 @RequestMapping(path = "/computed")
 public class ComputedRestController {
 

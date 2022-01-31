@@ -10,7 +10,7 @@ import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
  * @author fuinco
  *
  */
-@RestController
+//@RestController
 public class HelloRestController {
 
 	@Autowired

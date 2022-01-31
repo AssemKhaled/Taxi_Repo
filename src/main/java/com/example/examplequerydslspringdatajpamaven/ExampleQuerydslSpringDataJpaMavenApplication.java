@@ -20,14 +20,21 @@ import org.springframework.scheduling.annotation.EnableAsync;
  */
 @SpringBootApplication 
 @Configuration
-@ComponentScan(basePackages = { "com.example.examplequerydslspringdatajpamaven.*"})
+@ComponentScan(basePackages = { "com.example.examplequerydslspringdatajpamaven.config",
+								"com.example.examplequerydslspringdatajpamaven.entity" ,
+								"com.example.examplequerydslspringdatajpamaven.exception",
+								"com.example.examplequerydslspringdatajpamaven.photo",
+								"com.example.examplequerydslspringdatajpamaven.repository",
+								"com.example.examplequerydslspringdatajpamaven.responses",
+								"com.example.examplequerydslspringdatajpamaven.rest",
+								"com.example.examplequerydslspringdatajpamaven.service",
+								"com.example.examplequerydslspringdatajpamaven.tokens",
+								"com.example.examplequerydslspringdatajpamaven.Validator"
+			})
 public class ExampleQuerydslSpringDataJpaMavenApplication  {
 
 
-
-
 	public static void main(String[] args) {
-
 
 		String directoryPath = "/var/www/html/sareb_photo";
 		String user = "/var/www/html/sareb_photo/user_photos";
@@ -112,6 +119,5 @@ public class ExampleQuerydslSpringDataJpaMavenApplication  {
 	public ProfileServiceImpl testProfile() {
 		return new ProfileServiceImpl();
 	}
-
 
 }

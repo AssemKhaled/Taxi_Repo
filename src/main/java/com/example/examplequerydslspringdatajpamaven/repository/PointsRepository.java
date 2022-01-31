@@ -16,7 +16,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.Points;
  *
  */
 @Service
-public interface PointsRepository  extends JpaRepository<Points, Long>, QueryDslPredicateExecutor<Points>{
+public interface PointsRepository  extends JpaRepository<Points, Long>{
 
 	
 	@Query(value = "SELECT tc_points.* FROM tc_points"

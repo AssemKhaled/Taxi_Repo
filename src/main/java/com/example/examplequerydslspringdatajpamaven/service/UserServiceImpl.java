@@ -18,7 +18,6 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.example.examplequerydslspringdatajpamaven.entity.User;
@@ -33,7 +32,7 @@ import com.example.examplequerydslspringdatajpamaven.tokens.TokenSecurity;
  * @author fuinco
  *
  */
-@Component
+//@Component
 @Service
 public class UserServiceImpl extends RestServiceController implements IUserService {
 
@@ -49,7 +48,7 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	private UserRoleRepository roleRepository;
 
 	@Autowired
-	private UserRoleService userRoleService;
+	private UserRoleServiceImpl userRoleService;
 	
 	@Autowired
 	private TokenSecurity tokenSecurity;
@@ -77,7 +76,7 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	@Override
 	public User findById(Long userId) {
 		// TODO Auto-generated method stub
-		User user=userRepository.findOne(userId);
+		User user = userRepository.findOne(userId);
 		if(user == null) {
 			return null;
 		}
@@ -240,14 +239,14 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 		}
 		else {
 			User Loggeduser = findById(loggedUserId);
-			if(Loggeduser.equals(null)) {
+			if(Loggeduser == null) {
 				 List<User> users = null;
 				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value() ,"This logged user ID is not found",users);
 				 logger.info("************************ getAllUsersOfUser ENDED ***************************");
 				return  ResponseEntity.status(404).body(getObjectResponse);
 			}
-			User user=userRepository.findOne(userId);
-			if(user.equals(null)) {
+			User user = userRepository.findOne(userId);
+			if(user == null) {
 				 List<User> users = null;
 				 getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value() ,"This user is not found",users);
 				 logger.info("************************ getAllUsersOfUser ENDED ***************************");
@@ -374,7 +373,7 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 				return super.checkActive(TOKEN);
 		}
 		if(userId == 0) {
-			
+
 
 	    	getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is Required",null);
 	    	logger.info("************************createUser ENDED ***************************");
@@ -410,15 +409,15 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 		    	return ResponseEntity.ok().body(getObjectResponse);
 			}
 		}
-		
+
 		if(user.getIsCompany() == 1) {
 			if(user.getEmail() == null || user.getEmail() == "" || user.getPassword() == null
-					|| user.getPassword() == "" || user.getName() == null || user.getName() == "" 
+					|| user.getPassword() == "" || user.getName() == null || user.getName() == ""
 					|| user.getIdentity_num() == null || user.getIdentity_num() == ""
 					|| user.getCommercial_num() == null ||user.getCommercial_num() == ""
 					|| user.getCompany_phone() == null || user.getCompany_phone() == ""
 					|| user.getManager_phone() == null || user.getManager_phone() == ""
-					|| user.getManager_mobile() == null || user.getManager_mobile() == "" 
+					|| user.getManager_mobile() == null || user.getManager_mobile() == ""
 					|| user.getAccountType() == null || user.getAccountType() == 0 ) {
 					List<User> users = null;
 					String message= "attributes [email , password, name, identityNumber ,commercialNumber,"
@@ -428,11 +427,11 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 			    	logger.info("************************createUser ENDED ***************************");
 			    	return ResponseEntity.badRequest().body(getObjectResponse);
 				  }
-			
+
 		}
 		if(user.getIsCompany() == 0) {
 			if(user.getEmail() == null || user.getEmail() == "" || user.getPassword() == null
-					|| user.getPassword() == "" || user.getName() == null || user.getName() == "" 
+					|| user.getPassword() == "" || user.getName() == null || user.getName() == ""
 					|| user.getIdentity_num() == null || user.getIdentity_num() == ""
 					|| user.getDateOfBirth() == null ||user.getDateOfBirth() == ""
 					|| user.getCompany_phone() == null || user.getCompany_phone() == ""
@@ -445,7 +444,7 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 			    	logger.info("************************createUser ENDED ***************************");
 			    	return ResponseEntity.badRequest().body(getObjectResponse);
 				  }
-			
+
 		}
 		
 		if(user.getAccountType() == 1) {
@@ -928,11 +927,9 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	}
 
 	
-	
-	 public static String getMd5(String input) 
-	    { 
-	        try { 
-	  
+	 @Override
+	 public  String getMd5(String input) {
+	        try {
 
 	            MessageDigest md = MessageDigest.getInstance("MD5"); 
 	  
@@ -949,12 +946,11 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 	            } 
 	            return hashtext; 
 	        }  
-	  
 
 	        catch (NoSuchAlgorithmException e) { 
 	            throw new RuntimeException(e); 
-	        } 
-	    }
+	        }
+	}
 
 	@Override
 	public List<Integer> checkUserDuplication(User user) {
@@ -1093,7 +1089,7 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 		Set<User> userCreater=new HashSet<>() ;
 		userCreater.add(findById(parentId));
 		user.setUsersOfUser(userCreater);
-		
+
 		
 		if(user.getId() == null || user.getId() == 0) {
 			
@@ -1477,7 +1473,6 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 		// TODO Auto-generated method stub
 		List<User> childernUsers = new ArrayList<>();
 		childernUsers = new ArrayList<>();
-		
 	}
 	
 

@@ -11,7 +11,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import java.util.*;
 import java.security.KeyManagementException;
@@ -31,7 +30,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
@@ -73,7 +71,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  */
 
-@Component
+//@Component
 @Service
 public class DeviceServiceImpl extends RestServiceController implements DeviceService {
 
@@ -117,8 +115,11 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	
 	@Value("${sendCommand}")
 	private String sendCommand;
-	
-	/**
+
+    public DeviceServiceImpl() {
+    }
+
+    /**
 	 * get list device by limit 10
 	 */
 	@Override
@@ -456,12 +457,12 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			|| device.getUniqueid() == null || device.getUniqueid().equals("")
 			|| device.getSequence_number() == null || device.getSequence_number().equals("")
 			|| device.getPlate_num() == null || device.getPlate_num().equals("")
-			|| device.getLeft_letter() == null || device.getLeft_letter() == null
+			|| device.getLeft_letter() == null || device.getLeft_letter().equals("")
 			|| device.getRight_letter() == null || device.getRight_letter().equals("")
 			|| device.getMiddle_letter() == null || device.getMiddle_letter().equals("")	) {
 			
 			
-			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "Atrributes[id ,name, trackerImei , sequence" + 
+			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "Atrributes[id ,name, trackerImei , sequence" +
 					"					Number , plate num , leftLetter , middleLetter,RightLetter ] are required",null);
 			logger.info("************************ editDevice ENDED ***************************");
 			return ResponseEntity.badRequest().body(getObjectResponse);
@@ -1643,12 +1644,13 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			 getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
 			 return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
-		
-		if(super.checkActive(TOKEN)!= null)
+
+		ResponseEntity<?> tokenCheckerResponse = super.checkActive(TOKEN);
+
+		if(tokenCheckerResponse!= null)
 		{
-			return super.checkActive(TOKEN);
+			return tokenCheckerResponse;
 		}
-		
 		
 		if(userId.equals(0)) {
 			List<Device> devices = null;

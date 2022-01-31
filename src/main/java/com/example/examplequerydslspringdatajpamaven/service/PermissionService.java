@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.examplequerydslspringdatajpamaven.entity.Permission;
 
-@Service
+//@Service
 public interface PermissionService {
  
 	public ResponseEntity<?>addPermission(Permission permission);

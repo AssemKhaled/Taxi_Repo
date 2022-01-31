@@ -16,7 +16,7 @@ import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse
  * @author fuinco
  *
  */
-@Component
+//@Component
 @Service
 public class PermissionServiceImpl  implements PermissionService{
 

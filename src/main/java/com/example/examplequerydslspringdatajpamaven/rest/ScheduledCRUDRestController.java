@@ -21,7 +21,7 @@ import com.example.examplequerydslspringdatajpamaven.service.ScheduledServiceImp
  *
  */
 @CrossOrigin
-@Component
+//@Component
 @RequestMapping(path = "/scheduled")
 public class ScheduledCRUDRestController {
 

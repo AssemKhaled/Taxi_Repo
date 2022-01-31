@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
  * @author fuinco
  *
  */
-@Service
+//@Service
 public interface ChartService {
 	public ResponseEntity<?> getStatus(String TOKEN,Long userId);
 	public ResponseEntity<?> getDistanceFuelEngine(String TOKEN,Long userId);

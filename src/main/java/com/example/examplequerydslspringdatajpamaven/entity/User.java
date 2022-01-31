@@ -15,6 +15,7 @@ import javax.persistence.Table;
 import javax.persistence.JoinColumn;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 
 /**
  * Model of table tc_users in DB
@@ -22,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  */
 @Entity
+//@Builder
 @Table(name ="tc_users")
 public class User extends Attributes{
 
@@ -110,9 +112,65 @@ public class User extends Attributes{
 	
 	@Column(name = "delete_from_elm_date")
 	private Date delete_from_elm_date;
-	
+
 	@Column(name = "update_date_in_elm")
 	private Date update_date_in_elm;
+
+	@Column(name = "extensionNumber")
+	private String extensionNumber;
+
+	@Column(name = "devicetype")
+	private String devicetype;
+
+	@Column(name = "app_token")
+	private String app_token;
+
+	@Column(name = "birth_date")
+	private Date birth_date;
+
+	@Column(name = "date_type")
+	private Integer date_type;
+
+
+	public String getExtensionNumber() {
+		return extensionNumber;
+	}
+
+	public void setExtensionNumber(String extensionNumber) {
+		this.extensionNumber = extensionNumber;
+	}
+
+	public String getDevicetype() {
+		return devicetype;
+	}
+
+	public void setDevicetype(String devicetype) {
+		this.devicetype = devicetype;
+	}
+
+	public String getApp_token() {
+		return app_token;
+	}
+
+	public void setApp_token(String app_token) {
+		this.app_token = app_token;
+	}
+
+	public Date getBirth_date() {
+		return birth_date;
+	}
+
+	public void setBirth_date(Date birth_date) {
+		this.birth_date = birth_date;
+	}
+
+	public Integer getDate_type() {
+		return date_type;
+	}
+
+	public void setDate_type(Integer date_type) {
+		this.date_type = date_type;
+	}
 
 	 @JsonIgnore
 	 @ManyToMany(

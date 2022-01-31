@@ -16,7 +16,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.UserRole;
  *
  */
 @Component
-public interface UserRoleRepository extends  JpaRepository<UserRole, Long>, QueryDslPredicateExecutor<UserRole>{
+public interface UserRoleRepository extends  JpaRepository<UserRole, Long>{
 
 	@Query(value = "SELECT * FROM tc_user_roles WHERE name LIKE LOWER(:name) AND delete_date IS NULL and tc_user_roles.userId =:userId",nativeQuery = true)
 	public  List<UserRole> checkDublicateAdd(@Param("userId")Long userId,@Param("name")String name);

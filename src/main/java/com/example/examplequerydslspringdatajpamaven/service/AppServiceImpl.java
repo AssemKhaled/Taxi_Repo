@@ -16,7 +16,6 @@ import javax.net.ssl.SSLContext;
 
 import com.example.examplequerydslspringdatajpamaven.responses.DevicesMapResponse;
 import com.example.examplequerydslspringdatajpamaven.responses.VehicleInfoAndLastLocationsResponse;
-import io.radanalytics.operator.common.AnsiColors;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -35,7 +34,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -90,14 +88,12 @@ import com.example.examplequerydslspringdatajpamaven.tokens.TokenSecurity;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import static org.reflections.util.ConfigurationBuilder.build;
-
 /**
  * services functionality related to app
  * @author fuinco
  *
  */
-@Component
+//@Component
 @Service
 public class AppServiceImpl extends RestServiceController implements AppService{
 
@@ -190,8 +186,11 @@ public class AppServiceImpl extends RestServiceController implements AppService{
 
 	@Autowired
 	private DeviceServiceImpl deviceService;
-	
-	
+
+	public AppServiceImpl() {
+	}
+
+
 	/**
 	 * login of app
 	 */

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.examplequerydslspringdatajpamaven.entity.Task;
 
-@Service
+//@Service
 public interface TaskService {
 
 	public ResponseEntity<?> loginTask(String authorization);

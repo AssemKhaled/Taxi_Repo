@@ -17,7 +17,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.Notification;
  * @author fuinco
  *
  */
-public interface NotificationRepository extends  JpaRepository<Notification, Long>, QueryDslPredicateExecutor<Notification>{
+public interface NotificationRepository extends  JpaRepository<Notification, Long>{
 	
 	
 	@Query(value = "SELECT tc_notifications.* FROM tc_notifications INNER JOIN tc_user_notification ON tc_user_notification.notificationid = tc_notifications.id"

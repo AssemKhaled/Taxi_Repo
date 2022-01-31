@@ -24,10 +24,21 @@ public class Permission extends Attributes{
 	
 	@Column(name = "functionality")
 	private String functionality ;
-	
+
 	@Column(name = "delete_date")
 	private String delete_date;
-	
+
+	@Column(name = "features")
+	private String features;
+
+	public String getFeatures() {
+		return features;
+	}
+
+	public void setFeatures(String features) {
+		this.features = features;
+	}
+
 	public Long getId() {
 		return id;
 	}

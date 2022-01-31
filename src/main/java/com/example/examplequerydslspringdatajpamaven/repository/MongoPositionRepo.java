@@ -26,6 +26,7 @@ import org.springframework.data.mongodb.core.aggregation.ComparisonOperators.Gt;
 import org.springframework.data.mongodb.core.aggregation.ComparisonOperators.Lte;
 import org.springframework.data.mongodb.core.aggregation.DateOperators;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomMapData;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomPositions;
@@ -66,15 +67,13 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.repl
  * @author fuinco
  *
  */
-@Repository
+
+@Component
 public class MongoPositionRepo {
 
 	@Autowired
 	private MongoTemplate mongoTemplate;
-	
-	@Autowired
-	private MongoElmLiveLocationRepository mongoElmLiveLocationRepository;
-	
+
 	@Autowired
 	private DeviceRepository deviceRepository;
 	

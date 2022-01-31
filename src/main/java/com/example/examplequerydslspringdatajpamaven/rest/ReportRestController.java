@@ -17,7 +17,7 @@ import com.example.examplequerydslspringdatajpamaven.service.ReportServiceImpl;
  * @author fuinco
  *
  */
-@RestController
+//@RestController
 @RequestMapping(path = "/reports")
 @CrossOrigin
 public class ReportRestController {

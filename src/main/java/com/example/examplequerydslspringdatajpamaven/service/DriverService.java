@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.examplequerydslspringdatajpamaven.entity.Driver;
 
-@Service
+//@Service
 public interface DriverService {
 	
 	public ResponseEntity<?> getAllDrivers(String TOKEN,Long id,int offset,String search,String exportData);

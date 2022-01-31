@@ -22,7 +22,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
@@ -45,7 +44,7 @@ import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
  * @author fuinco
  *
  */
-@Component
+//@Component
 @Service
 public class ChartServiceImpl extends RestServiceController implements ChartService{
 	
@@ -72,10 +71,12 @@ public class ChartServiceImpl extends RestServiceController implements ChartServ
 	
 	@Autowired
 	MongoEventsRepo mongoEventsRepo;
-	
-	
-	
-	/**
+
+    public ChartServiceImpl() {
+    }
+
+
+    /**
 	 * get chart of status (online,offline,out of network) and total devices
 	 */
 	@Override

@@ -19,7 +19,7 @@ import com.example.examplequerydslspringdatajpamaven.service.ChartServiceImpl;
  *
  */
 @CrossOrigin
-@Component
+//@Component
 @RequestMapping(path = "/charts")
 public class ChartRestController {
 

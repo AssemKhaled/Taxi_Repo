@@ -11,7 +11,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.User;
  *
  */
 @Service
-public interface ProfileRepository extends JpaRepository<User, Long>, QueryDslPredicateExecutor<User> {
+public interface ProfileRepository extends JpaRepository<User, Long>{
 
 	
 	

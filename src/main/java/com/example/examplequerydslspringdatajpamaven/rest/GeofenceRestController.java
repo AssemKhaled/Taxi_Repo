@@ -21,7 +21,7 @@ import com.example.examplequerydslspringdatajpamaven.service.UserServiceImpl;
  * @author fuinco
  *
  */
-@RestController
+//@RestController
 @RequestMapping(path = "/geofences")
 @CrossOrigin
 public class GeofenceRestController {

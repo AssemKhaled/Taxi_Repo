@@ -5,7 +5,7 @@ import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-@Service
+//@Service
 public interface ElmService {
 	
 	public ResponseEntity<?> companyRegistrtaion(String TOKEN,Long userId,Long loggedUserId);

@@ -18,7 +18,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.userClientDevice;
  *
  */
 @Component
-public interface UserClientDeviceRepository extends JpaRepository<userClientDevice, Long>, QueryDslPredicateExecutor<userClientDevice>{
+public interface UserClientDeviceRepository extends JpaRepository<userClientDevice, Long>{
 
 
 	List<userClientDevice> findAllByUserid(Long userId);

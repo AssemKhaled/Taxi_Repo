@@ -18,7 +18,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.userClientGroup;
  *
  */
 @Component
-public interface UserClientGroupRepository extends JpaRepository<userClientGroup, Long>, QueryDslPredicateExecutor<userClientGroup>{
+public interface UserClientGroupRepository extends JpaRepository<userClientGroup, Long>{
 
 	@Transactional
     @Modifying

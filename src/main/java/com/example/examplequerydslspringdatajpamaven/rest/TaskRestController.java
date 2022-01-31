@@ -16,7 +16,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.Task;
 import com.example.examplequerydslspringdatajpamaven.service.TaskServiceImpl;
 
 @CrossOrigin
-@Component
+//@Component
 @RequestMapping(path = "/task")
 public class TaskRestController {
 

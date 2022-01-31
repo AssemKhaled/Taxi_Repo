@@ -20,7 +20,7 @@ import com.example.examplequerydslspringdatajpamaven.service.UserRoleService;
  *
  */
 @CrossOrigin
-@Component
+//@Component
 @RequestMapping(path = "/roles")
 public class UserRoleRestController {
 

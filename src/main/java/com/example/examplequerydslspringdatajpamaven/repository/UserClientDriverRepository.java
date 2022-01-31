@@ -19,7 +19,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.userClientDriver;
  *
  */
 @Component
-public interface UserClientDriverRepository extends JpaRepository<userClientDriver, Long>, QueryDslPredicateExecutor<userClientDriver>{
+public interface UserClientDriverRepository extends JpaRepository<userClientDriver, Long>{
 
 	
 	@Transactional

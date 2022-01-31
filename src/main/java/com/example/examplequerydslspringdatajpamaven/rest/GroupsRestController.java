@@ -25,7 +25,7 @@ import com.example.examplequerydslspringdatajpamaven.service.GroupsServiceImpl;
  *
  */
 @CrossOrigin
-@Component
+//@Component
 @RequestMapping(path = "/group")
 public class GroupsRestController {
 	

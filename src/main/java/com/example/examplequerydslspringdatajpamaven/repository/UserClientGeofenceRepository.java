@@ -18,7 +18,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.userClientGeofence;
  *
  */
 @Component
-public interface UserClientGeofenceRepository extends JpaRepository<userClientGeofence, Long>, QueryDslPredicateExecutor<userClientGeofence>{
+public interface UserClientGeofenceRepository extends JpaRepository<userClientGeofence, Long> {
 
 	@Transactional
     @Modifying

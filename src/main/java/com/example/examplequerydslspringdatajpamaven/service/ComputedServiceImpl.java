@@ -13,7 +13,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import com.example.examplequerydslspringdatajpamaven.entity.Attribute;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
@@ -36,7 +35,7 @@ import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
  * @author fuinco
  *
  */
-@Component
+//@Component
 @Service
 public class ComputedServiceImpl extends RestServiceController implements ComputedService{
 	private static final Log logger = LogFactory.getLog(ComputedServiceImpl.class);
@@ -73,7 +72,10 @@ public class ComputedServiceImpl extends RestServiceController implements Comput
 	@Autowired
 	UserClientGroupRepository userClientGroupRepository;
 
-	/**
+    public ComputedServiceImpl() {
+    }
+
+    /**
 	 * create attributes by body data 
 	 */
 	@Override

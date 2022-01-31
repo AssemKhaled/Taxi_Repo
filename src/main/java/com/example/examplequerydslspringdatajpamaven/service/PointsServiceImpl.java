@@ -11,7 +11,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
 import com.example.examplequerydslspringdatajpamaven.entity.Points;
@@ -30,7 +29,7 @@ import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
  *
  */
 
-@Component
+//@Component
 @Service
 public class PointsServiceImpl extends RestServiceController implements PointsService{
 
@@ -52,9 +51,12 @@ public class PointsServiceImpl extends RestServiceController implements PointsSe
 	
 	@Autowired
     UserClientPointRepository userClientPointRepository;
-	
-	
-	/**
+
+    public PointsServiceImpl() {
+    }
+
+
+    /**
 	 * get list of points limit 10
 	 */
 	@Override

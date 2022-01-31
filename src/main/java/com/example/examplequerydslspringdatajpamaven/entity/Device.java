@@ -841,15 +841,161 @@ public class Device extends Attributes{
 	
 	@Column(name = "end_date")
 	private Date end_date;
-	
+
+	@Column(name = "activity")
+	private String activity;
+
+	@Column(name = "groupid")
+	private Integer groupid;
+
+	@Column(name = "contact")
+	private String contact;
+
+	@Column(name = "category")
+	private String category;
+
+	@Column(name = "disabled")
+	private Integer disabled = 0;
+
+	@Column(name = "numberOfSeats")
+	private Integer numberOfSeats;
+
+	@Column(name = "taxiprofileId")
+	private Integer taxiprofileId;
+
+	@Column(name = "driver_last_location_id")
+	private String driver_last_location_id;
+
+	@Column(name = "driver_reference_key")
+	private String driver_reference_key;
+
+	@Column(name = "driver_panic_button")
+	private Integer driver_panic_button;
+
+	@Column(name = "passenger_panic_button")
+	private Integer passenger_panic_button;
+
+	@Column(name = "slope")
+	private Double slope = 0.0;
+
+	@Column(name = "factor")
+	private Double factor = 0.0;
+
+	@Column(name = "driverId")
+	private Long driverId;
+
+
+
+
+
 	@Transient
 	private Boolean activate_to_elm;
-	
-	
-	
 
-	
-	@JsonIgnore 
+	public Integer getGroupid() {
+		return groupid;
+	}
+
+	public void setGroupid(Integer groupid) {
+		this.groupid = groupid;
+	}
+
+	public String getContact() {
+		return contact;
+	}
+
+	public void setContact(String contact) {
+		this.contact = contact;
+	}
+
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
+	}
+
+	public Integer getDisabled() {
+		return disabled;
+	}
+
+	public void setDisabled(Integer disabled) {
+		this.disabled = disabled;
+	}
+
+	public Integer getNumberOfSeats() {
+		return numberOfSeats;
+	}
+
+	public void setNumberOfSeats(Integer numberOfSeats) {
+		this.numberOfSeats = numberOfSeats;
+	}
+
+	public Integer getTaxiprofileId() {
+		return taxiprofileId;
+	}
+
+	public void setTaxiprofileId(Integer taxiprofileId) {
+		this.taxiprofileId = taxiprofileId;
+	}
+
+	public String getDriver_last_location_id() {
+		return driver_last_location_id;
+	}
+
+	public void setDriver_last_location_id(String driver_last_location_id) {
+		this.driver_last_location_id = driver_last_location_id;
+	}
+
+	public String getDriver_reference_key() {
+		return driver_reference_key;
+	}
+
+	public void setDriver_reference_key(String driver_reference_key) {
+		this.driver_reference_key = driver_reference_key;
+	}
+
+	public Integer getDriver_panic_button() {
+		return driver_panic_button;
+	}
+
+	public void setDriver_panic_button(Integer driver_panic_button) {
+		this.driver_panic_button = driver_panic_button;
+	}
+
+	public Integer getPassenger_panic_button() {
+		return passenger_panic_button;
+	}
+
+	public void setPassenger_panic_button(Integer passenger_panic_button) {
+		this.passenger_panic_button = passenger_panic_button;
+	}
+
+	public Double getSlope() {
+		return slope;
+	}
+
+	public void setSlope(Double slope) {
+		this.slope = slope;
+	}
+
+	public Double getFactor() {
+		return factor;
+	}
+
+	public void setFactor(Double factor) {
+		this.factor = factor;
+	}
+
+	public String getActivity() {
+		return activity;
+	}
+
+	public void setActivity(String activity) {
+		this.activity = activity;
+	}
+
+	@JsonIgnore
 	@ManyToMany(
             fetch = FetchType.LAZY,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}

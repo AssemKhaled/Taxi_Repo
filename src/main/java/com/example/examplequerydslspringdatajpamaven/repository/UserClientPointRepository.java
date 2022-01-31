@@ -19,7 +19,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.userClientPoint;
  *
  */
 @Component
-public interface UserClientPointRepository extends JpaRepository<userClientPoint, Long>, QueryDslPredicateExecutor<userClientPoint>{
+public interface UserClientPointRepository extends JpaRepository<userClientPoint, Long>{
 
 	@Transactional
     @Modifying

@@ -18,7 +18,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
  *
  */
 @Component
-public interface GeofenceRepository extends JpaRepository<Geofence, Long>, QueryDslPredicateExecutor<Geofence>{
+public interface GeofenceRepository extends JpaRepository<Geofence, Long>{
 
 	
 	@Transactional

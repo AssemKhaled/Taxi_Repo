@@ -28,7 +28,7 @@ import com.example.examplequerydslspringdatajpamaven.service.ScheduledServiceImp
  * @author fuinco
  *
  */
-@Configuration
+//@Configuration
 @EnableScheduling
 public class ScheduledTasksRestController implements SchedulingConfigurer,DisposableBean{
 	private static final Log logger = LogFactory.getLog(DeviceServiceImpl.class);

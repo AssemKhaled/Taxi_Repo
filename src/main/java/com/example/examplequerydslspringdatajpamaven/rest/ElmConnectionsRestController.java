@@ -27,7 +27,7 @@ import com.example.examplequerydslspringdatajpamaven.service.ElmServiceImpl;
  *
  */
 @CrossOrigin
-@Component
+//@Component
 @RequestMapping(path = "/elm")
 public class ElmConnectionsRestController {
 

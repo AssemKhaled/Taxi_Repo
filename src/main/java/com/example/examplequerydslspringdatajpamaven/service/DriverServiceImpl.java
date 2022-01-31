@@ -8,12 +8,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.example.examplequerydslspringdatajpamaven.helper.ReusableMethods;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import com.example.examplequerydslspringdatajpamaven.entity.CustomDriverList;
 import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
@@ -29,13 +30,15 @@ import com.example.examplequerydslspringdatajpamaven.repository.UserClientDriver
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
+import org.springframework.stereotype.Service;
 
 /**
  * services functionality related to drivers
  * @author fuinco
  *
  */
-@Component
+//@Component
+	@Service
 public class DriverServiceImpl extends RestServiceController implements DriverService{
 
 	private static final Log logger = LogFactory.getLog(DriverServiceImpl.class);
@@ -63,9 +66,14 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 	
 	@Autowired
 	UserClientDriverRepository userClientDriverRepository;
-	
-	
-	/**
+
+	private final ReusableMethods reusableMethods = new ReusableMethods(userRepository);
+
+    public DriverServiceImpl() {
+	}
+
+
+    /**
 	 * get drivers list with limit 10
 	 */
 	@Override
@@ -212,19 +220,19 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 				}
 					
 					if(driver.getName()== null || driver.getUniqueid()== null
-							   || driver.getMobile_num() == null || driver.getName()== "" || driver.getUniqueid()== ""
-							   || driver.getMobile_num() == "") {
-						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Driver name , uniqueid and mobile number is Required",drivers);
+						|| driver.getMobile_num() == null || driver.getPassword() == null || driver.getName()== "" || driver.getUniqueid()== ""
+						|| driver.getMobile_num() == "" || driver.getPassword() == "") {
+						getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Driver name, uniqueId, password and mobile number is Required", drivers);
 						return ResponseEntity.badRequest().body(getObjectResponse);
 
 					}
 					else {
 						DecodePhoto decodePhoto=new DecodePhoto();
+						driver.setPassword(reusableMethods.getMd5(driver.getPassword()));
 				    	if(image !=null) {
 					    	if(image !="") {
 					    		if(image.startsWith("data:image")) {
-						        	driver.setPhoto(decodePhoto.Base64_Image(image,"driver"));				
-					    		
+						        	driver.setPhoto(decodePhoto.Base64_Image(image,"driver"));
 					    		}
 					    	}
 						}
@@ -299,7 +307,6 @@ public class DriverServiceImpl extends RestServiceController implements DriverSe
 						
 						else {
 							if(driver.getId() == null || driver.getId() == 0) {
-								
 								Set<User> userDriver = new HashSet<>();
 								userDriver.add(driverParent);
 								driver.setUserDriver(userDriver);

@@ -23,7 +23,7 @@ import com.example.examplequerydslspringdatajpamaven.service.NotificationService
  *
  */
 @CrossOrigin
-@Component
+//@Component
 @RequestMapping(path = "/notification")
 public class NotificationsRestController {
 

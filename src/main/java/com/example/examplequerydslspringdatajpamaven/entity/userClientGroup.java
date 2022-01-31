@@ -15,8 +15,6 @@ import javax.persistence.Table;
 @Table(name = "tc_user_client_group")
 public class userClientGroup {
 
-	
-	
 	@Column(name = "userid")
 	private Long userid;
 	

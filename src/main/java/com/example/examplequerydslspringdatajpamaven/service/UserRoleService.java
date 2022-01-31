@@ -1,11 +1,13 @@
 package com.example.examplequerydslspringdatajpamaven.service;
 
+import com.example.examplequerydslspringdatajpamaven.entity.UserRole;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import com.example.examplequerydslspringdatajpamaven.entity.UserRole;
 
-@Service
+//@Component
+//@Service
 public interface UserRoleService {
 
 	public ResponseEntity<?>createRole(String TOKEN,UserRole role,Long userId);

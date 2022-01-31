@@ -15,7 +15,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.Permission;
  *
  */
 @Component
-public interface PermissionRepository extends  JpaRepository<Permission, Long>, QueryDslPredicateExecutor<Permission> {
+public interface PermissionRepository extends  JpaRepository<Permission, Long>{
 
 	@Query(value = "SELECT * FROM tc_permissions WHERE name LIKE LOWER(:name) AND delete_date IS NULL",nativeQuery = true)
 	public  List<Permission> findByName(@Param("name")String name);

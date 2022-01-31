@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.examplequerydslspringdatajpamaven.Validator.JWKValidator;
-import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.Task;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.repository.TaskRepository;
@@ -44,8 +43,11 @@ public class TaskServiceImpl extends RestServiceController implements TaskServic
 	
 	@Autowired
 	private TaskRepository taskRepository;
-	
-	@Override
+
+    public TaskServiceImpl() {
+    }
+
+    @Override
 	public ResponseEntity<?> loginTask(String authorization) {
 		
 		logger.info("************************ Login STARTED ***************************");

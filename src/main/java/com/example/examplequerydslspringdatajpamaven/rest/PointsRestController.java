@@ -21,7 +21,7 @@ import com.example.examplequerydslspringdatajpamaven.service.PointsServiceImpl;
  *
  */
 @CrossOrigin
-@Component
+//@Component
 @RequestMapping(path = "/points")
 public class PointsRestController {
 

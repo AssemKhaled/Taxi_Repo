@@ -17,7 +17,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
  *
  */
 @Component
-public interface ComputedRepository  extends  JpaRepository<Attribute, Long>, QueryDslPredicateExecutor<Attribute>{
+public interface ComputedRepository  extends  JpaRepository<Attribute, Long>{
 
 	@Query(value = "SELECT tc_attributes.* FROM tc_attributes INNER JOIN tc_user_attribute ON tc_user_attribute.attributeid = tc_attributes.id"
 			+ " WHERE tc_user_attribute.userid IN(:userIds) and  tc_attributes.delete_date is null"

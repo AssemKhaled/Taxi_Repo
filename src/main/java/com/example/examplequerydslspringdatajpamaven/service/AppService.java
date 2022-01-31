@@ -15,14 +15,14 @@ import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
  * @author fuinco
  *
  */
-@Service
+//@Service
 public interface AppService {
 	public Boolean logoutTraccarApp(String email , String password);
 	public Boolean loginTraccarApp(String authorization);
 	public ResponseEntity<?> loginApp(String authorization);
 	public ResponseEntity<?> logoutApp(String TOKEN);
 
-	 ResponseEntity<?> getAllDeviceLiveDataMapAppNew(String TOKEN, Long userId);
+	ResponseEntity<?> getAllDeviceLiveDataMapAppNew(String TOKEN, Long userId);
 	public ResponseEntity<?> getAllDeviceLiveDataMapApp(String TOKEN,Long userId);
 	public ResponseEntity<?> vehicleInfoApp(String TOKEN,Long deviceId,Long userId);
 

@@ -19,7 +19,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.Group;
  *
  */
 @Component
-public interface GroupRepository extends  JpaRepository<Group, Long>, QueryDslPredicateExecutor<Group> {
+public interface GroupRepository extends  JpaRepository<Group, Long>{
 	
 	@Query(value = "SELECT tc_groups.* FROM tc_groups INNER JOIN tc_user_group ON tc_user_group.groupid = tc_groups.id"
 			+ " WHERE tc_user_group.userid IN(:userIds) and tc_groups.is_deleted is null"

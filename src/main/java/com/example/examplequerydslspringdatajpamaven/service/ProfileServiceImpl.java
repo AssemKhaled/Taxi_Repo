@@ -8,7 +8,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
@@ -23,7 +22,7 @@ import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
  * @author fuinco
  *
  */
-@Component
+//@Component
 @Service
 public class ProfileServiceImpl extends RestServiceController implements ProfileService{
 
@@ -37,7 +36,10 @@ public class ProfileServiceImpl extends RestServiceController implements Profile
 
 	private static final Log logger = LogFactory.getLog(ProfileServiceImpl.class);
 
-	
+	public ProfileServiceImpl() {
+	}
+
+
 	/**
 	 * get user profile info to edit
 	 */

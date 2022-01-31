@@ -12,7 +12,6 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import com.example.examplequerydslspringdatajpamaven.entity.Permission;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
@@ -29,7 +28,7 @@ import com.example.examplequerydslspringdatajpamaven.tokens.TokenSecurity;
  * @author fuinco
  *
  */
-@Component
+//@Component
 @Service
 public class UserRoleServiceImpl extends RestServiceController implements UserRoleService {
 
@@ -52,11 +51,14 @@ public class UserRoleServiceImpl extends RestServiceController implements UserRo
 	
 	
 	@Autowired
-	private PermissionService permissionService;
+	private PermissionServiceImpl permissionService;
 	
 	private GetObjectResponse getObjectResponse;
-	
-	
+
+	public UserRoleServiceImpl() {
+	}
+
+
 	/**
 	 * create role with data in body
 	 */

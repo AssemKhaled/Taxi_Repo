@@ -18,7 +18,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.DriverSelect;
  *
  */
 @Component
-public interface DriverRepository extends JpaRepository<Driver, Long>, QueryDslPredicateExecutor<Driver> {
+public interface DriverRepository extends JpaRepository<Driver, Long> {
 
 	@Transactional
     @Modifying

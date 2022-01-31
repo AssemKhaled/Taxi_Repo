@@ -1,6 +1,5 @@
 package com.example.examplequerydslspringdatajpamaven.service;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -9,7 +8,6 @@ import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import javax.net.ssl.SSLContext;
 
 import com.example.examplequerydslspringdatajpamaven.entity.*;
@@ -32,25 +30,10 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsAsyncClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.AsyncRestTemplate;
 import org.springframework.web.client.RestTemplate;
-
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.AsyncClientHttpRequest;
-import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.stereotype.Controller;
-import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.web.client.AsyncRequestCallback;
-import org.springframework.web.client.AsyncRestTemplate;
-import org.springframework.web.client.ResponseExtractor;
 
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
@@ -60,7 +43,7 @@ import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
  * @author fuinco
  *
  */
-@Component
+//@Component
 @Service
 public class ElmServiceImpl extends RestServiceController implements ElmService{
 
@@ -156,7 +139,7 @@ public class ElmServiceImpl extends RestServiceController implements ElmService{
 	private DriverServiceImpl driverServiceImpl;
 
 	public ElmServiceImpl(MongoTowCarLiveLocationRepository mongoTowCarLiveLocationRepository) {
-		this.mongoTowCarLiveLocationRepository = mongoTowCarLiveLocationRepository;
+        this.mongoTowCarLiveLocationRepository = mongoTowCarLiveLocationRepository;
 	}
 
 

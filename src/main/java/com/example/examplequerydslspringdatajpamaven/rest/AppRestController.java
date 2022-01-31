@@ -21,7 +21,8 @@ import com.example.examplequerydslspringdatajpamaven.service.DeviceServiceImpl;;
  *
  */
 @CrossOrigin
-@Component
+//@Component
+@RestController
 @RequestMapping(path = "/app")
 public class AppRestController {
 	

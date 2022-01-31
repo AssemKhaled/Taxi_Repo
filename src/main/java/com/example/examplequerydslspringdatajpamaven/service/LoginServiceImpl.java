@@ -17,7 +17,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import com.example.examplequerydslspringdatajpamaven.Validator.JWKValidator;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
@@ -32,7 +31,7 @@ import com.example.examplequerydslspringdatajpamaven.tokens.TokenSecurity;
  * @author fuinco
  *
  */
-@Component
+//@Component
 @Service
 public class LoginServiceImpl extends RestServiceController implements LoginService  {
 	
@@ -45,7 +44,7 @@ public class LoginServiceImpl extends RestServiceController implements LoginServ
 	private UserRepository userRepository;
 	 
 	@Autowired
-	private UserServiceImpl userServiceImpl;
+	private IUserService userServiceImpl;
 	
 	@Autowired
 	private JWKValidator jwkValidator;
@@ -54,9 +53,12 @@ public class LoginServiceImpl extends RestServiceController implements LoginServ
 	private UserRoleService userRoleService;
 	
 	private GetObjectResponse getObjectResponse;
-	
-	
-	/**
+
+    public LoginServiceImpl() {
+    }
+
+
+    /**
 	 * login using email and password return data of user with token
 	 */
 	@Override

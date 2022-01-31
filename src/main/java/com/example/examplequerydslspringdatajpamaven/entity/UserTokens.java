@@ -50,9 +50,4 @@ public class UserTokens {
 		this.tokenid = tokenid;
 	}
 
-	
-
-	
-	
-	
 }

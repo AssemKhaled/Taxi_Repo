@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
 
-@Service
+//@Service
 public interface GeofenceService {
 
 	public ResponseEntity<?> getAllGeofences(String TOKEN,Long id,int offset,String search,String exportData);

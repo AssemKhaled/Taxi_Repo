@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 
-@Service
+//@Service
 public interface ProfileService {
 	
 	public ResponseEntity<?> getUserInfo(String TOKEN,Long userId);

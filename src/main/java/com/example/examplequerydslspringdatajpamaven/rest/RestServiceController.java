@@ -9,21 +9,23 @@ import org.springframework.http.ResponseEntity;
 
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.tokens.TokenSecurity;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Service check authorized
  * @author fuinco
  *
  */
+@RestController
 public class RestServiceController {
  
 	GetObjectResponse getObjectResponse;
-	
+
 	@Autowired
 	private TokenSecurity tokenSecurity;
+
 	
 	public RestServiceController(){
-		
 	}
 	
 	public ResponseEntity<?> checkActive(String token) {
@@ -32,9 +34,7 @@ public class RestServiceController {
 			return this.ActiveReponse(false);
 		}
 		// Boolean updated = TokenSecurity.getInstance().checkToken(token);
-		 Boolean updated = tokenSecurity.checkToken(token);
-
-		 return this.ActiveReponse(updated);
+		 return this.ActiveReponse(tokenSecurity.checkToken(token));
 	}
 
 	

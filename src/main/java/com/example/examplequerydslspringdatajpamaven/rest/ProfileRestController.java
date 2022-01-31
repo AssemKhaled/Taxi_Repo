@@ -21,7 +21,7 @@ import com.example.examplequerydslspringdatajpamaven.service.UserServiceImpl;
  *
  */
 @CrossOrigin
-@RestController
+//@RestController
 @RequestMapping(path = "/profile")
 public class ProfileRestController {
 

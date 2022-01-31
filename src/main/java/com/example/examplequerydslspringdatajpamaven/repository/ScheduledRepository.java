@@ -17,7 +17,7 @@ import com.example.examplequerydslspringdatajpamaven.entity.Schedule;
  *
  */
 @Service
-public interface ScheduledRepository extends JpaRepository<Schedule, Long>, QueryDslPredicateExecutor<Schedule>{
+public interface ScheduledRepository extends JpaRepository<Schedule, Long>{
 
 	
 	@Query(value = "SELECT tc_schedule.* FROM tc_schedule"
