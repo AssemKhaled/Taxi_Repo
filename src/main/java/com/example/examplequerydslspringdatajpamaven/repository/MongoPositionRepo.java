@@ -2618,6 +2618,7 @@ public class MongoPositionRepo {
 	
 	            		Device device = deviceRepository.findOne(position.getId());
 	            		if(device != null) {
+							position.setSequenceNumber(device.getSequence_number());
 
 	    					Double roundTemp = 0.0;
 	    					Double roundHum = 0.0;
@@ -2775,7 +2776,8 @@ public class MongoPositionRepo {
 	            		
 	            		Device device = deviceRepository.findOne(position.getId());
 	            		if(device != null) {
-	            			
+							position.setSequenceNumber(device.getSequence_number());
+
 	    					Double roundTemp = 0.0;
 	    					Double roundHum = 0.0;
 
@@ -2932,7 +2934,8 @@ public class MongoPositionRepo {
  	            		
 	            		Device device = deviceRepository.findOne(position.getId());
 	            		if(device != null) {
-	            			
+							position.setSequenceNumber(device.getSequence_number());
+
 	    					Double roundTemp = 0.0;
 	    					Double roundHum = 0.0;
 
