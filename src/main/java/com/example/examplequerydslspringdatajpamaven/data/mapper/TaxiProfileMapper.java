@@ -14,7 +14,7 @@ public class TaxiProfileMapper {
 
     public TaxiProfileDto entityToDto(TaxiProfile taxiProfile){
         return TaxiProfileDto.builder()
-//                .id(taxiProfile.getId())
+                .id(taxiProfile.getId())
                 .name(taxiProfile.getName())
                 .km_fare(taxiProfile.getKm_fare())
                 .basic_fare(taxiProfile.getBasic_fare())

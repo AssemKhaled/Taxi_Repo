@@ -10,6 +10,7 @@ public class CustomMapData {
 
 	private Long id;
 	private String deviceName;
+	private String sequenceNumber;
 	private String lastUpdate;
 	private String lastUpdateApp;
 	private String positionId;
@@ -32,7 +33,7 @@ public class CustomMapData {
 
 	private Double speed ;
 
-	public CustomMapData(Long id, String deviceName, String lastUpdate, String lastUpdateApp, String positionId, Integer status, Integer vehicleStatus, Integer valid, Integer ignition, Double power, Double operator, Double latitude, Double longitude, Double speed, String address, Double temperature, Double humidity, String icon) {
+	public CustomMapData(Long id, String deviceName, String lastUpdate, String lastUpdateApp, String positionId, Integer status, Integer vehicleStatus, Integer valid, Integer ignition, Double power, Double operator, Double latitude, Double longitude, Double speed, String address, Double temperature, Double humidity, String icon, String sequenceNumber) {
 		this.id = id;
 		this.deviceName = deviceName;
 		this.lastUpdate = lastUpdate;
@@ -51,6 +52,7 @@ public class CustomMapData {
 		this.temperature = temperature;
 		this.humidity = humidity;
 		this.icon = icon;
+		this.sequenceNumber = sequenceNumber;
 	}
 
 	private String address;
@@ -272,6 +274,14 @@ public class CustomMapData {
 		this.humidity = humidity;
 	}
 
+
+	public String getSequenceNumber() {
+		return sequenceNumber;
+	}
+
+	public void setSequenceNumber(String sequenceNumber) {
+		this.sequenceNumber = sequenceNumber;
+	}
 
 
 }
