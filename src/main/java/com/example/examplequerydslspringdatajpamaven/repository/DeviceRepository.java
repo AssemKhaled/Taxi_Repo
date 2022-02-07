@@ -106,15 +106,16 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>{
 			+ " AND tc_devices.id IN (:deviceIds) and tc_devices.delete_date is null and tc_devices.positionid is not null AND (TIMESTAMPDIFF(day ,CURDATE(),tc_devices.end_date) >=0) ", nativeQuery = true)
 	List<String> getNumberOfOnlineDevicesListByIds(@Param("deviceIds")List<Long> deviceIds);
 	
-	
+	// AND (TIMESTAMPDIFF(day ,CURDATE(),tc_devices.end_date) >=0)
 	@Query(value = "SELECT tc_devices.positionid FROM tc_devices INNER JOIN tc_user_device ON tc_user_device.deviceid=tc_devices.id "
 			+ "where tc_devices.lastupdate>date_sub(now(), interval 3 minute)=false  AND tc_devices.lastupdate<date_sub(now(), interval 8 minute)=false "
-			+ " AND tc_user_device.userid IN (:userIds) and tc_devices.delete_date is null and tc_devices.positionid is not null AND (TIMESTAMPDIFF(day ,CURDATE(),tc_devices.end_date) >=0) ", nativeQuery = true)
+			+ " AND tc_user_device.userid IN (:userIds) and tc_devices.delete_date is null and tc_devices.positionid is not null", nativeQuery = true)
 	List<String> getNumberOfOutOfNetworkDevicesList(@Param("userIds")List<Long> userIds);
-	
+
+	// AND (TIMESTAMPDIFF(day ,CURDATE(),tc_devices.end_date) >=0)
 	@Query(value = "SELECT tc_devices.positionid FROM tc_devices INNER JOIN tc_user_device ON tc_user_device.deviceid=tc_devices.id "
 			+ "where tc_devices.lastupdate>date_sub(now(), interval 8 minute)=false "
-			+ " AND tc_user_device.userid IN (:userIds) and tc_devices.delete_date is null and tc_devices.positionid is not null AND (TIMESTAMPDIFF(day ,CURDATE(),tc_devices.end_date) >=0)", nativeQuery = true)
+			+ " AND tc_user_device.userid IN (:userIds) and tc_devices.delete_date is null and tc_devices.positionid is not null", nativeQuery = true)
 	List<String> getNumberOfOfflineDevicesList(@Param("userIds")List<Long> userIds);
 	
 	@Query(value = "SELECT tc_devices.positionid FROM tc_devices "
