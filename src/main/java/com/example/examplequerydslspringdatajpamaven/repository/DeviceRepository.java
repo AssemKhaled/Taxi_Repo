@@ -187,7 +187,7 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>{
      		+ " LEFT JOIN  tc_geofences ON tc_geofences.id=tc_device_geofence.geofenceid and tc_geofences.delete_date"
      		+ " is null INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id "
      		+ " LEFT JOIN tc_users ON tc_user_device.userid = tc_users.id" 
-     		+ " where tc_user_device.userid IN(:userIds) and (TIMESTAMPDIFF(day ,CURDATE(),tc_devices.end_date) >=0)"
+     		+ " where tc_user_device.userid IN(:userIds) and tc_devices.delete_date is null and (TIMESTAMPDIFF(day ,CURDATE(),tc_devices.end_date) >=0)"
      		+ " AND ( tc_devices.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.uniqueid LIKE LOWER(CONCAT('%',:search, '%')) "
      		+ " OR tc_devices.reference_key LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.sequence_number LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))"
      		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_users.name LIKE LOWER(CONCAT('%',:search, '%')) ) "
@@ -202,7 +202,7 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>{
      		+ " LEFT JOIN  tc_geofences ON tc_geofences.id=tc_device_geofence.geofenceid and tc_geofences.delete_date"
      		+ " is null INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id "
      		+ " LEFT JOIN tc_users ON tc_user_device.userid = tc_users.id" 
-     		+ " where tc_user_device.userid IN(:userIds) "
+     		+ " where tc_user_device.userid IN(:userIds) and tc_devices.delete_date is null"
      		+ " AND ( tc_devices.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.uniqueid LIKE LOWER(CONCAT('%',:search, '%')) "
      		+ " OR tc_devices.reference_key LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.sequence_number LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))"
      		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_users.name LIKE LOWER(CONCAT('%',:search, '%')) ) "
@@ -287,5 +287,7 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>{
 	
 	@Query(value = "select tc_devices.id from tc_devices", nativeQuery = true)
 	List<Long> getAllDeviceIds();
+
+	List<Device> findByTaxiprofileId(Integer taxiProfileId);
 }
 
