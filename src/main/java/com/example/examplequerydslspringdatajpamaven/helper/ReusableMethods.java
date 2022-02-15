@@ -46,9 +46,9 @@ public class ReusableMethods extends RestServiceController{
         return usersIds;
     }
 
-    public boolean checkDuplicationOfTaxiProfileName(List<TaxiProfile> taxiProfiles, String TaxiProfileName){
+    public boolean checkDuplicationOfTaxiProfileName(List<TaxiProfile> taxiProfiles, String TaxiProfileName, Long taxiProfileId){
         for (TaxiProfile taxiProfile: taxiProfiles){
-            if(TaxiProfileName.equals(taxiProfile.getName()))
+            if(TaxiProfileName.equals(taxiProfile.getName()) && taxiProfileId != taxiProfile.getId() && taxiProfile.getDeleteDate() == null)
                 return true;
         }
         return false;
