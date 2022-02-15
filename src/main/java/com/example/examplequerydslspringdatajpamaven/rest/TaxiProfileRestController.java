@@ -1,5 +1,6 @@
 package com.example.examplequerydslspringdatajpamaven.rest;
 import com.example.examplequerydslspringdatajpamaven.data.dtos.TaxiProfileDto;
+import com.example.examplequerydslspringdatajpamaven.service.TaxiProfileService;
 import com.example.examplequerydslspringdatajpamaven.service.TaxiProfileServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 public class TaxiProfileRestController {
 
 
-    private final TaxiProfileServiceImpl taxiProfileServiceImpl;
+    private final TaxiProfileService taxiProfileServiceImpl;
 
     public TaxiProfileRestController(TaxiProfileServiceImpl taxiProfileServiceImpl) {
         this.taxiProfileServiceImpl = taxiProfileServiceImpl;
@@ -26,7 +27,7 @@ public class TaxiProfileRestController {
         return taxiProfileServiceImpl.getAllTaxiProfile(TOKEN, loggedId, name, pageSize, pageNumber);
     }
     @PostMapping(value = "/createTaxiProfile")
-    public @ResponseBody ResponseEntity<?> getTaxiProfile(@RequestHeader(value = "TOKEN", defaultValue = "") String TOKEN,
+    public @ResponseBody ResponseEntity<?> createTaxiProfile(@RequestHeader(value = "TOKEN", defaultValue = "") String TOKEN,
                                                           @RequestParam(value = "loggedId", defaultValue = "0") Long loggedId,
                                                           @RequestBody(required = false) TaxiProfileDto taxiProfileDto
                                                           ){
@@ -45,9 +46,9 @@ public class TaxiProfileRestController {
     @PostMapping(value = "/deleteTaxiProfile")
     public @ResponseBody ResponseEntity<?> deleteTaxiProfile(@RequestHeader(value = "TOKEN", defaultValue = "") String TOKEN,
                                                              @RequestParam(value = "loggedId", defaultValue = "0") Long loggedId,
-                                                             @RequestParam(value = "userId") Long userId) {
+                                                             @RequestParam(value = "taxiProfileId") Long taxiProfileId) {
 
-        return taxiProfileServiceImpl.deleteTaxiProfile(TOKEN, loggedId, userId);
+        return taxiProfileServiceImpl.deleteTaxiProfile(TOKEN, loggedId, taxiProfileId);
     }
 
     @RequestMapping(value = "/getChildrenTaxiProfiles", method = RequestMethod.GET)
@@ -57,6 +58,21 @@ public class TaxiProfileRestController {
                                                                    @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
                                                                    @RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber){
         return taxiProfileServiceImpl.GetUserChildren(TOKEN, loggedId, userId, pageSize, pageNumber);
+    }
+
+    @RequestMapping(value = "/getTaxiProfileById", method = RequestMethod.GET)
+    public @ResponseBody ResponseEntity<?> getTaxiProfileById(@RequestHeader(value = "TOKEN", defaultValue = "") String TOKEN,
+                                                                  @RequestParam(value = "userId", defaultValue = "0") Long userId,
+                                                              @RequestParam(value = "taxiProfileId") Long taxiProfileId){
+        return taxiProfileServiceImpl.getTaxiProfileById(TOKEN, userId, taxiProfileId);
+    }
+
+    @GetMapping(path = "/assignTaxiProfileToDevice")
+    public ResponseEntity<?> assignTaxiProfileToDevice(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+                                                  @RequestParam (value = "taxiProfileId", defaultValue = "0") Long taxiProfileId,
+                                                  @RequestParam(value = "deviceId" ,defaultValue = "0") Long deviceId,
+                                                  @RequestParam(value = "userId" , defaultValue = "0")Long userId ) {
+        return taxiProfileServiceImpl.assignTaxiProfileToDevice(TOKEN, userId, taxiProfileId, deviceId);
     }
 }
 
