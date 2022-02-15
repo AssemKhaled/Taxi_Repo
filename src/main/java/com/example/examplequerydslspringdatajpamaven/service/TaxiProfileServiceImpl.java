@@ -2,9 +2,11 @@ package com.example.examplequerydslspringdatajpamaven.service;
 
 import com.example.examplequerydslspringdatajpamaven.data.dtos.TaxiProfileDto;
 import com.example.examplequerydslspringdatajpamaven.data.mapper.TaxiProfileMapper;
+import com.example.examplequerydslspringdatajpamaven.entity.Device;
 import com.example.examplequerydslspringdatajpamaven.entity.TaxiProfile;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.helper.ReusableMethods;
+import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.TaxiProfileRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
@@ -27,14 +29,20 @@ public class TaxiProfileServiceImpl extends RestServiceController implements Tax
     private final UserRepository userRepository;
     private final TaxiProfileRepository taxiProfileRepository;
     private final ReusableMethods reusableMethods ;
-    private final TaxiProfileMapper taxiProfileMapper ;
+    private final TaxiProfileMapper taxiProfileMapper;
+    private final UserServiceImpl userService;
+    private final UserRoleService userRoleService;
+    private final DeviceRepository deviceRepository;
 
     GetObjectResponse getObjectResponse;
     private static final Log logger = LogFactory.getLog(UserServiceImpl.class);
 
-    public TaxiProfileServiceImpl(UserRepository userRepository, TaxiProfileRepository taxiProfileRepository) {
+    public TaxiProfileServiceImpl(UserRepository userRepository, TaxiProfileRepository taxiProfileRepository, UserServiceImpl userService, UserRoleService userRoleService, DeviceRepository deviceRepository) {
         this.userRepository = userRepository;
         this.taxiProfileRepository = taxiProfileRepository;
+        this.userService = userService;
+        this.userRoleService = userRoleService;
+        this.deviceRepository = deviceRepository;
         this.taxiProfileMapper = new TaxiProfileMapper();
         this.reusableMethods = new ReusableMethods(userRepository);
     }
@@ -63,14 +71,14 @@ public class TaxiProfileServiceImpl extends RestServiceController implements Tax
                 taxiProfileRepository.findAllByCompanyIdIn(reusableMethods.GetUserChildrenId(loggerId));
 
         if(creater.getAccountType() == 1 || creater.getAccountType() == 2){
-            if(reusableMethods.checkDuplicationOfTaxiProfileName(taxiProfiles, taxiProfile.getName())){
+            if(reusableMethods.checkDuplicationOfTaxiProfileName(taxiProfiles, taxiProfile.getName(), taxiProfile.getId())){
                 getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value()
                         ,"Name Of Taxi Profile Already exist", Collections.singletonList(taxiProfile));
                 return ResponseEntity.ok().body(getObjectResponse);
             }
             taxiProfile.setCompanyId(creater.getId());
         }else if(creater.getAccountType() == 3){
-            if(reusableMethods.checkDuplicationOfTaxiProfileName(taxiProfiles, taxiProfile.getName())){
+            if(reusableMethods.checkDuplicationOfTaxiProfileName(taxiProfiles, taxiProfile.getName(), taxiProfile.getId())){
                 getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value()
                         ,"Name Of Taxi Profile Already exist", Collections.singletonList(taxiProfile));
                 return ResponseEntity.ok().body(getObjectResponse);
@@ -92,7 +100,7 @@ public class TaxiProfileServiceImpl extends RestServiceController implements Tax
 
             taxiProfiles =
                     taxiProfileRepository.findAllByCompanyIdIn(reusableMethods.GetUserChildrenId(parentClient.getId()));
-            if(reusableMethods.checkDuplicationOfTaxiProfileName(taxiProfiles, taxiProfile.getName())){
+            if(reusableMethods.checkDuplicationOfTaxiProfileName(taxiProfiles, taxiProfile.getName(), taxiProfile.getId())){
                 getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value()
                         ,"Name Of Taxi Profile Already exist", Collections.singletonList(taxiProfile));
                 return ResponseEntity.ok().body(getObjectResponse);
@@ -133,7 +141,9 @@ public class TaxiProfileServiceImpl extends RestServiceController implements Tax
             List<TaxiProfile> allTaxiProfile = taxiProfileRepository.findAll(pageable).getContent();
             List<TaxiProfileDto> allTaxiProfileDto = new ArrayList<>();
             for(TaxiProfile taxiProfile: allTaxiProfile){
-                allTaxiProfileDto.add(taxiProfileMapper.entityToDto(taxiProfile));
+                if(taxiProfile.getDeleteDate() == null){
+                    allTaxiProfileDto.add(taxiProfileMapper.entityToDto(taxiProfile));
+                }
             }
             getObjectResponse= new GetObjectResponse(HttpStatus.OK.value()
                     , "Success"
@@ -144,7 +154,9 @@ public class TaxiProfileServiceImpl extends RestServiceController implements Tax
             List<TaxiProfile> TaxiProfileByName = taxiProfileRepository.findAllByName(name, pageable);
             List<TaxiProfileDto> taxiProfileDto = new ArrayList<>();
             for(TaxiProfile taxiProfile: TaxiProfileByName){
-                taxiProfileDto.add(taxiProfileMapper.entityToDto(taxiProfile));
+                if(taxiProfile.getDeleteDate() == null){
+                    taxiProfileDto.add(taxiProfileMapper.entityToDto(taxiProfile));
+                }
             }
             getObjectResponse= new GetObjectResponse(HttpStatus.OK.value()
                     , "Success"
@@ -217,7 +229,7 @@ public class TaxiProfileServiceImpl extends RestServiceController implements Tax
         List<TaxiProfile> taxiProfiles =
                 taxiProfileRepository.findAllByCompanyIdIn(reusableMethods.GetUserChildrenId(loggerId));
 
-        if(reusableMethods.checkDuplicationOfTaxiProfileName(taxiProfiles, taxiProfile.getName())){
+        if(reusableMethods.checkDuplicationOfTaxiProfileName(taxiProfiles, taxiProfile.getName(), taxiProfile.getId())){
             getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value()
                     ,"Name Of Taxi Profile Already exist", Collections.singletonList(taxiProfile));
             return ResponseEntity.ok().body(getObjectResponse);
@@ -231,14 +243,47 @@ public class TaxiProfileServiceImpl extends RestServiceController implements Tax
     }
 
     @Override
-    public ResponseEntity<?> deleteTaxiProfile(String TOKEN, Long loggerId, Long userId){
-        TaxiProfile taxiProfile = taxiProfileRepository.findOne(userId);
+    public ResponseEntity<?> deleteTaxiProfile(String TOKEN, Long loggerId, Long taxiProfileId){
+        logger.info("************************ DeleteTaxiProfile ENDED STARTED ***************************");
+        if(TOKEN.equals("")) {
+
+            getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
+            return  ResponseEntity.badRequest().body(getObjectResponse);
+        }
+
+        if(super.checkActive(TOKEN)!= null)
+        {
+            return super.checkActive(TOKEN);
+        }
+        User loggedUser = userService.findById(loggerId);
+        if(loggedUser == null) {
+            getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged user is not found",null);
+            logger.info("************************ DeleteTaxiProfile ENDED ***************************");
+            return ResponseEntity.status(404).body(getObjectResponse);
+        }
+        if(!loggedUser.getAccountType().equals(1)) {
+            if(!userRoleService.checkUserHasPermission(loggerId, "DEVICE", "delete")) {
+                getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user doesnot has permission to delete device",null);
+                logger.info("************************ deleteDevice ENDED ***************************");
+                return  ResponseEntity.badRequest().body(getObjectResponse);
+            }
+        }
+
+        TaxiProfile taxiProfile = taxiProfileRepository.findOne(taxiProfileId);
         if (taxiProfile == null){
             getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value()
                     ,"Taxi Profile Not Found"
                     ,null);
             return ResponseEntity.badRequest().body(getObjectResponse);
         }
+
+        List<Device> deviceLinkedToThisTaxiProfile = deviceRepository.findByTaxiprofileId(taxiProfileId.intValue());
+
+        deviceLinkedToThisTaxiProfile.forEach(device -> {
+            device.setTaxiprofileId(null);
+        });
+
+        deviceRepository.save(deviceLinkedToThisTaxiProfile);
 
         Date date = new Date();
         taxiProfile.setDeleteDate(date);
@@ -252,6 +297,118 @@ public class TaxiProfileServiceImpl extends RestServiceController implements Tax
 
     }
 
+    @Override
+    public ResponseEntity<?> getTaxiProfileById(String TOKEN, Long userId, Long taxiProfileId){
+        logger.info("************************ GetTaxiProfileById STARTED ***************************");
+        if(TOKEN.equals("")) {
+
+            getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
+            return  ResponseEntity.badRequest().body(getObjectResponse);
+        }
+
+        if(super.checkActive(TOKEN)!= null)
+        {
+            return super.checkActive(TOKEN);
+        }
+        if(taxiProfileId == 0 || userId == 0) {
+            getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "taxiProfileId  and logged user Id are  Required",null);
+            logger.info("************************ GetTaxiProfileById ENDED ***************************");
+            return ResponseEntity.badRequest().body(getObjectResponse);
+        }
+        User loggedUser = userService.findById(userId);
+        if(loggedUser == null) {
+            getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This logged user is not found",null);
+            logger.info("************************ GetTaxiProfileById ENDED ***************************");
+            return ResponseEntity.status(404).body(getObjectResponse);
+        }
+
+        TaxiProfile taxiProfile = taxiProfileRepository.findOne(taxiProfileId);
+        if (taxiProfile == null) {
+
+            getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This taxiProfile is not found",null);
+            logger.info("************************ GetTaxiProfileById ENDED ***************************");
+            return ResponseEntity.ok().body(getObjectResponse);
+        }
+        else
+        {
+            if(taxiProfile.getDeleteDate() != null) {
+                List<Device> devices = null;
+                getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This taxiProfile is not found",devices);
+                logger.info("************************ GetTaxiProfileById ENDED ***************************");
+                return ResponseEntity.ok().body(getObjectResponse);
+            }
+            if(!Objects.equals(taxiProfile.getCompanyId(), userId) && (!loggedUser.getAccountType().equals(1) && !loggedUser.getAccountType().equals(2))){
+                List<Device> devices = null;
+                getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "You are not allowed to edit this taxi profile",devices);
+                logger.info("************************ GetTaxiProfileById ENDED ***************************");
+                return ResponseEntity.ok().body(getObjectResponse);
+            }
+            List<TaxiProfile> taxiProfiles = new ArrayList<>();
+
+            taxiProfiles.add(taxiProfile);
+            getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",taxiProfiles);
+            logger.info("************************ GetTaxiProfileById ENDED ***************************");
+            return ResponseEntity.ok().body(getObjectResponse);
+        }
+
+    }
+
+    @Override
+    public ResponseEntity<?> assignTaxiProfileToDevice(String TOKEN, Long userId, Long taxiProfileId, Long deviceId){
+        logger.info("************************ assignDeviceToTaxiProfile STARTED ***************************");
+        if(TOKEN.equals("")) {
+
+            getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
+            return  ResponseEntity.badRequest().body(getObjectResponse);
+        }
+
+        if(super.checkActive(TOKEN)!= null)
+        {
+            return super.checkActive(TOKEN);
+        }
+        if(userId == 0) {
+            getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Logged User ID is Required",null);
+            logger.info("************************ assignDeviceToTaxiProfile ENDED ***************************");
+            return ResponseEntity.badRequest().body(getObjectResponse);
+        }
+        User loggedUser = userService.findById(userId);
+        if(loggedUser == null) {
+            getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This loggedUser is not found",null);
+            logger.info("************************ assignDeviceToTaxiProfile ENDED ***************************");
+            return ResponseEntity.status(404).body(getObjectResponse);
+        }
+        if(deviceId == 0 ) {
+
+            getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",null);
+            logger.info("************************ assignDeviceToTaxiProfile ENDED ***************************");
+            return ResponseEntity.badRequest().body(getObjectResponse);
+        }
+
+        Device device = deviceRepository.findOne(deviceId);
+        if(device == null || device.getDelete_date() != null){
+            getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found or it was deleted",null);
+            logger.info("************************ assignDeviceToTaxiProfile ENDED ***************************");
+            return ResponseEntity.status(404).body(getObjectResponse);
+        }
+
+        TaxiProfile taxiProfile = taxiProfileRepository.findOne(taxiProfileId);
+        if(taxiProfile == null || taxiProfile.getDeleteDate() != null){
+            getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This taxiProfile is not found or it was deleted",null);
+            logger.info("************************ assignDeviceToTaxiProfile ENDED ***************************");
+            return ResponseEntity.status(404).body(getObjectResponse);
+        }
+
+        if(device.getTaxiprofileId() == null || device.getTaxiprofileId() != taxiProfile.getId().intValue()){
+            device.setTaxiprofileId(taxiProfile.getId().intValue());
+        }
+
+        deviceRepository.save(device);
+
+        List<Device> devices = null;
+        getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
+        logger.info("************************ assignDeviceToTaxiProfile ENDED ***************************");
+        return ResponseEntity.ok().body(getObjectResponse);
+    }
 }
 
 //    ----------------------------------Commented functions----------------------------------------------
