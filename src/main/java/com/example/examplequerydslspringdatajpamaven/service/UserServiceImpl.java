@@ -362,6 +362,7 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 		String nowTime = isoFormat.format(now);
 		
 		user.setCreate_date(nowTime);
+		user.setRoleId(2L);
 		
 		if(TOKEN.equals("")) {
 			 List<User> users = null;
@@ -403,7 +404,7 @@ public class UserServiceImpl extends RestServiceController implements IUserServi
 		}
 		
 		if(user.getExp_date() != null) {
-			if(creater.getAccountType() != 2) {
+			if(creater.getAccountType() != 2 && creater.getAccountType() != 1) {
 				getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Vendor only can set Expiration Date",null);
 		    	logger.info("************************createUser ENDED ***************************");
 		    	return ResponseEntity.ok().body(getObjectResponse);
