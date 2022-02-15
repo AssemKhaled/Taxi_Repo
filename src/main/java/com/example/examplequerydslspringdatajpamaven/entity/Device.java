@@ -356,7 +356,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 	     		+ " LEFT JOIN  tc_geofences ON tc_geofences.id=tc_device_geofence.geofenceid and tc_geofences.delete_date"
 	     		+ " is null INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id "
 	     		+ " LEFT JOIN tc_users ON tc_user_device.userid = tc_users.id" 
-	     		+ " where tc_user_device.userid IN(:userIds) and ((TIMESTAMPDIFF(day ,CURDATE(),tc_devices.end_date))>=0)"
+	     		+ " where tc_user_device.userid IN(:userIds) and tc_devices.delete_date is null and ((TIMESTAMPDIFF(day ,CURDATE(),tc_devices.end_date))>=0)"
 	     		+ " AND ( tc_devices.simcardNumber LIKE LOWER(CONCAT('%',:search, '%')) OR  tc_devices.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.uniqueid LIKE LOWER(CONCAT('%',:search, '%')) "
 	     		+ " OR tc_devices.reference_key LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.sequence_number LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))"
 	     		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_users.name LIKE LOWER(CONCAT('%',:search, '%')) ) "
@@ -375,7 +375,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
     		+ " LEFT JOIN  tc_geofences ON tc_geofences.id=tc_device_geofence.geofenceid and tc_geofences.delete_date"
     		+ " is null INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id "
     		+ " LEFT JOIN tc_users ON tc_user_device.userid = tc_users.id" 
-    		+ " where tc_user_device.userid IN(:userIds)"
+    		+ " where tc_user_device.userid IN(:userIds) and tc_devices.delete_date is null"
     		+ " AND ( tc_devices.simcardNumber LIKE LOWER(CONCAT('%',:search, '%')) OR  tc_devices.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.uniqueid LIKE LOWER(CONCAT('%',:search, '%')) "
     		+ " OR tc_devices.reference_key LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.sequence_number LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))"
     		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_users.name LIKE LOWER(CONCAT('%',:search, '%')) ) "
@@ -395,7 +395,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
     		+ " LEFT JOIN  tc_geofences ON tc_geofences.id=tc_device_geofence.geofenceid and tc_geofences.delete_date"
     		+ " is null INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id "
     		+ " LEFT JOIN tc_users ON tc_user_device.userid = tc_users.id" 
-    		+ " where tc_user_device.userid IN(:userIds) "
+    		+ " where tc_user_device.userid IN(:userIds) and tc_devices.delete_date is null"
     		+ " AND ( tc_devices.simcardNumber LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.uniqueid LIKE LOWER(CONCAT('%',:search, '%')) "
     		+ " OR tc_devices.reference_key LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.sequence_number LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))"
     		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_users.name LIKE LOWER(CONCAT('%',:search, '%')) ) "
@@ -414,7 +414,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
     		+ " LEFT JOIN  tc_geofences ON tc_geofences.id=tc_device_geofence.geofenceid and tc_geofences.delete_date"
     		+ " is null INNER JOIN tc_user_device ON tc_user_device.deviceid = tc_devices.id "
     		+ " LEFT JOIN tc_users ON tc_user_device.userid = tc_users.id" 
-    		+ " where tc_user_device.userid IN(:userIds) "
+    		+ " where tc_user_device.userid IN(:userIds) and tc_devices.delete_date is null"
     		+ " AND ( tc_devices.simcardNumber LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.uniqueid LIKE LOWER(CONCAT('%',:search, '%')) "
     		+ " OR tc_devices.reference_key LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.sequence_number LIKE LOWER(CONCAT('%',:search, '%')) OR tc_devices.lastupdate LIKE LOWER(CONCAT('%',:search, '%'))"
     		+ " OR tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_geofences.name LIKE LOWER(CONCAT('%',:search, '%')) OR tc_users.name LIKE LOWER(CONCAT('%',:search, '%')) ) "
@@ -561,7 +561,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 			" , tc_devices.lastTemp as temperature , tc_devices.lastHum as humidity "
 			+ " FROM tc_devices " + 
 			" INNER JOIN  tc_user_device ON tc_devices.id=tc_user_device.deviceid " + 
-			" where tc_user_device.userid IN(:userIds) and tc_devices.delete_date is null and tc_devices.positionid is null " + 
+			" where tc_user_device.userid IN(:userIds) and tc_devices.delete_date is null and tc_devices.positionid is null " +
 			" GROUP BY tc_devices.id"),
 	
 	@NamedNativeQuery(name="getDevicesDataMapByIdsNoPosition", 
