@@ -192,7 +192,7 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					 usersIds.add(object.getId());
 				 }
 			 }
-		 
+
 			 if(loggedUser.getAccountType().equals(3)) {
 				 if(exportData.equals("exportData")) {
 			    	 devices= deviceRepository.getDevicesListExport(usersIds,search);
@@ -318,12 +318,14 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				|| device.getPlate_num() == null|| device.getPlate_num().equals("")
 				|| device.getLeft_letter() == null || device.getLeft_letter().equals("")
                 || device.getMiddle_letter() == null|| device.getMiddle_letter().equals("")
-                || device.getRight_letter() == null|| device.getRight_letter().equals("")) {
-			
+                || device.getRight_letter() == null|| device.getRight_letter().equals("")
+				|| device.getColor() == null|| device.getColor().equals("")
+				|| device.getNumberOfSeats() == null || device.getNumberOfSeats() == 0) {
+
 			List<Device> devices = null;
 			
 			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "Attributes[name, trackerImei , sequence"
-					+ "Number , plate num , leftLetter , middleLetter,RightLetter ] are required",devices);
+					+ "Number , plate num , leftLetter , middleLetter,RightLetter, color, number of seats ] are required",devices);
 			logger.info("************************ createDevice ENDED ***************************");
 			return ResponseEntity.badRequest().body(getObjectResponse);
 					
@@ -459,11 +461,13 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 			|| device.getPlate_num() == null || device.getPlate_num().equals("")
 			|| device.getLeft_letter() == null || device.getLeft_letter().equals("")
 			|| device.getRight_letter() == null || device.getRight_letter().equals("")
-			|| device.getMiddle_letter() == null || device.getMiddle_letter().equals("")	) {
+			|| device.getMiddle_letter() == null || device.getMiddle_letter().equals("")
+			|| device.getColor() == null|| device.getColor().equals("")
+			|| device.getNumberOfSeats() == null || device.getNumberOfSeats() == 0) {
 			
 			
 			getObjectResponse = new GetObjectResponse( HttpStatus.BAD_REQUEST.value(), "Atrributes[id ,name, trackerImei , sequence" +
-					"					Number , plate num , leftLetter , middleLetter,RightLetter ] are required",null);
+					"					Number , plate num , leftLetter , middleLetter,RightLetter, color, number of seats ] are required",null);
 			logger.info("************************ editDevice ENDED ***************************");
 			return ResponseEntity.badRequest().body(getObjectResponse);
 					
