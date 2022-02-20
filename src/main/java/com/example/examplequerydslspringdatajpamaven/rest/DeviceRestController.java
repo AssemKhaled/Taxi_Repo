@@ -109,6 +109,12 @@ public class DeviceRestController {
 			                                               @RequestParam (value = "deviceId",defaultValue = "0") Long deviceId) {
 		return deviceService.getDeviceDriver(TOKEN,deviceId);
 	}
+
+	@GetMapping(value = "getDeviceTaxiProfile")
+	public @ResponseBody ResponseEntity<?> getDeviceTaxiProfile(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+																@RequestParam (value = "deviceId",defaultValue = "0") Long deviceId){
+		return null;
+	}
 	
 	@GetMapping(value = "/getDeviceGeofences")
 	public @ResponseBody ResponseEntity<?> getDeviceGeofences(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,

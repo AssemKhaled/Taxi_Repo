@@ -3,6 +3,10 @@ package com.example.examplequerydslspringdatajpamaven.service;
 import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+
+import com.example.examplequerydslspringdatajpamaven.entity.*;
+import com.example.examplequerydslspringdatajpamaven.repository.*;
+import com.example.examplequerydslspringdatajpamaven.responses.TaxiProfileListSelect;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -40,25 +44,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceList;
-import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceLiveData;
-import com.example.examplequerydslspringdatajpamaven.entity.CustomMapData;
-import com.example.examplequerydslspringdatajpamaven.entity.Device;
-import com.example.examplequerydslspringdatajpamaven.entity.DeviceSelect;
-import com.example.examplequerydslspringdatajpamaven.entity.Driver;
-import com.example.examplequerydslspringdatajpamaven.entity.Geofence;
-import com.example.examplequerydslspringdatajpamaven.entity.Group;
-import com.example.examplequerydslspringdatajpamaven.entity.MongoPositions;
-import com.example.examplequerydslspringdatajpamaven.entity.Notification;
-import com.example.examplequerydslspringdatajpamaven.entity.User;
-import com.example.examplequerydslspringdatajpamaven.entity.userClientDevice;
 import com.example.examplequerydslspringdatajpamaven.photo.DecodePhoto;
-import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.GroupRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionRepo;
-import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionsRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.UserClientDeviceRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.UserClientDriverRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -112,6 +98,9 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 	
 	@Autowired
 	private MongoPositionsRepository mongoPositionsRepository;
+
+	@Autowired
+	private TaxiProfileRepository taxiProfileRepository;
 	
 	@Value("${sendCommand}")
 	private String sendCommand;
@@ -1425,9 +1414,9 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		{
 			return super.checkActive(TOKEN);
 		}
-		
 
-		
+
+
 		if(loggedUserId != 0) {
 	    	User loggedUser = userService.findById(loggedUserId);
 	    	
@@ -1577,6 +1566,57 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 		}
 		
 		
+	}
+
+	public ResponseEntity<?> getDeviceTaxiProfile(String TOKEN,Long deviceId){
+		logger.info("************************ getDeviceTaxiProfile STARTED ***************************");
+		if(TOKEN.equals("")) {
+			List<Device> devices = null;
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+
+		if(super.checkActive(TOKEN)!= null)
+		{
+			return super.checkActive(TOKEN);
+		}
+
+		if(deviceId == 0) {
+			List<Device> devices = null;
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Device ID is Required",null);
+			logger.info("************************ getDeviceTaxiProfile ENDED ***************************");
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		else {
+			Device device = findById(deviceId);
+			if(device == null) {
+
+				List<Device> devices = null;
+				getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This device is not found",null);
+				logger.info("************************ getDeviceTaxiProfile ENDED ***************************");
+				return ResponseEntity.status(404).body(getObjectResponse);
+			} else {
+				TaxiProfile vehicleTaxiProfile = taxiProfileRepository.findOne(device.getTaxiprofileId().longValue());
+
+				if(vehicleTaxiProfile == null || vehicleTaxiProfile.getDeleteDate() != null){
+					getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "This taxi profile doesn't exist or deleted",null);
+					logger.info("************************ getDeviceTaxiProfile ENDED ***************************");
+					return ResponseEntity.status(404).body(getObjectResponse);
+				} else {
+					List<TaxiProfileListSelect> taxiProfileListSelect = new ArrayList<>();
+					TaxiProfileListSelect taxiProfile = TaxiProfileListSelect.builder()
+							.id(vehicleTaxiProfile.getId())
+							.name(vehicleTaxiProfile.getName())
+							.build();
+					taxiProfileListSelect.add(taxiProfile);
+
+					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",taxiProfileListSelect);
+					logger.info("************************ getDeviceTaxiProfile ENDED ***************************");
+					return ResponseEntity.ok().body(getObjectResponse);
+				}
+			}
+		}
+
 	}
 	
 	/**

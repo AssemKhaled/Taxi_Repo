@@ -39,7 +39,9 @@ public interface DeviceService {
 	public ResponseEntity<?> assignDeviceToGeofences(String TOKEN,Long deviceId,Long [] geoIds,Long userId );
 
 	public ResponseEntity<?> getDeviceDriver(String TOKEN,Long deviceId);
-		
+
+	public ResponseEntity<?> getDeviceTaxiProfile(String TOKEN,Long deviceId);
+
 	public ResponseEntity<?> getDeviceGeofences(String TOKEN,Long deviceId);
 	
 	public ResponseEntity<?> getDeviceStatus(String TOKEN,Long userId);
