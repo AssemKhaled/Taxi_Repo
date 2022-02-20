@@ -1,16 +1,11 @@
 package com.example.examplequerydslspringdatajpamaven.rest;
-import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
+import com.example.examplequerydslspringdatajpamaven.service.DashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import com.example.examplequerydslspringdatajpamaven.service.DeviceServiceImpl;
 import com.example.examplequerydslspringdatajpamaven.service.ReportServiceImpl;
-import com.example.examplequerydslspringdatajpamaven.service.UserServiceImpl;
-
-import java.util.List;
 
 /**
  * Services of Dashboard component
@@ -31,8 +26,14 @@ public class DashBoardRestController {
 
 	@Autowired
 	private UserRepository userRepository;
-	
- 
+
+	private final DashboardService dashboardService;
+
+	public DashBoardRestController(DashboardService dashboardService) {
+		this.dashboardService = dashboardService;
+	}
+
+
 	@GetMapping(path ="/getDevicesStatuesAndAllDrivers")
 	public ResponseEntity<?> devicesStatuesAndAllDrivers(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 			                                             @RequestParam (value = "userId", defaultValue = "0") Long userId){
@@ -79,7 +80,11 @@ public class DashBoardRestController {
 
 
 
-
+	@RequestMapping(value = "/dashboardStatisticsDriverStatus", method = RequestMethod.GET)
+	public ResponseEntity<?> getDashboardStatisticsDriverStatus(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+													@RequestParam(value = "userId",defaultValue = "0")Long userId){
+		return dashboardService.getDashboardStatisticsDriverStatus(TOKEN, userId);
+	}
 
 
 
