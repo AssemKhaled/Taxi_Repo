@@ -10,5 +10,6 @@ public interface TaxiProfileService {
     ResponseEntity<?> GetUserChildren(String TOKEN, Long loggerId, Long UserId, int pageSize, int pageNumber);
     ResponseEntity<?> getTaxiProfileById(String TOKEN, Long UserId, Long taxiProfileId);
     ResponseEntity<?> assignTaxiProfileToDevice(String TOKEN, Long userId, Long taxiProfileId, Long deviceId);
+    ResponseEntity<?> getTaxiProfileListForSelect(String TOKEN, Long userId);
 //    ResponseEntity<?> getTaxiProfileByName(String name);
 }
