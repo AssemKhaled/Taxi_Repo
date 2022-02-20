@@ -2,6 +2,7 @@ package com.example.examplequerydslspringdatajpamaven.rest;
 import com.example.examplequerydslspringdatajpamaven.data.dtos.TaxiProfileDto;
 import com.example.examplequerydslspringdatajpamaven.service.TaxiProfileService;
 import com.example.examplequerydslspringdatajpamaven.service.TaxiProfileServiceImpl;
+import okhttp3.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -73,6 +74,12 @@ public class TaxiProfileRestController {
                                                   @RequestParam(value = "deviceId" ,defaultValue = "0") Long deviceId,
                                                   @RequestParam(value = "userId" , defaultValue = "0")Long userId ) {
         return taxiProfileServiceImpl.assignTaxiProfileToDevice(TOKEN, userId, taxiProfileId, deviceId);
+    }
+
+    @GetMapping(path= "/taxiProfileListSelect")
+    public ResponseEntity<?> getTaxiProfileListForSelect(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+                                                         @RequestParam(value = "userId" , defaultValue = "0")Long userId){
+        return taxiProfileServiceImpl.getTaxiProfileListForSelect(TOKEN, userId);
     }
 }
 

@@ -10,6 +10,7 @@ import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository
 import com.example.examplequerydslspringdatajpamaven.repository.TaxiProfileRepository;
 import com.example.examplequerydslspringdatajpamaven.repository.UserRepository;
 import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
+import com.example.examplequerydslspringdatajpamaven.responses.TaxiProfileListSelect;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -408,6 +409,64 @@ public class TaxiProfileServiceImpl extends RestServiceController implements Tax
         getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",devices);
         logger.info("************************ assignDeviceToTaxiProfile ENDED ***************************");
         return ResponseEntity.ok().body(getObjectResponse);
+    }
+
+    @Override
+    public ResponseEntity<?> getTaxiProfileListForSelect(String TOKEN, Long userId){
+        logger.info("************************ getTaxiProfileListForSelect STARTED ***************************");
+        if(TOKEN.equals("")) {
+
+            getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
+            return  ResponseEntity.badRequest().body(getObjectResponse);
+        }
+
+        if(super.checkActive(TOKEN)!= null)
+        {
+            return super.checkActive(TOKEN);
+        }
+        if(userId == 0) {
+            getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "user Id is  Required",null);
+            logger.info("************************ getTaxiProfileListForSelect ENDED ***************************");
+            return ResponseEntity.badRequest().body(getObjectResponse);
+        }
+
+        User user = userService.findById(userId);
+        if(user == null || user.getDelete_date() != null) {
+            getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged user is deleted or doesn't exist",null);
+            logger.info("************************ getTaxiProfileListForSelect ENDED ***************************");
+            return ResponseEntity.badRequest().body(getObjectResponse);
+        }
+
+        List<Long>usersIds= new ArrayList<>();
+
+        if(user.getAccountType().equals(4)) {
+            usersIds.add(userId);
+        }
+        else {
+            List<User>childernUsers = userService.getAllChildernOfUser(userId);
+            if(childernUsers.isEmpty()) {
+                usersIds.add(userId);
+            }
+            else {
+                usersIds.add(user.getId());
+                for(User object : childernUsers) {
+                    usersIds.add(object.getId());
+                }
+            }
+        }
+
+        List<TaxiProfileListSelect> taxiProfileListSelect = taxiProfileRepository.getTaxiProfileByCompanyIds(usersIds);
+
+        if(taxiProfileListSelect.size() == 0){
+            getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this user and his children doesn't have any taxi profiles",null);
+            logger.info("************************ getTaxiProfileListForSelect ENDED ***************************");
+            return ResponseEntity.badRequest().body(getObjectResponse);
+        }
+        else {
+            getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",taxiProfileListSelect);
+            logger.info("************************ getTaxiProfileListForSelect ENDED ***************************");
+            return ResponseEntity.ok().body(getObjectResponse);
+        }
     }
 }
 
