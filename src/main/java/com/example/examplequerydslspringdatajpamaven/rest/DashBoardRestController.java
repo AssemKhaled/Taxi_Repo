@@ -86,6 +86,27 @@ public class DashBoardRestController {
 		return dashboardService.getDashboardStatisticsDriverStatus(TOKEN, userId);
 	}
 
+	@RequestMapping(value = "/dashboardStatisticsTrips", method = RequestMethod.GET)
+	public ResponseEntity<?> getDashboardStatisticsTrips(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+														 @RequestParam(value = "userId",defaultValue = "0")Long userId){
+		return dashboardService.getDashboardStatisticsTrips(TOKEN, userId);
+	}
 
+	@RequestMapping(value = "/dashboardDriversLiveDataTable", method = RequestMethod.GET)
+	public ResponseEntity<?> getDashboardDriversLiveDataTable(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+															  @RequestParam(value = "userId",defaultValue = "0")Long userId,
+															  @RequestParam (value = "offset",defaultValue = "0")int offset,
+															  @RequestParam (value = "limit",defaultValue = "0")int limit,
+															  @RequestParam(value = "search", defaultValue = "") String search){
+		return dashboardService.getDashboardDriversLiveDataTable(TOKEN, userId, offset, limit, search);
+	}
+
+	@RequestMapping(value = "DashboardActivityList", method = RequestMethod.GET)
+	public ResponseEntity<?> getDashboardActivitiesList(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+														@RequestParam(value = "userId",defaultValue = "0")Long userId,
+														@RequestParam (value = "offset",defaultValue = "0")int offset,
+														@RequestParam (value = "limit",defaultValue = "0")int limit){
+		return dashboardService.getDashboardActivitiesList(TOKEN, userId, offset , limit);
+	}
 
 }

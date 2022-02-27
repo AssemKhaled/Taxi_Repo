@@ -113,7 +113,7 @@ public class DeviceRestController {
 	@GetMapping(value = "getDeviceTaxiProfile")
 	public @ResponseBody ResponseEntity<?> getDeviceTaxiProfile(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
 																@RequestParam (value = "deviceId",defaultValue = "0") Long deviceId){
-		return null;
+		return deviceService.getDeviceTaxiProfile(TOKEN, deviceId);
 	}
 	
 	@GetMapping(value = "/getDeviceGeofences")

@@ -68,7 +68,7 @@ public class TaxiProfileRestController {
         return taxiProfileServiceImpl.getTaxiProfileById(TOKEN, userId, taxiProfileId);
     }
 
-    @GetMapping(path = "/assignTaxiProfileToDevice")
+    @RequestMapping(value = "/assignTaxiProfileToDevice", method = RequestMethod.GET)
     public ResponseEntity<?> assignTaxiProfileToDevice(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
                                                   @RequestParam (value = "taxiProfileId", defaultValue = "0") Long taxiProfileId,
                                                   @RequestParam(value = "deviceId" ,defaultValue = "0") Long deviceId,
