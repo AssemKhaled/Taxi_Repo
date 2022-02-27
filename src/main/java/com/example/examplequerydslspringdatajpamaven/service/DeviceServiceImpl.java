@@ -1596,6 +1596,11 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 				logger.info("************************ getDeviceTaxiProfile ENDED ***************************");
 				return ResponseEntity.status(404).body(getObjectResponse);
 			} else {
+				if(device.getTaxiprofileId() == null){
+					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "This device doesn't have a taxi profile yet",null);
+					logger.info("************************ getDeviceTaxiProfile ENDED ***************************");
+					return ResponseEntity.ok().body(getObjectResponse);
+				}
 				TaxiProfile vehicleTaxiProfile = taxiProfileRepository.findOne(device.getTaxiprofileId().longValue());
 
 				if(vehicleTaxiProfile == null || vehicleTaxiProfile.getDeleteDate() != null){
@@ -1603,14 +1608,11 @@ public class DeviceServiceImpl extends RestServiceController implements DeviceSe
 					logger.info("************************ getDeviceTaxiProfile ENDED ***************************");
 					return ResponseEntity.status(404).body(getObjectResponse);
 				} else {
-					List<TaxiProfileListSelect> taxiProfileListSelect = new ArrayList<>();
-					TaxiProfileListSelect taxiProfile = TaxiProfileListSelect.builder()
-							.id(vehicleTaxiProfile.getId())
-							.name(vehicleTaxiProfile.getName())
-							.build();
-					taxiProfileListSelect.add(taxiProfile);
+					List<TaxiProfile> taxiProfile = new ArrayList<>();
 
-					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",taxiProfileListSelect);
+					taxiProfile.add(vehicleTaxiProfile);
+
+					getObjectResponse = new GetObjectResponse(HttpStatus.OK.value(), "success",taxiProfile);
 					logger.info("************************ getDeviceTaxiProfile ENDED ***************************");
 					return ResponseEntity.ok().body(getObjectResponse);
 				}
