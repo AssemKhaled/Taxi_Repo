@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 
+import com.example.examplequerydslspringdatajpamaven.responses.DriversDataInDeviceTable;
 import org.bson.types.ObjectId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -293,5 +294,16 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>{
 	@Query(value = "SELECT tc_devices.driver_last_location_id FROM tc_devices"
 			+ " WHERE tc_devices.user_id IN(:userIds) AND tc_devices.driver_last_location_id is not null", nativeQuery = true)
 	List<String> getDriversLastLocationIdByUserIds(@Param("userIds") List<Long> userIds);
+
+	@Query(value = "SELECT tc_devices.driverId, tc_devices.driver_last_location_id, tc_devices.name FROM tc_devices "
+			+ " INNER JOIN tc_drivers ON tc_devices.driverId = tc_drivers.id"
+			+ " WHERE tc_devices.user_id IN(:userIds)  AND tc_devices.driver_last_location_id is not null " +
+			"And tc_drivers.delete_date is null" +
+			" AND ((tc_devices.name LIKE LOWER(CONCAT('%',:search, '%'))) OR (tc_drivers.name LIKE LOWER(CONCAT('%',:search, '%')))) LIMIT :offset,10", nativeQuery = true)
+	List<DriversDataInDeviceTable> getDriversDataByUserIds(@Param("userIds") List<Long> userIds, @Param("offset") int offset, @Param("search") String search);
+
+	@Query(value = "SELECT count(tc_devices.driverId) FROM tc_devices INNER JOIN tc_drivers ON tc_devices.driverId = tc_drivers.id " +
+			"WHERE tc_devices.user_id IN(:userIds) And tc_drivers.delete_date is null",nativeQuery = true )
+	Integer getTotalNumberOfDriversForUsers(@Param("userIds")List<Long> userIds);
 }
 
