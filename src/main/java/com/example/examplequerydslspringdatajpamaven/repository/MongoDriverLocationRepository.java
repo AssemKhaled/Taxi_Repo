@@ -11,4 +11,9 @@ public interface MongoDriverLocationRepository extends MongoRepository<MongoDriv
 
     List<MongoDriverLocation> findBy_idInAndServerTimeBetweenAndTripIdIsNull(List<String> driverLastLocationId, Date time3MinutesEarlier, Date now);
     List<MongoDriverLocation> findBy_idInAndServerTimeBetweenAndTripIdIsNotNull(List<String> driverLastLocationId, Date time3MinutesEarlier, Date now);
+
+    Integer countAllBy_idInAndServerTimeBetweenAndTripIdIsNull(List<String> driverLastLocationId, Date time3MinutesEarlier, Date now);
+    Integer countAllBy_idInAndServerTimeBetweenAndTripIdIsNotNull(List<String> driverLastLocationId, Date time3MinutesEarlier, Date now);
+
+    List<MongoDriverLocation> findBy_idInOrderByServerTimeDesc(List<ObjectId> driverLastLocationId);
 }

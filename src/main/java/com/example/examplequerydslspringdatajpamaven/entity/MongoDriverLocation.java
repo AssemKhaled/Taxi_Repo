@@ -70,12 +70,16 @@ public class MongoDriverLocation {
     private Double waitingCost;
 
     @Field("number_of_passengers")
-    private Double numberOfPassengers;
+    private Integer numberOfPassengers;
+
+
+    @Field("driver_name")
+    private String driverName;
 
     public MongoDriverLocation(ObjectId _id, Long id, Long driverId, String driverLat, String driverLong, String tripId, String locationTime,
                                Date serverTime, Double speed, String address, Double weight, String vehicleStatus, Boolean driverEmergencyButtonStatus,
                                Boolean passengerEmergencyButtonStatus, Double currentTripCost, Double distance, String duration, Double distanceCost,
-                               Double waitingCost, Double numberOfPassengers) {
+                               Double waitingCost, Integer numberOfPassengers) {
         this._id = _id;
         this.id = id;
         this.driverId = driverId;
@@ -250,13 +254,24 @@ public class MongoDriverLocation {
         this.waitingCost = waitingCost;
     }
 
-    public Double getNumberOfPassengers() {
+    public Integer getNumberOfPassengers() {
         return numberOfPassengers;
     }
 
-    public void setNumberOfPassengers(Double numberOfPassengers) {
+    public void setNumberOfPassengers(Integer numberOfPassengers) {
         this.numberOfPassengers = numberOfPassengers;
     }
 
+    public void setWeight(Double weight) {
+        this.weight = weight;
+    }
+
+    public String getDriverName() {
+        return driverName;
+    }
+
+    public void setDriverName(String driverName) {
+        this.driverName = driverName;
+    }
 
 }
