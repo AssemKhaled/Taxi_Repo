@@ -14,5 +14,7 @@ public class DashboardDriversStatistics {
 
     private List<MongoDriverLocation> mongoDriverLocationsIdle;
     private List<MongoDriverLocation> mongoDriverLocationsOnTrip;
+    private Integer numberOfIdleDriver;
+    private Integer numberOfDriverOnTrip;
 
 }
