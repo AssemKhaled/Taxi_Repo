@@ -430,36 +430,37 @@ public class DashboardServiceImpl  extends RestServiceController implements Dash
         return ResponseEntity.ok().body(getObjectResponse);
     }
 
-//    public ResponseEntity<?> checkUserValidation(String TOKEN, Long userId){
-//        logger.info("************************ getDashboardDriversLiveDataTable STARTED ***************************");
-//        if(TOKEN.equals("")) {
-//            List<Device> devices = null;
-//            getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
-//            return  ResponseEntity.badRequest().body(getObjectResponse);
-//        }
-//
-//        ResponseEntity<?> tokenCheckerResponse = super.checkActive(TOKEN);
-//
-//        if(tokenCheckerResponse!= null)
-//        {
-//            return tokenCheckerResponse;
-//        }
-//
-//        if(userId.equals(0)){
-//            List<Device> statistics = null;
-//            getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is required",statistics);
-//            logger.info("************************ getDashboardDriversLiveDataTable ENDED ***************************");
-//            return ResponseEntity.badRequest().body(getObjectResponse);
-//        }
-//
-//        User loggedUser = userService.findById(userId);
-//        if(loggedUser == null) {
-//            List<Device> statistics = null;
-//            getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Logged user is not found",statistics);
-//            logger.info("************************ getDashboardDriversLiveDataTable ENDED ***************************");
-//            return ResponseEntity.status(404).body(getObjectResponse);
-//        }
-//    }
+    public ResponseEntity<?> checkUserValidation(String TOKEN, Long userId, String apiTitle){
+        logger.info("************************" + apiTitle + "  STARTED ***************************");
+        if(TOKEN.equals("")) {
+            List<Device> devices = null;
+            getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
+            return  ResponseEntity.badRequest().body(getObjectResponse);
+        }
+
+        ResponseEntity<?> tokenCheckerResponse = super.checkActive(TOKEN);
+
+        if(tokenCheckerResponse!= null)
+        {
+            return tokenCheckerResponse;
+        }
+
+        if(userId.equals(0)){
+            List<Device> statistics = null;
+            getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is required",statistics);
+            logger.info("************************ " + apiTitle + "  ENDED ***************************");
+            return ResponseEntity.badRequest().body(getObjectResponse);
+        }
+
+        User loggedUser = userService.findById(userId);
+        if(loggedUser == null) {
+            List<Device> statistics = null;
+            getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Logged user is not found",statistics);
+            logger.info("************************ " + apiTitle + "  ENDED ***************************");
+            return ResponseEntity.status(404).body(getObjectResponse);
+        }
+        return ResponseEntity.ok(200);
+    }
 
     public static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit)
     {
