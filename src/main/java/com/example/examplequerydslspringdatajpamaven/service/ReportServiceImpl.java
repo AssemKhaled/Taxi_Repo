@@ -1,18 +1,16 @@
 package com.example.examplequerydslspringdatajpamaven.service;
 
 import java.nio.charset.Charset;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import com.example.examplequerydslspringdatajpamaven.repository.*;
+import com.example.examplequerydslspringdatajpamaven.responses.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
@@ -43,15 +41,6 @@ import com.example.examplequerydslspringdatajpamaven.entity.SummaryReport;
 import com.example.examplequerydslspringdatajpamaven.entity.TripPositions;
 import com.example.examplequerydslspringdatajpamaven.entity.TripReport;
 import com.example.examplequerydslspringdatajpamaven.entity.User;
-import com.example.examplequerydslspringdatajpamaven.repository.DeviceRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.DriverRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.GroupRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.MongoEventsRepo;
-import com.example.examplequerydslspringdatajpamaven.repository.MongoPositionRepo;
-import com.example.examplequerydslspringdatajpamaven.repository.UserClientDeviceRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.UserClientDriverRepository;
-import com.example.examplequerydslspringdatajpamaven.repository.UserClientGroupRepository;
-import com.example.examplequerydslspringdatajpamaven.responses.GetObjectResponse;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -119,6 +108,9 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	
 	@Autowired
 	private MongoPositionRepo mongoPositionRepo;
+
+	@Autowired
+	private TripDetailsRepository tripDetailsRepository;
 
     public ReportServiceImpl() {
     }
@@ -6580,7 +6572,200 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			logger.info("************************ getSensorsReport ENDED ***************************");
 			return  ResponseEntity.ok().body(getObjectResponse);
 	}
-	
-	
 
+	public ResponseEntity<?> getIncomeSummaryReport(String TOKEN, String start, String end, Long userId){
+		ResponseEntity responseEntity = checkUserValidation(TOKEN, userId, "getIncomeSummaryReport");
+
+		if(!Objects.equals(responseEntity.getStatusCodeValue(),200)){
+			return responseEntity;
+		}
+
+		User loggedUser = userServiceImpl.findById(userId);
+
+		List<Long> userIds = new ArrayList<>();
+		if(loggedUser.getAccountType().equals(4)) {
+			userIds.add(userId);
+		}
+		else {
+			List<User>childernUsers = userServiceImpl.getAllChildernOfUser(userId);
+			if(childernUsers.isEmpty()) {
+				userIds.add(userId);
+			}
+			else {
+				userIds.add(loggedUser.getId());
+				for(User object : childernUsers) {
+					userIds.add(object.getId());
+				}
+			}
+		}
+
+		Double totalCostOfTripsWithCashPayment = 0.0;
+		Double totalCostOfTripsWithCreditPayment = 0.0;
+		Double netProfit = 0.0;
+
+		List<Integer> driversIds = driverRepository.getDriversByUsersIds(userIds);
+		List<Long> driverIdsLong = new ArrayList<>();
+
+		for(Integer i: driversIds){
+			driverIdsLong.add(i.longValue());
+		}
+
+		LocalDateTime startDateAt = null;
+		LocalDateTime endDateAt = null;
+		Date dateFrom;
+		Date dateTo;
+		if(start.equals("") || end.equals("") || start ==null || end ==null) {
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",null);
+			logger.info("************************ getIncomeSummaryReport ENDED ***************************");
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		else{
+			startDateAt = LocalDateTime.parse(start);
+			endDateAt = LocalDateTime.parse(end);
+
+			dateFrom = Timestamp.valueOf(startDateAt);
+			dateTo = Timestamp.valueOf(endDateAt);
+		}
+
+		List<IncomeSummaryReportTotals> incomeSummaryReportTotals = tripDetailsRepository.incomeSummaryStatistics(driverIdsLong, dateFrom, dateTo);
+		totalCostOfTripsWithCashPayment = tripDetailsRepository.totalCostByPaymentMethod(driverIdsLong,0, dateFrom, dateTo);
+		totalCostOfTripsWithCreditPayment = tripDetailsRepository.totalCostByPaymentMethod(driverIdsLong, 1, dateFrom, dateTo);
+
+		if(incomeSummaryReportTotals.get(0) != null){
+			if(incomeSummaryReportTotals.get(0).getTotalIncome() != null && incomeSummaryReportTotals.get(0).getTotalVat() != null){
+				netProfit = incomeSummaryReportTotals.get(0).getTotalIncome() - incomeSummaryReportTotals.get(0).getTotalVat();
+			}
+			else if(incomeSummaryReportTotals.get(0).getTotalIncome() != null && incomeSummaryReportTotals.get(0).getTotalVat() == null){
+				netProfit = incomeSummaryReportTotals.get(0).getTotalIncome();
+			}
+		}
+
+		List<IncomeSummaryStatisticsResponse> incomeSummaryStatisticsResponseList = new ArrayList<>();
+		IncomeSummaryStatisticsResponse incomeSummaryStatisticsResponse = IncomeSummaryStatisticsResponse.builder()
+				.totalIncome(incomeSummaryReportTotals.get(0).getTotalIncome() != null? incomeSummaryReportTotals.get(0).getTotalIncome(): 0.0)
+				.totalVat(incomeSummaryReportTotals.get(0).getTotalVat() != null? incomeSummaryReportTotals.get(0).getTotalVat(): 0.0)
+				.totalNumberOfTrips(incomeSummaryReportTotals.get(0).getTotalNumberOfTrips())
+				.totalCash(totalCostOfTripsWithCashPayment != null? totalCostOfTripsWithCashPayment: 0.0)
+				.totalCredit(totalCostOfTripsWithCreditPayment!= null? totalCostOfTripsWithCreditPayment: 0.0)
+				.netProfit(netProfit)
+				.build();
+
+		incomeSummaryStatisticsResponseList.add(incomeSummaryStatisticsResponse);
+
+		getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",incomeSummaryStatisticsResponseList);
+		logger.info("************************ getIncomeSummaryReport ENDED ***************************");
+		return  ResponseEntity.ok().body(getObjectResponse);
+	}
+
+	public ResponseEntity<?> getIncomeSummaryChart(String TOKEN, String start, String end, Long userId, String filterBy){
+
+		ResponseEntity responseEntity = checkUserValidation(TOKEN, userId, "getIncomeSummaryChart");
+
+		if(!Objects.equals(responseEntity.getStatusCodeValue(),200)){
+			return responseEntity;
+		}
+
+		User loggedUser = userServiceImpl.findById(userId);
+
+		List<Long> userIds = new ArrayList<>();
+		if(loggedUser.getAccountType().equals(4)) {
+			userIds.add(userId);
+		}
+		else {
+			List<User>childernUsers = userServiceImpl.getAllChildernOfUser(userId);
+			if(childernUsers.isEmpty()) {
+				userIds.add(userId);
+			}
+			else {
+				userIds.add(loggedUser.getId());
+				for(User object : childernUsers) {
+					userIds.add(object.getId());
+				}
+			}
+		}
+
+		List<Integer> driversIds = driverRepository.getDriversByUsersIds(userIds);
+		List<Long> driverIdsLong = new ArrayList<>();
+
+		List<IncomeSummaryStatisticsPerDriverOrVehicleChart> incomeSummaryReportPerDriverOrVehicleChart = new ArrayList<>();
+		List<IncomeSummaryStatisticsPerDayChart> incomeSummaryReportChartPerDay = new ArrayList<>();
+
+		for(Integer i: driversIds){
+			driverIdsLong.add(i.longValue());
+		}
+
+		LocalDateTime startDateAt = null;
+		LocalDateTime endDateAt = null;
+		Date dateFrom;
+		Date dateTo;
+		if(start.equals("") || end.equals("") || start ==null || end ==null) {
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",null);
+			logger.info("************************ getIncomeSummaryChart ENDED ***************************");
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		else{
+			startDateAt = LocalDateTime.parse(start);
+			endDateAt = LocalDateTime.parse(end);
+
+			dateFrom = Timestamp.valueOf(startDateAt);
+			dateTo = Timestamp.valueOf(endDateAt);
+		}
+
+		switch (filterBy){
+			case "day":
+				incomeSummaryReportChartPerDay = tripDetailsRepository.incomeSummaryStatisticsChartsPerDay(driverIdsLong, dateFrom, dateTo);
+
+				getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",incomeSummaryReportChartPerDay);
+				logger.info("************************ getIncomeSummaryReport ENDED ***************************");
+				return  ResponseEntity.ok().body(getObjectResponse);
+			case "driver":
+				incomeSummaryReportPerDriverOrVehicleChart = tripDetailsRepository.incomeSummaryStatisticsChartsPerDriver(driverIdsLong, dateFrom, dateTo);
+
+				getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",incomeSummaryReportPerDriverOrVehicleChart);
+				logger.info("************************ getIncomeSummaryReport ENDED ***************************");
+				return  ResponseEntity.ok().body(getObjectResponse);
+			case "device":
+				incomeSummaryReportPerDriverOrVehicleChart = tripDetailsRepository.incomeSummaryStatisticsChartsPerDevice(driverIdsLong, dateFrom, dateTo);
+
+				getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",incomeSummaryReportPerDriverOrVehicleChart);
+				logger.info("************************ getIncomeSummaryReport ENDED ***************************");
+				return  ResponseEntity.ok().body(getObjectResponse);
+			default:
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "You need to send a filter",null);
+				logger.info("************************ getIncomeSummaryChart ENDED ***************************");
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+	}
+
+	public ResponseEntity<?> checkUserValidation(String TOKEN, Long userId, String apiTitle){
+		logger.info("************************" + apiTitle + "  STARTED ***************************");
+		if(TOKEN.equals("")) {
+			List<Device> devices = null;
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",devices);
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+
+		ResponseEntity<?> tokenCheckerResponse = super.checkActive(TOKEN);
+
+		if(tokenCheckerResponse!= null)
+		{
+			return tokenCheckerResponse;
+		}
+
+		if(userId.equals(0)){
+			List<Device> statistics = null;
+			getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "User ID is required",statistics);
+			logger.info("************************ " + apiTitle + "  ENDED ***************************");
+			return ResponseEntity.badRequest().body(getObjectResponse);
+		}
+
+		User loggedUser = userServiceImpl.findById(userId);
+		if(loggedUser == null) {
+			List<Device> statistics = null;
+			getObjectResponse = new GetObjectResponse(HttpStatus.NOT_FOUND.value(), "Logged user is not found",statistics);
+			logger.info("************************ " + apiTitle + "  ENDED ***************************");
+			return ResponseEntity.status(404).body(getObjectResponse);
+		}
+		return ResponseEntity.ok(200);
+	}
 }

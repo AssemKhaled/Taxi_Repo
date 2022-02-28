@@ -1,5 +1,6 @@
 package com.example.examplequerydslspringdatajpamaven.service;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -45,7 +46,11 @@ public interface ReportService {
 
 	public ResponseEntity<?> getviewTrip(String TOKEN,Long deviceId,String startTime,String endTime);
 
-	public ResponseEntity<?> getVehicleTempHum(String TOKEN,Long [] deviceId,Long [] groupId,int offset,String start,String end,String search,Long userId,String exportData);	
+	public ResponseEntity<?> getVehicleTempHum(String TOKEN,Long [] deviceId,Long [] groupId,int offset,String start,String end,String search,Long userId,String exportData);
+
+	ResponseEntity<?> getIncomeSummaryReport(String TOKEN, String start, String end, Long userId);
+
+	ResponseEntity<?> getIncomeSummaryChart(String TOKEN, String start, String end, Long userId, String filterBy);
 
 
 }
