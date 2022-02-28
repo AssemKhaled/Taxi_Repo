@@ -17,7 +17,7 @@ import com.example.examplequerydslspringdatajpamaven.service.ReportServiceImpl;
  * @author fuinco
  *
  */
-//@RestController
+@RestController
 @RequestMapping(path = "/reports")
 @CrossOrigin
 public class ReportRestController {
@@ -331,6 +331,23 @@ public class ReportRestController {
 	
     	return  reportServiceImpl.getVehicleTempHum(TOKEN,deviceId,groupId, offset, start, end,search,userId,exportData);
 
+	}
+
+	@RequestMapping(value = "/getIncomeSummaryReport", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getIncomeSummaryReport(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+																  @RequestParam (value = "start", defaultValue = "") String start,
+																  @RequestParam (value = "end", defaultValue = "") String end,
+																  @RequestParam (value = "userId",defaultValue = "0")Long userId){
+		return reportServiceImpl.getIncomeSummaryReport(TOKEN, start, end, userId);
+	}
+
+	@RequestMapping(value = "/getIncomeSummaryChart", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getIncomeSummaryChart(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+																 @RequestParam (value = "start", defaultValue = "") String start,
+																 @RequestParam (value = "end", defaultValue = "") String end,
+																 @RequestParam (value = "filterBy", defaultValue = "") String filterBy,
+																 @RequestParam (value = "userId",defaultValue = "0")Long userId){
+		return reportServiceImpl.getIncomeSummaryChart(TOKEN, start, end, userId, filterBy);
 	}
 
 
