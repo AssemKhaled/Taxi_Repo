@@ -291,6 +291,8 @@ public interface DeviceRepository extends  JpaRepository<Device, Long>{
 
 	List<Device> findByTaxiprofileId(Integer taxiProfileId);
 
+	Device findByDriverId(Long driverId);
+
 	@Query(value = "SELECT tc_devices.driver_last_location_id FROM tc_devices"
 			+ " WHERE tc_devices.user_id IN(:userIds) AND tc_devices.driver_last_location_id is not null", nativeQuery = true)
 	List<String> getDriversLastLocationIdByUserIds(@Param("userIds") List<Long> userIds);

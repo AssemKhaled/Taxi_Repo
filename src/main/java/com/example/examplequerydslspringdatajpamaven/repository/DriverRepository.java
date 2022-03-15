@@ -1,6 +1,8 @@
 package com.example.examplequerydslspringdatajpamaven.repository;
 
 import java.util.List;
+
+import com.example.examplequerydslspringdatajpamaven.responses.DriverAndVehicles;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -148,4 +150,14 @@ public interface DriverRepository extends JpaRepository<Driver, Long> {
 	@Query(value = "SELECT tc_drivers.id FROM tc_drivers"
 			+ " WHERE tc_drivers.companyId IN(:userIds) AND tc_drivers.delete_date is null", nativeQuery = true)
 	List<Integer> getDriversByUsersIds(@Param("userIds") List<Long> userIds);
+
+	@Query(value = "SELECT tc_drivers.id FROM tc_drivers"
+			+ " WHERE tc_drivers.companyId IN(:userIds) AND tc_drivers.delete_date is null", nativeQuery = true)
+	List<Long> getDriversByUsersIdsLong(@Param("userIds") List<Long> userIds);
+
+	@Query(value = "SELECt  tc_drivers.name AS DriverName, tc_drivers.id AS Id, tc_devices.name AS VehicleName FROM tc_drivers" +
+			" INNER JOIN tc_devices ON tc_devices.driverId = tc_drivers.id" +
+			" INNER Join tc_device_driver ON tc_drivers.id = tc_device_driver.driverid" +
+			" WHERE tc_drivers.companyId IN(:userIds) AND tc_drivers.delete_date is null ", nativeQuery = true)
+	List<DriverAndVehicles> getDriversNamesAndVehicles(@Param("userIds") List<Long> userIds);
 }
