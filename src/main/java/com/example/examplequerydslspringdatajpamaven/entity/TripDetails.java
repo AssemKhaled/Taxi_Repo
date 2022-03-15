@@ -101,5 +101,8 @@ public class TripDetails {
     @Column(name = "basic_cost")
     private Long basicCost;
 
+    @Column(name = "actual_cost")
+    private Long actualCost;
+
 }
 
