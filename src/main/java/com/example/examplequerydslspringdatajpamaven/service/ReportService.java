@@ -52,5 +52,12 @@ public interface ReportService {
 
 	ResponseEntity<?> getIncomeSummaryChart(String TOKEN, String start, String end, Long userId, String filterBy);
 
+	ResponseEntity<?> getIncomeReportDetails(String TOKEN, String start, String end, Long userId, String filterBy);
+
+	ResponseEntity<?> getInvoiceReport(String TOKEN, String start, String end, Long userId, Long driverId);
+
+	ResponseEntity<?> getInvoiceTripRouteReport(String TOKEN, Long userId, String tripLocalId);
+
+
 
 }

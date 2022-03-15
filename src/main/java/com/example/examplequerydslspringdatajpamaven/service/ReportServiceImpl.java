@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import com.example.examplequerydslspringdatajpamaven.entity.*;
 import com.example.examplequerydslspringdatajpamaven.repository.*;
 import com.example.examplequerydslspringdatajpamaven.responses.*;
 import org.apache.commons.logging.Log;
@@ -27,20 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
-import com.example.examplequerydslspringdatajpamaven.entity.CustomPositions;
-import com.example.examplequerydslspringdatajpamaven.entity.Device;
-import com.example.examplequerydslspringdatajpamaven.entity.DeviceTempHum;
-import com.example.examplequerydslspringdatajpamaven.entity.DeviceWorkingHours;
-import com.example.examplequerydslspringdatajpamaven.entity.Driver;
-import com.example.examplequerydslspringdatajpamaven.entity.DriverWorkingHours;
-import com.example.examplequerydslspringdatajpamaven.entity.EventReport;
-import com.example.examplequerydslspringdatajpamaven.entity.EventReportByCurl;
-import com.example.examplequerydslspringdatajpamaven.entity.Group;
-import com.example.examplequerydslspringdatajpamaven.entity.StopReport;
-import com.example.examplequerydslspringdatajpamaven.entity.SummaryReport;
-import com.example.examplequerydslspringdatajpamaven.entity.TripPositions;
-import com.example.examplequerydslspringdatajpamaven.entity.TripReport;
-import com.example.examplequerydslspringdatajpamaven.entity.User;
 import com.example.examplequerydslspringdatajpamaven.rest.RestServiceController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -112,8 +99,11 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	@Autowired
 	private TripDetailsRepository tripDetailsRepository;
 
-    public ReportServiceImpl() {
-    }
+	private final MongoDriverLocationRepository mongoDriverLocationRepository;
+
+    public ReportServiceImpl(MongoDriverLocationRepository mongoDriverLocationRepository) {
+		this.mongoDriverLocationRepository = mongoDriverLocationRepository;
+	}
 
 
     /**
@@ -6573,6 +6563,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			return  ResponseEntity.ok().body(getObjectResponse);
 	}
 
+	@Override
 	public ResponseEntity<?> getIncomeSummaryReport(String TOKEN, String start, String end, Long userId){
 		ResponseEntity responseEntity = checkUserValidation(TOKEN, userId, "getIncomeSummaryReport");
 
@@ -6657,6 +6648,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 		return  ResponseEntity.ok().body(getObjectResponse);
 	}
 
+	@Override
 	public ResponseEntity<?> getIncomeSummaryChart(String TOKEN, String start, String end, Long userId, String filterBy){
 
 		ResponseEntity responseEntity = checkUserValidation(TOKEN, userId, "getIncomeSummaryChart");
@@ -6735,6 +6727,258 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				logger.info("************************ getIncomeSummaryChart ENDED ***************************");
 				return  ResponseEntity.badRequest().body(getObjectResponse);
 		}
+	}
+
+	@Override
+	public ResponseEntity<?> getIncomeReportDetails(String TOKEN, String start, String end, Long userId, String filterBy){
+		ResponseEntity responseEntity = checkUserValidation(TOKEN, userId, "getIncomeReportDetails");
+
+		if(!Objects.equals(responseEntity.getStatusCodeValue(),200)){
+			return responseEntity;
+		}
+
+		User loggedUser = userServiceImpl.findById(userId);
+
+		List<Long> userIds = new ArrayList<>();
+		if(loggedUser.getAccountType().equals(4)) {
+			userIds.add(userId);
+		}
+		else {
+			List<User>childernUsers = userServiceImpl.getAllChildernOfUser(userId);
+			if(childernUsers.isEmpty()) {
+				userIds.add(userId);
+			}
+			else {
+				userIds.add(loggedUser.getId());
+				for(User object : childernUsers) {
+					userIds.add(object.getId());
+				}
+			}
+		}
+
+		List<Integer> driversIds = driverRepository.getDriversByUsersIds(userIds);
+		List<Long> driverIdsLong = new ArrayList<>();
+		List<IncomeReportDetailsPerDay> incomeReportDetailsPerDay = new ArrayList<>();
+		List<IncomeReportDetailsPerDriverOrVehicle> incomeReportDetailsPerDriverOrVehicle = new ArrayList<>();
+
+
+
+		for(Integer i: driversIds){
+			driverIdsLong.add(i.longValue());
+		}
+
+		LocalDateTime startDateAt = null;
+		LocalDateTime endDateAt = null;
+		Date dateFrom;
+		Date dateTo;
+		if(start.equals("") || end.equals("") || start ==null || end ==null) {
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",null);
+			logger.info("************************ getIncomeReportDetails ENDED ***************************");
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		else{
+			startDateAt = LocalDateTime.parse(start);
+			endDateAt = LocalDateTime.parse(end);
+
+			dateFrom = Timestamp.valueOf(startDateAt);
+			dateTo = Timestamp.valueOf(endDateAt);
+		}
+
+		switch (filterBy){
+			case "driver":
+				incomeReportDetailsPerDriverOrVehicle = tripDetailsRepository.incomeReportDetailsPerDriver(driverIdsLong, dateFrom, dateTo);
+
+				getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",incomeReportDetailsPerDriverOrVehicle);
+				logger.info("************************ getIncomeReportDetails ENDED ***************************");
+				return  ResponseEntity.ok().body(getObjectResponse);
+
+			case "day":
+				incomeReportDetailsPerDay = tripDetailsRepository.incomeReportDetailsPerDay(driverIdsLong, dateFrom, dateTo);
+
+				getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",incomeReportDetailsPerDay);
+				logger.info("************************ getIncomeReportDetails ENDED ***************************");
+				return  ResponseEntity.ok().body(getObjectResponse);
+
+			case "device":
+				incomeReportDetailsPerDriverOrVehicle = tripDetailsRepository.incomeReportDetailsPerDevice(driverIdsLong, dateFrom, dateTo);
+
+				getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",incomeReportDetailsPerDriverOrVehicle);
+				logger.info("************************ getIncomeReportDetails ENDED ***************************");
+				return  ResponseEntity.ok().body(getObjectResponse);
+
+			default:
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "You need to send a filter",null);
+				logger.info("************************ getIncomeReportDetails ENDED ***************************");
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+	}
+
+	@Override
+	public ResponseEntity<?> getInvoiceReport(String TOKEN, String start, String end, Long userId, Long driverId){
+		ResponseEntity responseEntity = checkUserValidation(TOKEN, userId, "getInvoiceReport");
+
+		if(!Objects.equals(responseEntity.getStatusCodeValue(),200)){
+			return responseEntity;
+		}
+
+		User loggedUser = userServiceImpl.findById(userId);
+
+		List<Long> userIds = new ArrayList<>();
+		if(loggedUser.getAccountType().equals(4)) {
+			userIds.add(userId);
+		}
+		else {
+			List<User>childernUsers = userServiceImpl.getAllChildernOfUser(userId);
+			if(childernUsers.isEmpty()) {
+				userIds.add(userId);
+			}
+			else {
+				userIds.add(loggedUser.getId());
+				for(User object : childernUsers) {
+					userIds.add(object.getId());
+				}
+			}
+		}
+
+		List<Long> driverIdsLong = new ArrayList<>();
+		List<DriverAndVehicles> driversAndVehiclesOfUser = driverRepository.getDriversNamesAndVehicles(userIds);
+		List<TripDetails> tripDetailsList = new ArrayList<>();
+		List<TripDetailsInvoiceReportResponse> tripDetailsInvoiceReportResponseList = new ArrayList<>();
+
+		for(DriverAndVehicles driverAndVehicle: driversAndVehiclesOfUser){
+			driverIdsLong.add(driverAndVehicle.getId());
+		}
+
+		LocalDateTime startDateAt = null;
+		LocalDateTime endDateAt = null;
+		Date dateFrom;
+		Date dateTo;
+		if(start.equals("") || end.equals("") || start ==null || end ==null) {
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Date start and end is Required",null);
+			logger.info("************************ getInvoiceReport ENDED ***************************");
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+		else{
+			startDateAt = LocalDateTime.parse(start);
+			endDateAt = LocalDateTime.parse(end);
+
+			dateFrom = Timestamp.valueOf(startDateAt);
+			dateTo = Timestamp.valueOf(endDateAt);
+		}
+
+
+		if(driverId == 0){
+			tripDetailsList = tripDetailsRepository.
+					findAllByDriverIdInAndPickupDatetimeBetweenOrderByPickupDatetimeDesc(driverIdsLong, dateFrom, dateTo);
+
+			for(TripDetails tripDetails: tripDetailsList){
+				String driverName = "";
+				String vehicleName = "";
+				for(DriverAndVehicles driverAndVehicle: driversAndVehiclesOfUser){
+					if(Objects.equals(tripDetails.getDriverId(), driverAndVehicle.getId())){
+						driverName = driverAndVehicle.getDriverName();
+						vehicleName = driverAndVehicle.getVehicleName();
+					}
+				}
+
+				TripDetailsInvoiceReportResponse tripDetailsInvoice = TripDetailsInvoiceReportResponse.builder()
+						.tripId(tripDetails.getTripLocalId())
+						.driverName(driverName)
+						.vehicleName(vehicleName)
+						.actualCost(tripDetails.getActualCost())
+						.basicCost(tripDetails.getBasicCost())
+						.distance(tripDetails.getDistance())
+						.dropDateTime(tripDetails.getDropDateTime())
+						.duration(tripDetails.getDuration())
+						.paymentMethod(tripDetails.getPaymentMethod())
+						.pickupDatetime(tripDetails.getPickupDatetime())
+						.totalCost(tripDetails.getTotalCost())
+						.totalVat(tripDetails.getTotalVat())
+						.totalDistanceCost(tripDetails.getTotalDistanceCost())
+						.totalWaitingCost(tripDetails.getTotalWaitingCost())
+						.build();
+
+				tripDetailsInvoiceReportResponseList.add(tripDetailsInvoice);
+			}
+		}
+		else {
+			Driver driver = driverRepository.findOne(driverId);
+			if(driver == null || driver.getDelete_date() != null){
+				getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "this driver doesn't exist or deleted",null);
+				logger.info("************************ getInvoiceReport ENDED ***************************");
+				return  ResponseEntity.badRequest().body(getObjectResponse);
+			}
+			String driverName = driver.getName();
+			String vehicleName = deviceRepository.findByDriverId(driverId).getName();
+
+			tripDetailsList = tripDetailsRepository.
+					findAllByDriverIdAndPickupDatetimeBetweenOrderByPickupDatetimeDesc(driverId, dateFrom, dateTo);
+
+			for(TripDetails tripDetails: tripDetailsList){
+				TripDetailsInvoiceReportResponse tripDetailsInvoice = TripDetailsInvoiceReportResponse.builder()
+						.tripId(tripDetails.getTripLocalId())
+						.driverName(driverName)
+						.vehicleName(vehicleName)
+						.actualCost(tripDetails.getActualCost())
+						.basicCost(tripDetails.getBasicCost())
+						.distance(tripDetails.getDistance())
+						.dropDateTime(tripDetails.getDropDateTime())
+						.duration(tripDetails.getDuration())
+						.paymentMethod(tripDetails.getPaymentMethod())
+						.pickupDatetime(tripDetails.getPickupDatetime())
+						.totalCost(tripDetails.getTotalCost())
+						.totalVat(tripDetails.getTotalVat())
+						.totalDistanceCost(tripDetails.getTotalDistanceCost())
+						.totalWaitingCost(tripDetails.getTotalWaitingCost())
+						.build();
+
+				tripDetailsInvoiceReportResponseList.add(tripDetailsInvoice);
+			}
+		}
+
+		getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",tripDetailsInvoiceReportResponseList);
+		logger.info("************************ getIncomeReportDetails ENDED ***************************");
+		return  ResponseEntity.ok().body(getObjectResponse);
+	}
+
+	@Override
+	public ResponseEntity<?> getInvoiceTripRouteReport(String TOKEN, Long userId, String tripLocalId){
+		ResponseEntity responseEntity = checkUserValidation(TOKEN, userId, "getInvoiceReport");
+
+		if(!Objects.equals(responseEntity.getStatusCodeValue(),200)){
+			return responseEntity;
+		}
+
+		User loggedUser = userServiceImpl.findById(userId);
+
+		List<Long> userIds = new ArrayList<>();
+		if(loggedUser.getAccountType().equals(4)) {
+			userIds.add(userId);
+		}
+		else {
+			List<User>childernUsers = userServiceImpl.getAllChildernOfUser(userId);
+			if(childernUsers.isEmpty()) {
+				userIds.add(userId);
+			}
+			else {
+				userIds.add(loggedUser.getId());
+				for(User object : childernUsers) {
+					userIds.add(object.getId());
+				}
+			}
+		}
+
+		List<MongoDriverLocation> mongoDriverLocationList = mongoDriverLocationRepository.findAllByTripIdOrderByServerTimeDesc(tripLocalId);
+
+		if(mongoDriverLocationList.size() == 0){
+			getObjectResponse= new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "This trip local Id doesn't exist",null);
+			logger.info("************************ getInvoiceTripRouteReport ENDED ***************************");
+			return  ResponseEntity.badRequest().body(getObjectResponse);
+		}
+
+		getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",mongoDriverLocationList);
+		logger.info("************************ getInvoiceTripRouteReport ENDED ***************************");
+		return  ResponseEntity.ok().body(getObjectResponse);
 	}
 
 	public ResponseEntity<?> checkUserValidation(String TOKEN, Long userId, String apiTitle){

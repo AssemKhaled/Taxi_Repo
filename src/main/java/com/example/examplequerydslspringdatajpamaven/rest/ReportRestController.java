@@ -350,5 +350,29 @@ public class ReportRestController {
 		return reportServiceImpl.getIncomeSummaryChart(TOKEN, start, end, userId, filterBy);
 	}
 
+	@RequestMapping(value = "/getIncomeReportDetails", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getIncomeReportDetails(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+																 @RequestParam (value = "start", defaultValue = "") String start,
+																 @RequestParam (value = "end", defaultValue = "") String end,
+																 @RequestParam (value = "filterBy", defaultValue = "") String filterBy,
+																 @RequestParam (value = "userId",defaultValue = "0")Long userId){
+		return reportServiceImpl.getIncomeReportDetails(TOKEN, start, end, userId, filterBy);
+	}
+
+	@RequestMapping(value = "getInvoiceReport", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getInvoiceReport(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+															@RequestParam (value = "start", defaultValue = "") String start,
+															@RequestParam (value = "end", defaultValue = "") String end,
+															@RequestParam (value = "userId",defaultValue = "0")Long userId,
+															@RequestParam (value = "driverId", defaultValue = "0") Long driverId){
+		return reportServiceImpl.getInvoiceReport(TOKEN, start, end, userId, driverId);
+	}
+
+	@RequestMapping(value = "getInvoiceTripRouteReport", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> getInvoiceTripRouteReport(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+															   @RequestParam (value = "userId",defaultValue = "0")Long userId,
+															   @RequestParam (value = "tripDetailsLocalId",defaultValue = "0")String tripDetailsLocalId){
+		return reportServiceImpl.getInvoiceTripRouteReport(TOKEN, userId, tripDetailsLocalId);
+	}
 
 }
