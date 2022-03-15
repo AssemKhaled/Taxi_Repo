@@ -1,6 +1,7 @@
 package com.example.examplequerydslspringdatajpamaven.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -12,6 +13,7 @@ import java.util.Date;
 public class MongoDriverLocation {
 
     @Id
+    @JsonIgnore
     private ObjectId _id;
 
     @Field("id")
@@ -42,8 +44,8 @@ public class MongoDriverLocation {
     @Field("address")
     private String address;
 
-    @Field("weight")
-    private Double weight;
+//    @Field("weight")
+//    private Double weight;
 
     @Field("vehicle_status")
     private String vehicleStatus;
@@ -77,7 +79,7 @@ public class MongoDriverLocation {
     private String driverName;
 
     public MongoDriverLocation(ObjectId _id, Long id, Long driverId, String driverLat, String driverLong, String tripId, String locationTime,
-                               Date serverTime, Double speed, String address, Double weight, String vehicleStatus, Boolean driverEmergencyButtonStatus,
+                               Date serverTime, Double speed, String address, String vehicleStatus, Boolean driverEmergencyButtonStatus,
                                Boolean passengerEmergencyButtonStatus, Double currentTripCost, Double distance, String duration, Double distanceCost,
                                Double waitingCost, Integer numberOfPassengers) {
         this._id = _id;
@@ -90,7 +92,7 @@ public class MongoDriverLocation {
         this.serverTime = serverTime;
         this.speed = speed;
         this.address = address;
-        this.weight = weight;
+//        this.weight = weight;
         this.vehicleStatus = vehicleStatus;
         this.driverEmergencyButtonStatus = driverEmergencyButtonStatus;
         this.passengerEmergencyButtonStatus = passengerEmergencyButtonStatus;
@@ -182,13 +184,13 @@ public class MongoDriverLocation {
         this.address = address;
     }
 
-    public double getWeight() {
-        return weight;
-    }
-
-    public void setWeight(double weight) {
-        this.weight = weight;
-    }
+//    public double getWeight() {
+//        return weight;
+//    }
+//
+//    public void setWeight(double weight) {
+//        this.weight = weight;
+//    }
 
     public String getVehicleStatus() {
         return vehicleStatus;
@@ -260,10 +262,6 @@ public class MongoDriverLocation {
 
     public void setNumberOfPassengers(Integer numberOfPassengers) {
         this.numberOfPassengers = numberOfPassengers;
-    }
-
-    public void setWeight(Double weight) {
-        this.weight = weight;
     }
 
     public String getDriverName() {
