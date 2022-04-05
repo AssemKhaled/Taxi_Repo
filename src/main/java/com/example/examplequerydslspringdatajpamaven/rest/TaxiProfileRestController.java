@@ -81,6 +81,13 @@ public class TaxiProfileRestController {
                                                          @RequestParam(value = "userId" , defaultValue = "0")Long userId){
         return taxiProfileServiceImpl.getTaxiProfileListForSelect(TOKEN, userId);
     }
+
+    @GetMapping(path= "/getTaxiProfileByDriverId")
+    public ResponseEntity<?> getTaxiProfileByDriverId(@RequestHeader(value = "TOKEN", defaultValue = "")String TOKEN,
+                                                      @RequestParam(value = "userId" , defaultValue = "0")Long userId,
+                                                      @RequestParam(value = "driverId", defaultValue = "0") Long driverId){
+        return taxiProfileServiceImpl.getTaxiProfileByDriverId(TOKEN, userId, driverId);
+    }
 }
 
 //    ------------------------------------Commented work--------------------------------------------------------
