@@ -468,6 +468,72 @@ public class TaxiProfileServiceImpl extends RestServiceController implements Tax
             return ResponseEntity.ok().body(getObjectResponse);
         }
     }
+
+    @Override
+    public ResponseEntity<?> getTaxiProfileByDriverId(String TOKEN, Long userId, Long driverId){
+        if(TOKEN.equals("")) {
+
+            getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "TOKEN id is required",null);
+            return  ResponseEntity.badRequest().body(getObjectResponse);
+        }
+
+        if(super.checkActive(TOKEN)!= null)
+        {
+            return super.checkActive(TOKEN);
+        }
+        if(userId == 0) {
+            getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "user Id is  Required",null);
+            logger.info("************************ getTaxiProfileByDriverId ENDED ***************************");
+            return ResponseEntity.badRequest().body(getObjectResponse);
+        }
+
+        User user = userService.findById(userId);
+        if(user == null || user.getDelete_date() != null) {
+            getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "logged user is deleted or doesn't exist",null);
+            logger.info("************************ getTaxiProfileByDriverId ENDED ***************************");
+            return ResponseEntity.badRequest().body(getObjectResponse);
+        }
+
+        List<Long>usersIds= new ArrayList<>();
+
+        if(user.getAccountType().equals(4)) {
+            usersIds.add(userId);
+        }
+        else {
+            List<User>childernUsers = userService.getAllChildernOfUser(userId);
+            if(childernUsers.isEmpty()) {
+                usersIds.add(userId);
+            }
+            else {
+                usersIds.add(user.getId());
+                for(User object : childernUsers) {
+                    usersIds.add(object.getId());
+                }
+            }
+        }
+
+        if(driverId == 0){
+            getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "Driver Id is  Required",null);
+            logger.info("************************ getTaxiProfileByDriverId ENDED ***************************");
+            return ResponseEntity.badRequest().body(getObjectResponse);
+        }
+        Device device = deviceRepository.findByDriverId(driverId);
+        List<TaxiProfile> taxiProfiles = new ArrayList<>();
+
+        if(device == null){
+            getObjectResponse = new GetObjectResponse(HttpStatus.BAD_REQUEST.value(), "This driver doesn't have a device",null);
+            logger.info("************************ getTaxiProfileByDriverId ENDED ***************************");
+            return ResponseEntity.badRequest().body(getObjectResponse);
+        }
+        if(device.getTaxiprofileId() != null){
+            TaxiProfile taxiProfile = taxiProfileRepository.findOne(device.getTaxiprofileId().longValue());
+            taxiProfiles.add(taxiProfile);
+        }
+        getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",taxiProfiles);
+        logger.info("************************ getTaxiProfileByDriverId ENDED ***************************");
+        return ResponseEntity.ok().body(getObjectResponse);
+    }
+
 }
 
 //    ----------------------------------Commented functions----------------------------------------------
