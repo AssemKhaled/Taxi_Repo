@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.example.examplequerydslspringdatajpamaven.entity.*;
+import com.example.examplequerydslspringdatajpamaven.helper.Utilities;
 import com.example.examplequerydslspringdatajpamaven.repository.*;
 import com.example.examplequerydslspringdatajpamaven.responses.*;
 import org.apache.commons.logging.Log;
@@ -18,6 +19,8 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -100,6 +103,8 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	private TripDetailsRepository tripDetailsRepository;
 
 	private final MongoDriverLocationRepository mongoDriverLocationRepository;
+
+	private final Utilities utilities = new Utilities();
 
     public ReportServiceImpl(MongoDriverLocationRepository mongoDriverLocationRepository) {
 		this.mongoDriverLocationRepository = mongoDriverLocationRepository;
@@ -1513,7 +1518,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 
 					Date date = new Date();
-					SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd"); 
+					SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 					String currentDate=formatter.format(date);
 					
 					String from = currentDate +" 00:00:01";
@@ -6730,7 +6735,8 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	}
 
 	@Override
-	public ResponseEntity<?> getIncomeReportDetails(String TOKEN, String start, String end, Long userId, String filterBy){
+	public ResponseEntity<?> getIncomeReportDetails(String TOKEN, String start, String end, Long userId, String filterBy,
+													int offset, int limit, String timeOffset){
 		ResponseEntity responseEntity = checkUserValidation(TOKEN, userId, "getIncomeReportDetails");
 
 		if(!Objects.equals(responseEntity.getStatusCodeValue(),200)){
@@ -6784,25 +6790,31 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			dateTo = Timestamp.valueOf(endDateAt);
 		}
 
+		int size = 0;
+
 		switch (filterBy){
 			case "driver":
-				incomeReportDetailsPerDriverOrVehicle = tripDetailsRepository.incomeReportDetailsPerDriver(driverIdsLong, dateFrom, dateTo);
+				incomeReportDetailsPerDriverOrVehicle = tripDetailsRepository.incomeReportDetailsPerDriver(driverIdsLong, dateFrom, dateTo, offset);
 
-				getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",incomeReportDetailsPerDriverOrVehicle);
+				size = tripDetailsRepository.sizeOfIncomeReportDetailsPerDriver(driverIdsLong, dateFrom, dateTo);
+
+				getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",incomeReportDetailsPerDriverOrVehicle, size);
 				logger.info("************************ getIncomeReportDetails ENDED ***************************");
 				return  ResponseEntity.ok().body(getObjectResponse);
 
 			case "day":
-				incomeReportDetailsPerDay = tripDetailsRepository.incomeReportDetailsPerDay(driverIdsLong, dateFrom, dateTo);
+				incomeReportDetailsPerDay = tripDetailsRepository.incomeReportDetailsPerDay(driverIdsLong, dateFrom, dateTo, offset);
+				size = tripDetailsRepository.sizeOfIncomeReportDetailsPerDay(driverIdsLong, dateFrom, dateTo);
 
-				getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",incomeReportDetailsPerDay);
+				getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",incomeReportDetailsPerDay, size);
 				logger.info("************************ getIncomeReportDetails ENDED ***************************");
 				return  ResponseEntity.ok().body(getObjectResponse);
 
 			case "device":
-				incomeReportDetailsPerDriverOrVehicle = tripDetailsRepository.incomeReportDetailsPerDevice(driverIdsLong, dateFrom, dateTo);
+				incomeReportDetailsPerDriverOrVehicle = tripDetailsRepository.incomeReportDetailsPerDevice(driverIdsLong, dateFrom, dateTo, offset);
+				size = tripDetailsRepository.sizeOfIncomeReportDetailsPerDevice(driverIdsLong, dateFrom, dateTo);
 
-				getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",incomeReportDetailsPerDriverOrVehicle);
+				getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",incomeReportDetailsPerDriverOrVehicle, size);
 				logger.info("************************ getIncomeReportDetails ENDED ***************************");
 				return  ResponseEntity.ok().body(getObjectResponse);
 
@@ -6814,7 +6826,7 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 	}
 
 	@Override
-	public ResponseEntity<?> getInvoiceReport(String TOKEN, String start, String end, Long userId, Long driverId){
+	public ResponseEntity<?> getInvoiceReport(String TOKEN, String start, String end, Long userId, Long driverId, int offset, int limit, String timeOffset){
 		ResponseEntity responseEntity = checkUserValidation(TOKEN, userId, "getInvoiceReport");
 
 		if(!Objects.equals(responseEntity.getStatusCodeValue(),200)){
@@ -6866,10 +6878,14 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 			dateTo = Timestamp.valueOf(endDateAt);
 		}
 
+		int size = 0;
+		Pageable pageable = new PageRequest(offset,limit);
 
 		if(driverId == 0){
 			tripDetailsList = tripDetailsRepository.
-					findAllByDriverIdInAndPickupDatetimeBetweenOrderByPickupDatetimeDesc(driverIdsLong, dateFrom, dateTo);
+					findAllByDriverIdInAndPickupDatetimeBetweenOrderByPickupDatetimeDesc(driverIdsLong, dateFrom, dateTo, pageable);
+
+			size = tripDetailsRepository.countAllByDriverIdInAndPickupDatetimeBetween(driverIdsLong, dateFrom, dateTo);
 
 			for(TripDetails tripDetails: tripDetailsList){
 				String driverName = "";
@@ -6883,16 +6899,20 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 
 				TripDetailsInvoiceReportResponse tripDetailsInvoice = TripDetailsInvoiceReportResponse.builder()
 						.tripId(tripDetails.getTripLocalId())
+						.driverId(tripDetails.getDriverId())
 						.driverName(driverName)
 						.vehicleName(vehicleName)
 						.actualCost(tripDetails.getActualCost())
 						.basicCost(tripDetails.getBasicCost())
 						.distance(tripDetails.getDistance())
-						.dropDateTime(tripDetails.getDropDateTime())
+//						.dropDateTime(tripDetails.getDropDateTime())
+						.dropDateTime(utilities.timeZoneConverter(tripDetails.getDropDateTime(), timeOffset))
 						.duration(tripDetails.getDuration())
 						.paymentMethod(tripDetails.getPaymentMethod())
-						.pickupDatetime(tripDetails.getPickupDatetime())
+//						.pickupDatetime(tripDetails.getPickupDatetime())
+						.pickupDatetime(utilities.timeZoneConverter(tripDetails.getPickupDatetime(), timeOffset))
 						.totalCost(tripDetails.getTotalCost())
+						.totalWaitingTime(tripDetails.getTotalWaitingTime().toString())
 						.totalVat(tripDetails.getTotalVat())
 						.totalDistanceCost(tripDetails.getTotalDistanceCost())
 						.totalWaitingCost(tripDetails.getTotalWaitingCost())
@@ -6909,34 +6929,40 @@ public class ReportServiceImpl extends RestServiceController implements ReportSe
 				return  ResponseEntity.badRequest().body(getObjectResponse);
 			}
 			String driverName = driver.getName();
+			String driverUniqueId = driver.getUniqueid();
 			String vehicleName = deviceRepository.findByDriverId(driverId).getName();
 
 			tripDetailsList = tripDetailsRepository.
-					findAllByDriverIdAndPickupDatetimeBetweenOrderByPickupDatetimeDesc(driverId, dateFrom, dateTo);
+					findAllByDriverIdAndPickupDatetimeBetweenOrderByPickupDatetimeDesc(driverId, dateFrom, dateTo, pageable);
+
+			size = tripDetailsRepository.countAllByDriverIdAndPickupDatetimeBetween(driverId, dateFrom, dateTo);
 
 			for(TripDetails tripDetails: tripDetailsList){
 				TripDetailsInvoiceReportResponse tripDetailsInvoice = TripDetailsInvoiceReportResponse.builder()
 						.tripId(tripDetails.getTripLocalId())
+						.driverId(tripDetails.getDriverId())
 						.driverName(driverName)
+						.driverUniqueId(driverUniqueId)
 						.vehicleName(vehicleName)
 						.actualCost(tripDetails.getActualCost())
 						.basicCost(tripDetails.getBasicCost())
 						.distance(tripDetails.getDistance())
-						.dropDateTime(tripDetails.getDropDateTime())
+						.dropDateTime(utilities.timeZoneConverter(tripDetails.getDropDateTime(), timeOffset))
 						.duration(tripDetails.getDuration())
 						.paymentMethod(tripDetails.getPaymentMethod())
-						.pickupDatetime(tripDetails.getPickupDatetime())
+						.pickupDatetime(utilities.timeZoneConverter(tripDetails.getPickupDatetime(), timeOffset))
 						.totalCost(tripDetails.getTotalCost())
 						.totalVat(tripDetails.getTotalVat())
 						.totalDistanceCost(tripDetails.getTotalDistanceCost())
 						.totalWaitingCost(tripDetails.getTotalWaitingCost())
+						.totalWaitingTime(tripDetails.getTotalWaitingTime().toString())
 						.build();
 
 				tripDetailsInvoiceReportResponseList.add(tripDetailsInvoice);
 			}
 		}
 
-		getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",tripDetailsInvoiceReportResponseList);
+		getObjectResponse= new GetObjectResponse(HttpStatus.OK.value(), "success",tripDetailsInvoiceReportResponseList, size);
 		logger.info("************************ getIncomeReportDetails ENDED ***************************");
 		return  ResponseEntity.ok().body(getObjectResponse);
 	}
