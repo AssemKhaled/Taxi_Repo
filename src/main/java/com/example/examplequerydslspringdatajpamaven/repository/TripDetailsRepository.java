@@ -1,7 +1,9 @@
 package com.example.examplequerydslspringdatajpamaven.repository;
 
+import com.example.examplequerydslspringdatajpamaven.entity.CustomDeviceList;
 import com.example.examplequerydslspringdatajpamaven.entity.TripDetails;
 import com.example.examplequerydslspringdatajpamaven.responses.*;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -59,28 +61,41 @@ public interface TripDetailsRepository extends JpaRepository<TripDetails, Long> 
     List<IncomeSummaryStatisticsPerDriverOrVehicleChart> incomeSummaryStatisticsChartsPerDevice(@Param("driverIds") List<Long> driverIds,
                                                                                                 @Param("start") Date start, @Param("end") Date end);
 
-    @Query(value = "Select tc_trip_details.pickup_date AS PickupDate," +
-            " SUM(tc_trip_details.total_cost) AS TotalIncome, COUNT(*) AS TotalNumberOfTrips," +
-            " SUM(tc_trip_details.total_vat) AS TotalVat, SUM(tc_trip_details.actual_cost) AS NetProfit," +
-            " SUM(CASE WHEN tc_trip_details.payment_method = 0 THEN tc_trip_details.total_cost END ) totalCash," +
-            " SUM(CASE WHEN tc_trip_details.payment_method = 1 THEN tc_trip_details.total_cost END ) totalCredit" +
-            " FROM tc_trip_details Where tc_trip_details.driver_id IN(:driverIds)" +
-            " and tc_trip_details.pickup_date_time BETWEEN :start AND :end GROUP BY tc_trip_details.pickup_date", nativeQuery = true)
+    @Query(nativeQuery = true, name = "incomeReportDetailsPerDay")
     List<IncomeReportDetailsPerDay> incomeReportDetailsPerDay(@Param("driverIds") List<Long> driverIds,
-                                                        @Param("start") Date start, @Param("end") Date end);
+                                       @Param("start") Date start, @Param("end") Date end, @Param("offset") int offset);
 
-    @Query(value = "Select tc_trip_details.driver_id AS id , tc_drivers.name AS name," +
+
+    @Query(value = "SELECT COUNT(*) X FROM( Select tc_trip_details.pickup_date AS pickupDate, tc_trip_details.pickup_date AS filter," +
             " SUM(tc_trip_details.total_cost) AS totalIncome, COUNT(*) AS totalNumberOfTrips," +
-            " SUM(tc_trip_details.total_vat) AS totalVat, SUM(tc_trip_details.actual_cost) AS NetProfit," +
+            " SUM(tc_trip_details.total_vat) AS totalVat, SUM(tc_trip_details.actual_cost) AS netProfit," +
             " SUM(CASE WHEN tc_trip_details.payment_method = 0 THEN tc_trip_details.total_cost END ) totalCash," +
             " SUM(CASE WHEN tc_trip_details.payment_method = 1 THEN tc_trip_details.total_cost END ) totalCredit" +
-            " FROM tc_trip_details  INNER Join tc_drivers ON tc_trip_details.driver_id = tc_drivers.id" +
-            " Where tc_trip_details.driver_id IN(:driverIds)" +
-            " and tc_trip_details.pickup_date_time BETWEEN :start AND :end GROUP BY tc_trip_details.driver_id", nativeQuery = true)
-    List<IncomeReportDetailsPerDriverOrVehicle> incomeReportDetailsPerDriver(@Param("driverIds") List<Long> driverIds,
-                                                        @Param("start") Date start, @Param("end") Date end);
+            "  FROM tc_trip_details Where tc_trip_details.driver_id IN(:driverIds)" +
+            " and tc_trip_details.pickup_date_time BETWEEN :start AND :end GROUP BY tc_trip_details.pickup_date) T", nativeQuery = true)
+    Integer sizeOfIncomeReportDetailsPerDay(@Param("driverIds") List<Long> driverIds,
+                                      @Param("start") Date start, @Param("end") Date end);
 
-    @Query(value = "Select tc_devices.id AS id , tc_devices.name AS name," +
+    @Query(nativeQuery = true, name = "incomeReportDetailsPerDriver")
+    List<IncomeReportDetailsPerDriverOrVehicle> incomeReportDetailsPerDriver(@Param("driverIds") List<Long> driverIds,
+                                                              @Param("start") Date start, @Param("end") Date end, @Param("offset") int offset);
+
+    @Query(value = "SELECT COUNT(*) X FROM( Select tc_trip_details.driver_id AS id , tc_drivers.name AS name, tc_drivers.name AS filter," +
+            "  SUM(tc_trip_details.total_cost) AS totalIncome, COUNT(*) AS totalNumberOfTrips," +
+            "  SUM(tc_trip_details.total_vat) AS totalVat, SUM(tc_trip_details.actual_cost) AS NetProfit," +
+            "  SUM(CASE WHEN tc_trip_details.payment_method = 0 THEN tc_trip_details.total_cost END ) totalCash," +
+            "  SUM(CASE WHEN tc_trip_details.payment_method = 1 THEN tc_trip_details.total_cost END ) totalCredit" +
+            "  FROM tc_trip_details  INNER Join tc_drivers ON tc_trip_details.driver_id = tc_drivers.id" +
+            "  Where tc_trip_details.driver_id IN(:driverIds)" +
+            "  and tc_trip_details.pickup_date_time BETWEEN :start AND :end GROUP BY tc_trip_details.driver_id) T", nativeQuery = true)
+    Integer sizeOfIncomeReportDetailsPerDriver(@Param("driverIds") List<Long> driverIds,
+                                            @Param("start") Date start, @Param("end") Date end);
+
+    @Query(nativeQuery = true, name = "incomeReportDetailsPerDevice")
+    List<IncomeReportDetailsPerDriverOrVehicle> incomeReportDetailsPerDevice(@Param("driverIds") List<Long> driverIds,
+                                                                             @Param("start") Date start, @Param("end") Date end, @Param("offset") int offset);
+
+    @Query(value = "SELECT COUNT(*) X (Select tc_devices.id AS id , tc_devices.name AS name, tc_devices.name AS filter," +
             " SUM(tc_trip_details.total_cost) AS totalIncome, COUNT(*) AS totalNumberOfTrips," +
             " SUM(tc_trip_details.total_vat) AS totalVat, SUM(tc_trip_details.actual_cost) AS NetProfit," +
             " SUM(CASE WHEN tc_trip_details.payment_method = 0 THEN tc_trip_details.total_cost END ) totalCash," +
@@ -88,13 +103,17 @@ public interface TripDetailsRepository extends JpaRepository<TripDetails, Long> 
             " FROM tc_trip_details  INNER Join tc_devices ON tc_trip_details.driver_id = tc_devices.driverId" +
             " INNER Join tc_device_driver ON tc_trip_details.driver_id = tc_device_driver.driverid" +
             " Where tc_trip_details.driver_id IN(:driverIds)" +
-            " and tc_trip_details.pickup_date_time BETWEEN :start AND :end GROUP BY tc_devices.id", nativeQuery = true)
-    List<IncomeReportDetailsPerDriverOrVehicle> incomeReportDetailsPerDevice(@Param("driverIds") List<Long> driverIds,
-                                                                             @Param("start") Date start, @Param("end") Date end);
+            " and tc_trip_details.pickup_date_time BETWEEN :start AND :end GROUP BY tc_devices.id) T", nativeQuery = true)
+    Integer sizeOfIncomeReportDetailsPerDevice(@Param("driverIds") List<Long> driverIds,
+                                               @Param("start") Date start, @Param("end") Date end);
 
-    List<TripDetails> findAllByDriverIdInAndPickupDatetimeBetweenOrderByPickupDatetimeDesc(List<Long> driverIds, Date start, Date end);
+    List<TripDetails> findAllByDriverIdInAndPickupDatetimeBetweenOrderByPickupDatetimeDesc(List<Long> driverIds, Date start, Date end, Pageable pageable);
 
-    List<TripDetails> findAllByDriverIdAndPickupDatetimeBetweenOrderByPickupDatetimeDesc(Long driverId, Date start, Date end);
+    Integer countAllByDriverIdInAndPickupDatetimeBetween(List<Long> driverIds, Date start, Date end);
+
+    List<TripDetails> findAllByDriverIdAndPickupDatetimeBetweenOrderByPickupDatetimeDesc(Long driverId, Date start, Date end, Pageable pageable);
+
+    Integer countAllByDriverIdAndPickupDatetimeBetween(Long driverId, Date start, Date end);
 
 //    @Query(value = "Select tc_trip_details.* , tc_devices.name AS VehicleName, tc_drivers.name AS DriverName" +
 //            " FROM tc_trip_details INNER Join tc_devices ON tc_trip_details.driver_id = tc_devices.driverId" +
