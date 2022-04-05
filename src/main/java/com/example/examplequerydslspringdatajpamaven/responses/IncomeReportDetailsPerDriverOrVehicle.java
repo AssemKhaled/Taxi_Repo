@@ -1,13 +1,21 @@
 package com.example.examplequerydslspringdatajpamaven.responses;
 
-public interface IncomeReportDetailsPerDriverOrVehicle {
+import lombok.*;
 
-        Long getId();
-        String getName();
-        Double getTotalIncome();
-        Integer getTotalNumberOfTrips();
-        Double getTotalVat();
-        Double getNetProfit();
-        Double getTotalCash();
-        Double getTotalCredit();
+@AllArgsConstructor
+@Setter
+@Getter
+@NoArgsConstructor
+@Builder
+public class IncomeReportDetailsPerDriverOrVehicle {
+
+   Long Id;
+   String Name;
+   String filter;
+   Double TotalIncome;
+   Integer TotalNumberOfTrips;
+   Double TotalVat;
+   Double NetProfit;
+   Double TotalCash;
+   Double TotalCredit;
 }

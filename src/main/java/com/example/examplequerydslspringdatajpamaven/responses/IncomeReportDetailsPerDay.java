@@ -1,13 +1,24 @@
 package com.example.examplequerydslspringdatajpamaven.responses;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.*;
+
 import java.util.Date;
 
-public interface IncomeReportDetailsPerDay {
-    Date getPickupDate();
-    Double getTotalIncome();
-    Integer getTotalNumberOfTrips();
-    Double getTotalVat();
-    Double getNetProfit();
-    Double getTotalCash();
-    Double getTotalCredit();
+@AllArgsConstructor
+@Setter
+@Getter
+@NoArgsConstructor
+@Builder
+public class IncomeReportDetailsPerDay {
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    Date PickupDate;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    Date filter;
+    Double TotalIncome;
+    Integer TotalNumberOfTrips;
+    Double TotalVat;
+    Double NetProfit;
+    Double TotalCash;
+    Double TotalCredit;
 }
