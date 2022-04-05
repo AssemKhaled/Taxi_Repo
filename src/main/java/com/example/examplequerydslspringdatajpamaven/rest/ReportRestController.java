@@ -355,8 +355,11 @@ public class ReportRestController {
 																 @RequestParam (value = "start", defaultValue = "") String start,
 																 @RequestParam (value = "end", defaultValue = "") String end,
 																 @RequestParam (value = "filterBy", defaultValue = "") String filterBy,
-																 @RequestParam (value = "userId",defaultValue = "0")Long userId){
-		return reportServiceImpl.getIncomeReportDetails(TOKEN, start, end, userId, filterBy);
+																 @RequestParam (value = "userId",defaultValue = "0")Long userId,
+															     @RequestParam (value = "offset", defaultValue = "0") int offset,
+															     @RequestParam (value = "limit",defaultValue = "0")int limit,
+															     @RequestParam (value = "timeOffset", defaultValue = "") String timeOffset){
+		return reportServiceImpl.getIncomeReportDetails(TOKEN, start, end, userId, filterBy, offset, limit, timeOffset);
 	}
 
 	@RequestMapping(value = "getInvoiceReport", method = RequestMethod.GET)
@@ -364,8 +367,11 @@ public class ReportRestController {
 															@RequestParam (value = "start", defaultValue = "") String start,
 															@RequestParam (value = "end", defaultValue = "") String end,
 															@RequestParam (value = "userId",defaultValue = "0")Long userId,
-															@RequestParam (value = "driverId", defaultValue = "0") Long driverId){
-		return reportServiceImpl.getInvoiceReport(TOKEN, start, end, userId, driverId);
+															@RequestParam (value = "driverId", defaultValue = "0") Long driverId,
+															@RequestParam (value = "offset", defaultValue = "0") int offset,
+															@RequestParam (value = "limit",defaultValue = "0")int limit,
+															@RequestParam (value = "timeOffset", defaultValue = "") String timeOffset){
+		return reportServiceImpl.getInvoiceReport(TOKEN, start, end, userId, driverId, offset, limit, timeOffset);
 	}
 
 	@RequestMapping(value = "getInvoiceTripRouteReport", method = RequestMethod.GET)
